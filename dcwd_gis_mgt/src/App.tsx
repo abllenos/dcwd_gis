@@ -22,6 +22,8 @@ const App: React.FC = () => {
           <img src={logo} style={{ height: '30px', margin: '19px 0 10px 70px' }} alt="dcwd" />
           <NavBar />
         </Sider>
+
+        
         <Layout>
           <Header style={{ fontSize: '25px', background: 'white' }}>
             <span style={{ fontWeight: '400', margin: '0 0 0 0' }}> </span>
