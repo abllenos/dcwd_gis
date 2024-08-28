@@ -11,6 +11,7 @@ import AccessLevel from './components/AccessLevel';
 import Dashboard from './components/CustomerStat';
 import UserLogs from './components/UserLogs';
 import Department from './components/Department';
+import DMAInletTable from './components/DMAInlet';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -28,11 +29,13 @@ const App: React.FC = () => {
           </Header>
           <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
             <Routes>
+              <Route path="/" element={<Dashboard />} />
               <Route path="/access-level" element={<AccessLevel />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/userlogs" element={<UserLogs />} />
               <Route path="/UserLogs" element={<UserLogs />} />
               <Route path="/department" element={<Department />} />
+              <Route path="/DMAInlet" element={<DMAInletTable />} />
             </Routes>
           </Content>
           

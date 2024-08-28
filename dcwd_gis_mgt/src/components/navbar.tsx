@@ -28,7 +28,7 @@ const items: MenuItem[] = [
       { key: '13', label: <strong>PIPE NETWORK</strong>},
       { key: '14', label: <Link to ="#">Distribution & Transmission Valve</Link>},
       { key: '15', label: <strong>DISTRICT METERING AREA</strong>},
-      { key: '16', label: <Link to ="#">DMA Inlet</Link>}
+      { key: '16', label: <Link to ="/DMAInlet">DMA Inlet</Link>}
     ]
   },
   {

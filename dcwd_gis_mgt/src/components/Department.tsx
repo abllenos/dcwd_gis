@@ -3,7 +3,7 @@ import { fetchData } from './endpoints/getDept';
 import { Table } from 'antd'
 import 'antd/dist/reset.css'
 
-// Define the structure of the department data
+
 interface Department {
   ID: number;
   Department: string;
