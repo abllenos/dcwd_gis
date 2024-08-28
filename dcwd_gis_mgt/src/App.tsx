@@ -37,10 +37,7 @@ const App: React.FC = () => {
               <Route path="/department" element={<Department />} />
               <Route path="/DMAInlet" element={<DMAInletTable />} />
             </Routes>
-          </Content>
-          
-
-          
+          </Content>              
         </Layout>
       </Layout>
     
