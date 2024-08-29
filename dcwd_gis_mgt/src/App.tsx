@@ -39,7 +39,9 @@ const App: React.FC = () => {
               <Route path="/DMAInlet" element={<DMAInletTable />} />
               <Route path="/PMS" element={<PMSTable />} />
             </Routes>
-          </Content>              
+          </Content>        
+          
+                
         </Layout>
       </Layout>
     
