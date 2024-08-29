@@ -12,6 +12,7 @@ import Dashboard from './components/CustomerStat';
 import UserLogs from './components/UserLogs';
 import Department from './components/Department';
 import DMAInletTable from './components/DMAInlet';
+import PMSTable from './components/PMS';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -36,6 +37,7 @@ const App: React.FC = () => {
               <Route path="/UserLogs" element={<UserLogs />} />
               <Route path="/department" element={<Department />} />
               <Route path="/DMAInlet" element={<DMAInletTable />} />
+              <Route path="/PMS" element={<PMSTable />} />
             </Routes>
           </Content>              
         </Layout>

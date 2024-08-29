@@ -24,7 +24,7 @@ const items: MenuItem[] = [
       { key: '9', label: <Link to ="#">Pressure Setting Valve</Link>},
       { key: '10', label: <Link to ="#">Pressure Release Valve</Link>},
       { key: '11', label: <Link to ="#">Blow Off Valve</Link>},
-      { key: '12', label: <Link to ="#">Pressure Monitoring Valve</Link>},
+      { key: '12', label: <Link to ="/PMS">Pressure Monitoring Valve</Link>},
       { key: '13', label: <strong>PIPE NETWORK</strong>},
       { key: '14', label: <Link to ="#">Distribution & Transmission Valve</Link>},
       { key: '15', label: <strong>DISTRICT METERING AREA</strong>},
