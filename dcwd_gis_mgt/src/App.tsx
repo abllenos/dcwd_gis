@@ -40,8 +40,6 @@ const App: React.FC = () => {
               <Route path="/PMS" element={<PMSTable />} />
             </Routes>
           </Content>        
-          
-                
         </Layout>
       </Layout>
     
