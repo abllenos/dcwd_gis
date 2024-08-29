@@ -22,9 +22,7 @@ const PMSList: React.FC = () => {
     const getData = async () => {
       try {
         const rawData = await fetchData();
-        console.log("API response:", rawData);
-        
-        
+        console.log("API response:", rawData);      
         if (Array.isArray(rawData)) {
           const transformedData: PMS[] = rawData.map((item: any[]) => ({
             gid: parseInt(item[0], 10),
@@ -32,8 +30,6 @@ const PMSList: React.FC = () => {
             location: item[2],
                        
           }));
-         
-
           setData(transformedData);
           setFilteredData(transformedData); 
         } else {
