@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+
+.custom-table .ant-table-thead > tr > th {
+  white-space: normal; /* Allow text to wrap */
+  word-break: break-word; /* Ensure long words break and wrap */
+  overflow: hidden; /* Prevent overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+}
+
+.custom-table .ant-table-cell {
+  padding: 8px; /* Adjust padding for better spacing */
+}
