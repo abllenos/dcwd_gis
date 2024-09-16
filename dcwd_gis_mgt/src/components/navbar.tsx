@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbortedDeferredError, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Menu } from 'antd';
 import { Book, Box, Home, LogOut, Monitor, Settings } from 'react-feather';
 import type { MenuProps } from 'antd';
@@ -7,66 +7,62 @@ import type { MenuProps } from 'antd';
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
-
   { key: '1', icon: <Monitor />, label: <Link to="/Dashboard">Dashboard</Link> },
   {
     key: 'sub2',
-    icon: <Box/>,
+    icon: <Box />,
     label: 'Data Layers',
     children: [
-      { key: '2', label: <strong>ASSETS</strong> },
-      { key: '3', label: <Link to="#" className="menu-item-link">District Metering Area</Link> },
-      { key: '4', label: <Link to="#" className="menu-item-link">Map Viewer</Link> },
-      { key: '5', label: <strong>VALVE</strong> },
-      { key: '6', label: <Link to="#" className="menu-item-link">Air Valve</Link> },
-      { key: '7', label: <Link to="#" className="menu-item-link">Fire Hydrant</Link> },
-      { key: '8', label: <Link to="#" className="menu-item-link">Isolation Valve</Link> },
-      { key: '9', label: <Link to="#" className="menu-item-link">Pressure Setting Valve</Link> },
-      { key: '10', label: <Link to="#" className="menu-item-link">Pressure Release Valve</Link> },
-      { key: '11', label: <Link to="#" className="menu-item-link">Blow Off Valve</Link> },
-      { key: '12', label: <Link to="/PMS" className="menu-item-link">Pressure Monitoring Valve</Link> },
-      { key: '13', label: <strong>PIPE NETWORK</strong> },
-      { key: '14', label: <Link to="#" className="menu-item-link">Distribution & Transmission Valve</Link> },
-      { key: '15', label: <strong>DISTRICT METERING AREA</strong> },
-      { key: '16', label: <Link to="/DMAInlet" className="menu-item-link">DMA Inlet</Link> },
-      { key: '17', label: <strong>SEWERAGE AND SANITATION</strong> },
-      { key: '18', label: <Link to="/RTA" className="menu-item-link">Rapid Technical Assessment Program</Link> },
-    ]
+      { key: 'sub2-1', label: <strong>ASSETS</strong> },
+      { key: 'sub2-2', label: <Link to="#" className="menu-item-link">District Metering Area</Link> },
+      { key: 'sub2-3', label: <Link to="#" className="menu-item-link">Map Viewer</Link> },
+      { key: 'sub2-4', label: <strong>VALVE</strong> },
+      { key: 'sub2-5', label: <Link to="#" className="menu-item-link">Air Valve</Link> },
+      { key: 'sub2-6', label: <Link to="#" className="menu-item-link">Fire Hydrant</Link> },
+      { key: 'sub2-7', label: <Link to="#" className="menu-item-link">Isolation Valve</Link> },
+      { key: 'sub2-8', label: <Link to="#" className="menu-item-link">Pressure Setting Valve</Link> },
+      { key: 'sub2-9', label: <Link to="#" className="menu-item-link">Pressure Release Valve</Link> },
+      { key: 'sub2-10', label: <Link to="#" className="menu-item-link">Blow Off Valve</Link> },
+      { key: 'sub2-11', label: <Link to="/PMS" className="menu-item-link">Pressure Monitoring Valve</Link> },
+      { key: 'sub2-12', label: <strong>PIPE NETWORK</strong> },
+      { key: 'sub2-13', label: <Link to="#" className="menu-item-link">Distribution & Transmission Valve</Link> },
+      { key: 'sub2-14', label: <strong>DISTRICT METERING AREA</strong> },
+      { key: 'sub2-15', label: <Link to="/DMAInlet" className="menu-item-link">DMA Inlet</Link> },
+      { key: 'sub2-16', label: <strong>SEWERAGE AND SANITATION</strong> },
+      { key: 'sub2-17', label: <Link to="/RTA" className="menu-item-link">Rapid Technical Assessment Program</Link> },
+    ],
   },
   {
     key: 'sub3',
     label: 'Management',
     icon: <Book />,
     children: [
-      { key: '17', label: <Link to="/UserLogs">Logs</Link> },
-    ]
+      { key: 'sub3-1', label: <Link to="/UserLogs">Logs</Link> },
+    ],
   },
- 
   {
     key: 'sub4',
     icon: <Box />,
     label: 'System Management',
     children: [
-      { key: '18', label: <Link to="./AccessLevel">Access Level</Link> },
-      { key: '19', label: <Link to="/Department">Department</Link> },
-      { key: '20', label: <Link to="/UserList">User Accounts</Link> },
-    ]
+      { key: 'sub4-1', label: <Link to="./AccessLevel">Access Level</Link> },
+      { key: 'sub4-2', label: <Link to="/Department">Department</Link> },
+      { key: 'sub4-3', label: <Link to="/UserList">User Accounts</Link> },
+    ],
   },
-  { key: '21', icon: <Settings />, label: <Link to="/account-settings">Account Settings</Link> },
-  { key: '22', icon: <LogOut />, label: <Link to="/logout">Log Out</Link> }
-];
+  { key: '23', icon: <Settings />, label: <Link to="/account-settings">Account Settings</Link> },
+  { key: '24', icon: <LogOut />, label: <Link to="/logout">Log Out</Link>,
+}];
 
 const NavBar: React.FC = () => {
   return (
-    
-      <Menu
-        theme="light"
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['sub1']}
-        mode="inline"
-        items={items}
-      />
-    
+    <Menu
+      theme="light"
+      defaultSelectedKeys={['1']}
+      defaultOpenKeys={['sub1']}
+      mode="inline"
+      items={items}
+    />
   );
 };
 
