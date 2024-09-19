@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Statistic } from 'antd';
-import { getCustomerStat } from './endpoints/getCustomerStat'; // Ensure this path is correct
+import { getCustomerStat } from './endpoints/getCustomerStat'; 
 import CountUp from 'react-countup';
 import type { StatisticProps } from 'antd';
 import MapComponent from './mapView';
