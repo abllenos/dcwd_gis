@@ -53,7 +53,7 @@ const Dashboard: React.FC = () => {
         setRow({ val: [0, 0, 0] });
       }
     };
-
+ 
     fetchData();
   }, []);
 
