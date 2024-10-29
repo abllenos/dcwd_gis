@@ -1,20 +1,120 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
-const MapComponent: React.FC = () => {
-    const googleMapUrl = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d22398.307445712784!2d125.58314947021847!3d7.068021371569972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sph!4v1719284561486!5m2!1sen!2sph"
-    return (
-      <div style={{ margin: '30px 100px',height: '100vh', width: '95%'}}>
-        <iframe
-        width="95%"
-        height="50%"
-        src={googleMapUrl}
-        allowFullScreen
-        loading="lazy"
-        style={{border: 0}}
-        
-        />
-      </div>
-    )
+declare global {
+  interface Window {
+    google: any;
+    initMap?: () => void; 
+  }
 }
 
-export default MapComponent
+interface Coordinate {
+  lat: number;
+  lng: number;
+}
+
+interface MapComponentProps {
+  geometry: {
+    coordinates: Coordinate[];
+  } | null;
+  center?: {
+    lat: number;
+    lng: number;
+  } | null;
+}
+
+const MapComponent: React.FC<MapComponentProps> = ({ geometry, center }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<any>(null);
+
+  const loadGoogleMapsScript = () => {
+    if (document.querySelector('#google-maps-script')) {
+      if (window.google) {
+        window.initMap && window.initMap();
+      }
+      return;
+    }
+
+    const googleMapsScript = document.createElement('script');
+    googleMapsScript.id = 'google-maps-script';
+    googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyADLvGv3WeY3YCsDjWFackLgAOl7gxzGEA&callback=initMap`;
+    googleMapsScript.async = true;
+    googleMapsScript.defer = true;
+    googleMapsScript.onerror = () => console.error('Error loading Google Maps script.');
+    document.body.appendChild(googleMapsScript);
+  };
+
+  useEffect(() => {
+    window.initMap = () => {
+      if (mapRef.current) {
+        mapInstance.current = new window.google.maps.Map(mapRef.current, {
+          center: center || { lat: 7.0819, lng: 125.5105 },
+          zoom: 13,
+        });
+
+        if (geometry && geometry.coordinates.length > 0) {
+          const bounds = new window.google.maps.LatLngBounds();
+          const coords = geometry.coordinates.map(coord => new window.google.maps.LatLng(coord.lat, coord.lng));
+          
+          coords.forEach(coord => {
+            bounds.extend(coord);
+          });
+
+          const isPolygon =
+            geometry.coordinates.length > 2 &&
+            geometry.coordinates[0].lat === geometry.coordinates[geometry.coordinates.length - 1].lat &&
+            geometry.coordinates[0].lng === geometry.coordinates[geometry.coordinates.length - 1].lng;
+
+          if (isPolygon) {
+            const polygon = new window.google.maps.Polygon({
+              paths: coords,
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+              fillColor: '#FF0000',
+              fillOpacity: 0.35,
+            });
+            polygon.setMap(mapInstance.current);
+          } else if (geometry.coordinates.length === 1) { 
+            new window.google.maps.Marker({
+              position: coords[0],
+              map: mapInstance.current,
+              title: 'Single Coordinate Location',
+            });
+          } else {
+            const polyline = new window.google.maps.Polyline({
+              path: coords,
+              geodesic: true,
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+            });
+            polyline.setMap(mapInstance.current);
+          }
+
+          
+          if (coords.every(coord => !isNaN(coord.lat()) && !isNaN(coord.lng()))) {
+            mapInstance.current.fitBounds(bounds);
+          } else {
+            console.error('Invalid coordinates detected, cannot fit bounds.');
+          }
+        } else {
+          console.error('No coordinates to display on the map or geometry is null.');
+        }
+      } else {
+        console.error('Map element not found.');
+      }
+    };
+
+    loadGoogleMapsScript();
+
+    return () => {
+      window.initMap = undefined; 
+      const script = document.querySelector('#google-maps-script');
+      if (script) document.body.removeChild(script);
+    };
+  }, [geometry, center]);
+
+  return <div ref={mapRef} style={{ width: '100%', height: '800px' }} />;
+};
+
+export default MapComponent;

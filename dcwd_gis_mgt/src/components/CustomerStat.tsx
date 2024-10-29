@@ -78,8 +78,8 @@ const Dashboard: React.FC = () => {
           </Col>
         </Row>
       </div>
-      <div>
-        <MapComponent />
+      <div style ={{margin: '20px'}}>
+        <MapComponent geometry={null} />
       </div>
     </>
   );
