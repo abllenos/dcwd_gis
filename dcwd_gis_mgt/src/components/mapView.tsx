@@ -44,75 +44,76 @@ const MapComponent: React.FC<MapComponentProps> = ({ geometry, center }) => {
   };
 
   useEffect(() => {
-    window.initMap = () => {
-      if (mapRef.current) {
-        mapInstance.current = new window.google.maps.Map(mapRef.current, {
-          center: center || { lat: 7.0819, lng: 125.5105 },
-          zoom: 13,
-        });
+  window.initMap = () => {
+    if (mapRef.current) {
+      mapInstance.current = new window.google.maps.Map(mapRef.current, {
+        center: center || { lat: 7.0819, lng: 125.5105 },
+        zoom: 13,
+      });
 
-        if (geometry && geometry.coordinates.length > 0) {
-          const bounds = new window.google.maps.LatLngBounds();
-          const coords = geometry.coordinates.map(coord => new window.google.maps.LatLng(coord.lat, coord.lng));
-          
-          coords.forEach(coord => {
-            bounds.extend(coord);
-          });
+      if (geometry && geometry.coordinates.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        const validCoords = geometry.coordinates
+          .filter(coord => !isNaN(coord.lat) && !isNaN(coord.lng))  // Filter out invalid coordinates
+          .map(coord => new window.google.maps.LatLng(coord.lat, coord.lng));
 
-          const isPolygon =
-            geometry.coordinates.length > 2 &&
-            geometry.coordinates[0].lat === geometry.coordinates[geometry.coordinates.length - 1].lat &&
-            geometry.coordinates[0].lng === geometry.coordinates[geometry.coordinates.length - 1].lng;
-
-          if (isPolygon) {
-            const polygon = new window.google.maps.Polygon({
-              paths: coords,
-              strokeColor: '#FF0000',
-              strokeOpacity: 1.0,
-              strokeWeight: 2,
-              fillColor: '#FF0000',
-              fillOpacity: 0.35,
-            });
-            polygon.setMap(mapInstance.current);
-          } else if (geometry.coordinates.length === 1) { 
-            new window.google.maps.Marker({
-              position: coords[0],
-              map: mapInstance.current,
-              title: 'Single Coordinate Location',
-            });
-          } else {
-            const polyline = new window.google.maps.Polyline({
-              path: coords,
-              geodesic: true,
-              strokeColor: '#FF0000',
-              strokeOpacity: 1.0,
-              strokeWeight: 2,
-            });
-            polyline.setMap(mapInstance.current);
-          }
-
-          
-          if (coords.every(coord => !isNaN(coord.lat()) && !isNaN(coord.lng()))) {
-            mapInstance.current.fitBounds(bounds);
-          } else {
-            console.error('Invalid coordinates detected, cannot fit bounds.');
-          }
-        } else {
-          console.error('No coordinates to display on the map or geometry is null.');
+        if (validCoords.length === 0) {
+          console.error('All coordinates are invalid, cannot fit bounds.');
+          return;
         }
+
+        validCoords.forEach(coord => bounds.extend(coord));
+
+        const isPolygon =
+          validCoords.length > 2 &&
+          validCoords[0].lat() === validCoords[validCoords.length - 1].lat() &&
+          validCoords[0].lng() === validCoords[validCoords.length - 1].lng();
+
+        if (isPolygon) {
+          const polygon = new window.google.maps.Polygon({
+            paths: validCoords,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+          });
+          polygon.setMap(mapInstance.current);
+        } else if (validCoords.length === 1) {
+          new window.google.maps.Marker({
+            position: validCoords[0],
+            map: mapInstance.current,
+            title: 'Single Coordinate Location',
+          });
+        } else {
+          const polyline = new window.google.maps.Polyline({
+            path: validCoords,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+          });
+          polyline.setMap(mapInstance.current);
+        }
+
+        mapInstance.current.fitBounds(bounds);
       } else {
-        console.error('Map element not found.');
+        console.error('No coordinates to display on the map or geometry is null.');
       }
-    };
+    } else {
+      console.error('Map element not found.');
+    }
+  };
 
-    loadGoogleMapsScript();
+  loadGoogleMapsScript();
 
-    return () => {
-      window.initMap = undefined; 
-      const script = document.querySelector('#google-maps-script');
-      if (script) document.body.removeChild(script);
-    };
-  }, [geometry, center]);
+  return () => {
+    window.initMap = undefined;
+    const script = document.querySelector('#google-maps-script');
+    if (script) document.body.removeChild(script);
+  };
+}, [geometry, center]);
+
 
   return <div ref={mapRef} style={{ width: '100%', height: '800px' }} />;
 };
