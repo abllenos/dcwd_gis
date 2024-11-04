@@ -188,7 +188,7 @@ const UserLogs: React.FC = () => {
     { title: 'Layer ID', dataIndex: 'layerid', key: 'layerid' },
     { title: 'Asset ID', dataIndex: 'assetid', key: 'assetid' },
     { title: 'Modified By', dataIndex: 'modified_by', key: 'modified_by' },
-    { title: 'Access Flag', dataIndex: 'access_flg', key: 'access_flg' },
+    { title: 'Transaction Type', dataIndex: 'access_flg', key: 'access_flg', render: (value: string) => (value === '1' ? 'Geometry Alteration' : value === '2' ? 'Data Alteration' : value) },
     { title: 'Transaction DateTime', dataIndex: 'transaction_datetime', key: 'transaction_datetime' },
     { title: 'Description', dataIndex: 'description', key: 'description' },
   ];
@@ -266,7 +266,7 @@ const UserLogs: React.FC = () => {
             <p><strong>Layer ID:</strong> {selectedLog.layerid}</p>
             <p><strong>Asset ID:</strong> {selectedLog.assetid}</p>
             <p><strong>Modified By:</strong> {selectedLog.modified_by}</p>
-            <p><strong>Access Flag:</strong> {selectedLog.access_flg}</p>
+            <p><strong>Transaction Type:</strong> {selectedLog.access_flg}</p>
             <p><strong>Transaction DateTime:</strong> {selectedLog.transaction_datetime}</p>
             <p><strong>Description:</strong> {selectedLog.description}</p>
 
