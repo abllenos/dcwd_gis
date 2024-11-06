@@ -6,6 +6,17 @@ import { fetchLogs } from './endpoints/Logs';
 import { fetchGeometry } from './endpoints/Logs';
 import MapComponent from './mapView';
 
+const modifiedByMappings: Record<'002480' | '002481' | '001260' | '001782' | '000747' | '000850' | '000866' | '001779' | '001786', string> = {
+  '002480': 'AOT',
+  '002481': 'ABL',
+  '001260': 'CNC',
+  '001782': 'RDJ',
+  '000747': 'ALB',
+  '000850': 'JPA',
+  '000866': 'GPF',
+  '001779': 'RPC',
+  '001786': 'ABV',
+};
 
 interface Log {
   ID: string;
@@ -39,6 +50,8 @@ const UserLogs: React.FC = () => {
   const [geometry, setGeometryData] = useState<any>(null);
   const [isLoadingGeometry, setIsLoadingGeometry] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lng: number; lat: number } | null>(null);
+
+  
 
   useEffect(() => {
     const fetchLayerOptions = async () => {
@@ -187,11 +200,28 @@ const UserLogs: React.FC = () => {
     { title: 'ID', dataIndex: 'ID', key: 'ID' },
     { title: 'Layer ID', dataIndex: 'layerid', key: 'layerid' },
     { title: 'Asset ID', dataIndex: 'assetid', key: 'assetid' },
-    { title: 'Modified By', dataIndex: 'modified_by', key: 'modified_by' },
-    { title: 'Transaction Type', dataIndex: 'access_flg', key: 'access_flg', render: (value: string) => (value === '1' ? 'Geometry Alteration' : value === '2' ? 'Data Alteration' : value) },
+
+    { title: 'Modified By', dataIndex: 'modified_by', key: 'modified_by', 
+      render: (value: string) => 
+        (value === '002480' ? 'AOT' : 
+        value === '002481' ? 'ABL' : 
+        value === '001260' ? 'CNC' : 
+        value === '001782' ? 'RDJ' :
+        value === '000747' ? 'ALB' : 
+        value === '000850' ? 'JPA' : 
+        value === '000866' ? 'GPF' : 
+        value === '001779' ? 'RPC' : 
+        value === '001786' ? 'ABV' : 
+        value) },
+
+    { title: 'Transaction Type', dataIndex: 'access_flg', key: 'access_flg', 
+      render: (value: string) => (value === '1' ? 'Geometry Alteration' : value === '2' ? 'Data Alteration' : value ) },
+
     { title: 'Transaction DateTime', dataIndex: 'transaction_datetime', key: 'transaction_datetime' },
     { title: 'Description', dataIndex: 'description', key: 'description' },
   ];
+
+  
 
   return (
     <div>
@@ -222,6 +252,7 @@ const UserLogs: React.FC = () => {
           { value: 'assetid', label: 'Asset ID' },
           { value: 'modified_by', label: 'Modified By' },
           { value: 'access_flg', label: 'Access Flag' },
+         
         ]}
       />
 
@@ -265,7 +296,7 @@ const UserLogs: React.FC = () => {
             <p><strong>ID:</strong> {selectedLog.ID}</p>
             <p><strong>Layer ID:</strong> {selectedLog.layerid}</p>
             <p><strong>Asset ID:</strong> {selectedLog.assetid}</p>
-            <p><strong>Modified By:</strong> {selectedLog.modified_by}</p>
+            <p><strong>Modified By:</strong> {modifiedByMappings[selectedLog.modified_by as keyof typeof modifiedByMappings] || selectedLog.modified_by}</p>
             <p><strong>Transaction Type:</strong> {selectedLog.access_flg}</p>
             <p><strong>Transaction DateTime:</strong> {selectedLog.transaction_datetime}</p>
             <p><strong>Description:</strong> {selectedLog.description}</p>
