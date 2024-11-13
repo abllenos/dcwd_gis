@@ -6,7 +6,7 @@ import { fetchLogs } from './endpoints/Logs';
 import { fetchGeometry } from './endpoints/Logs';
 import MapComponent from './mapView';
 
-const modifiedByMappings: Record<'002480' | '002481' | '001260' | '001782' | '000747' | '000850' | '000866' | '001779' | '001786', string> = {
+const modifiedByMappings: Record<'002480' | '002481' | '001260' | '001782' | '000747' | '000850' | '000866' | '001779' | '001786' | '001746' | '001780', string> = {
   '002480': 'AOT',
   '002481': 'ABL',
   '001260': 'CNC',
@@ -16,6 +16,8 @@ const modifiedByMappings: Record<'002480' | '002481' | '001260' | '001782' | '00
   '000866': 'GPF',
   '001779': 'RPC',
   '001786': 'ABV',
+  '001746': 'MVC',
+  '001780': 'CBE',
 };
 
 interface Log {
@@ -212,6 +214,8 @@ const UserLogs: React.FC = () => {
         value === '000866' ? 'GPF' : 
         value === '001779' ? 'RPC' : 
         value === '001786' ? 'ABV' : 
+        value === '001746' ? 'MVC' :
+        value === '001780' ? 'CBE' :
         value) },
 
     { title: 'Transaction Type', dataIndex: 'access_flg', key: 'access_flg', 
