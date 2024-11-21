@@ -1,10 +1,7 @@
-// App.tsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 import 'leaflet/dist/leaflet.css';
-
-import { useAuth } from './AuthContext';
 import NavBar from './components/navbar';
 import logo from './assets/image/logo.png';
 import './App.css';
@@ -18,6 +15,7 @@ import PMSTable from './components/PMS';
 import RTATable from './components/RTA';
 import Login from './components/Login';
 import Logout from './components/Logout';
+import { useAuth } from './AuthContext';
 
 const { Header, Content, Sider } = Layout;
 
