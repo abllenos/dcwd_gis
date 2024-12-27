@@ -37,6 +37,7 @@ const NavBar: React.FC = () => {
     { key: 'sub2-15', label: <Link to="/DMAInlet">DMA Inlet</Link> },
     { key: 'sub2-16', label: <strong>SEWERAGE AND SANITATION</strong> },
     { key: 'sub2-17', label: <Link to="/RTA">Rapid Technical Assessment Program</Link> },
+    { key: 'sub2-18', label: <Link to="/rtaViewer">RTA Viewer</Link>}
   ];
 
   const management = [

@@ -54,7 +54,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ geometry, center }) => {
       if (geometry && geometry.coordinates.length > 0) {
         const bounds = new window.google.maps.LatLngBounds();
         const validCoords = geometry.coordinates
-          .filter(coord => !isNaN(coord.lat) && !isNaN(coord.lng))  // Filter out invalid coordinates
+          .filter(coord => !isNaN(coord.lat) && !isNaN(coord.lng))  
           .map(coord => new window.google.maps.LatLng(coord.lat, coord.lng));
 
         if (validCoords.length === 0) {

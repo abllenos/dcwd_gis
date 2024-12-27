@@ -191,7 +191,7 @@ const UserLogs: React.FC = () => {
       setIsLoadingGeometry(false);
     }
   };
-  
+
     const handleModalClose = () => {
     setIsModalVisible(false);
     setSelectedLog(null);
@@ -240,14 +240,14 @@ const UserLogs: React.FC = () => {
       </Breadcrumb>
 
       <Select
-        style={{ width: 200, margin: '20px' }}
+        style={{ width: 200, margin: '20px', cursor: 'pointer' }}
         placeholder="Select a Layer ID"
         onChange={setSelectedLayerID}
         options={layerOptions}
       />
 
       <Select
-        style={{ width: 200, margin: '20px' }}
+        style={{ width: 200, margin: '20px', cursor: 'pointer' }}
         placeholder="Select Search Field"
         value={searchField}
         onChange={setSearchField}
@@ -256,7 +256,6 @@ const UserLogs: React.FC = () => {
           { value: 'assetid', label: 'Asset ID' },
           { value: 'modified_by', label: 'Modified By' },
           { value: 'access_flg', label: 'Access Flag' },
-         
         ]}
       />
 
