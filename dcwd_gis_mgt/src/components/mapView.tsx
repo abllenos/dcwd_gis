@@ -96,6 +96,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ geometry, center }) => {
           polyline.setMap(mapInstance.current);
         }
 
+
+        
         mapInstance.current.fitBounds(bounds);
       } else {
         console.error('No coordinates to display on the map or geometry is null.');
