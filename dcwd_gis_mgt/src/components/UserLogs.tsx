@@ -300,7 +300,7 @@ const UserLogs: React.FC = () => {
             <p><strong>Layer ID:</strong> {selectedLog.layerid}</p>
             <p><strong>Asset ID:</strong> {selectedLog.assetid}</p>
             <p><strong>Modified By:</strong> {modifiedByMappings[selectedLog.modified_by as keyof typeof modifiedByMappings] || selectedLog.modified_by}</p>
-            <p><strong>Transaction Type:</strong> {selectedLog.access_flg}</p>
+            <p><strong>Transaction Type:</strong> {selectedLog.access_flg === '1' ? 'Geometry Alteration' : selectedLog.access_flg === '2' ? 'Data Alteration' : selectedLog.access_flg}</p>
             <p><strong>Transaction DateTime:</strong> {selectedLog.transaction_datetime}</p>
             <p><strong>Description:</strong> {selectedLog.description}</p>
 
