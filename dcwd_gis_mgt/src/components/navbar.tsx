@@ -42,6 +42,7 @@ const NavBar: React.FC = () => {
 
   const management = [
     { key: 'sub3-1', label: <Link to="/UserLogs">Logs</Link> },
+    { key: 'sub3-2', label: <Link to="/Employees">Employees</Link> },
   ];
 
   const systemManagement = [
