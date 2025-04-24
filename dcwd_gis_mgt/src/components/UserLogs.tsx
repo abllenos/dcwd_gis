@@ -305,7 +305,7 @@ const UserLogs: React.FC = () => {
             <p><strong>Description:</strong> {selectedLog.description}</p>
 
             {geometry && geometry.coordinates && geometry.coordinates.length > 0 && mapCenter && !isNaN(mapCenter.lat) && !isNaN(mapCenter.lng) && (
-              <MapComponent geometry={geometry} center={mapCenter} apiKey={''} />
+              <MapComponent geometry={geometry} center={mapCenter} />
             )}
            
           </div>
