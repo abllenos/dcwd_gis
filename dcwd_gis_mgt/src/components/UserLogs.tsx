@@ -229,15 +229,21 @@ const UserLogs: React.FC = () => {
 
   return (
     <div>
-      <Breadcrumb style={{ margin: '20px 20px 20px 40px' }}>
-        <Breadcrumb.Item href="/Dashboard">
-          <HomeOutlined />
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <span>Management</span>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Logs</Breadcrumb.Item>
-      </Breadcrumb>
+     <Breadcrumb
+      style={{ margin: '20px 20px 20px 40px' }}
+      items={[
+        {
+          href: '/Dashboard',
+          title: <HomeOutlined />,
+        },
+        {
+          title: 'Management',
+        },
+        {
+          title: 'Logs',
+        },
+      ]}
+    />
 
       <Select
         style={{ width: 200, margin: '20px', cursor: 'pointer' }}

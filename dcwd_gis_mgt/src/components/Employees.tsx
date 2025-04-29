@@ -68,15 +68,22 @@ const EmployeeTable: React.FC = () => {
 
   return (
     <div>
-      <Breadcrumb style={{ margin: "20px 20px 20px 40px" }}>
-        <Breadcrumb.Item href="/Dashboard">
-          <HomeOutlined />
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <span>Management</span>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Employees</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: '20px 20px 20px 40px'}}
+        items={[
+          {
+            href: '/Dashboard',
+            title: <HomeOutlined />,
+          },
+          {
+            title: 'Management'
+          },
+          {
+            title: 'Employees'
+          }
+        ]}
+      />
+      
 
       <Search 
         placeholder="Search Employee by any field" 

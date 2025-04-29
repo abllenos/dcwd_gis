@@ -83,15 +83,22 @@ const PMSList: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb style={{ margin: '20px 20px 20px 40px' }}>
-        <Breadcrumb.Item href="/Dashboard">
-          <HomeOutlined />
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <span>Data Layers</span>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>PMS</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: '20px 20px 20px 40px' }}
+        items={[
+          {
+            href: '/Dashboard',
+            title: <HomeOutlined />,
+          },
+          {
+            title: 'Data Layers',
+          },
+          {
+            title: 'PMS',
+          },
+        ]}
+      />
+
       <Card
         title="PMS"
         extra={
