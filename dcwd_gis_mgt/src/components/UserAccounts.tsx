@@ -10,9 +10,10 @@ interface DataType {
   empID: string;
   FirstName: string;
   LastName: string;
-  Username: string;
+
   AccessLevel: string;
   DeptID: string;
+  Role: string;
 }
 
 const columns: TableColumnsType<DataType> = [
@@ -29,17 +30,18 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: 'LastName',
   },
   {
-    title: 'User Name',
-    dataIndex: 'Username',
-  },
-  {
     title: 'Access Level',
     dataIndex: 'AccessLevel',
   },
   {
-    title: 'DeptID',
+    title: 'Department',
     dataIndex: 'DeptID',
   },
+  {
+    title: 'Role',
+    dataIndex: 'Role',
+  }
+
 ];
 
 const UserAccounts: React.FC = () => {
@@ -101,18 +103,18 @@ const UserAccounts: React.FC = () => {
           const [last, firstMiddle] = fullName.includes(',') ? fullName.split(',') : [fullName, ''];
           const firstName = firstMiddle?.trim() || '';
           const lastName = last.trim();
-          const username = empID; // You can change this logic if needed
           const deptID = item[3].trim();
           const accessLevel = item[4]?.trim() || '';
+          const roleDesc = item[5]?.trim() || '';
 
           return {
             key: index,
             empID,
             FirstName: firstName,
             LastName: lastName,
-            Username: username,
             AccessLevel: accessLevel,
             DeptID: deptID,
+            Role: roleDesc
           };
         });
 
@@ -133,7 +135,7 @@ const UserAccounts: React.FC = () => {
         </Breadcrumb.Item>
         <Breadcrumb.Item href="">
           <UserOutlined />
-          <span>Application List</span>
+          <span>System Management</span>
         </Breadcrumb.Item>
         <Breadcrumb.Item>User Accounts</Breadcrumb.Item>
       </Breadcrumb>
@@ -145,7 +147,7 @@ const UserAccounts: React.FC = () => {
           dataSource={data}
         />
       </Spin>
-      
+
     </div>
   );
 };
