@@ -145,6 +145,7 @@ const UserAccounts: React.FC = () => {
           dataSource={data}
         />
       </Spin>
+      
     </div>
   );
 };
