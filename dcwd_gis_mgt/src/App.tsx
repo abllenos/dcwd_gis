@@ -17,6 +17,7 @@ import Login from './components/Login';
 import Logout from './components/Logout';
 import TableList from './components/rtaViewer';
 import EmployeeTable from './components/Employees';
+import UserAccounts from './components/UserAccounts';
 import { useAuth } from './AuthContext';
 
 const { Header, Content, Sider } = Layout;
@@ -48,6 +49,7 @@ const App: React.FC = () => {
               <Route path="/PMS" element={<PrivateRoute><PMSTable /></PrivateRoute>} />
               <Route path="/RTA" element={<PrivateRoute><RTATable /></PrivateRoute>} />
               <Route path="/rtaViewer" element={<PrivateRoute><TableList /></PrivateRoute>} />
+              <Route path="/UserAccounts" element={<PrivateRoute><UserAccounts /></PrivateRoute>} />
               <Route path="/Employees" element={<PrivateRoute><EmployeeTable /></PrivateRoute>} />
             </Routes>
           </Content>

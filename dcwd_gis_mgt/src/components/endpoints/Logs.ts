@@ -4,6 +4,10 @@ const apiUserLogs = axios.create({
   baseURL: 'https://api-gis.davao-water.gov.ph/helpers/gis/api/UserLogs',
 });
 
+// const apiUserLogs = axios.create({
+//   baseURL: '192.100.140.193/gisAPI/api/logs/fetchByLayerID'
+// });
+
 // const apiGeometry = axios.create({
 //   baseURL: 'https://api-gis.davao-water.gov.ph/helpers/gis/api/UserLogs',
 // });

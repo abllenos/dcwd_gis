@@ -48,7 +48,7 @@ const NavBar: React.FC = () => {
   const systemManagement = [
     { key: 'sub4-1', label: <Link to="/AccessLevel">Access Level</Link> },
     { key: 'sub4-2', label: <Link to="/Department">Department</Link> },
-    { key: 'sub4-3', label: <Link to="/UserList">User Accounts</Link> },
+    { key: 'sub4-3', label: <Link to="/UserAccounts">User Accounts</Link> },
   ];
 
   const items: MenuItem[] = [
