@@ -10,7 +10,6 @@ interface DataType {
   empID: string;
   FirstName: string;
   LastName: string;
-
   AccessLevel: string;
   DeptID: string;
   Role: string;
@@ -41,7 +40,6 @@ const columns: TableColumnsType<DataType> = [
     title: 'Role',
     dataIndex: 'Role',
   }
-
 ];
 
 const UserAccounts: React.FC = () => {
@@ -99,11 +97,21 @@ const UserAccounts: React.FC = () => {
       .then((json) => {
         const formattedData: DataType[] = json.data.map((item: any[], index: number) => {
           const empID = item[1];
-          const fullName = item[2].trim();
-          const [last, firstMiddle] = fullName.includes(',') ? fullName.split(',') : [fullName, ''];
-          const firstName = firstMiddle?.trim() || '';
-          const lastName = last.trim();
-          const deptID = item[3].trim();
+          const fullName = item[2]?.trim() || '';
+
+          let lastName = '';
+          let firstName = '';
+
+          if (fullName.includes(',')) {
+            const [last, firstMiddle] = fullName.split(',');
+            lastName = last.trim().replace(/\s+/g, ' ');
+            firstName = firstMiddle.trim().replace(/\s+/g, ' ');
+          } else {
+            lastName = fullName.trim();
+            firstName = '';
+          }
+
+          const deptID = item[3]?.trim() || '';
           const accessLevel = item[4]?.trim() || '';
           const roleDesc = item[5]?.trim() || '';
 
@@ -147,7 +155,6 @@ const UserAccounts: React.FC = () => {
           dataSource={data}
         />
       </Spin>
-
     </div>
   );
 };
