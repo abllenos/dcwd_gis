@@ -7,6 +7,7 @@ import {
   FileTextOutlined,
   ClusterOutlined,
   FileOutlined,
+  LogoutOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
@@ -68,6 +69,11 @@ const items: MenuItem[] = [
     label: 'Settings',
     icon: <SettingOutlined />,
   },
+  {
+    key: 'logout',
+    label: 'Logout',
+    icon: <LogoutOutlined />,
+  }
 ];
 
 const App: React.FC = () => {
