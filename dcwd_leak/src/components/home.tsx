@@ -1,36 +1,81 @@
 import React from 'react';
 import { Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    Typography,
+} from "@material-tailwind/react";
+import Chart from "react-apexcharts";
+import { Square3Stack3DIcon } from "@heroicons/react/24/outline";
 
 interface DataType {
   key: string;
-  name: string;
-  age: number;
-  address: string;
+  id: string;
+  date_time_reported: string;
+  leak_type: string;
+  location: string;
+  ref_meter: string;
+  ref_no: string;
+  status: string;
   tags: string[];
+}
+
+const chartConfig = {
+    type: "bar",
+    height: 240,
+    series: [
+        {
+            name: "Tickets",
+            data: [50,40,300,320,500,350,200,230,500],
+        },
+    ],
+    options: {
+        char: {
+            toolbar: {
+                show: false,
+            },
+        },
+    }
 }
 
 const columns: TableProps<DataType>['columns'] = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
     render: (text) => <a>{text}</a>,
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'Date & Time Reported',
+    dataIndex: 'date_time_reported',
+    key: 'date_time_reported',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: 'Leak Type',
+    dataIndex: 'leak_type',
+    key: 'leak_type',
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
+    title: 'Reference Meter',
+    dataIndex: 'ref_meter',
+    key: 'ref_meter',
+  },
+  {
+    title: 'Location',
+    dataIndex: 'location',
+    key: 'location',
+  },
+  {
+    title: 'Ref No.',
+    dataIndex: 'ref_no',
+    key: 'ref_no',
+  },
+  {
+    title: 'Ticket Status',
+    key: 'status',
+    dataIndex: 'status',
     render: (_, { tags }) => (
       <>
         {tags.map((tag) => {
@@ -47,39 +92,19 @@ const columns: TableProps<DataType>['columns'] = [
       </>
     ),
   },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
 ];
 
 const data: DataType[] = [
   {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
+    key: 'id',
+    id: '12',
+    date_time_reported: 'May 13, 2025, 8:00 PM',
+    leak_type: 'SL',
+    ref_meter: '519486764J',
+    location: 'Maa',
+    ref_no: '2025010351321',
+    status: 'pending', 
+    tags: ['dispatched'],
   },
 ];
 
