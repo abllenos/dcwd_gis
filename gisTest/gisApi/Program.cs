@@ -5,7 +5,7 @@ class Program
 {
     static void Main()
     {
-        getUseraccounts gua = new getUseraccounts();
+        getDmaInlet gua = new getDmaInlet();
         gua.FetchUserAccounts();
     }
 }

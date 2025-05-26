@@ -3,7 +3,7 @@ using Npgsql;
 
 namespace gisApi.Api
 {
-    internal class getUseraccounts
+    internal class getDmaInlet
     {
         public void FetchUserAccounts()
         {
