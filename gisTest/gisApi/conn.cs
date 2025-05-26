@@ -1,14 +1,14 @@
-using MySql.Data.MySqlClient;
+using Npgsql; 
 
 namespace gisApi.Api
 {
     internal class Conn
     {
-        private readonly string connectionString = "Server=192.100.140.197;Database=db_gis_mgt;User Id=root;Password=tobisedi110373;";
+        private readonly string connectionString = "Host=192.100.140.198;Port=5432;Database=db_gis;Username=controller;Password=dcwd@110373";
 
-        public MySqlConnection GetConnection()
+        public NpgsqlConnection GetConnection()
         {
-            return new MySqlConnection(connectionString);
+            return new NpgsqlConnection(connectionString);
         }
     }
 }
