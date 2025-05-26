@@ -6,6 +6,6 @@ class Program
     static void Main()
     {
         getDmaInlet gua = new getDmaInlet();
-        gua.FetchUserAccounts();
+        gua.FetchDmaInlet();
     }
 }

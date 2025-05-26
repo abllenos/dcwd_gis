@@ -5,7 +5,7 @@ namespace gisApi.Api
 {
     internal class getDmaInlet
     {
-        public void FetchUserAccounts()
+        public void FetchDmaInlet()
         {
             Conn db = new Conn();
 
