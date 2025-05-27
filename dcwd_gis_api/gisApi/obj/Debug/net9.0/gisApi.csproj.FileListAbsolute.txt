@@ -28,3 +28,6 @@ C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\obj\Debug\net9.0\gisApi.p
 C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\obj\Debug\net9.0\gisApi.genruntimeconfig.cache
 C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\obj\Debug\net9.0\ref\gisApi.dll
 C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\bin\Debug\net9.0\Npgsql.dll
+C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\bin\Debug\net9.0\System.Data.Odbc.dll
+C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\bin\Debug\net9.0\runtimes\unix\lib\net9.0\System.Data.Odbc.dll
+C:\Users\abllenos\Desktop\dcwd_gis\dcwd_gis_api\gisApi\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Data.Odbc.dll

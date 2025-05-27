@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "EY2eH7QIleY=",
+  "dgSpecHash": "qRhb095HVAI=",
   "success": true,
   "projectFilePath": "C:\\Users\\abllenos\\Desktop\\dcwd_gis\\dcwd_gis_api\\gisApi\\gisApi.csproj",
   "expectedPackageFiles": [
@@ -8,7 +8,8 @@
     "C:\\Users\\abllenos\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
     "C:\\Users\\abllenos\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",
     "C:\\Users\\abllenos\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
-    "C:\\Users\\abllenos\\.nuget\\packages\\npgsql\\9.0.3\\npgsql.9.0.3.nupkg.sha512"
+    "C:\\Users\\abllenos\\.nuget\\packages\\npgsql\\9.0.3\\npgsql.9.0.3.nupkg.sha512",
+    "C:\\Users\\abllenos\\.nuget\\packages\\system.data.odbc\\9.0.5\\system.data.odbc.9.0.5.nupkg.sha512"
   ],
   "logs": []
 }

@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="System.Data.Odbc" Version="9.0.5" />
   </ItemGroup>
 
 </Project>

@@ -57,6 +57,10 @@
             "Npgsql": {
               "target": "Package",
               "version": "[9.0.3, )"
+            },
+            "System.Data.Odbc": {
+              "target": "Package",
+              "version": "[9.0.5, )"
             }
           },
           "imports": [
