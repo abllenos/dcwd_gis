@@ -23,25 +23,6 @@ const AirValveTable: React.FC = () => {
     const [searchText, setSearchText] = useState<string>("");
 
     useEffect(() => {
-        // const fetchAirValve = async () => {
-        //     try {
-        //         const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getAv.php");
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! Status: ${response.status}`);
-        //         }
-        //         const result = await response.json();
-        //         const airValves = Array.isArray(result.data) ? result.data : [];
-        //         setData(airValves);
-        //         setFilteredData(airValves);
-        //     } catch (err: any) {
-        //         setError(err.message);
-        //     } finally {
-        //         setLoading(false);
-        //     }
-        // };
-
-        // fetchAirValve();
-
         (async () => {
             try {
                 const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getAv.php");
@@ -62,16 +43,18 @@ const AirValveTable: React.FC = () => {
 
     const handleSearch = (value: string) => {
         setSearchText(value);
+        const lowerValue = value.toLowerCase();
+
         const filtered = data.filter((airValve) =>
-            (airValve.arv_number ?? '').toLowerCase().includes(value.toLowerCase())
+            (airValve.arv_number?.toLowerCase() ?? '').includes(lowerValue) ||
+            (airValve.dategeocoded?.toLowerCase() ?? '').includes(lowerValue) ||
+            (airValve.wonumber?.toLowerCase() ?? '').includes(lowerValue) ||
+            (airValve.size?.toString() ?? '').includes(lowerValue) ||
+            (airValve.brand_description?.toLowerCase() ?? '').includes(lowerValue) ||
+            (airValve.status?.toLowerCase() ?? '').includes(lowerValue) ||
+            (airValve.location?.toLowerCase() ?? '').includes(lowerValue)
         );
         setFilteredData(filtered);
-    };
-
-
-    const handleReset = () => {
-        setSearchText("");
-        setFilteredData(data);
     };
 
     const columns = [
@@ -88,38 +71,22 @@ const AirValveTable: React.FC = () => {
     if (error) return <Alert message={error} type="error" showIcon />;
 
     return (
-        <>
-            <Breadcrumb
-                style={{ margin: '20px 20px 20px 40px' }}
-                items={[
-                    { href: '/Dashboard', title: <HomeOutlined /> },
-                    { title: 'GIS Management' },
-                    { title: 'Air Valves' },
-                ]}
+       <div>
+          <Breadcrumb>
+              <Breadcrumb.Item href="/">
+                 <HomeOutlined />
+              </Breadcrumb.Item>
+               <Breadcrumb.Item>Air Valve</Breadcrumb.Item>
+         </Breadcrumb>
+          <Input.Search
+             placeholder="Search"
+             value={searchText}
+             onChange={(e) => handleSearch(e.target.value)}
+             style={{ width: 300, marginBottom: 20, marginTop: 20 }}
+         
             />
-
-            <Card
-                title="Air Valves"
-                extra={
-                    <Space>
-                        <Input
-                            placeholder="Search ARV Number..."
-                            value={searchText}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            style={{ width: 200 }}
-                            suffix={<SearchOutlined />}
-                        />
-                        <Button onClick={handleReset}>Reset</Button>
-                    </Space>
-                }
-            >
-                <Table
-                    dataSource={filteredData}
-                    columns={columns}
-                    rowKey="gid"
-                />
-            </Card>
-        </>
+            <Table dataSource={filteredData} columns={columns} />;
+               </div>
     );
 };
 

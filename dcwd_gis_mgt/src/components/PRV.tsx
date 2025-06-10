@@ -19,6 +19,7 @@ const PRVTable: React.FC = () => {
     const [filteredData, setFilteredData] = useState<PRV[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchText, setSearchText] = useState<string>("");
 
     useEffect(() => {
         (async() => {
@@ -41,14 +42,18 @@ const PRVTable: React.FC = () => {
 
     }, []);
 
-    const onSearch = (value: string) => {
-        const lowercasedValue = value.toLowerCase();
-        const filtered = data.filter((prv) => 
-            Object.values(prv).some(
-                (field) =>
-                    field &&
-                    field.toString().toLowerCase().includes(lowercasedValue)
-            )
+    const handleSearch = (value: string) => {
+        setSearchText(value);
+        const lowerValue = value.toLowerCase();
+
+        const filtered = data.filter((prv) =>
+            (prv.prv_number?.toLowerCase() ?? '').includes(lowerValue) ||
+            (prv.dategeocoded?.toLowerCase() ?? '').includes(lowerValue) ||
+            (prv.wonumber?.toLowerCase() ?? '').includes(lowerValue) ||
+            (prv.size?.toString() ?? '').includes(lowerValue) ||
+            (prv.prv_setting?.toLowerCase() ?? '').includes(lowerValue) ||
+            (prv.projecttitle?.toLowerCase() ?? '').includes(lowerValue) ||
+            (prv.status_remarks?.toLowerCase() ?? '').includes(lowerValue)
         );
         setFilteredData(filtered);
     };
@@ -77,12 +82,14 @@ const PRVTable: React.FC = () => {
                 <Breadcrumb.Item href="/">
                     <HomeOutlined />
                 </Breadcrumb.Item>
-                <Breadcrumb.Item>PRV</Breadcrumb.Item>
+                <Breadcrumb.Item>Air Valve</Breadcrumb.Item>
             </Breadcrumb>
             <Input.Search
-                placeholder="Search PRV"
-                onSearch={onSearch}
-                style={{ marginBottom: 8, width: 200, marginTop: 16 }}
+                placeholder="Search"
+                value={searchText}
+                onChange={(e) => handleSearch(e.target.value)}
+                style={{ width: 300, marginBottom: 20, marginTop: 20 }}
+                 
             />
             <Table dataSource={filteredData} columns={columns} />;
         </div>

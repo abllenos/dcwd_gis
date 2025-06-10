@@ -21,6 +21,8 @@ import UserAccounts from './components/UserAccounts';
 import { useAuth } from './AuthContext';
 import AirValveTable from './components/AirValve';
 import PRVTable from './components/PRV';
+import PSVTable from './components/PSV';
+import BOVTable from './components/BOV';
 
 const { Header, Content, Sider } = Layout;
 
@@ -67,6 +69,8 @@ const App: React.FC = () => {
               <Route path="/Employees" element={<PrivateRoute><EmployeeTable /></PrivateRoute>} />
               <Route path="/AirValve" element={<PrivateRoute><AirValveTable /></PrivateRoute>} />
               <Route path="/PRV" element={<PrivateRoute><PRVTable /></PrivateRoute>} />
+              <Route path="/PSV" element={<PrivateRoute><PSVTable /></PrivateRoute>} />
+              <Route path="/BOV" element={<PrivateRoute><BOVTable /></PrivateRoute>} />
             </Routes>
           </Content>
         </Layout>
