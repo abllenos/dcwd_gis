@@ -24,25 +24,23 @@ const DMAList: React.FC = () => {
 
 
  useEffect(() => {
-         const fetchDMA = async () => {
-             try {
-                 const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getDmaInlet.php");
-                 if (!response.ok){
-                     throw new Error(`HTTP error! Status: ${response.status}`);
-                 }
-                 const result = await response.json();
-                 const rawArray = Array.isArray(result.data) ? result.data : [];
- 
-                 setData(rawArray);
-                 setFilteredData(rawArray);
-             } catch (err: any) {
-                 setError(err.message);
-             } finally {
-                 setLoading(false);
-             }
-         };
- 
-         fetchDMA();
+        (async() => {
+          try {
+            const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getDmaInlet.php");
+            if (!response.ok){
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const result = await response.json();
+            const rawArray = Array.isArray(result.data) ? result.data : [];
+
+            setData(rawArray);
+            setFilteredData(rawArray);
+          } catch (err: any) {
+            setError(err.message);
+          } finally {
+            setLoading(false);
+          }
+        })();
      }, []);
 
 const handleSearch = (value: string) => {

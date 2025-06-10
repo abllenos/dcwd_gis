@@ -21,8 +21,8 @@ const PRVTable: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchPRV = async () => {
-            try {
+        (async() => {
+                  try {
                 const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getPrv.php");
                 if (!response.ok){
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -37,9 +37,8 @@ const PRVTable: React.FC = () => {
             } finally {
                 setLoading(false);
             }
-        };
+        })();
 
-        fetchPRV();
     }, []);
 
     const onSearch = (value: string) => {
