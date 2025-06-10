@@ -146,26 +146,27 @@ const UserLogs: React.FC = () => {
   
       if (geometryResponse && geometryResponse.success) {
         if (geometryResponse.coordinates && geometryResponse.coordinates.length > 0) {
-          let formattedCoordinates: { lng: number; lat: number }[] = [];
-  
-          if (geometryResponse.coordinates.length === 2) {
-            const [lng, lat] = geometryResponse.coordinates;
-            formattedCoordinates.push({ lng, lat });
-          } else if (Array.isArray(geometryResponse.coordinates[0][0])) {
-            formattedCoordinates = geometryResponse.coordinates.flatMap((coordSet: number[][]) =>
-              coordSet.map((coord: number[]) => ({
-                lng: coord[0],
-                lat: coord[1],
-              }))
-            );
-          } else if (Array.isArray(geometryResponse.coordinates[0])) {
-            formattedCoordinates = geometryResponse.coordinates.map((coord: number[]) => ({
-              lng: coord[0],
-              lat: coord[1],
-            }));
-          }
+          
+         const flattenCoordinates = (coords: any): { lng: number; lat: number }[] => {
+            const result: { lng: number; lat: number }[] = [];
+            const recurse = (arr: any) => {
+              if (Array.isArray(arr[0])) {
+                arr.forEach(recurse);
+              } else if (typeof arr[0] === 'number' && typeof arr[1] === 'number') {
+                result.push({ lng: arr[0], lat: arr[1] });
+              }
+            };
+
+            recurse(coords);
+            return result;
+          };
+
+          const formattedCoordinates = flattenCoordinates(geometryResponse.coordinates);
+          
+          console.log('Formatted Coordinates:', formattedCoordinates);      
   
           setGeometryData({ coordinates: formattedCoordinates });
+          setMapCenter(formattedCoordinates[0] ?? { lat: 7.0819, lng: 125.5105 });
   
           if (
             formattedCoordinates.length > 0 &&

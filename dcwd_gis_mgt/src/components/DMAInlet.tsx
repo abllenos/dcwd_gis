@@ -1,17 +1,18 @@
-import React, { Key, useEffect, useState } from 'react';
-import { Table, Spin, Alert, Input, Button, Space, Breadcrumb, Card } from 'antd';
-import { SearchOutlined, HomeOutlined } from '@ant-design/icons';
-import 'antd/dist/reset.css';
-import { fetchData } from './endpoints/getDmaInlet'; 
+import React, { useEffect, useState } from 'react';
+import { Table, Input, Spin, Alert } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { HomeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Breadcrumb } from "antd";
 
 interface DMA {
-  gid: number;
-  wonumber: string;
-  project_title: string;
+  dma_code: string;
+  landmark: string;
+  watersource: string;
   size: number;
-  type: string;
-  length: number;
-  created_at: Date;
+  depth: number;
+  date_installed: string;
+  prv_date_installed: string;
+  status_of_work: string;
 }
 
 const DMAList: React.FC = () => {
@@ -21,134 +22,79 @@ const DMAList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string>('');
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const rawData = await fetchData();
-        console.log("API response:", rawData);
-        
-        
-        if (Array.isArray(rawData)) {
-          const transformedData: DMA[] = rawData.map((item: any[]) => ({
-            gid: parseInt(item[0], 10),
-            wonumber: item[1], 
-            project_title: item[2],
-            size: parseFloat(item[3]), 
-            type: item[4],
-            length: parseFloat(item[5]),
-            created_at: new Date(item[6]), 
-            
-          }));
-         
 
-          setData(transformedData);
-          setFilteredData(transformedData); 
-        } else {
-          throw new Error('Fetched data is not an array');
-        }
-      } catch (error) {
-        setError('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+         const fetchDMA = async () => {
+             try {
+                 const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getDmaInlet.php");
+                 if (!response.ok){
+                     throw new Error(`HTTP error! Status: ${response.status}`);
+                 }
+                 const result = await response.json();
+                 const rawArray = Array.isArray(result.data) ? result.data : [];
+ 
+                 setData(rawArray);
+                 setFilteredData(rawArray);
+             } catch (err: any) {
+                 setError(err.message);
+             } finally {
+                 setLoading(false);
+             }
+         };
+ 
+         fetchDMA();
+     }, []);
 
-    getData();
-  }, []);
+const handleSearch = (value: string) => {
+  setSearchText(value);
+  const lowerValue = value.toLowerCase();
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    const filtered = data.filter((record) =>
-      Object.values(record).some((field) =>
-        field != null && field.toString().toLowerCase().includes(value.toLowerCase())
-      )
-    );
-    setFilteredData(filtered);
-  };
+  const filtered = data.filter((dma) =>
+    (dma.dma_code?.toLowerCase() ?? '').includes(lowerValue) ||
+    (dma.landmark?.toLowerCase() ?? '').includes(lowerValue) ||
+    (dma.watersource?.toLowerCase() ?? '').includes(lowerValue) ||
+    (dma.status_of_work?.toLowerCase() ?? '').includes(lowerValue) ||
+    (dma.date_installed?.toLowerCase() ?? '').includes(lowerValue) ||
+    (dma.prv_date_installed?.toLowerCase() ?? '').includes(lowerValue) ||
+    (dma.size?.toString() ?? '').includes(lowerValue) ||
+    (dma.depth?.toString() ?? '').includes(lowerValue)
+  );
 
-  const handleReset = () => {
-    setSearchText('');
-    setFilteredData(data); 
-  };
+  setFilteredData(filtered);
+};
 
-  if (loading) return <Spin tip="Loading..." />;
-  if (error) return <Alert message="Error" description={error} type="error" />;
 
-  const columns = [
-    {
-      title: 'GID',
-      dataIndex: 'gid',
-      key: 'gid',
-    },
-    {
-      title: 'Work Order Number',
-      dataIndex: 'wonumber',
-      key: 'wonumber',
-    },
-    {
-      title: 'Project Title',
-      dataIndex: 'project_title',
-      key: 'project_title',
-    },
-    {
-      title: 'Size',
-      dataIndex: 'size',
-      key: 'size',
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
-      title: 'Length',
-      dataIndex: 'length',
-      key: 'length',
-    },
-    
+  const columns: ColumnsType<DMA> = [
+    { title: 'DMA Code', dataIndex: 'dma_code', key: 'dma_code' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Water Source', dataIndex: 'watersource', key: 'watersource' },
+    { title: 'Size', dataIndex: 'size', key: 'size' },
+    { title: 'Depth', dataIndex: 'depth', key: 'depth' },
+    { title: 'Date Installed', dataIndex: 'date_installed', key: 'date_installed' },
+    { title: 'Previous Date Installed', dataIndex: 'prv_date_installed', key: 'prv_date_installed' },
+    { title: 'Status of Work', dataIndex: 'status_of_work', key: 'status_of_work' },
   ];
 
-  return (
-    <>
-      <Breadcrumb
-        style={{ margin: '20px 20px 20px 40px' }}
-        items={[
-          {
-            href: '/Dashboard',
-            title: <HomeOutlined />,
-          },
-          {
-            title: 'Data Layers',
-          },
-          {
-            title: 'DMA Inlet',
-          },
-        ]}
-      />
+  if (loading) return <Spin size="large" />;
+  if (error) return <Alert message="Error" description={error} type="error" showIcon />;
 
-      <Card
-        title="DMA"
-        extra={
-          <Space>
-            <Input
-              placeholder="Search..."
-              value={searchText}
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 200 }}
-              suffix={<SearchOutlined />}
-            />
-            <Button onClick={handleReset}>Reset</Button>
-          </Space>
-        }
-      >
-        <Table
-          dataSource={filteredData}
-          columns={columns}
-          rowKey="gid" 
-        />
-      </Card>
-       
-    </>
+  return (
+    <div style={{ padding: 20 }}>
+        <Breadcrumb>
+            <Breadcrumb.Item href="/">
+              <HomeOutlined />
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>DMA Inlet</Breadcrumb.Item>
+        </Breadcrumb>
+      <Input
+        placeholder="Search DMA..."
+        value={searchText}
+        onChange={(e) => handleSearch(e.target.value)}
+        style={{ width: 300, marginBottom: 20, marginTop: 20 }}
+        suffix={<SearchOutlined />}
+      />
+      <Table dataSource={filteredData} columns={columns} rowKey="gid" />
+    </div>
   );
 };
 

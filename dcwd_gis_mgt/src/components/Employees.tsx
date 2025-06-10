@@ -23,7 +23,7 @@ const EmployeeTable: React.FC = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://192.100.140.198/api/react/employee.php");
+        const response = await fetch("http://192.100.140.198/api/react/gismgt/employee.php");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }

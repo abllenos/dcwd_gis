@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:8012/web/dcwdgis/ajax/query/getPipeSystem.php?mode=T1&_=1724814920418';
+const API_URL = 'http://192.100.140.198/helpers/gis/mgtsys/getLayers/getDmaInlet.php';
 
 export const fetchData = async () => {
     try {

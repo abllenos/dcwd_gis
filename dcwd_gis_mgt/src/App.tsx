@@ -19,6 +19,8 @@ import TableList from './components/rtaViewer';
 import EmployeeTable from './components/Employees';
 import UserAccounts from './components/UserAccounts';
 import { useAuth } from './AuthContext';
+import AirValveTable from './components/AirValve';
+import PRVTable from './components/PRV';
 
 const { Header, Content, Sider } = Layout;
 
@@ -28,11 +30,23 @@ const App: React.FC = () => {
   return (
     isAuthenticated ? (
       <Layout style={{ minHeight: '100vh' }}>
-        <Sider theme="light" width={256}>
+        <Sider
+          theme="light"
+          width={256}
+          style={{
+            position: 'fixed',
+            height: '100vh',
+            overflow: 'auto',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            zIndex: 1000,
+          }}
+        >
           <img src={logo} style={{ height: '30px', margin: '19px 0 10px 70px' }} alt="dcwd" />
           <NavBar />
         </Sider>
-        <Layout>
+        <Layout style={{ marginLeft: 256 }}>
           <Header style={{ fontSize: '25px', background: 'white' }}>
             <span style={{ fontWeight: '400', margin: '0 0 0 0' }}></span>
           </Header>
@@ -51,6 +65,8 @@ const App: React.FC = () => {
               <Route path="/rtaViewer" element={<PrivateRoute><TableList /></PrivateRoute>} />
               <Route path="/UserAccounts" element={<PrivateRoute><UserAccounts /></PrivateRoute>} />
               <Route path="/Employees" element={<PrivateRoute><EmployeeTable /></PrivateRoute>} />
+              <Route path="/AirValve" element={<PrivateRoute><AirValveTable /></PrivateRoute>} />
+              <Route path="/PRV" element={<PrivateRoute><PRVTable /></PrivateRoute>} />
             </Routes>
           </Content>
         </Layout>
