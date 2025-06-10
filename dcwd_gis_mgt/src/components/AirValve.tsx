@@ -86,7 +86,7 @@ const AirValveTable: React.FC = () => {
          
             />
             <Table dataSource={filteredData} columns={columns} />;
-               </div>
+        </div>
     );
 };
 
