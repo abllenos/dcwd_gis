@@ -1,128 +1,102 @@
-import React, { Key, useEffect, useState } from 'react';
-import { Table, Spin, Alert, Input, Button, Space, Breadcrumb, Card } from 'antd';
-import { SearchOutlined, HomeOutlined } from '@ant-design/icons';
-import 'antd/dist/reset.css';
-import { fetchData } from './endpoints/getPMS'; 
+import React, { useState, useMemo } from "react";
+import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
+import { HomeOutlined, SearchOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "./util/conn";
+import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+
+const { Search } = Input;
 
 interface PMS {
-  gid: number;
   pms_number: string;
   location: string;
-  
+  wonumber: string;
+  year_installed: string;
+  tapping_details: string;
+  remarks: string;
+  serialno: string;
+  model: string;
 }
 
-const PMSList: React.FC = () => {
-  const [data, setData] = useState<PMS[]>([]);
-  const [filteredData, setFilteredData] = useState<PMS[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchText, setSearchText] = useState<string>('');
+const fetchPMSData = async (): Promise<PMS[]> => {
+  const res = await axiosInstance.get("getPMS.php");
+  return Array.isArray(res.data.data) ? res.data.data : [];
+};
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const rawData = await fetchData();
-        console.log("API response:", rawData);      
-        if (Array.isArray(rawData)) {
-          const transformedData: PMS[] = rawData.map((item: any[]) => ({
-            gid: parseInt(item[0], 10),
-            pms_number: item[1], 
-            location: item[2],
-                       
-          }));
-          setData(transformedData);
-          setFilteredData(transformedData); 
-        } else {
-          throw new Error('Fetched data is not an array');
-        }
-      } catch (error) {
-        setError('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
+const PMSTable: React.FC = () => {
+  const [searchText, setSearchText] = useState("");
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
 
-    getData();
-  }, []);
+  });
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    const filtered = data.filter((record) =>
-      Object.values(record).some((field) =>
-        field != null && field.toString().toLowerCase().includes(value.toLowerCase())
-      )
+  const { data, isLoading, error } = useQuery<PMS[]>({
+    queryKey: ["pmsData"],
+    queryFn: fetchPMSData,
+  });
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    const lowerValue = searchText.toLowerCase();
+    return data.filter((pms) =>
+      (pms.pms_number?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.location?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.wonumber?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.year_installed?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.tapping_details?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.remarks?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.serialno?.toLowerCase() ?? "").includes(lowerValue) ||
+      (pms.model?.toLowerCase() ?? "").includes(lowerValue)
     );
-    setFilteredData(filtered);
-  };
+  }, [data, searchText]);
 
-  const handleReset = () => {
-    setSearchText('');
-    setFilteredData(data); 
-  };
-
-  if (loading) return <Spin tip="Loading..." />;
-  if (error) return <Alert message="Error" description={error} type="error" />;
-
-  const columns = [
+  const columns: ColumnsType<PMS> = [
     {
-      title: 'ID',
-      dataIndex: 'gid',
-      key: 'gid',
+      title: "#",
+      key: "index",
+      render: (_text, _record, index) =>
+        ((pagination.current || 1) - 1) * (pagination.pageSize || 10) + index + 1,
+      width: 50,
     },
-    {
-      title: 'PMS Number',
-      dataIndex: 'pms_number',
-      key: 'pms_number',
-    },
-    {
-      title: 'Location',
-      dataIndex: 'location',
-      key: 'location',
-    },    
+    { title: "PMS Number", dataIndex: "pms_number", key: "pms_number" },
+    { title: "Location", dataIndex: "location", key: "location" },
+    { title: "WO Number", dataIndex: "wonumber", key: "wonumber" },
+    { title: "Year Installed", dataIndex: "year_installed", key: "year_installed" },
+    { title: "Tapping Details", dataIndex: "tapping_details", key: "tapping_details" },
+    { title: "Remarks", dataIndex: "remarks", key: "remarks" },
+    { title: "Serial No", dataIndex: "serialno", key: "serialno" },
+    { title: "Model", dataIndex: "model", key: "model" },
   ];
 
-  return (
-    <>
-      <Breadcrumb
-        style={{ margin: '20px 20px 20px 40px' }}
-        items={[
-          {
-            href: '/Dashboard',
-            title: <HomeOutlined />,
-          },
-          {
-            title: 'Data Layers',
-          },
-          {
-            title: 'PMS',
-          },
-        ]}
-      />
+  if (isLoading) return <Spin size="large" />;
+  if (error instanceof Error) return <Alert message={error.message} type="error" showIcon />;
 
-      <Card
-        title="PMS"
-        extra={
-          <Space>
-            <Input
-              placeholder="Search..."
-              value={searchText}
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 200 }}
-              suffix={<SearchOutlined />}
-            />
-            <Button onClick={handleReset}>Reset</Button>
-          </Space>
-        }
-      >
-        <Table
-          dataSource={filteredData}
-          columns={columns}
-          rowKey="gid" 
-        />
-      </Card>
-       
-    </>
+  return (
+    <div>
+      <Breadcrumb>
+        <Breadcrumb.Item href="/">
+          <HomeOutlined />
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>PMS</Breadcrumb.Item>
+      </Breadcrumb>
+      <Search
+       placeholder="Search..."
+        value={searchText}
+        onChange={(e) => {
+          setSearchText(e.target.value);
+          setPagination({ ...pagination, current: 1 }); 
+        }}
+        style={{ width: 300, marginBottom: 20, marginTop: 20 }}
+      />
+      <Table dataSource={filteredData}
+        columns={columns}
+        rowKey="pms_number"
+        pagination={{
+          ...pagination,
+          total: filteredData.length,
+          onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+        }} />
+    </div>
   );
 };
 
-export default PMSList;
+export default PMSTable;

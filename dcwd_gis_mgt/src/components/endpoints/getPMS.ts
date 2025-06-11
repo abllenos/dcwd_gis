@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:8012/web/dcwdgis/ajax/query/getPMS.php?mode=T1&_=1724889273279';
+const API_URL = 'http://192.100.140.198/helpers/gis/mgtsys/getLayers/getPMS.php';
 
 export const fetchData = async () => {
     try {
