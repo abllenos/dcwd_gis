@@ -9,6 +9,7 @@ import {
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./util/conn";
+import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 
 const { Search } = Input;
 
@@ -24,12 +25,16 @@ interface PSV {
 }
 
 const fetchPSVData = async (): Promise<PSV[]> => {
-    const res = await axiosInstance.get("getPsv.php");
-    return Array.isArray(res.data.data) ? res.data.data : [];
-}
+  const res = await axiosInstance.get("getPsv.php");
+  return Array.isArray(res.data.data) ? res.data.data : [];
+};
 
 const PSVTable: React.FC = () => {
   const [searchText, setSearchText] = useState("");
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    current: 1,
+    pageSize: 10,
+  });
 
   const { data, isLoading, error } = useQuery<PSV[]>({
     queryKey: ["psvData"],
@@ -51,7 +56,14 @@ const PSVTable: React.FC = () => {
     );
   }, [data, searchText]);
 
-  const columns = [
+  const columns: ColumnsType<PSV> = [
+    {
+      title: "#",
+      key: "index",
+      render: (_text, _record, index) =>
+        ((pagination.current || 1) - 1) * (pagination.pageSize || 10) + index + 1,
+      width: 60,
+    },
     { title: "PSV Number", dataIndex: "psv_number", key: "psv_number" },
     { title: "Account Number", dataIndex: "accountnumber", key: "accountnumber" },
     { title: "Location", dataIndex: "location", key: "location" },
@@ -63,10 +75,11 @@ const PSVTable: React.FC = () => {
   ];
 
   if (isLoading) return <Spin size="large" />;
-  if (error instanceof Error) return <Alert message={error.message} type="error" showIcon />;
+  if (error instanceof Error)
+    return <Alert message="Error" description={error.message} type="error" showIcon />;
 
   return (
-    <div>
+    <div style={{ padding: 20 }}>
       <Breadcrumb>
         <Breadcrumb.Item href="/">
           <HomeOutlined />
@@ -77,11 +90,23 @@ const PSVTable: React.FC = () => {
       <Search
         placeholder="Search"
         value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
+        onChange={(e) => {
+          setSearchText(e.target.value);
+          setPagination({ ...pagination, current: 1 }); // Reset to first page on search
+        }}
         style={{ width: 300, marginBottom: 20, marginTop: 20 }}
       />
 
-      <Table dataSource={filteredData} columns={columns} rowKey="psv_number" />
+      <Table
+        dataSource={filteredData}
+        columns={columns}
+        rowKey="psv_number"
+        pagination={{
+          ...pagination,
+          total: filteredData.length,
+          onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+        }}
+      />
     </div>
   );
 };

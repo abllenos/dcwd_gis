@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Input, Spin, Alert } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { HomeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Breadcrumb } from "antd";
+import React, { useState, useMemo } from "react";
+import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
+import { HomeOutlined, SearchOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "./util/conn";
+import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+
+const { Search } = Input;
 
 interface DMA {
   dma_code: string;
@@ -15,83 +18,90 @@ interface DMA {
   status_of_work: string;
 }
 
-const DMAList: React.FC = () => {
-  const [data, setData] = useState<DMA[]>([]);
-  const [filteredData, setFilteredData] = useState<DMA[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchText, setSearchText] = useState<string>('');
-
-
- useEffect(() => {
-        (async() => {
-          try {
-            const response = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getDmaInlet.php");
-            if (!response.ok){
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const result = await response.json();
-            const rawArray = Array.isArray(result.data) ? result.data : [];
-
-            setData(rawArray);
-            setFilteredData(rawArray);
-          } catch (err: any) {
-            setError(err.message);
-          } finally {
-            setLoading(false);
-          }
-        })();
-     }, []);
-
-const handleSearch = (value: string) => {
-  setSearchText(value);
-  const lowerValue = value.toLowerCase();
-
-  const filtered = data.filter((dma) =>
-    (dma.dma_code?.toLowerCase() ?? '').includes(lowerValue) ||
-    (dma.landmark?.toLowerCase() ?? '').includes(lowerValue) ||
-    (dma.watersource?.toLowerCase() ?? '').includes(lowerValue) ||
-    (dma.status_of_work?.toLowerCase() ?? '').includes(lowerValue) ||
-    (dma.date_installed?.toLowerCase() ?? '').includes(lowerValue) ||
-    (dma.prv_date_installed?.toLowerCase() ?? '').includes(lowerValue) ||
-    (dma.size?.toString() ?? '').includes(lowerValue) ||
-    (dma.depth?.toString() ?? '').includes(lowerValue)
-  );
-
-  setFilteredData(filtered);
+const fetchDMAData = async (): Promise<DMA[]> => {
+  const res = await axiosInstance.get("getDmaInlet.php");
+  return Array.isArray(res.data.data) ? res.data.data : [];
 };
 
+const DMAList: React.FC = () => {
+  const [searchText, setSearchText] = useState("");
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    current: 1,
+    pageSize: 10,
+  });
+
+  const { data, isLoading, error } = useQuery<DMA[]>({
+    queryKey: ["dmaData"],
+    queryFn: fetchDMAData,
+  });
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    const lowerValue = searchText.toLowerCase();
+    return data.filter((dma) =>
+      (dma.dma_code?.toLowerCase() ?? "").includes(lowerValue) ||
+      (dma.landmark?.toLowerCase() ?? "").includes(lowerValue) ||
+      (dma.watersource?.toLowerCase() ?? "").includes(lowerValue) ||
+      (dma.size?.toString() ?? "").includes(lowerValue) ||
+      (dma.depth?.toString() ?? "").includes(lowerValue) ||
+      (dma.date_installed?.toLowerCase() ?? "").includes(lowerValue) ||
+      (dma.prv_date_installed?.toLowerCase() ?? "").includes(lowerValue) ||
+      (dma.status_of_work?.toLowerCase() ?? "").includes(lowerValue)
+    );
+  }, [data, searchText]);
 
   const columns: ColumnsType<DMA> = [
-    { title: 'DMA Code', dataIndex: 'dma_code', key: 'dma_code' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Water Source', dataIndex: 'watersource', key: 'watersource' },
-    { title: 'Size', dataIndex: 'size', key: 'size' },
-    { title: 'Depth', dataIndex: 'depth', key: 'depth' },
-    { title: 'Date Installed', dataIndex: 'date_installed', key: 'date_installed' },
-    { title: 'Previous Date Installed', dataIndex: 'prv_date_installed', key: 'prv_date_installed' },
-    { title: 'Status of Work', dataIndex: 'status_of_work', key: 'status_of_work' },
+    {
+      title: "#",
+      key: "index",
+      render: (_text, _record, index) =>
+        ((pagination.current || 1) - 1) * (pagination.pageSize || 10) + index + 1,
+      width: 60,
+    },
+    { title: "DMA Code", dataIndex: "dma_code", key: "dma_code" },
+    { title: "Landmark", dataIndex: "landmark", key: "landmark" },
+    { title: "Water Source", dataIndex: "watersource", key: "watersource" },
+    { title: "Size", dataIndex: "size", key: "size" },
+    { title: "Depth", dataIndex: "depth", key: "depth" },
+    { title: "Date Installed", dataIndex: "date_installed", key: "date_installed" },
+    { title: "Previous Date Installed", dataIndex: "prv_date_installed", key: "prv_date_installed" },
+    { title: "Status of Work", dataIndex: "status_of_work", key: "status_of_work" },
   ];
 
-  if (loading) return <Spin size="large" />;
-  if (error) return <Alert message="Error" description={error} type="error" showIcon />;
+  if (isLoading) return <Spin size="large" />;
+  if (error instanceof Error)
+    return <Alert message="Error" description={error.message} type="error" showIcon />;
 
   return (
     <div style={{ padding: 20 }}>
-        <Breadcrumb>
-            <Breadcrumb.Item href="/">
-              <HomeOutlined />
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>DMA Inlet</Breadcrumb.Item>
-        </Breadcrumb>
-      <Input
+      <Breadcrumb>
+        <Breadcrumb.Item href="/">
+          <HomeOutlined />
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>DMA Inlet</Breadcrumb.Item>
+      </Breadcrumb>
+
+      <Search
         placeholder="Search DMA..."
         value={searchText}
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={(e) => {
+          setSearchText(e.target.value);
+          setPagination({ ...pagination, current: 1 }); // reset to page 1
+        }}
         style={{ width: 300, marginBottom: 20, marginTop: 20 }}
-        suffix={<SearchOutlined />}
+       
       />
-      <Table dataSource={filteredData} columns={columns} rowKey="gid" />
+
+      <Table
+        dataSource={filteredData}
+        columns={columns}
+        rowKey="dma_code"
+        pagination={{
+          ...pagination,
+          total: filteredData.length,
+          onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+        }}
+      />
     </div>
   );
 };
