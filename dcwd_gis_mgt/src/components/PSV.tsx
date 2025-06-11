@@ -92,7 +92,7 @@ const PSVTable: React.FC = () => {
         value={searchText}
         onChange={(e) => {
           setSearchText(e.target.value);
-          setPagination({ ...pagination, current: 1 }); // Reset to first page on search
+          setPagination({ ...pagination, current: 1 }); 
         }}
         style={{ width: 300, marginBottom: 20, marginTop: 20 }}
       />

@@ -86,7 +86,7 @@ const DMAList: React.FC = () => {
         value={searchText}
         onChange={(e) => {
           setSearchText(e.target.value);
-          setPagination({ ...pagination, current: 1 }); // reset to page 1
+          setPagination({ ...pagination, current: 1 }); 
         }}
         style={{ width: 300, marginBottom: 20, marginTop: 20 }}
        
