@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Table, Spin, Alert, Input, Breadcrumb } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "./util/conn";
 
 const { Search } = Input;
 
@@ -18,18 +19,16 @@ interface PRV {
     st_asgeojson: string;
 }
 
-const fetchPRV = async (): Promise<PRV[]> => {
-    const res = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getPrv.php");
-    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-    const result = await res.json();
-    return Array.isArray(result.data) ? result.data : [];
-};
+const fetchPRVData = async (): Promise<PRV[]> => {
+    const res = await axiosInstance.get("getPrv.php");
+    return Array.isArray(res.data.data) ? res.data.data : [];
+}
 
 const PRVTable: React.FC = () => {
     const [searchText, setSearchText] = useState("");
     const { data, isLoading, error } = useQuery<PRV[]>({
         queryKey: ["prv"],
-        queryFn: fetchPRV,
+        queryFn: fetchPRVData,
     });
 
     const filteredData = useMemo(() => {

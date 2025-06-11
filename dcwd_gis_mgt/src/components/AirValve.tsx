@@ -8,6 +8,7 @@ import {
 } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "./util/conn";
 
 const { Search } = Input;
 
@@ -22,13 +23,10 @@ interface AirValve {
   location: string;
 }
 
-
 const fetchAirValves = async (): Promise<AirValve[]> => {
-  const res = await fetch("http://192.100.140.198/helpers/gis/mgtsys/getLayers/getAv.php");
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  const result = await res.json();
-  return Array.isArray(result.data) ? result.data : [];
-};
+    const res = await axiosInstance.get("getAv.php");
+    return Array.isArray(res.data.data) ? res.data.data : [];
+}
 
 const AirValveTable: React.FC = () => {
   const [searchText, setSearchText] = useState("");
