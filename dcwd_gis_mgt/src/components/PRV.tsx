@@ -82,7 +82,7 @@ const PRVTable: React.FC = () => {
                 <Breadcrumb.Item href="/">
                     <HomeOutlined />
                 </Breadcrumb.Item>
-                <Breadcrumb.Item>Air Valve</Breadcrumb.Item>
+                <Breadcrumb.Item>Pressure Release Valve</Breadcrumb.Item>
             </Breadcrumb>
             <Input.Search
                 placeholder="Search"
