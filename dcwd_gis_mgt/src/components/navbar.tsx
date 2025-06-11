@@ -1,10 +1,21 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Modal } from 'antd';
-import { Book, Box, Home, LogOut, Monitor, Settings } from 'react-feather';
+import {
+  Book,
+  Box,
+  Monitor,
+  Settings,
+  LogOut,
+} from 'react-feather';
 import type { MenuProps } from 'antd';
 
 type MenuItem = Required<MenuProps>['items'][number];
+
+const createLinkItem = (key: string, label: string, path?: string): MenuItem => ({
+  key,
+  label: path ? <Link to={path}>{label}</Link> : <span style={{ fontWeight: 600 }}>{label}</span>,
+});
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
@@ -15,72 +26,84 @@ const NavBar: React.FC = () => {
       content: 'Your session will be closed and you will be redirected to the login page.',
       okText: 'Yes, log me out',
       cancelText: 'Cancel',
-      onOk: () => navigate('/logout'), 
+      onOk: () => navigate('/logout'),
     });
   };
 
-  const dataLayers = [
-    { key: 'sub2-1', label: <strong>ASSETS</strong> },
-    { key: 'sub2-2', label: <Link to="#">District Metering Area</Link> },
-    { key: 'sub2-3', label: <Link to="#">Map Viewer</Link> },
-    { key: 'sub2-4', label: <strong>VALVE</strong> },
-    { key: 'sub2-5', label: <Link to="/AirValve">Air Valve</Link> },
-    { key: 'sub2-6', label: <Link to="#">Fire Hydrant</Link> },
-    { key: 'sub2-7', label: <Link to="#">Isolation Valve</Link> },
-    { key: 'sub2-8', label: <Link to="/PSV">Pressure Setting Valve</Link> },
-    { key: 'sub2-9', label: <Link to="/PRV">Pressure Release Valve</Link> },
-    { key: 'sub2-10', label: <Link to="/BOV">Blow Off Valve</Link> },
-    { key: 'sub2-11', label: <Link to="/PMS">Pressure Monitoring Valve</Link> },
-    { key: 'sub2-12', label: <strong>PIPE NETWORK</strong> },
-    { key: 'sub2-13', label: <Link to="#">Distribution & Transmission Valve</Link> },
-    { key: 'sub2-14', label: <strong>DISTRICT METERING AREA</strong> },
-    { key: 'sub2-15', label: <Link to="/DMAInlet">DMA Inlet</Link> },
-    { key: 'sub2-16', label: <strong>SEWERAGE AND SANITATION</strong> },
-    { key: 'sub2-17', label: <Link to="/RTA">Rapid Technical Assessment Program</Link> },
-    { key: 'sub2-18', label: <Link to="/rtaViewer">RTA Viewer</Link>}
+  const dataLayers: MenuItem[] = [
+    createLinkItem('sub2-1', 'ASSETS'),
+    createLinkItem('sub2-2', 'District Metering Area', '#'),
+    createLinkItem('sub2-3', 'Map Viewer', '#'),
+    createLinkItem('sub2-4', 'VALVE'),
+    createLinkItem('sub2-5', 'Air Valve', '/AirValve'),
+    createLinkItem('sub2-6', 'Fire Hydrant', '#'),
+    createLinkItem('sub2-7', 'Isolation Valve', '#'),
+    createLinkItem('sub2-8', 'Pressure Setting Valve', '/PSV'),
+    createLinkItem('sub2-9', 'Pressure Release Valve', '/PRV'),
+    createLinkItem('sub2-10', 'Blow Off Valve', '/BOV'),
+    createLinkItem('sub2-11', 'Pressure Monitoring Valve', '/PMS'),
+    createLinkItem('sub2-12', 'PIPE NETWORK'),
+    createLinkItem('sub2-13', 'Distribution & Transmission Valve', '#'),
+    createLinkItem('sub2-14', 'DISTRICT METERING AREA'),
+    createLinkItem('sub2-15', 'DMA Inlet', '/DMAInlet'),
+    createLinkItem('sub2-16', 'SEWERAGE AND SANITATION'),
+    createLinkItem('sub2-17', 'Rapid Technical Assessment Program', '/RTA'),
+    createLinkItem('sub2-18', 'RTA Viewer', '/rtaViewer'),
   ];
 
-  const management = [
-    { key: 'sub3-1', label: <Link to="/UserLogs">Logs</Link> },
-    { key: 'sub3-2', label: <Link to="/Employees">Employees</Link> },
+  const management: MenuItem[] = [
+    createLinkItem('sub3-1', 'Logs', '/UserLogs'),
+    createLinkItem('sub3-2', 'Employees', '/Employees'),
   ];
 
-  const systemManagement = [
-    { key: 'sub4-1', label: <Link to="/AccessLevel">Access Level</Link> },
-    { key: 'sub4-2', label: <Link to="/Department">Department</Link> },
-    { key: 'sub4-3', label: <Link to="/UserAccounts">User Accounts</Link> },
+  const systemManagement: MenuItem[] = [
+    createLinkItem('sub4-1', 'Access Level', '/AccessLevel'),
+    createLinkItem('sub4-2', 'Department', '/Department'),
+    createLinkItem('sub4-3', 'User Accounts', '/UserAccounts'),
   ];
 
   const items: MenuItem[] = [
-    { key: '1', icon: <Monitor />, label: <Link to="/Dashboard">Dashboard</Link> },
     {
-      key: 'sub2',
+      key: 'dashboard',
+      icon: <Monitor />,
+      label: <Link to="/Dashboard">Dashboard</Link>,
+    },
+    {
+      key: 'data-layers',
       icon: <Box />,
       label: 'Data Layers',
       children: dataLayers,
     },
     {
-      key: 'sub3',
-      label: 'Management',
+      key: 'management',
       icon: <Book />,
+      label: 'Management',
       children: management,
     },
     {
-      key: 'sub4',
+      key: 'system-management',
       icon: <Box />,
       label: 'System Management',
       children: systemManagement,
     },
-    { key: '23', icon: <Settings />, label: <Link to="/account-settings">Account Settings</Link> },
-    { key: '24', icon: <LogOut />, label: <span onClick={handleLogoutClick}>Log Out</span> },
+    {
+      key: 'account-settings',
+      icon: <Settings />,
+      label: <Link to="/account-settings">Account Settings</Link>,
+    },
+    {
+      key: 'logout',
+      icon: <LogOut />,
+      label: <span onClick={handleLogoutClick}>Log Out</span>,
+    },
   ];
 
   return (
     <Menu
       theme="light"
-      defaultSelectedKeys={['1']}
-      defaultOpenKeys={['sub1']}
       mode="inline"
+      defaultSelectedKeys={['dashboard']}
+      defaultOpenKeys={['data-layers']}
       items={items}
     />
   );
