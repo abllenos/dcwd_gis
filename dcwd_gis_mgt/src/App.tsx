@@ -49,8 +49,11 @@ const App: React.FC = () => {
           <NavBar />
         </Sider>
         <Layout style={{ marginLeft: 256 }}>
-          <Header style={{ fontSize: '25px', background: 'white' }}>
-            <span style={{ fontWeight: '400', margin: '0 0 0 0' }}></span>
+          <Header style={{ fontSize: '16px', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px' }}>
+            <div style={{ fontSize: '20px', fontWeight: 500 }}>Dashboard</div>
+            <div style={{ fontSize: '16px', color: '#555' }}>
+            <strong>{localStorage.getItem('username')}</strong>
+            </div>
           </Header>
           <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
             <Routes>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, Input, Typography, Card, Row, Col } from 'antd';
 import { useAuth } from '../AuthContext'; 
 import './css/Login.css';
-import dcwd from '../assets/image/dcwd.jpg'
+import dcwd from '../assets/image/dcwd.jpg';
 
 const { Title } = Typography;
 
@@ -16,12 +16,34 @@ const Login: React.FC = () => {
   const handleLogin = (values: { username: string; password: string }) => {
     const { username, password } = values;
 
-    if (username === '002481' && password === 'abllenos') {
-      login();
-      navigate('/dashboard');
-    } else {
-      alert('Invalid credentials');
-    }
+    fetch('http://192.100.140.198/helpers/gis/mgtsys/getUseraccounts.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && data.user) {
+          const { username, empID } = data.user;
+
+          
+          localStorage.setItem('username', username);
+          localStorage.setItem('empID', empID);
+
+          console.log('Logged in as:', username);
+
+          login(); 
+          navigate('/dashboard');
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Login error:', error);
+        alert('An error occurred during login.');
+      });
   };
 
   return (
@@ -36,7 +58,6 @@ const Login: React.FC = () => {
         }}
       >
         <Row gutter={16} align="middle">
-         
           <Col xs={24} md={10}>
             <img 
               src={dcwd}
@@ -45,7 +66,6 @@ const Login: React.FC = () => {
             />
           </Col>
 
-        
           <Col xs={24} md={14}>
             <Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>Login</Title>
             <Form
