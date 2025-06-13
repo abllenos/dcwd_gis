@@ -9,6 +9,7 @@ import {
   LogOut,
 } from 'react-feather';
 import type { MenuProps } from 'antd';
+import { useAuth } from '../AuthContext';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -19,16 +20,13 @@ const createLinkItem = (key: string, label: string, path?: string): MenuItem => 
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const handleLogoutClick = () => {
-    Modal.confirm({
-      title: 'Are you sure you want to log out?',
-      content: 'Your session will be closed and you will be redirected to the login page.',
-      okText: 'Yes, log me out',
-      cancelText: 'Cancel',
-      onOk: () => navigate('/logout'),
-    });
-  };
+const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+  if (key === 'logout') {
+    navigate('/logout');
+  }
+};
 
   const dataLayers: MenuItem[] = [
     createLinkItem('sub2-1', 'ASSETS'),
@@ -94,7 +92,7 @@ const NavBar: React.FC = () => {
     {
       key: 'logout',
       icon: <LogOut />,
-      label: <span onClick={handleLogoutClick}>Log Out</span>,
+      label: <span>Log Out</span>,
     },
   ];
 
@@ -105,6 +103,7 @@ const NavBar: React.FC = () => {
       defaultSelectedKeys={['dashboard']}
       defaultOpenKeys={['data-layers']}
       items={items}
+      onClick={handleMenuClick}
     />
   );
 };
