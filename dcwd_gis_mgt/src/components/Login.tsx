@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Typography, Card, Row, Col } from 'antd';
+import { Button, Form, Input, Typography, Card, Row, Col, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useAuth } from '../AuthContext'; 
 import './css/Login.css';
 import dcwd from '../assets/image/dcwd.jpg';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const showErrorModal = (message: string) => {
+    setModalMessage(message);
+    setModalVisible(true);
+  };
 
   const handleLogin = (values: { username: string; password: string }) => {
     const { username, password } = values;
@@ -28,21 +36,20 @@ const Login: React.FC = () => {
         if (data.success && data.user) {
           const { username, empID } = data.user;
 
-          
           localStorage.setItem('username', username);
           localStorage.setItem('empID', empID);
 
           console.log('Logged in as:', username);
 
-          login(); 
+          login();
           navigate('/dashboard');
         } else {
-          alert(data.message);
+          showErrorModal(data.message || 'Invalid credentials. Please try again.');
         }
       })
       .catch(error => {
         console.error('Login error:', error);
-        alert('An error occurred during login.');
+        showErrorModal('An error occurred during login. Please check your network or try again later.');
       });
   };
 
@@ -106,6 +113,25 @@ const Login: React.FC = () => {
           </Col>
         </Row>
       </Card>
+
+      <Modal
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={[
+          <Button key="ok" type="primary" onClick={() => setModalVisible(false)}>
+            OK
+          </Button>
+        ]}
+        title={
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ExclamationCircleOutlined style={{ color: '#ff4d4f', fontSize: '20px' }} />
+            <Text strong style={{ color: '#ff4d4f' }}>Login Alert</Text>
+          </span>
+        }
+        centered
+      >
+        <Text>{modalMessage}</Text>
+      </Modal>
     </div>
   );
 };
