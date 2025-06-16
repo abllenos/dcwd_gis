@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
 import { HomeOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "./util/conn";
+import {axiosInstance} from "./util/conn";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 
 const { Search } = Input;
@@ -19,7 +19,7 @@ interface PMS {
 }
 
 const fetchPMSData = async (): Promise<PMS[]> => {
-  const res = await axiosInstance.get("getPMS.php");
+  const res = await axiosInstance.get("helpers/gis/mgtsys/getLayers/getPMS.php");
   return Array.isArray(res.data.data) ? res.data.data : [];
 };
 

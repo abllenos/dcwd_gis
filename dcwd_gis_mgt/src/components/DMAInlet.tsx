@@ -2,8 +2,8 @@ import React, { useState, useMemo } from "react";
 import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
 import { HomeOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "./util/conn";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+import { axiosInstance } from "./util/conn";
 
 const { Search } = Input;
 
@@ -19,7 +19,8 @@ interface DMA {
 }
 
 const fetchDMAData = async (): Promise<DMA[]> => {
-  const res = await axiosInstance.get("getDmaInlet.php");
+  // const res = await axiosInstance.get("getDmaInlet.php");
+  const res = await axiosInstance.get("helpers/gis/mgtsys/getLayers/getDmaInlet.php");
   return Array.isArray(res.data.data) ? res.data.data : [];
 };
 
@@ -77,7 +78,7 @@ const DMAList: React.FC = () => {
       <Breadcrumb>
         <Breadcrumb.Item href="/">
           <HomeOutlined />
-        </Breadcrumb.Item>
+        </Breadcrumb.Item> 
         <Breadcrumb.Item>DMA Inlet</Breadcrumb.Item>
       </Breadcrumb>
 

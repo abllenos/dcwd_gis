@@ -8,7 +8,7 @@ import {
 } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "./util/conn";
+import {axiosInstance} from "./util/conn";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 
 const { Search } = Input;
@@ -25,7 +25,7 @@ interface PSV {
 }
 
 const fetchPSVData = async (): Promise<PSV[]> => {
-  const res = await axiosInstance.get("getPsv.php");
+  const res = await axiosInstance.get("helpers/gis/mgtsys/getLayers/getPsv.php");
   return Array.isArray(res.data.data) ? res.data.data : [];
 };
 

@@ -23,6 +23,9 @@ import AirValveTable from './components/AirValve';
 import PRVTable from './components/PRV';
 import PSVTable from './components/PSV';
 import BOVTable from './components/BOV';
+import FireHydrantList from './components/FireHydrant';
+import DistributionList from './components/Distribution';
+import IsolationTable from './components/Isolation';
 
 const { Header, Content, Sider } = Layout;
 
@@ -74,6 +77,9 @@ const App: React.FC = () => {
               <Route path="/PRV" element={<PrivateRoute><PRVTable /></PrivateRoute>} />
               <Route path="/PSV" element={<PrivateRoute><PSVTable /></PrivateRoute>} />
               <Route path="/BOV" element={<PrivateRoute><BOVTable /></PrivateRoute>} />
+              <Route path="/FireHydrant" element={<PrivateRoute><FireHydrantList /></PrivateRoute>} />
+              <Route path="/Distribution" element={<PrivateRoute><DistributionList /></PrivateRoute>} />
+              <Route path="/Isolation" element={<PrivateRoute><IsolationTable /></PrivateRoute>} />
             </Routes>
           </Content>
         </Layout>

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Table, Spin, Alert, Input, Breadcrumb } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "./util/conn";
+import {axiosInstance} from "./util/conn";
 
 const { Search } = Input;
 
@@ -20,7 +20,7 @@ interface PRV {
 }
 
 const fetchPRVData = async (): Promise<PRV[]> => {
-    const res = await axiosInstance.get("getPrv.php");
+    const res = await axiosInstance.get("helpers/gis/mgtsys/getLayers/getPrv.php");
     return Array.isArray(res.data.data) ? res.data.data : [];
 }
 

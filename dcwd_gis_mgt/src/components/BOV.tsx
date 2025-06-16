@@ -8,7 +8,7 @@ import {
 } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "./util/conn";
+import {axiosInstance} from "./util/conn";
 
 const { Search } = Input;
 
@@ -24,7 +24,7 @@ interface BOV {
 }
 
 const fetchBOVData = async (): Promise<BOV[]> => {
-  const res = await axiosInstance.get("getBov.php");
+  const res = await axiosInstance.get("helpers/gis/mgtsys/getLayers/getBov.php");
   return Array.isArray(res.data.data) ? res.data.data : [];
 };
 
