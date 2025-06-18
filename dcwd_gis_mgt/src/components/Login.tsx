@@ -34,12 +34,13 @@ const Login: React.FC = () => {
       .then(response => response.json())
       .then(data => {
         if (data.success && data.user) {
-          const { username, empID } = data.user;
+          const { username, empID, firstname, middlename, lastname } = data.user;
 
           localStorage.setItem('username', username);
           localStorage.setItem('empID', empID);
-
-          console.log('Logged in as:', username);
+          localStorage.setItem('firstname', firstname);
+          localStorage.setItem('middlename', middlename);
+          localStorage.setItem('lastname', lastname);
 
           login();
           navigate('/dashboard');
