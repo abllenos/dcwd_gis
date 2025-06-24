@@ -1,107 +1,61 @@
-import React, { useState } from 'react';
-import { Table, Breadcrumb } from 'antd';
-import type { TableColumnsType, TableProps } from 'antd';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useState, useMemo } from "react";
+import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
+import { HomeOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "./util/conn";
 
-type TableRowSelection<T> = TableProps<T>['rowSelection'];
+const { Search } = Input;
 
-interface DataType {
-  key: React.Key;
-  id: number;
-  accesslevel: string;
-  description: string;
+interface AccessLevel {
+  ID: number;
+  Accesslevel: string;
+  Description: string
 }
 
-const columns: TableColumnsType<DataType> = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-  },
-  {
-    title: 'Access Level',
-    dataIndex: 'accesslevel',
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-  },
-];
+const fetchAccessLevel = async (): Promise<AccessLevel[]> => {
+  const res = await axiosInstance.get("helpers/gis/mgtsys/getAccesslevel.php");
+  return Array.isArray(res.data.data) ? res.data.data : [];
+};
 
-const data: DataType[] = [];
-for (let i = 0; i < 15; i++) {
-  data.push({
-    key: i,
-    id: i,
-    accesslevel: `R000${i}`,
-    description: `Access${i}`,
+const AccessLevelTable: React.FC = () => {
+  const [searchText, setSearchText] = useState("");
+
+  const { data, isLoading, error } = useQuery<AccessLevel[]>({
+    queryKey: ["accesslevelData"],
+    queryFn: fetchAccessLevel,
   });
-}
 
-const AccessLevel: React.FC = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    const lowerValue = searchText.toLowerCase();
+    return data.filter((accesslevel) =>
+      (accesslevel.ID?.toString() ?? "").includes(lowerValue) ||
+      (accesslevel.Accesslevel?.toLowerCase() ?? "").includes(lowerValue) ||
+      (accesslevel.Description?.toLowerCase() ?? "").includes(lowerValue)
+    );
+  }, [data, searchText]);
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
+  const columns = [
+    { title: "ID", dataIndex: "ID", key: "ID" },
+    { title: "Access Level", dataIndex: "Accesslevel", key: "Accesslevel" },
+    { title: "Description", dataIndex: "Description", key: "Description" },
+  ];
 
-  const rowSelection: TableRowSelection<DataType> = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    selections: [
-      {
-        key: 'select-all',
-        text: 'Select All',
-        onSelect: (changeableRowKeys) => {
-          setSelectedRowKeys(changeableRowKeys);
-        },
-      },
-      {
-        key: 'select-none',
-        text: 'Select None',
-        onSelect: () => {
-          setSelectedRowKeys([]);
-        },
-      },
-      {
-        key: 'select-odd',
-        text: 'Select Odd Rows',
-        onSelect: (changeableRowKeys) => {
-          const newSelectedRowKeys = changeableRowKeys.filter((_, index) => index % 2 === 0);
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-      {
-        key: 'select-even',
-        text: 'Select Even Rows',
-        onSelect: (changeableRowKeys) => {
-          const newSelectedRowKeys = changeableRowKeys.filter((_, index) => index % 2 !== 0);
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-    ],
-  };
+  if (isLoading) return <Spin size="large"/>;
+  if (error instanceof Error) return <Alert message={error.message} type="error" showIcon/>;
 
   return (
     <div>
       <Breadcrumb>
-        <Breadcrumb.Item href="">
+        <Breadcrumb.Item href="/">
           <HomeOutlined />
         </Breadcrumb.Item>
-        <Breadcrumb.Item href="">
-          <UserOutlined />
-          <span>Application List</span>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Application</Breadcrumb.Item>
+        <Breadcrumb.Item>Access Level</Breadcrumb.Item>
       </Breadcrumb>
-      <Table
-        style={{ margin: '20px' }}
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={data}
-      />
+      <h1>Access Level</h1>
+      <Table columns={columns} dataSource={filteredData} pagination={{ pageSize: 10 }}/>
     </div>
   );
 };
 
-export default AccessLevel;
+export default AccessLevelTable;

@@ -26,6 +26,7 @@ import BOVTable from './components/BOV';
 import FireHydrantList from './components/FireHydrant';
 import DistributionList from './components/Distribution';
 import IsolationTable from './components/Isolation';
+import AccessLevelTable from './components/AccessLevel';
 
 const { Header, Content, Sider } = Layout;
 
@@ -80,6 +81,7 @@ const App: React.FC = () => {
               <Route path="/FireHydrant" element={<PrivateRoute><FireHydrantList /></PrivateRoute>} />
               <Route path="/Distribution" element={<PrivateRoute><DistributionList /></PrivateRoute>} />
               <Route path="/Isolation" element={<PrivateRoute><IsolationTable /></PrivateRoute>} />
+              <Route path="/AccessLevel" element={<PrivateRoute><AccessLevelTable /></PrivateRoute>} />
             </Routes>
           </Content>
         </Layout>
