@@ -5,6 +5,7 @@ import { HomeOutlined } from '@ant-design/icons';
 import { fetchLogs } from './endpoints/Logs';
 import { fetchGeometry } from './endpoints/Logs';
 import MapComponent from './mapView';
+import type { TablePaginationConfig } from "antd/es/table";
 
 const modifiedByMappings: Record<'002480' | '002481' | '001260' | '001782' | '000747' | '000850' | '000866' | '001779' | '001786' | '001746' | '001780', string> = {
   '002480': 'AOT',
@@ -52,6 +53,11 @@ const UserLogs: React.FC = () => {
   const [geometry, setGeometryData] = useState<any>(null);
   const [isLoadingGeometry, setIsLoadingGeometry] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lng: number; lat: number } | null>(null);
+
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    current: 1,
+    pageSize: 10,
+  });
 
   
 
@@ -200,6 +206,12 @@ const UserLogs: React.FC = () => {
   };
 
   const columns: ColumnsType<Log> = [
+    { title: "#",
+      key: "index",
+      render: (_text, _record, index) => 
+        ((pagination.current || 1) - 1) * (pagination.pageSize || 10) + index + 1,
+      width: 60,
+    },
     { title: 'ID', dataIndex: 'ID', key: 'ID' },
     { title: 'Layer ID', dataIndex: 'layerid', key: 'layerid' },
     { title: 'Asset ID', dataIndex: 'assetid', key: 'assetid' },

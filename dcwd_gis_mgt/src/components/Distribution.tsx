@@ -16,7 +16,7 @@ interface Distribution {
   description: string;
   ws: string;
   otp: string;
-  st_asgeojson?: string; // Add if geometry is present
+  st_asgeojson?: string; 
 }
 
 const fetchDistributionData = async (): Promise<Distribution[]> => {
