@@ -13,6 +13,7 @@ import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home'; 
+import ReportALeak from './components/ReportALeak';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -85,7 +86,7 @@ const App: React.FC = () => {
       case 'dashboard':
         return <div>Dashboard</div>;
       case 'report-a-leak':
-        return <div>Report A Leak</div>;
+        return <ReportALeak />;
       default:
         return <div>Select a menu item.</div>;
     }
