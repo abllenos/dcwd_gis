@@ -5,20 +5,21 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const labelStyle: React.CSSProperties = {
-  fontWeight: 600,
+  fontWeight: 500,
   textTransform: 'uppercase' as const,
   fontSize: 12,
+  fontFamily: 'Arial, sans-serif',
 };
 
 const ReportALeak: React.FC = () => {
   return (
     <div style={{ padding: 5, fontFamily: 'Segoe UI, sans-serif' }}>
-      <Title level={3} style={{ fontWeight: 'bold' }}>
+      {/* <Title level={3} style={{ fontWeight: 'bold' }}>
         Report A Leak
-      </Title>
+      </Title> */}
 
       <Divider orientation="left">
-        <Text strong>Contact Information</Text>
+        <Text style = {{ fontSize: 18}} strong>Contact Information</Text>
       </Divider>
 
       <Form layout="vertical">
@@ -44,11 +45,10 @@ const ReportALeak: React.FC = () => {
               <Input />
             </Form.Item>
           </Col>
-          
         </Row>
 
         <Divider orientation="left">
-          <Text strong>Leak Information</Text>
+          <Text style = {{ fontSize: 18}} strong>Leak Information</Text>
         </Divider>
 
         <Row gutter={16}>
@@ -94,7 +94,7 @@ const ReportALeak: React.FC = () => {
         </Form.Item>
 
         <Divider orientation="left">
-          <Text strong>Search Address</Text>
+          <Text style = {{ fontSize: 18}} strong>Search Address</Text>
         </Divider>
 
         <Form.Item label={<span style={labelStyle}>Search</span>}>
@@ -106,16 +106,17 @@ const ReportALeak: React.FC = () => {
             title="Map"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125259.98975149246!2d125.4952082!3d7.09101925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f90db8f7a5ec45%3A0x9cfc1cf02b731b02!2sDavao%20City!5e0!3m2!1sen!2sph!4v1625094609834!5m2!1sen!2sph"
             width="100%"
-            height="100%"
+            height= '800px'
             style={{ border: 0 }}
             loading="lazy"
           />
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
           <Button danger>Cancel</Button>
           <Button type="primary">Submit</Button>
         </div>
+        </div>
+            
+        
       </Form>
     </div>
   );

@@ -17,16 +17,18 @@ import ReportALeak from './components/ReportALeak';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
+const iconSize = { fontSize: '17px'};
+
 const items: MenuItem[] = [
   {
     key: 'home',
     label: 'Home',
-    icon: <HomeOutlined />,
+    icon: <HomeOutlined style = {iconSize} />,
   },
   {
     key: 'create-report',
     label: 'Create a Report',
-    icon: <FileTextOutlined />,
+    icon: <FileTextOutlined style = {iconSize} />,
     children: [
       { key: 'report-a-leak', label: 'Report A Leak' },
       { key: 'leak-detection', label: 'Leak Detection' },
@@ -36,7 +38,7 @@ const items: MenuItem[] = [
   {
     key: 'operation',
     label: 'Operation',
-    icon: <AppstoreOutlined />,
+    icon: <AppstoreOutlined style = {iconSize} />,
     children: [
       { key: 'leak-reports', label: 'Leak Reports' },
       { key: 'supply-complaints', label: 'Supply Complaints' },
@@ -46,7 +48,7 @@ const items: MenuItem[] = [
   {
     key: 'maintenance',
     label: 'System Maintenance',
-    icon: <ClusterOutlined />,
+    icon: <ClusterOutlined style = {iconSize} />,
     children: [
       { key: 'dispatch-override', label: 'Dispatch Override' },
       { key: 'caretaker-assignment', label: 'Caretaker Assignment' },
@@ -58,17 +60,17 @@ const items: MenuItem[] = [
   {
     key: 'reports',
     label: 'Reports',
-    icon: <FileOutlined />,
+    icon: <FileOutlined style = {iconSize} />,
   },
   {
     key: 'settings',
     label: 'Settings',
-    icon: <SettingOutlined />,
+    icon: <SettingOutlined style = {iconSize} />,
   },
   {
     key: 'logout',
     label: 'Logout',
-    icon: <LogoutOutlined />,
+    icon: <LogoutOutlined style = {iconSize} />,
   }
 ];
 
@@ -92,36 +94,75 @@ const App: React.FC = () => {
     }
   };
 
-  return (
-  <div style={{ display: 'flex' }}>
-    <div style={{ width: 256, borderRight: '1px solid #f0f0f0' }}>
-      <div style={{ padding: 16, textAlign: 'center' }}>
-        <img src={dcwd} alt="DCWD Logo" style={{ maxWidth: '100%', height: 'auto' }} />
+    return (
+  <div style={{ display: 'flex', backgroundColor: '#f5f7fa' }}>
+    <div
+      style={{
+        width: 256,
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        borderRight: '1px solid #e0e0e0',
+        backgroundColor: '#ffffff',
+        overflowY: 'auto',
+        boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
+        zIndex: 1000,
+      }}
+    >
+      <div style={{ padding: 20, textAlign: 'center' }}>
+        <img
+          src={dcwd}
+          alt="DCWD Logo"
+          style={{
+            maxWidth: '80%',
+            height: 'auto',
+            borderRadius: 8,
+            boxShadow: '10px 10px 10px rgba(0, 0, 0, 0.1)',
+          }}
+        />
       </div>
       <Menu
         onClick={onClick}
         selectedKeys={[selectedKey]}
-        defaultOpenKeys={['sub1']}
         mode="inline"
         items={items}
-        style={{ fontSize: '16px' }}
+        style={{ fontSize: '16px', border: 'none' }}
       />
     </div>
-    <div style={{ flex: 1 }}>
-      <div style={{
-        padding: '16px 24px',
-        borderBottom: '1px solid #d9d9d9',
-        fontSize: '20px',
-        fontWeight: 'normal'
-      }}>
-        Leak Reporting
+
+    <div style={{ marginLeft: 256, flex: 1, minHeight: '100vh' }}>
+      <div
+        style={{
+          padding: '16px 24px',
+          borderBottom: '1px solid #e8e8e8',
+          fontSize: '18px',
+          fontWeight: 600,
+          backgroundColor: '#ffffff',
+          position: 'sticky',
+          top: 0,
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <span>Leak Reporting</span>
       </div>
-      <div style={{ padding: 24 }}>
+
+      <div
+        style={{
+          padding: 24,
+          backgroundColor: '#f5f7fa',
+          minHeight: 'calc(100vh - 64px)',
+        }}
+      >
         {renderContent()}
       </div>
     </div>
   </div>
 );
+
 };
 
 export default App;
