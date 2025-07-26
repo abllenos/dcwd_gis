@@ -104,6 +104,7 @@ const App: React.FC = () => {
         defaultOpenKeys={['sub1']}
         mode="inline"
         items={items}
+        style={{ fontSize: '16px' }}
       />
     </div>
     <div style={{ flex: 1 }}>
