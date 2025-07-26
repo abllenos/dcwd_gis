@@ -39,7 +39,6 @@ const chartConfig = {
         },
     }
 }
-
 const columns: TableProps<DataType>['columns'] = [
   {
     title: 'ID',
