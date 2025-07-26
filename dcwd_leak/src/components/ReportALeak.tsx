@@ -12,7 +12,7 @@ const labelStyle: React.CSSProperties = {
 
 const ReportALeak: React.FC = () => {
   return (
-    <div style={{ padding: 24, fontFamily: 'Segoe UI, sans-serif' }}>
+    <div style={{ padding: 5, fontFamily: 'Segoe UI, sans-serif' }}>
       <Title level={3} style={{ fontWeight: 'bold' }}>
         Report A Leak
       </Title>
@@ -25,10 +25,12 @@ const ReportALeak: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item label={<span style={labelStyle}>Account No or Meter No</span>}>
-              <Input placeholder="Enter account or meter number" />
+                <Input.Group compact>
+                <Input style={{ width: 'calc(100% - 700px)' }} placeholder="Enter account or meter number" />
+                <Button type="primary">Search</Button>
+                </Input.Group>
             </Form.Item>
           </Col>
-          
         </Row>
 
         <Row gutter={16}>
