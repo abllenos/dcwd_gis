@@ -12,7 +12,7 @@ import {
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 import dcwd from './assets/image/logo.png';
-import Home from './components/home'; // your home component
+import Home from './components/home'; 
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -21,11 +21,6 @@ const items: MenuItem[] = [
     key: 'home',
     label: 'Home',
     icon: <HomeOutlined />,
-  },
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: <DesktopOutlined />,
   },
   {
     key: 'create-report',
@@ -91,29 +86,40 @@ const App: React.FC = () => {
         return <div>Dashboard</div>;
       case 'report-a-leak':
         return <div>Report A Leak</div>;
-      // Add more cases for other keys as needed
       default:
         return <div>Select a menu item.</div>;
     }
   };
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: 256, borderRight: '1px solid #f0f0f0' }}>
-        <div style={{ padding: 16, textAlign: 'center' }}>
-          <img src={dcwd} alt="DCWD Logo" style={{ maxWidth: '100%', height: 'auto' }} />
-        </div>
-        <Menu
-          onClick={onClick}
-          selectedKeys={[selectedKey]}
-          defaultOpenKeys={['sub1']}
-          mode="inline"
-          items={items}
-        />
+  <div style={{ display: 'flex' }}>
+    <div style={{ width: 256, borderRight: '1px solid #f0f0f0' }}>
+      <div style={{ padding: 16, textAlign: 'center' }}>
+        <img src={dcwd} alt="DCWD Logo" style={{ maxWidth: '100%', height: 'auto' }} />
       </div>
-      <div style={{ flex: 1, padding: 24 }}>{renderContent()}</div>
+      <Menu
+        onClick={onClick}
+        selectedKeys={[selectedKey]}
+        defaultOpenKeys={['sub1']}
+        mode="inline"
+        items={items}
+      />
     </div>
-  );
+    <div style={{ flex: 1 }}>
+      <div style={{
+        padding: '16px 24px',
+        borderBottom: '1px solid #d9d9d9',
+        fontSize: '20px',
+        fontWeight: 'normal'
+      }}>
+        Leak Reporting
+      </div>
+      <div style={{ padding: 24 }}>
+        {renderContent()}
+      </div>
+    </div>
+  </div>
+);
 };
 
 export default App;
