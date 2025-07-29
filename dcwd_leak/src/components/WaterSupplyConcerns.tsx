@@ -34,71 +34,49 @@ const ReportALeak: React.FC = () => {
         </Row>
 
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item label={<span style={labelStyle}>Name</span>}>
               <Input />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label={<span style={labelStyle}>Contact No.</span>}>
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Divider orientation="left">
-          <Text style={{ fontSize: 18 }} strong>Leak Information</Text>
-        </Divider>
-
-        <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label={<span style={labelStyle}>Leak Type</span>}>
-              <Select placeholder="-SELECT-">
-                <Option value="major">Major</Option>
-                <Option value="minor">Minor</Option>                
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label={<span style={labelStyle}>Leak Pressure</span>}>
-              <Select placeholder="-SELECT-">
-                <Option value="high">High</Option>
-                <Option value="low">Low</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label={<span style={labelStyle}>Visibility</span>}>
-              <Select placeholder="-SELECT-">
-                <Option value="exposedleak">Exposed Leak</Option>
-                <Option value="undergroundleak">Underground Leak</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label={<span style={labelStyle}>Address</span>}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label={<span style={labelStyle}>Landmark</span>}>
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
             <Form.Item label={<span style={labelStyle}>Nearest Meter</span>}>
               <Input />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label={<span style={labelStyle}>Remarks</span>}>
-              <Input.TextArea rows={3} />
+        </Row>
+        
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Location</span>}>
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Contact No.</span>}>
+              <Input />
+            </Form.Item>
+          </Col>          
+        </Row>
+
+        <Divider orientation="left">
+          <Text style={{ fontSize: 18 }} strong>Complaint Details</Text>
+        </Divider>
+
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>JMS Code</span>}>
+              <Select placeholder="-SELECT-">
+                <Option value="nowater">No Water</Option>
+                <Option value="lowpressure">Low Pressure</Option>
+                <Option value="waterquality">Water Quality Complaints</Option>                                    
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Complaint Details</span>}>
+              <Select placeholder="-SELECT-">
+              </Select>
             </Form.Item>
           </Col>
         </Row>
