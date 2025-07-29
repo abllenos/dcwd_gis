@@ -1,6 +1,7 @@
 import React from 'react';
-import { Form, Input, Button, Select, Divider, Typography, Row, Col } from 'antd';
+import { Form, Input, Button, Select, Divider, Typography, Row, Col, InputNumber } from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
+import { DatePicker } from 'antd';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -22,7 +23,8 @@ const ReportALeak: React.FC = () => {
       <Form layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label={<span style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 4}}>
+            <Form.Item 
+            label={<span style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 4}}>
               <SearchOutlined style={{ fontSize: 15}}/>
               Search Account No or Meter No</span>}>
               <Input.Group compact style={{ display: 'flex' }}>
@@ -32,6 +34,7 @@ const ReportALeak: React.FC = () => {
             </Form.Item>
           </Col>
         </Row>
+
 
         <Row gutter={16}>
           <Col span={12}>
@@ -46,37 +49,6 @@ const ReportALeak: React.FC = () => {
           </Col>
         </Row>
 
-        <Divider orientation="left">
-          <Text style={{ fontSize: 18 }} strong>Leak Information</Text>
-        </Divider>
-
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item label={<span style={labelStyle}>Leak Type</span>}>
-              <Select placeholder="-SELECT-">
-                <Option value="major">Major</Option>
-                <Option value="minor">Minor</Option>                
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label={<span style={labelStyle}>Leak Pressure</span>}>
-              <Select placeholder="-SELECT-">
-                <Option value="high">High</Option>
-                <Option value="low">Low</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label={<span style={labelStyle}>Visibility</span>}>
-              <Select placeholder="-SELECT-">
-                <Option value="exposedleak">Exposed Leak</Option>
-                <Option value="undergroundleak">Underground Leak</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item label={<span style={labelStyle}>Address</span>}>
@@ -84,18 +56,80 @@ const ReportALeak: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label={<span style={labelStyle}>Landmark</span>}>
+            <Form.Item label={<span style={labelStyle}>LandMark</span>}>
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={<span style={labelStyle}>Nearest Meter</span>}>
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+        
+
+
+        <Divider orientation="left">
+          <Text style={{ fontSize: 18 }} strong>Leak Details</Text>
+        </Divider>
+
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Date & Time</span>}>
+              <DatePicker 
+              showTime={{format:'hh:mm A'}} 
+              format ="DD/MM/YY hh:mm A" 
+              style={{width: '100%'}} 
+              placeholder="dd/mm/yy --:-- --"/>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Leak Type</span>}>
+              <Select placeholder="-SELECT-">
+                <Option value="serviceline">Serviceline</Option>
+                <Option value="mainline">Mainline</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Leak Indicator</span>}>
+              <Select placeholder="-SELECT-" />
+            </Form.Item>
+          </Col>          
+        </Row>
+
+        <Row gutter={16}>
+
+                  <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>Covering</span>}>
+              <Select placeholder="-SELECT-">
+                <Option Value='concrete'>Concrete</Option>
+                <Option Value='gravel'>Gravel</Option>
+                <Option Value='soil'>Soil</Option>
+              </Select>  
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>NRW Level</span>}>
+              <InputNumber<number>
+              min={0}
+              max={100}
+              step={0.01}
+              defaultValue={0.00}
+              style={{width: '100%'}}
+              formatter={value => !isNaN(Number(value)) ? Number(value).toFixed(2) : '0.00'}
+              parser={value => parseFloat(value || '0')}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={<span style={labelStyle}>DMA</span>}>
               <Input />
             </Form.Item>
           </Col>
         </Row>
 
         <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label={<span style={labelStyle}>Nearest Meter</span>}>
-              <Input />
-            </Form.Item>
-          </Col>
           <Col span={12}>
             <Form.Item label={<span style={labelStyle}>Remarks</span>}>
               <Input.TextArea rows={3} />
