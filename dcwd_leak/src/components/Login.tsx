@@ -43,10 +43,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const data = await response.json();
       console.log('API raw response:', data); 
 
-      if (response.ok && data.success) {
+      if (response.ok && data.statusCode === 200) {
+        console.log("Login successful, navigating...");
+        onLogin(data.data);
         navigate('/home');
-        onLogin(data.data); 
-        
       } else {
         setError(data.message || 'Invalid email or password');
       }
