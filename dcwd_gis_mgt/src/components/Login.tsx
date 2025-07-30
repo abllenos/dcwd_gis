@@ -24,34 +24,32 @@ const Login: React.FC = () => {
   const handleLogin = (values: { username: string; password: string }) => {
     const { username, password } = values;
 
-    fetch('http://192.100.140.198/helpers/gis/mgtsys/getUseraccounts.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success && data.user) {
-          const { username, empID, firstname, middlename, lastname } = data.user;
+    fetch('https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/userlogin/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ username, password }),
+})
+  .then(async response => {
+    const data = await response.json();
+    console.log('API raw response:', data);
 
-          localStorage.setItem('username', username);
-          localStorage.setItem('empID', empID);
-          localStorage.setItem('firstname', firstname);
-          localStorage.setItem('middlename', middlename);
-          localStorage.setItem('lastname', lastname);
+    if (response.ok && data.statusCode === 200 && data.data?.token) {
+  
+      localStorage.setItem('token', data.data.token);
 
-          login();
-          navigate('/dashboard');
-        } else {
-          showErrorModal(data.message || 'Invalid credentials. Please try again.');
-        }
-      })
-      .catch(error => {
-        console.error('Login error:', error);
-        showErrorModal('An error occurred during login. Please check your network or try again later.');
-      });
+      localStorage.setItem('user', JSON.stringify(data.data));
+      login(); 
+      navigate('/dashboard');
+    } else {
+      showErrorModal(data.message || 'Invalid credentials. Please try again.');
+    }
+  })
+  .catch(error => {
+    console.error('Login error:', error);
+    showErrorModal('An error occurred during login. Please check your network or try again later.');
+  });
   };
 
   return (
