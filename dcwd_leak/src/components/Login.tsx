@@ -5,6 +5,7 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom'; 
 
 interface LoginProps {
   onLogin: (userData: any) => void;
@@ -17,6 +18,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [darkMode, setDarkMode] = useState(false);
 
+  const navigate = useNavigate();
   const styles = getStyles(darkMode);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,10 +41,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       );
 
       const data = await response.json();
-      console.log('API raw response:', data); // optional for debugging
+      console.log('API raw response:', data); 
 
       if (response.ok && data.success) {
-        onLogin(data.data); // Pass user data to parent
+        navigate('/home');
+        onLogin(data.data); 
+        
       } else {
         setError(data.message || 'Invalid email or password');
       }

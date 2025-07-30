@@ -57,8 +57,7 @@ const SupplyComplaints: React.FC = () => {
   const handleCancel = () => setModalVisible(false);
 
   const filteredData = (tabKey: string) => {
-    let tabFiltered = data; // Add filtering logic here per tab if needed
-
+    let tabFiltered = data; 
     if (searchText.trim()) {
       const keyword = searchText.toLowerCase();
       tabFiltered = tabFiltered.filter(record =>
