@@ -11,16 +11,19 @@ import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
 import { Layout, Menu, Button } from 'antd';
+import type { MenuProps } from 'antd';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
+
 import ReportALeak from './components/CreateReport/ReportALeak';
 import LeakDetection from './components/CreateReport/LeakDetection';
 import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
 import LeakReports from './components/Operations/LeakReports';
 import SupplyComplaints from './components/Operations/SupplyComplaints';
+import Login from './components/Login';
 
 import './styles/theme.css';
 
@@ -44,40 +47,23 @@ const items: MenuItem[] = [
     icon: <HomeOutlined style={iconSize} />,
   },
   {
-    key: 'create-report',
-    label: 'Create a Report',
+    key: 'report-a-leak',
+    label: bulletLabel('Report A Leak'),
     icon: <FileTextOutlined style={iconSize} />,
-    children: [
-      { key: 'report-a-leak', label: bulletLabel('Report A Leak') },
-      { key: 'leak-detection', label: bulletLabel('Leak Detection') },
-      { key: 'supply-concerns', label: bulletLabel('Water Supply Concerns') },
-    ],
   },
   {
-    key: 'operation',
-    label: 'Operation',
-    icon: <AppstoreOutlined style={iconSize} />,
-    children: [
-      { key: 'leak-reports', label: bulletLabel('Leak Reports') },
-      { key: 'supply-complaints', label: bulletLabel('Supply Complaints') },
-      { key: 'quality-complaints', label: bulletLabel('Quality Complaints') },
-    ],
+    key: 'leak-detection',
+    label: bulletLabel('Leak Detection'),
+    icon: <FileTextOutlined style={iconSize} />,
   },
   {
-    key: 'maintenance',
-    label: 'System Maintenance',
-    icon: <ClusterOutlined style={iconSize} />,
-    children: [
-      { key: 'dispatch-override', label: bulletLabel('Dispatch Override') },
-      { key: 'caretaker-assignment', label: bulletLabel('Caretaker Assignment') },
-      { key: 'access-level', label: bulletLabel('Access Level') },
-      { key: 'user-accounts', label: bulletLabel('User Accounts') },
-      { key: 'jms-data-seeding', label: bulletLabel('JMS Data Seeding') },
-    ],
+    key: 'supply-concerns',
+    label: bulletLabel('Water Supply Concerns'),
+    icon: <FileTextOutlined style={iconSize} />,
   },
   {
-    key: 'reports',
-    label: 'Reports',
+    key: 'leak-reports',
+    label: bulletLabel('Leak Reports'),
     icon: <FileOutlined style={iconSize} />,
   },
   {
@@ -92,12 +78,19 @@ const items: MenuItem[] = [
   },
 ];
 
-const App: React.FC = () => {
-  const [selectedKey, setSelectedKey] = useState<string>('home');
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [selectedKey, setSelectedKey] = useState('home');
+  const navigate = useNavigate();
 
   const onClick: MenuProps['onClick'] = (e) => {
-    setSelectedKey(e.key);
+    if (e.key === 'logout') {
+      onLogout();
+      navigate('/login');
+    } else {
+      setSelectedKey(e.key);
+      navigate(`/${e.key}`);
+    }
   };
 
   const renderContent = () => {
@@ -124,9 +117,9 @@ const App: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh', fontFamily: 'Segoe UI, sans-serif' }}>
       <Sider
-        trigger={null}
         collapsible
         collapsed={collapsed}
+
         collapsedWidth={80}
         width={300}
         style={{
@@ -140,6 +133,7 @@ const App: React.FC = () => {
           overflowY: 'auto',
           boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
           transition: 'all 0.2s ease',
+
         }}
       >
         <div style={{ padding: 20, textAlign: 'center' }}>
@@ -151,12 +145,10 @@ const App: React.FC = () => {
                 maxWidth: '80%',
                 height: 'auto',
                 borderRadius: 8,
-                boxShadow: '10px 10px 10px rgba(0, 0, 0, 0.1)',
               }}
             />
           )}
         </div>
-
         <Menu
           onClick={onClick}
           selectedKeys={[selectedKey]}
@@ -169,7 +161,6 @@ const App: React.FC = () => {
             border: 'none',
           }}
           theme="light"
-          rootClassName="custom-sidebar-menu"
         />
       </Sider>
 
@@ -205,6 +196,31 @@ const App: React.FC = () => {
         </Content>
       </Layout>
     </Layout>
+  );
+};
+
+const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/login"
+          element={<Login onLogin={() => setIsLoggedIn(true)} />}
+        />
+        <Route
+          path="/*"
+          element={
+            isLoggedIn ? (
+              <Dashboard onLogout={() => setIsLoggedIn(false)} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 
