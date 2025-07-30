@@ -28,40 +28,40 @@ interface ComplaintData {
 const reportData: ComplaintData[] = [
   {
     key: '1',
-    id: '20124',
-    location: 'Zone 1 - Barangay A',
-    remarks: 'Low pressure in area',
-    referenceMeter: 'RM-123456',
-    contactNo: '09171234567',
-    dateTimeReported: 'Jul 28, 2025 09:00 AM',
+    id: '30124',
+    location: 'Zone 2 - Barangay D',
+    remarks: 'Water has unusual odor',
+    referenceMeter: 'RM-543210',
+    contactNo: '09180001111',
+    dateTimeReported: 'Jul 29, 2025 08:45 AM',
   },
 ];
 
 const onProcessData: ComplaintData[] = [
   {
     key: '2',
-    id: '20142',
-    location: 'Zone 3 - Barangay B',
-    remarks: 'No water since last night',
-    referenceMeter: 'RM-654321',
-    contactNo: '09981234567',
-    dateTimeReported: 'Jul 28, 2025 10:30 AM',
+    id: '30125',
+    location: 'Zone 5 - Barangay E',
+    remarks: 'Discoloration in tap water',
+    referenceMeter: 'RM-678901',
+    contactNo: '09990002222',
+    dateTimeReported: 'Jul 29, 2025 09:30 AM',
   },
 ];
 
 const completedData: ComplaintData[] = [
   {
     key: '3',
-    id: '20167',
-    location: 'Zone 4 - Barangay C',
-    remarks: 'Resolved pressure issue',
-    referenceMeter: 'RM-789123',
-    contactNo: '09081234567',
-    dateTimeReported: 'Jul 28, 2025 08:15 AM',
+    id: '30126',
+    location: 'Zone 6 - Barangay F',
+    remarks: 'Resolved taste issue',
+    referenceMeter: 'RM-112233',
+    contactNo: '09220003333',
+    dateTimeReported: 'Jul 29, 2025 07:30 AM',
   },
 ];
 
-const SupplyComplaints: React.FC = () => {
+const QualityComplaints: React.FC = () => {
   const [activeTab, setActiveTab] = useState('reports');
   const [searchText, setSearchText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -141,9 +141,9 @@ const SupplyComplaints: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Supply Complaints</Title>
+        <Title level={3} style={{ marginBottom: 0 }}>Quality Complaints</Title>
         <Input.Search
-          placeholder="Search ID, Meter No., Contact..."
+          placeholder="Search"
           allowClear
           style={{ width: 300 }}
           onChange={e => setSearchText(e.target.value.toLowerCase())}
@@ -152,7 +152,7 @@ const SupplyComplaints: React.FC = () => {
 
       <Breadcrumb style={{ marginBottom: 16 }}>
         <Breadcrumb.Item>Operation</Breadcrumb.Item>
-        <Breadcrumb.Item>Supply Complaints</Breadcrumb.Item>
+        <Breadcrumb.Item>Quality Complaints</Breadcrumb.Item>
       </Breadcrumb>
 
       <Card style={{ marginBottom: 0 }} bodyStyle={{ padding: 0 }}>
@@ -196,4 +196,4 @@ const SupplyComplaints: React.FC = () => {
   );
 };
 
-export default SupplyComplaints;
+export default QualityComplaints;

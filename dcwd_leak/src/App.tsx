@@ -15,6 +15,7 @@ import { Layout, Menu, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
+import Login from './components/Login';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
 
@@ -23,7 +24,7 @@ import LeakDetection from './components/CreateReport/LeakDetection';
 import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
 import LeakReports from './components/Operations/LeakReports';
 import SupplyComplaints from './components/Operations/SupplyComplaints';
-import Login from './components/Login';
+import QualityComplaints from './components/Operations/QualityComplaints';
 
 import './styles/theme.css';
 
@@ -47,23 +48,40 @@ const items: MenuItem[] = [
     icon: <HomeOutlined style={iconSize} />,
   },
   {
-    key: 'report-a-leak',
-    label: bulletLabel('Report A Leak'),
-    icon: <FileTextOutlined style={iconSize} />,
+    key: 'create-report',
+    label: 'Create a Report',
+    icon: <FileTextOutlined style={iconSize}/>,
+    children: [
+      { key: 'report-a-leak', label: bulletLabel('Report A Leak') },
+      { key: 'leak-detection', label: bulletLabel('Leak Detection') },
+      { key: 'supply-concerns', label: bulletLabel('Water Supply Concerns') },
+    ]
   },
   {
-    key: 'leak-detection',
-    label: bulletLabel('Leak Detection'),
-    icon: <FileTextOutlined style={iconSize} />,
+    key: 'operation',
+    label: 'Operation',
+    icon: <AppstoreOutlined style={iconSize} />,
+    children: [
+      { key: 'leak-reports', label: bulletLabel('Leak Reports') },
+      { key: 'supply-complaints', label: bulletLabel('Supply Complaints') },
+      { key: 'quality-complaints', label: bulletLabel('Quality Complaints') },
+    ],
   },
   {
-    key: 'supply-concerns',
-    label: bulletLabel('Water Supply Concerns'),
-    icon: <FileTextOutlined style={iconSize} />,
+    key: 'maintenance',
+    label: 'System Maintenance',
+    icon: <ClusterOutlined style={iconSize} />,
+    children: [
+      { key: 'dispatch-override', label: bulletLabel('Dispatch Override') },
+      { key: 'caretaker-assignment', label: bulletLabel('Caretaker Assignment') },
+      { key: 'access-level', label: bulletLabel('Access Level') },
+      { key: 'user-accounts', label: bulletLabel('User Accounts') },
+      { key: 'jms-data-seeding', label: bulletLabel('JMS Data Seeding') },
+    ],
   },
   {
-    key: 'leak-reports',
-    label: bulletLabel('Leak Reports'),
+    key: 'reports',
+    label: 'Reports',
     icon: <FileOutlined style={iconSize} />,
   },
   {
@@ -107,6 +125,8 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         return <LeakReports />;
       case 'supply-complaints':
         return <SupplyComplaints />;
+      case 'quality-complaints':
+        return <QualityComplaints />;
       default:
         return <div>Select a menu item.</div>;
     }
@@ -180,7 +200,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             onClick={() => setCollapsed(!collapsed)}
             style={{ fontSize: '16px', marginRight: 16 }}
           />
-          <span>Leak Reporting</span>
+          <span>Leak Reporting System</span>
         </Header>
 
         <Content

@@ -9,6 +9,8 @@ import {
   Tabs,
   Card,
   Input,
+  Badge,
+  DatePicker,
 } from 'antd';
 import {
   EditOutlined,
@@ -16,6 +18,7 @@ import {
   FileSearchOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -113,21 +116,52 @@ const columnPresets: Record<string, (keyof typeof columnMap)[]> = {
   notfound: ['id', 'jmsControlNo', 'referenceMeter', 'location', 'landmark', 'dateTimeReported', 'teamLeader'],
 };
 
+const tabLabels: Record<string, string> = {
+  customer: 'Customer',
+  dispatched: 'Dispatched',
+  serviceline: 'Leak Detection',
+  turnover: 'Repair Turn-over',
+  scheduled: 'Repair Scheduled',
+  repaired: 'Repaired Leaks',
+  after: 'Leak After the Meter',
+  notfound: 'Leak Not Found',
+};
+
 const LeakReports: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
-  const [activeTab, setActiveTab] = useState('reports');
+  const [activeTab, setActiveTab] = useState('customer');
   const [searchText, setSearchText] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<LeakData | null>(null);
+  const [formValues, setFormValues] = useState<Partial<LeakData>>({});
 
   const showModal = (title: string, record?: LeakData) => {
     setModalTitle(title);
     setSelectedRecord(record || null);
+    if (title === 'Update Report' && record) {
+      setFormValues({...record});
+    }
     setModalVisible(true);
   };
 
-
-  const handleCancel = () => setModalVisible(false);
+  const handleCancel = () => {
+    setModalVisible(false); setFormValues({});
+  }
+  
+  const handleInputChange = (field: keyof LeakData, value: string) => {
+    setFormValues(prev => ({ ...prev, [field]: value}));
+  }
+  
+   const handleUpdateSubmit = () => {
+    if (selectedRecord) {
+      const index = data.findIndex(item => item.key === selectedRecord.key);
+      if (index !== -1) {
+        data[index] = { ...data[index], ...formValues } as LeakData;
+      }
+      setModalVisible(false);
+      setFormValues({});
+    }
+  };
 
   const filteredData = (tabKey: string) => {
     let tabFiltered = data;
@@ -154,7 +188,7 @@ const LeakReports: React.FC = () => {
     render: (_, record) => (
       <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
         <Button icon={<CarOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Dispatch')} />
-        <Button icon={<EditOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Update Report')} />
+        <Button icon={<EditOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Update Report', record)} />
         <Button icon={<FileSearchOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Report Details', record)} />
       </div>
     ),
@@ -171,7 +205,7 @@ const LeakReports: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <Title level={3} style={{ marginBottom: 0 }}>Leak Reports</Title>
         <Input.Search
-          placeholder="Search ID, Location, Contact No..."
+          placeholder="Search"
           allowClear
           style={{ width: 300 }}
           onChange={e => setSearchText(e.target.value.toLowerCase())}
@@ -193,24 +227,35 @@ const LeakReports: React.FC = () => {
         <span style={{ marginLeft: 8 }}>records per page</span>
       </div>
 
-      <Card style={{ marginBottom: 0}} bodyStyle={{ padding: 0 }}>
+      <Card bodyStyle={{ padding: 0 }}>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
           type="card"
           tabBarGutter={0}
         >
-          <TabPane tab="Customer" key="customer" />
-          <TabPane tab="Leak Detection" key="serviceline" />
-          <TabPane tab="Dispatched" key="dispatched" />
-          <TabPane tab="Repaired Leaks" key="repaired" />
-          <TabPane tab="Repair Turn-over" key="turnover" />
-          <TabPane tab="Repair Scheduled" key="scheduled" />
-          <TabPane tab="Leak After the Meter" key="after" />
-          <TabPane tab="Leak Not Found" key="notfound" />
+          {Object.entries(tabLabels).map(([key, label]) => (
+            <TabPane
+              key={key}
+              tab={
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    {label}
+                    {!['repaired', 'after', 'notfound'].includes(key) && (
+                      <Badge
+                        count={filteredData(key).length}
+                        color="blue"
+                        overflowCount={99}
+                        size="small"
+                        style={{ paddingInline: 6,
+                          borderRadius: 4,}}
+                      />
+                    )}      
+                </span>
+              }
+            />
+          ))}
         </Tabs>
       </Card>
-
 
       <Table
         columns={getColumns(activeTab)}
@@ -226,7 +271,33 @@ const LeakReports: React.FC = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        {modalTitle === 'Report Details' && selectedRecord ? (
+        {modalTitle === 'Update Report' && selectedRecord ? (
+          <div>
+            {columnPresets[activeTab].map((key) => (
+              <div key={key} style={{ marginBottom: 12  }}>
+                <label style={{ fontWeight: 500}}> {columnMap[key].title}: </label>
+                {key === 'dateTimeReported'? (
+                  <DatePicker 
+                    showTime
+                    format= 'MMM DD, YYYY hh.mm A'
+                    value={formValues [key] ? dayjs (formValues[key], 'MMM DD, YYYY hh.mm A') : null}
+                    onChange ={(date, dateString) => handleInputChange(key, dateString as string)}  
+                    style= {{width: '100%'}}
+                  />
+
+                ) : (
+                <Input
+                  value={formValues[key] || ''}
+                  onChange={e => handleInputChange(key, e.target.value)}
+                />
+              )}
+              </div>
+            ))}
+             <Button type="primary" onClick={handleUpdateSubmit} block>
+              Save Changes
+            </Button>
+          </div>
+        ) : modalTitle === 'Report Details' && selectedRecord ? (
           <div>
             {columnPresets[activeTab].map((key) => (
               <p key={key}>
