@@ -137,6 +137,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   return (
     <Layout style={{ minHeight: '100vh', fontFamily: 'Segoe UI, sans-serif' }}>
       <Sider
+        trigger={null}
         collapsible
         collapsed={collapsed}
         collapsedWidth={80}
