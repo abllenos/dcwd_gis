@@ -17,10 +17,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
-import ReportALeak from './components/ReportALeak';
-import LeakDetection from './components/LeakDetection';
-import WaterSupplyConcerns from './components/WaterSupplyConcerns';
-import LeakReports from './components/LeakReports';
+
+import ReportALeak from './components/CreateReport/ReportALeak';
+import LeakDetection from './components/CreateReport/LeakDetection';
+import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
+import LeakReports from './components/Operations/LeakReports';
+import SupplyComplaints from './components/Operations/SupplyComplaints';
 import Login from './components/Login';
 
 import './styles/theme.css';
@@ -103,21 +105,35 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         return <WaterSupplyConcerns />;
       case 'leak-reports':
         return <LeakReports />;
+      case 'supply-complaints':
+        return <SupplyComplaints />;
       default:
         return <div>Select a menu item.</div>;
     }
   };
+
+  const siderWidth = collapsed ? 80 : 300;
 
   return (
     <Layout style={{ minHeight: '100vh', fontFamily: 'Segoe UI, sans-serif' }}>
       <Sider
         collapsible
         collapsed={collapsed}
-        onCollapse={setCollapsed}
-        width={260}
+
+        collapsedWidth={80}
+        width={300}
         style={{
-          backgroundColor: '#4C8BFF',
+          position: 'fixed',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: 1000,
+          height: '100vh',
+          backgroundColor: '#D0EBFF',
           overflowY: 'auto',
+          boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
+          transition: 'all 0.2s ease',
+
         }}
       >
         <div style={{ padding: 20, textAlign: 'center' }}>
@@ -140,7 +156,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           items={items}
           style={{
             fontSize: '16px',
-            backgroundColor: '#4C8BFF',
+            backgroundColor: '#D0EBFF',
             color: 'white',
             border: 'none',
           }}
@@ -148,11 +164,11 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         />
       </Sider>
 
-      <Layout>
+      <Layout style={{ marginLeft: siderWidth, transition: 'margin-left 0.2s ease' }}>
         <Header
           style={{
             padding: '0 24px',
-            backgroundColor: '#fff',
+            backgroundColor: '#E7F2FF',
             borderBottom: '1px solid #e8e8e8',
             display: 'flex',
             alignItems: 'center',
@@ -164,12 +180,18 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
-            style={{ fontSize: '16px' }}
+            style={{ fontSize: '16px', marginRight: 16 }}
           />
           <span>Leak Reporting</span>
         </Header>
 
-        <Content style={{ padding: 24, backgroundColor: '#f5f7fa' }}>
+        <Content
+          style={{
+            padding: 24,
+            backgroundColor: '#E7F2FF',
+            minHeight: 'calc(100vh - 64px)',
+          }}
+        >
           {renderContent()}
         </Content>
       </Layout>
