@@ -22,9 +22,16 @@ import Home from './components/home';
 import ReportALeak from './components/CreateReport/ReportALeak';
 import LeakDetection from './components/CreateReport/LeakDetection';
 import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
+
 import LeakReports from './components/Operations/LeakReports';
 import SupplyComplaints from './components/Operations/SupplyComplaints';
 import QualityComplaints from './components/Operations/QualityComplaints';
+
+import DispatchOveride from './components/SystemMaintenance/DispatchOveride';
+import CaretakerAssignment from './components/SystemMaintenance/CaretakerAssignment';
+import AccessLevel from './components/SystemMaintenance/AccessLevel';
+import UserAccounts from './components/SystemMaintenance/UserAccounts';
+import JMSDataSeeding from './components/SystemMaintenance/JMSDataSeeding';
 
 import './styles/theme.css';
 
@@ -127,15 +134,25 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         return <SupplyComplaints />;
       case 'quality-complaints':
         return <QualityComplaints />;
+      case 'dispatch-override':
+        return <DispatchOveride />;
+      case 'caretaker-assignment':
+        return <CaretakerAssignment />;
+      case 'access-level':
+        return <AccessLevel />;
+      case 'user-accounts':
+        return <UserAccounts />;
+      case 'jms-data-seeding':
+        return <JMSDataSeeding />;
       default:
         return <div>Select a menu item.</div>;
     }
   };
 
-  const siderWidth = collapsed ? 80 : 300;
+  const siderWidth = collapsed ? 80 : 280;
 
   return (
-    <Layout style={{ minHeight: '100vh', fontFamily: 'Segoe UI, sans-serif' }}>
+    <Layout style={{ minHeight: '100vh', fontFamily: 'Noto Sans, sans-serif' }}>
       <Sider
         trigger={null}
         collapsible

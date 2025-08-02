@@ -155,25 +155,26 @@ const QualityComplaints: React.FC = () => {
         <Breadcrumb.Item>Quality Complaints</Breadcrumb.Item>
       </Breadcrumb>
 
-      <Card style={{ marginBottom: 0 }} bodyStyle={{ padding: 0 }}>
+      {/* Card container for Tabs and Table */}
+      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
           type="card"
+          className='custom-tabs'          
         >
           <TabPane tab="Reports" key="reports" />
           <TabPane tab="On-Process" key="onprocess" />
           <TabPane tab="Completed" key="completed" />
         </Tabs>
+        <Table
+          columns={columns}
+          dataSource={filteredData()}
+          pagination={{ pageSize: 8 }}
+          scroll={{ x: 'max-content' }}
+          bordered
+        />
       </Card>
-
-      <Table
-        columns={columns}
-        dataSource={filteredData()}
-        pagination={{ pageSize: 8 }}
-        scroll={{ x: 'max-content' }}
-        bordered
-      />
 
       <Modal
         title="Complaint Details"

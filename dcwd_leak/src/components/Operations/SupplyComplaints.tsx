@@ -143,7 +143,7 @@ const SupplyComplaints: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <Title level={3} style={{ marginBottom: 0 }}>Supply Complaints</Title>
         <Input.Search
-          placeholder="Search ID, Meter No., Contact..."
+          placeholder="Search"
           allowClear
           style={{ width: 300 }}
           onChange={e => setSearchText(e.target.value.toLowerCase())}
@@ -155,25 +155,26 @@ const SupplyComplaints: React.FC = () => {
         <Breadcrumb.Item>Supply Complaints</Breadcrumb.Item>
       </Breadcrumb>
 
-      <Card style={{ marginBottom: 0 }} bodyStyle={{ padding: 0 }}>
+
+      <Card style={{ marginBottom: 0, width: '100%' }} bodyStyle={{ padding: 0 }}>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
           type="card"
+          className='custom-tabs'          
         >
           <TabPane tab="Reports" key="reports" />
           <TabPane tab="On-Process" key="onprocess" />
           <TabPane tab="Completed" key="completed" />
         </Tabs>
+        <Table
+          columns={columns}
+          dataSource={filteredData()}
+          pagination={{ pageSize: 8 }}
+          scroll={{ x: 'max-content' }}
+          bordered
+        />
       </Card>
-
-      <Table
-        columns={columns}
-        dataSource={filteredData()}
-        pagination={{ pageSize: 8 }}
-        scroll={{ x: 'max-content' }}
-        bordered
-      />
 
       <Modal
         title="Complaint Details"
