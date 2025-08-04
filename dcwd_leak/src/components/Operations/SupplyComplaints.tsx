@@ -155,13 +155,12 @@ const SupplyComplaints: React.FC = () => {
         <Breadcrumb.Item>Supply Complaints</Breadcrumb.Item>
       </Breadcrumb>
 
-
       <Card style={{ marginBottom: 0, width: '100%' }} bodyStyle={{ padding: 0 }}>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
           type="card"
-          className='custom-tabs'          
+          className='custom-tabs'
         >
           <TabPane tab="Reports" key="reports" />
           <TabPane tab="On-Process" key="onprocess" />
@@ -183,13 +182,58 @@ const SupplyComplaints: React.FC = () => {
         footer={null}
       >
         {selectedRecord && (
-          <div>
-            <p><strong>ID:</strong> {selectedRecord.id}</p>
-            <p><strong>Location:</strong> {selectedRecord.location}</p>
-            <p><strong>Remarks:</strong> {selectedRecord.remarks}</p>
-            <p><strong>Reference Meter:</strong> {selectedRecord.referenceMeter}</p>
-            <p><strong>Contact No.:</strong> {selectedRecord.contactNo}</p>
-            <p><strong>Date/Time Reported:</strong> {selectedRecord.dateTimeReported}</p>
+          <div style={{ marginTop: 12 }}>
+
+            <div
+              style={{
+                backgroundColor: '#3B82F6',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '10px 10px 0 0',
+                display: 'inline-block',
+                fontWeight: 600,
+                fontSize: 16,
+              }}
+            >
+              <FileSearchOutlined style={{ marginRight: 8 }} />
+              Report Details
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#f8fbfe',
+                border: '1px solid #bcdfff',
+                borderRadius: '0 0 10px 10px',
+                padding: '20px 24px',
+                marginBottom: 24,
+                fontSize: 15,
+                lineHeight: '1.8',
+              }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
+                <div><strong>COMPLAINT ID</strong>      :</div>       <div>{selectedRecord.id}</div>
+                <div><strong>LOCATION</strong>          :</div>           <div>{selectedRecord.location}</div>
+                <div><strong>REMARKS</strong>           :</div>            <div>{selectedRecord.remarks}</div>
+                <div><strong>REFERENCE METER</strong>   :</div>    <div>{selectedRecord.referenceMeter}</div>
+                <div><strong>CONTACT</strong>           :</div>            <div>{selectedRecord.contactNo}</div>
+                <div><strong>DATE/TIME REPORTED</strong>:</div> <div>{selectedRecord.dateTimeReported}</div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>
+                Remarks:
+              </label>
+              <Input.TextArea
+                placeholder="Enter your remarks here..."
+                rows={4}
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <Button type="primary" style={{ backgroundColor: '#00B4D8', borderColor: '#00B4D8', fontWeight: 500, }}>
+              Submit Remarks
+            </Button>
           </div>
         )}
       </Modal>
