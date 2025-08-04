@@ -45,6 +45,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       if (response.ok && data.statusCode === 200) {
         console.log("Login successful, navigating...");
+        // Store token and user data in localStorage for debugging
+        if (data.data && data.data.token) {
+          localStorage.setItem('debug_token', data.data.token);
+        }
+        if (data.data) {
+          localStorage.setItem('debug_user_data', JSON.stringify(data.data));
+        }
         onLogin(data.data);
         navigate('/home');
       } else {
