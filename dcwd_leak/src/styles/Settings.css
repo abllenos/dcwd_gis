@@ -1,0 +1,16 @@
+/* Force Ant Design Input editable text and caret to black, including focus/active/hover states */
+.ant-input,
+.ant-input:focus,
+.ant-input-focused,
+.ant-input:hover,
+.ant-input:active {
+  color: #000 !important;
+  caret-color: #000 !important;
+}
+
+/* Remove blue border on focus, set to neutral gray or black if desired */
+.ant-input:focus,
+.ant-input-focused {
+  border-color: #222 !important;
+  box-shadow: none !important;
+}

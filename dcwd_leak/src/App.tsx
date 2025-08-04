@@ -14,11 +14,10 @@ import {
 import { Layout, Menu, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-
 import Login from './components/Login';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
-
+import Settings from './components/Settings';
 import ReportALeak from './components/CreateReport/ReportALeak';
 import LeakDetection from './components/CreateReport/LeakDetection';
 import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
@@ -144,6 +143,8 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         return <UserAccounts />;
       case 'jms-data-seeding':
         return <JMSDataSeeding />;
+      case 'settings':
+        return <Settings />;
       default:
         return <div>Select a menu item.</div>;
     }

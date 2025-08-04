@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { Table, Tag, Card, Row, Col } from 'antd';
 import {
@@ -14,6 +16,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+
 
 interface DataType {
   key: string;
@@ -110,113 +113,137 @@ const Home: React.FC = () => {
                   background: 'linear-gradient(200deg, #726e6eff, #4c85d4ff, #726e6eff, #1b1a1aff)',
                   backgroundSize: '750% 750%',
                   color: 'white',
-                  borderRadius: '10px',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-                  animation: 'gradientLoop 12s ease infinite',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.11)',
+                  animation: 'gradientLoop 6s ease infinite',
+                  padding: '26px 22px 18px 22px',
+                  marginBottom: 8,
                 }}
               >
-                <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>Welcome, Bam!</h1>
-                <p style={{ opacity: 0.9 }}>You're now viewing the latest leak report dashboard.</p>
+                <h1 style={{ fontSize: '2.1rem', fontWeight: 'bold', marginBottom: 8, letterSpacing: 1 }}>Welcome, Bam!</h1>
+                <p style={{ opacity: 0.92 }}>You're now viewing the latest leak report dashboard.</p>
               </Card>
             </Col>
             {/* Stat Cards in a Row */}
-            <Col xs={24} md={8}>
-              <Card
-                bordered={false}
-                style={{
-                  backgroundColor: '#6ba5f7ff',
-                  color: 'white',
-                  transition: 'box-shadow 0.3s, transform 0.3s',
-                  boxShadow: '0 2px 12px rgba(24, 144, 255, 0.15)',
-                  cursor: 'pointer',
-                }}
-                bodyStyle={{ padding: 20 }}
-                className="stat-card stat-card-total"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="text-sm">Total Reports</div>
-                    <div className="text-3xl font-bold">{total}</div>
+            <Col xs={24}>
+              <div style={{ display: 'flex', gap: 16 }}>
+                <Card
+                  bordered={false}
+                  style={{
+                    backgroundColor: '#6ba5f7ff',
+                    color: 'white',
+                    transition: 'box-shadow 0.3s, transform 0.3s',
+                    boxShadow: '0 2px 12px rgba(24, 144, 255, 0.15)',
+                    cursor: 'pointer',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: 115,
+                    maxHeight: 125,
+                    height: 120,
+                  }}
+                  bodyStyle={{ width: '100%' }}
+                  className="stat-card stat-card-total"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div style={{ fontSize: '1.1rem' }}>Total Reports</div>
+                      <div style={{ fontSize: '1.1rem' }}>{total}</div>
+                    </div>
+                    <FileTextOutlined style={{ fontSize: 22, opacity: 0.3 }} />
                   </div>
-                  <FileTextOutlined style={{ fontSize: 40, opacity: 0.3 }} />
-                </div>
-              </Card>
-            </Col>
-            <Col xs={24} md={8}>
-              <Card
-                bordered={false}
-                style={{
-                  backgroundColor: '#49862aff',
-                  color: 'white',
-                  transition: 'box-shadow 0.3s, transform 0.3s',
-                  boxShadow: '0 2px 12px rgba(73, 134, 42, 0.15)',
-                  cursor: 'pointer',
-                }}
-                bodyStyle={{ padding: 20 }}
-                className="stat-card stat-card-dispatched"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="text-sm">Dispatched</div>
-                    <div className="text-3xl font-bold">{dispatched}</div>
+                </Card>
+                <Card
+                  bordered={false}
+                  style={{
+                    backgroundColor: '#49862aff',
+                    color: 'white',
+                    transition: 'box-shadow 0.3s, transform 0.3s',
+                    boxShadow: '0 2px 12px rgba(73, 134, 42, 0.15)',
+                    cursor: 'pointer',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: 115,
+                    maxHeight: 125,
+                    height: 120,
+                  }}
+                  bodyStyle={{ width: '100%' }}
+                  className="stat-card stat-card-dispatched"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div style={{ fontSize: '1.1rem' }}>Dispatched</div>
+                      <div style={{ fontSize: '1.1rem' }}>{dispatched}</div>
+                    </div>
+                    <CheckCircleOutlined style={{ fontSize: 22, opacity: 0.3 }} />
                   </div>
-                  <CheckCircleOutlined style={{ fontSize: 40, opacity: 0.3 }} />
-                </div>
-              </Card>
-            </Col>
-            <Col xs={24} md={8}>
-              <Card
-                bordered={false}
-                style={{
-                  backgroundColor: '#df811dff',
-                  color: 'white',
-                  transition: 'box-shadow 0.3s, transform 0.3s',
-                  boxShadow: '0 2px 12px rgba(223, 129, 29, 0.15)',
-                  cursor: 'pointer',
-                }}
-                bodyStyle={{ padding: 20 }}
-                className="stat-card stat-card-pending"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="text-sm">Pending</div>
-                    <div className="text-3xl font-bold">{pending}</div>
+                </Card>
+                <Card
+                  bordered={false}
+                  style={{
+                    backgroundColor: '#df811dff',
+                    color: 'white',
+                    transition: 'box-shadow 0.3s, transform 0.3s',
+                    boxShadow: '0 2px 12px rgba(223, 129, 29, 0.15)',
+                    cursor: 'pointer',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: 115,
+                    maxHeight: 125,
+                    height: 120,
+                  }}
+                  bodyStyle={{ width: '100%' }}
+                  className="stat-card stat-card-pending"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div style={{ fontSize: '1.1rem' }}>Pending</div>
+                      <div style={{ fontSize: '1.1rem' }}>{pending}</div>
+                    </div>
+                    <ClockCircleOutlined style={{ fontSize: 22, opacity: 0.3 }} />
                   </div>
-                  <ClockCircleOutlined style={{ fontSize: 40, opacity: 0.3 }} />
-                </div>
-              </Card>
+                </Card>
+              </div>
             </Col>
-      <style>
-        {`
-          .stat-card:hover {
-            box-shadow: 0 6px 24px rgba(24, 144, 255, 0.25), 0 1.5px 6px rgba(0,0,0,0.08);
-            transform: translateY(-4px) scale(1.03);
-          }
-        `}
-      </style>
           </Row>
+          <style>
+            {`
+              .stat-card:hover {
+                box-shadow: 0 6px 24px rgba(24, 144, 255, 0.25), 0 1.5px 6px rgba(0,0,0,0.08);
+                transform: translateY(-4px) scale(1.03);
+              }
+            `}
+          </style>
         </Col>
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
           <Card
             title="Monthly Leak Reports"
             bordered={false}
-            style={{ minHeight: 250, width: '100%', minWidth: 350 }}
-            bodyStyle={{ padding: '10px 10px 0 10px' }}
+            style={{ height: '100%', minHeight: 360, width: '100%', minWidth: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+            bodyStyle={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 10px 0 10px', height: '100%', minHeight: 360 }}
           >
-              <ResponsiveContainer width="100%" height={180}>
-                <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} width={30} />
-                  <Tooltip contentStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="reports" stroke="#1890ff" strokeWidth={1.5} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={320}>
+              <LineChart data={chartData} margin={{ top: 10, right: 30, bottom: 10, left: 40 }}>
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  tick={{ dy: 10, fontSize: 13 }}
+                />
+                <YAxis axisLine={false} tickLine={false} width={30} />
+                <Tooltip contentStyle={{ fontSize: 12 }} />
+                <Line type="monotone" dataKey="reports" stroke="#1890ff" strokeWidth={1.5} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
           </Card>
         </Col>
 
         {/* Table below cards and chart */}
         <Col xs={24}>
-          <h2 className="text-xl font-semibold mb-4 mt-4">Leak Reports</h2>
+          <h2 className="text-xl font-semibold mb-4 mt-4"></h2>
           <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered style={{ width: '100%' }} />
         </Col>
 
