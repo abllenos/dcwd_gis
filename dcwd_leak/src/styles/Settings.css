@@ -1,4 +1,22 @@
-/* Force Ant Design Input editable text and caret to black, including focus/active/hover states */
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(23, 78, 166, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(23, 78, 166, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(23, 78, 166, 0);
+  }
+}
+
+.animated-avatar {
+  animation: pulseGlow 2s infinite;
+  border-radius: 50%;
+}
+
+
 .ant-input,
 .ant-input:focus,
 .ant-input-focused,
@@ -8,7 +26,6 @@
   caret-color: #000 !important;
 }
 
-/* Remove blue border on focus, set to neutral gray or black if desired */
 .ant-input:focus,
 .ant-input-focused {
   border-color: #222 !important;
