@@ -141,7 +141,11 @@ const SupplyComplaints: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Supply Complaints</Title>
+        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
+          <Breadcrumb.Item>Operation</Breadcrumb.Item>
+          <Breadcrumb.Item>Water Supply Complaints</Breadcrumb.Item>
+        </Breadcrumb>
+        
         <Input.Search
           placeholder="Search"
           allowClear
@@ -150,12 +154,7 @@ const SupplyComplaints: React.FC = () => {
         />
       </div>
 
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Operation</Breadcrumb.Item>
-        <Breadcrumb.Item>Supply Complaints</Breadcrumb.Item>
-      </Breadcrumb>
-
-      <Card style={{ marginBottom: 0, width: '100%' }} bodyStyle={{ padding: 0 }}>
+      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
@@ -180,7 +179,9 @@ const SupplyComplaints: React.FC = () => {
         open={modalVisible}
         onCancel={handleCancel}
         footer={null}
-      >
+        width={720}
+        bodyStyle={{ padding: '24px' }}      
+        >
         {selectedRecord && (
           <div style={{ marginTop: 12 }}>
 

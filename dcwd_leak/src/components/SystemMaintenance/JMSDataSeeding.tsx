@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import {
   Table,
   Button,
-  Typography,
   Breadcrumb,
   Card,
   Input,
   Modal,
 } from 'antd';
-import { FileSearchOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, HomeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-
-const { Title } = Typography;
+import { useNavigate } from 'react-router-dom';
 
 interface JMSData {
   key: string;
@@ -47,13 +45,18 @@ const jmsData: JMSData[] = [
     referenceAccountNo: 'REF-123456',
     jmsControlNo: 'JMS-001',
   },
-  // Add more sample data as needed
+
 ];
 
 const JMSDataSeeding: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<JMSData | null>(null);
+  const navigate = useNavigate();
+
+  const handleHomeClick = () => {
+    navigate('/home');
+  }
 
   const showDetails = (record: JMSData) => {
     setSelectedRecord(record);
@@ -117,19 +120,28 @@ const JMSDataSeeding: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Maintenance - JMS Data Seeding</Title>
-        <Input.Search
-          placeholder="Search"
-          allowClear
-          style={{ width: 300 }}
-          onChange={e => setSearchText(e.target.value.toLowerCase())}
-        />
+         <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              icon={<HomeOutlined />}
+              onClick={handleHomeClick}
+              type="text"
+              style={{ fontSize: 16, color: '#00008B', margin: 0 }}
+              shape='circle'
+            />
+          <Breadcrumb style={{fontSize: 16, fontWeight: 500, }}>
+            <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
+            <Breadcrumb.Item>User Accounts</Breadcrumb.Item>
+          </Breadcrumb>
+        </div>  
+          <Input.Search
+            placeholder="Search"
+            allowClear
+            style={{ width: 300 }}
+            onChange={e => setSearchText(e.target.value.toLowerCase())}
+          />
       </div>
 
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
-        <Breadcrumb.Item>JMS Data Seeding</Breadcrumb.Item>
-      </Breadcrumb>
+
 
       <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
         <Table

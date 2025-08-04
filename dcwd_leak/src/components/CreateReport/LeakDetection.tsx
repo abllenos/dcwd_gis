@@ -27,10 +27,7 @@ const labelStyle: React.CSSProperties = {
 const LeakDetection: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <Title level={3} style={{ marginBottom: 0 }}>
-        Leak Detection
-      </Title>
-      <Breadcrumb style={{ marginBottom: 24 }}>
+      <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Leak Detection</Breadcrumb.Item>
       </Breadcrumb>
@@ -45,7 +42,6 @@ const LeakDetection: React.FC = () => {
         }}
       >
         <Form layout="vertical">
-          {/* Contact Information */}
           <Divider orientation="left">
             <Text style={{ fontSize: 18 }} strong>
               Contact Information
@@ -77,7 +73,7 @@ const LeakDetection: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Contact No.</span>}>
+              <Form.Item label={<span style={labelStyle}>Contact #</span>}>
                 <Input />
               </Form.Item>
             </Col>
@@ -101,7 +97,6 @@ const LeakDetection: React.FC = () => {
             </Col>
           </Row>
 
-          {/* Leak Details */}
           <Divider orientation="left">
             <Text style={{ fontSize: 18 }} strong>
               Leak Details
@@ -174,7 +169,6 @@ const LeakDetection: React.FC = () => {
             </Col>
           </Row>
 
-          {/* Search Address */}
           <Divider orientation="left">
             <Text style={{ fontSize: 18 }} strong>
               Search Address

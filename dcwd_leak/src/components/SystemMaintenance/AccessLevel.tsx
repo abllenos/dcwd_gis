@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Table,
   Button,
-  Typography,
   Breadcrumb,
   Card,
   Input,
@@ -11,7 +10,6 @@ import {
 import { FileSearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title } = Typography;
 
 interface AccessLevelData {
   key: string;
@@ -27,7 +25,7 @@ const accessLevelData: AccessLevelData[] = [
     accessCode: 'A001',
     description: 'Admin Access',
   },
-  // Add more sample data as needed
+  
 ];
 
 const AccessLevel: React.FC = () => {
@@ -87,7 +85,11 @@ const AccessLevel: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Maintenance - Access Level</Title>
+        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
+        <Breadcrumb.Item>Operation</Breadcrumb.Item>
+        <Breadcrumb.Item>Supply Complaints</Breadcrumb.Item>
+        </Breadcrumb>
+        
         <Input.Search
           placeholder="Search"
           allowClear
@@ -95,11 +97,6 @@ const AccessLevel: React.FC = () => {
           onChange={e => setSearchText(e.target.value.toLowerCase())}
         />
       </div>
-
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
-        <Breadcrumb.Item>Access Level</Breadcrumb.Item>
-      </Breadcrumb>
 
       <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
         <Table
