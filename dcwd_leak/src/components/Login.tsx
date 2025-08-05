@@ -5,7 +5,9 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface LoginProps {
   onLogin: (userData: any) => void;
@@ -15,7 +17,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [darkMode, setDarkMode] = useState(false);
 
   const navigate = useNavigate();
@@ -23,7 +24,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
     try {
       const response = await fetch(
@@ -33,38 +33,37 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            username: username,
-            password: password,
-          }),
+          body: JSON.stringify({ username, password }),
         }
       );
 
       const data = await response.json();
-      console.log('API raw response:', data); 
+      console.log('API raw response:', data);
 
       if (response.ok && data.statusCode === 200) {
-        console.log("Login successful, navigating...");
-        // Store token and user data in localStorage for debugging
-        if (data.data && data.data.token) {
+        if (data.data?.token) {
           localStorage.setItem('debug_token', data.data.token);
         }
         if (data.data) {
           localStorage.setItem('debug_user_data', JSON.stringify(data.data));
         }
+
+        toast.success('You have logged in successfully.');
         onLogin(data.data);
-        navigate('/home');
+
+        setTimeout(() => navigate('/home'), 1500);
       } else {
-        setError(data.message || 'Invalid email or password');
+        toast.error(data.message || 'Invalid email or password');
       }
     } catch (err) {
       console.error(err);
-      setError('Failed to connect to server.');
+      toast.error('Failed to connect to server.');
     }
   };
 
   return (
     <div style={styles.container}>
+      <ToastContainer position="top-center" autoClose={2500} />
       <button onClick={() => setDarkMode(!darkMode)} style={styles.toggleButton}>
         {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
       </button>
@@ -103,8 +102,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             </span>
           </div>
-
-          {error && <p style={styles.error}>{error}</p>}
 
           <button type="submit" style={styles.button}>
             Log In
@@ -212,12 +209,6 @@ function getStyles(darkMode: boolean): { [key: string]: React.CSSProperties } {
       borderRadius: '4px',
       cursor: 'pointer',
       fontSize: '15px',
-    },
-    error: {
-      color: 'red',
-      fontSize: '13px',
-      textAlign: 'center',
-      marginBottom: '10px',
     },
     blurOverlay: {
       position: 'absolute',

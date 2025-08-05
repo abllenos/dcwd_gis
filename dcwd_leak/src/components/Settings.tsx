@@ -3,73 +3,54 @@ import '../styles/Settings.css';
 import { Card, Avatar, Input, Button, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
-// Edit Profile Form Component
-function EditProfileForm() {
-  const [employeeId, setEmployeeId] = React.useState('EMP-00123');
-  const [profileEmail, setProfileEmail] = React.useState('juan.delacruz@email.com');
-  const [firstName, setFirstName] = React.useState('Juan');
-  const [lastName, setLastName] = React.useState('Dela Cruz');
-  const [saving, setSaving] = React.useState(false);
+interface EditProfileFormProps {
+  employeeId: string;
+  setEmployeeId: (value: string) => void;
+  profileEmail: string;
+  setProfileEmail: (value: string) => void;
+  firstName: string;
+  setFirstName: (value: string) => void;
+  lastName: string;
+  setLastName: (value: string) => void;
+  onSave: () => void;
+  saving: boolean;
+}
 
-  const handleProfileSave = () => {
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      message.success('Profile updated!');
-    }, 1000);
-  };
-
+function EditProfileForm({
+  employeeId,
+  setEmployeeId,
+  profileEmail,
+  setProfileEmail,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
+  onSave,
+  saving,
+}: EditProfileFormProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Row: Employee ID & Email Address */}
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 16 }}>
         <div style={{ flex: 1 }}>
-          <span style={{ fontWeight: 500, color: '#000' }}>Employee ID:</span>
-          <Input
-            value={employeeId}
-            onChange={e => setEmployeeId(e.target.value)}
-            style={{ marginTop: 4, fontSize: 15, color: '#000', background: '#fff', caretColor: '#000' }}
-            placeholder="Enter employee ID"
-          />
+          <span style={{ fontWeight: 500 }}>Employee ID:</span>
+          <Input value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} />
         </div>
         <div style={{ flex: 1 }}>
-          <span style={{ fontWeight: 500, color: '#000' }}>Email Address:</span>
-          <Input
-            value={profileEmail}
-            onChange={e => setProfileEmail(e.target.value)}
-            style={{ marginTop: 4, fontSize: 15, color: '#000', background: '#fff', caretColor: '#000' }}
-            placeholder="Enter email address"
-            type="email"
-          />
+          <span style={{ fontWeight: 500 }}>Email Address:</span>
+          <Input value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} />
         </div>
       </div>
-      {/* Row: First Name & Last Name */}
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 16 }}>
         <div style={{ flex: 1 }}>
-          <span style={{ fontWeight: 500, color: '#000' }}>First Name:</span>
-          <Input
-            value={firstName}
-            onChange={e => setFirstName(e.target.value)}
-            style={{ marginTop: 4, fontSize: 15, color: '#000', background: '#fff', caretColor: '#000' }}
-            placeholder="Enter first name"
-          />
+          <span style={{ fontWeight: 500 }}>First Name:</span>
+          <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
         </div>
         <div style={{ flex: 1 }}>
-          <span style={{ fontWeight: 500, color: '#000' }}>Last Name:</span>
-          <Input
-            value={lastName}
-            onChange={e => setLastName(e.target.value)}
-            style={{ marginTop: 4, fontSize: 15, color: '#000', background: '#fff', caretColor: '#000' }}
-            placeholder="Enter last name"
-          />
+          <span style={{ fontWeight: 500 }}>Last Name:</span>
+          <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </div>
       </div>
-      <Button
-        type="primary"
-        onClick={handleProfileSave}
-        loading={saving}
-        style={{ alignSelf: 'flex-end', marginTop: 8, background: '#174ea6', borderColor: '#174ea6', color: '#fff' }}
-      >
+      <Button type="primary" onClick={onSave} loading={saving} style={{ alignSelf: 'flex-end' }}>
         Update
       </Button>
     </div>
@@ -77,120 +58,185 @@ function EditProfileForm() {
 }
 
 function Settings() {
-  const [email, setEmail] = React.useState('juan.delacruz@email.com');
+  const [employeeId, setEmployeeId] = React.useState('EMP-00123');
+  const [profileEmail, setProfileEmail] = React.useState('alvinllenos@email.com');
+  const [firstName, setFirstName] = React.useState('Alvin');
+  const [lastName, setLastName] = React.useState('Llenos');
+  const [email, setEmail] = React.useState('alvinllenos@email.com');
   const [mobile, setMobile] = React.useState('09171234567');
-  const [loading, setLoading] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [contactSaving, setContactSaving] = React.useState(false);
 
-  const handleSave = () => {
-    setLoading(true);
+  const [showContactPreview, setShowContactPreview] = React.useState(false);
+  const [showProfilePreview, setShowProfilePreview] = React.useState(false);
+
+  const handleProfileSave = () => {
+    setSaving(true);
     setTimeout(() => {
-      setLoading(false);
+      setSaving(false);
+      setShowProfilePreview(true);
+      message.success('Profile updated!');
+    }, 1000);
+  };
+
+  const handleContactSave = () => {
+    setContactSaving(true);
+    setTimeout(() => {
+      setContactSaving(false);
+      setShowContactPreview(true);
       message.success('Contact details updated!');
     }, 1000);
   };
 
   return (
-    <div style={{ padding: 24, minHeight: '80vh', background: '#f5f7fa', position: 'relative' }}>
-      {/* Decorative background behind profile */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 520,
-        height: 220,
-        zIndex: 0,
-        background: 'radial-gradient(circle at 60% 40%, #6ba5f7 0%, #4c85d4 60%, transparent 100%)',
-        borderRadius: 32,
-        filter: 'blur(2px)',
-        opacity: 0.35,
-      }} />
-      <Card
-        bordered={false}
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#f0f4f8',
+        padding: '40px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 24,
+      }}
+    >
+      {/* Header background */}
+      <div
         style={{
-          maxWidth: 500,
-          margin: '0 auto',
-          borderRadius: 12,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-          position: 'relative',
-          zIndex: 1,
-          background: 'linear-gradient(135deg, #e3edfa 0%, #f5f7fa 100%)',
+          width: '100%',
+          background: 'linear-gradient(90deg, #174ea6, #4c85d4)',
+          padding: '40px 24px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 280,
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-          <Avatar size={80} icon={<UserOutlined />} style={{ background: 'linear-gradient(135deg, #4c85d4 60%, #6ba5f7 100%)', marginBottom: 12, boxShadow: '0 4px 16px rgba(76,133,212,0.18)' }} />
-          <div style={{ fontWeight: 600, fontSize: 20, color: '#000' }}>ALVIN LLENOS</div>
-          <div style={{ color: '#000', fontSize: 15, marginTop: 2 }}>INFORMATION AND COMMUNATION TECHNOLOGY DEPARTMENT</div>
-        </div>
-      </Card>
+        <div
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            padding: 24,
+            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.06)',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: 1000,
+            gap: 32,
+          }}
+        >
+          {/* Animated Avatar */}
+          <div className="animated-avatar" style={{
+            backgroundColor: '#dbeafe',
+            borderRadius: '50%',
+            padding: 14,
+            border: '3px solid #174ea6',
+          }}>
+            <Avatar
+              size={100}
+              icon={<UserOutlined />}
+              style={{ backgroundColor: '#fff', color: '#174ea6', fontSize: 36 }}
+            />
+          </div>
 
-      {/* Contact Details and Edit Profile Cards Side by Side */}
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 24, marginTop: 24, alignItems: 'flex-start' }}>
-        {/* Contact Details Card */}
+          {/* Info */}
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 20, color: '#174ea6', textTransform: 'uppercase' }}>
+              ALVIN LLENOS
+            </div>
+            <div style={{ fontSize: 14, color: '#333', marginTop: 4 }}>
+              INFORMATION AND COMMUNICATION TECHNOLOGY DEPARTMENT
+            </div>
+          </div>
+
+          {/* Preview */}
+          {(showContactPreview || showProfilePreview) && (
+            <div
+              style={{
+                flex: 1,
+                background: '#f9f9f9',
+                padding: 16,
+                borderRadius: 12,
+                transition: 'all 0.3s ease',
+                boxShadow: '0 0 0 3px #d6e4ff',
+              }}
+            >
+              <div style={{ fontWeight: 500, marginBottom: 8 }}>Preview:</div>
+              {showContactPreview && (
+                <>
+                  <div>Email: {email}</div>
+                  <div>Mobile: {mobile}</div>
+                </>
+              )}
+              {showProfilePreview && (
+                <>
+                  <div style={{ marginTop: 12 }}>Employee ID: {employeeId}</div>
+                  <div>Email: {profileEmail}</div>
+                  <div>First Name: {firstName}</div>
+                  <div>Last Name: {lastName}</div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Contact & Profile Cards */}
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap' }}>
         <Card
           title="Contact Details"
-          bordered={false}
           style={{
             flex: 1,
-            minWidth: 260,
+            minWidth: 280,
             borderRadius: 14,
-            boxShadow: '0 4px 18px rgba(44, 98, 186, 0.10)',
-            position: 'relative',
-            zIndex: 1,
-            background: 'linear-gradient(135deg, #fafdff 60%, #e9f1fb 100%)',
-            border: 'none',
+            background: '#fff',
+            boxShadow: '0 4px 18px rgba(44, 98, 186, 0.08)',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <span style={{ fontWeight: 500, color: '#000' }}>Email Address:</span>
-              <Input
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                style={{ marginTop: 4, fontSize: 15, color: '#000', background: '#fff', caretColor: '#000' }}
-                placeholder="Enter email address"
-                type="email"
-              />
+              <span style={{ fontWeight: 500 }}>Email Address:</span>
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div>
-              <span style={{ fontWeight: 500, color: '#000' }}>Mobile No.:</span>
-              <Input
-                value={mobile}
-                onChange={e => setMobile(e.target.value)}
-                style={{ marginTop: 4, fontSize: 15, color: '#000', background: '#fff', caretColor: '#000' }}
-                placeholder="Enter mobile number"
-              />
+              <span style={{ fontWeight: 500 }}>Mobile No.:</span>
+              <Input value={mobile} onChange={(e) => setMobile(e.target.value)} />
             </div>
             <Button
               type="primary"
-              onClick={handleSave}
-              loading={loading}
-              style={{ alignSelf: 'flex-end', marginTop: 8, background: '#174ea6', borderColor: '#174ea6', color: '#fff' }}
+              loading={contactSaving}
+              onClick={handleContactSave}
+              style={{ alignSelf: 'flex-end' }}
             >
               Update
             </Button>
           </div>
         </Card>
 
-        {/* Edit Profile Card */}
         <Card
           title="Edit Profile"
-          bordered={false}
           style={{
             flex: 1,
-            minWidth: 260,
+            minWidth: 280,
             borderRadius: 14,
-            boxShadow: '0 4px 18px rgba(44, 98, 186, 0.10)',
-            position: 'relative',
-            zIndex: 1,
-            background: 'linear-gradient(135deg, #fafdff 60%, #e9f1fb 100%)',
-            border: 'none',
+            background: '#fff',
+            boxShadow: '0 4px 18px rgba(44, 98, 186, 0.08)',
           }}
         >
-          <EditProfileForm />
+          <EditProfileForm
+            employeeId={employeeId}
+            setEmployeeId={setEmployeeId}
+            profileEmail={profileEmail}
+            setProfileEmail={setProfileEmail}
+            firstName={firstName}
+            setFirstName={setFirstName}
+            lastName={lastName}
+            setLastName={setLastName}
+            onSave={handleProfileSave}
+            saving={saving}
+          />
         </Card>
       </div>
-
     </div>
   );
 }
