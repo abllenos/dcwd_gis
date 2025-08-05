@@ -122,10 +122,12 @@ const ReportALeak: React.FC = () => {
   };
 
   return (
+
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <Title level={3} style={{ marginBottom: 0 }}>Report A Leak</Title>
 
       <Breadcrumb style={{ marginBottom: 24 }}>
+
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
       </Breadcrumb>
@@ -148,12 +150,15 @@ const ReportALeak: React.FC = () => {
           </Row>
 
           <Row gutter={16}>
+
             <Col span={12}>
               <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}><Input /></Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>}><Input /></Form.Item>
             </Col>
+
+
           </Row>
 
           <Divider orientation="left">

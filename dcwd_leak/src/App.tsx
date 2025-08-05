@@ -31,6 +31,7 @@ import CaretakerAssignment from './components/SystemMaintenance/CaretakerAssignm
 import AccessLevel from './components/SystemMaintenance/AccessLevel';
 import UserAccounts from './components/SystemMaintenance/UserAccounts';
 import JMSDataSeeding from './components/SystemMaintenance/JMSDataSeeding';
+import Reports from './components/Report/Reports';
 
 import './styles/theme.css';
 
@@ -41,8 +42,18 @@ type MenuItem = Required<MenuProps>['items'][number];
 const iconSize = { fontSize: '17px' };
 
 const bulletLabel = (text: string) => (
-  <span>
-    <RightOutlined style={{ fontSize: 10, marginRight: 8 }} />
+  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <span
+      style={{
+    
+        width: 6,
+        height: 6,
+        borderRadius: '50%',
+        backgroundColor: '#333',
+        marginRight: 8,
+        marginLeft: 2,
+      }}
+    />
     {text}
   </span>
 );
@@ -145,6 +156,8 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         return <JMSDataSeeding />;
       case 'settings':
         return <Settings />;
+      case 'reports':
+        return <Reports />;
       default:
         return <div>Select a menu item.</div>;
     }
@@ -159,7 +172,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         collapsible
         collapsed={collapsed}
         collapsedWidth={80}
-        width={300}
+        width={280}
         style={{
           position: 'fixed',
           top: 0,
@@ -204,13 +217,19 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       <Layout style={{ marginLeft: siderWidth, transition: 'margin-left 0.2s ease' }}>
         <Header
           style={{
+            position: 'fixed',
+            top: 0,
+            left: siderWidth,
+            right: 0,
+            height: 64,
             padding: '0 24px',
             backgroundColor: '#E7F2FF',
-            borderBottom: '1px solid #e8e8e8',
+            borderBottom: '1px solid #D0EBFF',
             display: 'flex',
             alignItems: 'center',
             fontSize: '18px',
             fontWeight: 600,
+            zIndex: 1000,
           }}
         >
           <Button
@@ -224,6 +243,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
         <Content
           style={{
+            marginTop: 64,
             padding: 24,
             backgroundColor: '#E7F2FF',
             minHeight: 'calc(100vh - 64px)',

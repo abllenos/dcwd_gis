@@ -18,6 +18,7 @@ const { TabPane } = Tabs;
 interface ComplaintData {
   key: string;
   id: string;
+  accountNumber: string;
   location: string;
   remarks: string;
   referenceMeter: string;
@@ -29,6 +30,7 @@ const reportData: ComplaintData[] = [
   {
     key: '1',
     id: '30124',
+    accountNumber: '1231-0011-112351',
     location: 'Zone 2 - Barangay D',
     remarks: 'Water has unusual odor',
     referenceMeter: 'RM-543210',
@@ -41,6 +43,7 @@ const onProcessData: ComplaintData[] = [
   {
     key: '2',
     id: '30125',
+    accountNumber: '3221-51321-71523',
     location: 'Zone 5 - Barangay E',
     remarks: 'Discoloration in tap water',
     referenceMeter: 'RM-678901',
@@ -53,6 +56,7 @@ const completedData: ComplaintData[] = [
   {
     key: '3',
     id: '30126',
+    accountNumber: '3221-5123-71523',    
     location: 'Zone 6 - Barangay F',
     remarks: 'Resolved taste issue',
     referenceMeter: 'RM-112233',
@@ -108,6 +112,7 @@ const QualityComplaints: React.FC = () => {
       sorter: (a, b) => Number(a.id) - Number(b.id),
       sortDirections: ['ascend', 'descend'],
     },
+    { title: 'Account Number', dataIndex: 'accountNumber' },
     { title: 'Location', dataIndex: 'location' },
     { title: 'Remarks', dataIndex: 'remarks' },
     { title: 'Reference Meter', dataIndex: 'referenceMeter' },
@@ -141,7 +146,11 @@ const QualityComplaints: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Quality Complaints</Title>
+        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
+          <Breadcrumb.Item>Operation</Breadcrumb.Item>
+          <Breadcrumb.Item>Water Quality Complaints</Breadcrumb.Item>
+        </Breadcrumb>
+
         <Input.Search
           placeholder="Search"
           allowClear
@@ -150,12 +159,6 @@ const QualityComplaints: React.FC = () => {
         />
       </div>
 
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Operation</Breadcrumb.Item>
-        <Breadcrumb.Item>Quality Complaints</Breadcrumb.Item>
-      </Breadcrumb>
-
-      {/* Card container for Tabs and Table */}
       <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
         <Tabs
           activeKey={activeTab}
@@ -167,6 +170,7 @@ const QualityComplaints: React.FC = () => {
           <TabPane tab="On-Process" key="onprocess" />
           <TabPane tab="Completed" key="completed" />
         </Tabs>
+
         <Table
           columns={columns}
           dataSource={filteredData()}
@@ -181,15 +185,69 @@ const QualityComplaints: React.FC = () => {
         open={modalVisible}
         onCancel={handleCancel}
         footer={null}
+        width={720}
+        bodyStyle={{ padding: '24px' }}
       >
         {selectedRecord && (
-          <div>
-            <p><strong>ID:</strong> {selectedRecord.id}</p>
-            <p><strong>Location:</strong> {selectedRecord.location}</p>
-            <p><strong>Remarks:</strong> {selectedRecord.remarks}</p>
-            <p><strong>Reference Meter:</strong> {selectedRecord.referenceMeter}</p>
-            <p><strong>Contact No.:</strong> {selectedRecord.contactNo}</p>
-            <p><strong>Date/Time Reported:</strong> {selectedRecord.dateTimeReported}</p>
+          <div style={{ marginTop: 12 }}>
+            <div
+              style={{
+                backgroundColor: '#3B82F6',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '10px 10px 0 0',
+                display: 'inline-block',
+                fontWeight: 600,
+                fontSize: 16,
+              }}
+            >
+              <FileSearchOutlined style={{ marginRight: 8 }} />
+              Report Details
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#f8fbfe',
+                border: '1px solid #bcdfff',
+                borderRadius: '0 0 10px 10px',
+                padding: '20px 24px',
+                marginBottom: 24,
+                fontSize: 15,
+                lineHeight: '1.8',
+              }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
+              <div><strong>ID:</strong> </div> <div> {selectedRecord.id}</div>
+              <div><strong>Account Number:</strong> </div> <div>{selectedRecord.accountNumber}</div>
+              <div><strong>Location:</strong></div> <div> {selectedRecord.location}</div>
+              <div><strong>Remarks:</strong> </div> <div>{selectedRecord.remarks}</div>
+              <div><strong>Reference Meter:</strong> </div> <div>{selectedRecord.referenceMeter}</div>
+              <div><strong>Contact No.:</strong> </div> <div>{selectedRecord.contactNo}</div>
+              <div><strong>Date/Time Reported:</strong> </div>  <div>{selectedRecord.dateTimeReported}</div>
+          </div>
+        </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>
+                Remarks:
+              </label>
+              <Input.TextArea
+                placeholder="Enter your remarks here..."
+                rows={4}
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <Button
+              type="primary"
+              style={{
+                backgroundColor: '#00B4D8',
+                borderColor: '#00B4D8',
+                fontWeight: 500,
+              }}
+            >
+              Submit Remarks
+            </Button>
           </div>
         )}
       </Modal>

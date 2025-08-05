@@ -139,8 +139,8 @@ const Home: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     minHeight: 115,
-                    maxHeight: 125,
-                    height: 120,
+                    maxHeight: 150,
+                    height: 140,
                   }}
                   bodyStyle={{ width: '100%' }}
                   className="stat-card stat-card-total"
@@ -165,8 +165,8 @@ const Home: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     minHeight: 115,
-                    maxHeight: 125,
-                    height: 120,
+                    maxHeight: 150,
+                    height: 140,
                   }}
                   bodyStyle={{ width: '100%' }}
                   className="stat-card stat-card-dispatched"
@@ -191,8 +191,8 @@ const Home: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     minHeight: 115,
-                    maxHeight: 125,
-                    height: 120,
+                    maxHeight: 150,
+                    height: 140,
                   }}
                   bodyStyle={{ width: '100%' }}
                   className="stat-card stat-card-pending"
@@ -224,7 +224,7 @@ const Home: React.FC = () => {
             style={{ height: '100%', minHeight: 360, width: '100%', minWidth: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
             bodyStyle={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 10px 0 10px', height: '100%', minHeight: 360 }}
           >
-            <ResponsiveContainer width="100%" height={320}>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData} margin={{ top: 10, right: 30, bottom: 10, left: 40 }}>
                 <XAxis
                   dataKey="name"

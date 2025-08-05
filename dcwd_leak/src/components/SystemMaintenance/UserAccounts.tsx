@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Table,
   Button,
-  Typography,
   Breadcrumb,
   Card,
   Input,
@@ -10,8 +9,9 @@ import {
 } from 'antd';
 import { FileSearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import {HomeOutlined} from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
-const { Title } = Typography;
 
 interface UserAccountData {
   key: string;
@@ -41,6 +41,11 @@ const UserAccounts: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<UserAccountData | null>(null);
+  const navigate = useNavigate();
+
+  const handleHomeClick = () => {
+    navigate('/home');
+  }
 
   const showDetails = (record: UserAccountData) => {
     setSelectedRecord(record);
@@ -97,20 +102,29 @@ const UserAccounts: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Maintenance - User Accounts</Title>
-        <Input.Search
-          placeholder="Search"
-          allowClear
-          style={{ width: 300 }}
-          onChange={e => setSearchText(e.target.value.toLowerCase())}
-        />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              icon={<HomeOutlined />}
+              onClick={handleHomeClick}
+              type="text"
+              style={{ fontSize: 16, color: '#00008B', margin: 0 }}
+              shape='circle'
+            />
+          <Breadcrumb style={{fontSize: 16, fontWeight: 500, }}>
+            <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
+            <Breadcrumb.Item>User Accounts</Breadcrumb.Item>
+          </Breadcrumb>
+        </div>  
+          <Input.Search
+            placeholder="Search"
+            allowClear
+            style={{ width: 300 }}
+            onChange={e => setSearchText(e.target.value.toLowerCase())}
+          />
       </div>
 
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
-        <Breadcrumb.Item>User Accounts</Breadcrumb.Item>
-      </Breadcrumb>
+
 
       <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
         <Table
