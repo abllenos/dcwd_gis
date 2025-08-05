@@ -25,11 +25,7 @@ const labelStyle: React.CSSProperties = {
 const WaterSupplyConcerns: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <Title level={3} style={{ marginBottom: 0 }}>
-        Supply Concerns
-      </Title>
-
-      <Breadcrumb style={{ marginBottom: 24 }}>
+      <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Water Supply Concerns</Breadcrumb.Item>
       </Breadcrumb>

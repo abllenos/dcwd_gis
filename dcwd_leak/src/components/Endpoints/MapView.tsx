@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { loadGoogleMapsScript } from '../Utils/loadMapScript';
+/// <reference types="@types/google.maps" />
 
 interface MapComponentProps {
   lat: number;

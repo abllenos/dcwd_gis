@@ -214,7 +214,10 @@ const LeakReports: React.FC = () => {
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Title level={3} style={{ marginBottom: 0 }}>Leak Reports</Title>
+        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
+          <Breadcrumb.Item>Operation</Breadcrumb.Item>
+        <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
+        </Breadcrumb>
         <Input.Search
           placeholder="Search"
           allowClear
@@ -223,10 +226,6 @@ const LeakReports: React.FC = () => {
         />
       </div>
 
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Operation</Breadcrumb.Item>
-        <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
-      </Breadcrumb>
 
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <span style={{ marginRight: 8 }}>Display</span>
@@ -288,7 +287,7 @@ const LeakReports: React.FC = () => {
         footer={null}
       >
         {modalTitle === 'Dispatch' && selectedRecord ? (
-          <div>
+          <div style={{boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
             {dispatchFields.map(({ label, value }) => (
               <p key={label}>
                 <strong>{label}:</strong> {value}
