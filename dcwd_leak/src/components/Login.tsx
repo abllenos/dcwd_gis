@@ -63,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div style={styles.container}>
-      <ToastContainer position="top-center" autoClose={2500} />
+      <ToastContainer position="top-center" autoClose={2500} aria-label={'Notification Toast'}/>
       <button onClick={() => setDarkMode(!darkMode)} style={styles.toggleButton}>
         {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
       </button>

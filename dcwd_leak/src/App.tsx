@@ -224,11 +224,12 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             height: 64,
             padding: '0 24px',
             backgroundColor: '#E7F2FF',
-            borderBottom: '1px solid #949899ff',
+            borderBottom: '1px solid #D0EBFF',
             display: 'flex',
             alignItems: 'center',
             fontSize: '18px',
             fontWeight: 600,
+            zIndex: 1000,
           }}
         >
           <Button
