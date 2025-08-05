@@ -3,14 +3,12 @@ import {
   Table,
   Button,
   Select,
-  Typography,
   Breadcrumb,
   Modal,
   Tabs,
   Card,
   Input,
   Badge,
-  DatePicker,
 } from 'antd';
 import {
   EditOutlined,
@@ -18,10 +16,8 @@ import {
   FileSearchOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
 
 const { Option } = Select;
-const { Title } = Typography;
 const { TabPane } = Tabs;
 
 interface LeakData {
@@ -40,6 +36,7 @@ interface LeakData {
   teamLeader?: string;
   dateTurnedOver?: string;
   turnoverReason?: string;
+  leakPressure?: string;
 }
 
 const data: LeakData[] = [
@@ -57,6 +54,7 @@ const data: LeakData[] = [
     jmsControlNo: 'JMS-001',
     dateRepaired: 'Jun 26, 2025',
     teamLeader: 'John Doe',
+    leakPressure: 'Low',
   },
   {
     key: '2',
@@ -86,7 +84,6 @@ const data: LeakData[] = [
   },
 ];
 
-// Common column definitions
 const columnMap = {
   id: { title: 'ID', dataIndex: 'id', sorter: true },
   leakType: { title: 'Type of Leak', dataIndex: 'leakType' },
@@ -104,7 +101,6 @@ const columnMap = {
   turnoverReason: { title: 'Reason', dataIndex: 'turnoverReason' },
 };
 
-// Column configurations for each tab
 const columnPresets: Record<string, (keyof typeof columnMap)[]> = {
   customer: ['id', 'leakType', 'location', 'landmark', 'referenceMeter', 'contactNo', 'dateTimeReported', 'referenceNo'],
   serviceline: ['id', 'leakType', 'location', 'landmark', 'referenceMeter', 'referenceNo'],
@@ -208,7 +204,7 @@ const LeakReports: React.FC = () => {
     { label: 'LANDMARK', value: selectedRecord?.landmark },
     { label: 'CONTACT NO.', value: selectedRecord?.contactNo },
     { label: 'LEAK TYPE', value: selectedRecord?.leakType },
-    //{ label: 'LEAK PRESSURE', value: selectedRecord?.remarks || 'N/A' },
+    { label: 'LEAK PRESSURE', value: selectedRecord?.leakPressure || 'N/A' },
   ];
 
   return (
@@ -237,7 +233,6 @@ const LeakReports: React.FC = () => {
         <span style={{ marginLeft: 8 }}>records per page</span>
       </div>
 
-      {/* Card container for Tabs and Table */}
       <Card
         bodyStyle={{ padding: 0 }}
         style={{
@@ -285,9 +280,10 @@ const LeakReports: React.FC = () => {
         visible={modalVisible}
         onCancel={handleCancel}
         footer={null}
+        width={720}
       >
         {modalTitle === 'Dispatch' && selectedRecord ? (
-          <div style={{boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
+          <div style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
             {dispatchFields.map(({ label, value }) => (
               <p key={label}>
                 <strong>{label}:</strong> {value}
@@ -311,47 +307,105 @@ const LeakReports: React.FC = () => {
               <Button type="primary">Dispatch Leak</Button>
             </div>
           </div>
-        ): modalTitle === 'Update Report' && selectedRecord ? (
-          <div>
-            {columnPresets[activeTab].map((key) => (
-              <div key={key} style={{ marginBottom: 12 }}>
-                <label style={{ fontWeight: 500 }}> {columnMap[key].title}: </label>
-                {key === 'dateTimeReported' ? (
-                  <DatePicker
-                    showTime
-                    format='MMM DD, YYYY hh.mm A'
-                    value={formValues[key] ? dayjs(formValues[key], 'MMM DD, YYYY hh.mm A') : null}
-                    onChange={(date, dateString) => handleInputChange(key, dateString as string)}
-                    style={{ width: '100%' }}
-                  />
-                ) : (
-                  <Input
-                    value={formValues[key] || ''}
-                    onChange={e => handleInputChange(key, e.target.value)}
-                  />
-                )}
+        ) : modalTitle === 'Update Report' && selectedRecord ? (
+          <div className="update-form">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label>Location:</label>
+                <Input value={formValues.location} disabled />
               </div>
-            ))}
-            <Button type="primary" onClick={handleUpdateSubmit} block>
-              Save Changes
-            </Button>
+              <div>
+                <label>Landmark:</label>
+                <Input value={formValues.landmark} onChange={e => handleInputChange('landmark', e.target.value)} />
+              </div>
+              <div>
+                <label>Contact No:</label>
+                <Input value={formValues.contactNo} onChange={e => handleInputChange('contactNo', e.target.value)} />
+              </div>
+              <div>
+                <label>Nearest Meter:</label>
+                <Input value={formValues.referenceMeter} onChange={e => handleInputChange('referenceMeter', e.target.value)} />
+              </div>
+              <div>
+                <label>DMA ID:</label>
+                <Select placeholder="- SELECT -" onChange={(value) => handleInputChange('dmaId' as keyof LeakData, value)}>
+                  <Option value="DMA001">DMA001</Option>
+                  <Option value="DMA002">DMA002</Option>
+                </Select>
+              </div>
+              <div>
+                <label>Covering:</label>
+                <Select placeholder="- SELECT -" onChange={(value) => handleInputChange('covering' as keyof LeakData, value)}>
+                  <Option value="SOIL">SOIL</Option>
+                  <Option value="CONCRETE">CONCRETE</Option>
+                </Select>
+              </div>
+              <div>
+                <label>NRW Level:</label>
+                <Input value={(formValues as any).nrwLevel || ''} onChange={e => handleInputChange('nrwLevel' as keyof LeakData, e.target.value)} />
+              </div>
+            </div>
+            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <Button onClick={handleCancel} style={{ background: '#00607A', color: '#fff' }}>
+                Close
+              </Button>
+              <Button type="primary" onClick={handleUpdateSubmit}>
+                Save
+              </Button>
+            </div>
           </div>
         ) : modalTitle === 'Report Details' && selectedRecord ? (
-          <div>
-            {columnPresets[activeTab].map((key) => (
-              <p key={key}>
-                <strong>{columnMap[key].title}:</strong>{' '}
-                {(selectedRecord as any)[key] || 'N/A'}
-              </p>
-            ))}
-          </div>
-        ) : modalTitle === 'Dispatch' && selectedRecord ? (
-          <div>
-            {dispatchFields.map(({ label, value }) => (
-              <p key={label}>
-                <strong>{label}:</strong> {value}
-              </p>
-            ))}
+          <div style={{marginTop: 12 }}>
+            <div
+              style={{ backgroundColor: '#3B82F6', 
+              color: 'white', padding: '8px 16px', 
+              borderRadius: '10px 10px 0 0', 
+              display: 'inline-block', 
+              fontWeight: 600, 
+              fontSize: 16 
+            }}
+            >
+              <FileSearchOutlined style={{ marginRight: 8 }} /
+              >
+              Report Details
+            </div>
+
+            <div   style={{
+              backgroundColor: '#f8fbfe',
+              border: '1px solid #bcdfff',
+              borderRadius: '0 0 10px 10px',
+              padding: '20px 24px',
+              marginBottom: 24,
+              fontSize: 15,
+              lineHeight: '1.8',
+            }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
+                {columnPresets[activeTab].map((key) => (
+                  <React.Fragment key={key}>
+                    <div><strong>{columnMap[key].title}:</strong></div>
+                    <div>{(selectedRecord as any)[key] || 'N/A'}</div>
+                  </React.Fragment>
+                ))}
+                <div><strong>Leak Pressure:</strong></div>
+                <div>{selectedRecord.leakPressure || 'N/A'}</div>
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent:'flex-end' }}>
+              <Button
+                type="primary"
+                style={{
+                  backgroundColor: '#00B4D8',
+                  borderColor: '#00B4D8',
+                  fontWeight: 500,
+
+                }}
+                onClick={handleCancel}
+              >
+                Close  
+              </Button>
+            </div>  
           </div>
         ) : (
           <p>This is the {modalTitle.toLowerCase()} modal content.</p>
