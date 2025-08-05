@@ -10,8 +10,11 @@ import {
   Row,
   Col,
   Breadcrumb,
+  Upload,
+  message
 } from 'antd';
-import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -29,7 +32,9 @@ const ReportALeak: React.FC = () => {
   const [lng, setLng] = useState<number>(125.6131);
   const [wscode, setWscode] = useState<string>('');
   const [CT_ID, setCaretaker] = useState<string>('');
-  
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (lat !== null && lng !== null) {
       fetchWscode(lat, lng);
@@ -39,9 +44,8 @@ const ReportALeak: React.FC = () => {
     console.log('Caretaker:', CT_ID);
   }, [lat, lng, wscode, CT_ID]);
 
-
   const fetchWscode = async (lat: number, lng: number) => {
-  try {
+    try {
       const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
       const data = await response.json();
       if (data.success && data.data && data.data.length > 0) {
@@ -55,27 +59,70 @@ const ReportALeak: React.FC = () => {
   };
 
   const fetchCaretaker = async (lat: number, lng: number) => {
-  try {
-    const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
-    const data = await response.json();
-    
-    if (data && data.CT_ID) {
-      setCaretaker(data.CT_ID);
-    } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
-      setCaretaker(data.data[0].CT_ID);
+    try {
+      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
+      const data = await response.json();
+
+      if (data && data.CT_ID) {
+        setCaretaker(data.CT_ID);
+      } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
+        setCaretaker(data.data[0].CT_ID);
+      }
+    } catch (error) {
+      console.error('Error fetching caretaker: ', error);
     }
-  } catch (error) {
-    console.error('Error fetching caretaker: ', error);
-  }
-};
+  };
 
   const handleMapClick = (clickedLat: number, clickedLng: number) => {
     setLat(clickedLat);
     setLng(clickedLng);
   };
 
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    formData.append('Name', values.Name || '');
+    formData.append('Number', values.Number || '');
+    formData.append('NearestMeter', values.NearestMeter || '');
+    formData.append('Address', values.address || '');
+    formData.append('Landmark', values.Landmark || '');
+    formData.append('LeakPressure', values.leakPressure || '');
+    formData.append('Visibility', values.visibility || '');
+    formData.append('TypeId', values.typeId || '');
+    formData.append('SpoolID', '0');
+    formData.append('Latitude', lat.toString());
+    formData.append('Longitude', lng.toString());
+
+    if (fileList.length) {
+      fileList.forEach((file, index) => {
+        formData.append('Images', file.originFileObj);
+      });
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakDetection/saveLeakReport',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      message.success('Leak report submitted successfully');
+      form.resetFields();
+      setFileList([]);
+    } catch (error) {
+      console.error(error);
+      message.error('Failed to submit leak report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-     <div style={{ padding: '4px 24px 24px 24px' }}>
+    <div style={{ padding: '4px 24px 24px 24px' }}>
       <Title level={3} style={{ marginBottom: 0 }}>Report A Leak</Title>
 
       <Breadcrumb style={{ marginBottom: 24 }}>
@@ -84,7 +131,7 @@ const ReportALeak: React.FC = () => {
       </Breadcrumb>
 
       <div style={{ backgroundColor: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Divider orientation="left">
             <Text style={{ fontSize: 18 }} strong>Contact Information</Text>
           </Divider>
@@ -101,8 +148,12 @@ const ReportALeak: React.FC = () => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Name</span>}><Input /></Form.Item></Col>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Contact No.</span>}><Input /></Form.Item></Col>
+            <Col span={12}>
+              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}><Input /></Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>}><Input /></Form.Item>
+            </Col>
           </Row>
 
           <Divider orientation="left">
@@ -110,20 +161,42 @@ const ReportALeak: React.FC = () => {
           </Divider>
 
           <Row gutter={16}>
-            <Col span={8}><Form.Item label={<span style={labelStyle}>Leak Type</span>}><Select placeholder="-SELECT-"><Option value="major">Major</Option><Option value="minor">Minor</Option></Select></Form.Item></Col>
-            <Col span={8}><Form.Item label={<span style={labelStyle}>Leak Pressure</span>}><Select placeholder="-SELECT-"><Option value="high">High</Option><Option value="low">Low</Option></Select></Form.Item></Col>
-            <Col span={8}><Form.Item label={<span style={labelStyle}>Visibility</span>}><Select placeholder="-SELECT-"><Option value="exposedleak">Exposed Leak</Option><Option value="undergroundleak">Underground Leak</Option></Select></Form.Item></Col>
+            <Col span={8}>
+              <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>}>
+                <Select placeholder="-SELECT-">
+                  <Option value="1">Service Line</Option>
+                  <Option value="2">Main Line</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="leakPressure" label={<span style={labelStyle}>Leak Pressure</span>}>
+                <Select placeholder="-SELECT-">
+                  <Option value="1">High</Option>
+                  <Option value="2">Low</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="visibility" label={<span style={labelStyle}>Visibility</span>}>
+                <Select placeholder="-SELECT-">
+                  <Option value="1">Exposed Leak</Option>
+                  <Option value="2">Underground Leak</Option>
+                </Select>
+              </Form.Item>
+            </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Address</span>}><Input /></Form.Item></Col>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Landmark</span>}><Input /></Form.Item></Col>
+            <Col span={12}><Form.Item name="address" label={<span style={labelStyle}>Address</span>}><Input /></Form.Item></Col>
+            <Col span={12}><Form.Item name="Landmark" label={<span style={labelStyle}>Landmark</span>}><Input /></Form.Item></Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Nearest Meter</span>}><Input /></Form.Item></Col>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Remarks</span>}><Input.TextArea rows={3} /></Form.Item></Col>
+            <Col span={12}><Form.Item name="NearestMeter" label={<span style={labelStyle}>Nearest Meter</span>}><Input /></Form.Item></Col>
+            <Col span={12}><Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}><Input.TextArea rows={3} /></Form.Item></Col>
           </Row>
+
 
           <Divider orientation="left">
             <Text style={{ fontSize: 18 }} strong>Search Address</Text>
@@ -132,8 +205,6 @@ const ReportALeak: React.FC = () => {
           <Form.Item label={<span style={labelStyle}>Search</span>}>
             <Input placeholder="e.g., Matina, Davao City, Davao del Sur" addonAfter={<EnvironmentOutlined />} />
           </Form.Item>
-
-        
 
           <div style={{ height: 400, border: '1px solid #ccc', marginBottom: 24 }}>
             <MapComponent lat={lat} lng={lng} onMapClick={handleMapClick} />
@@ -151,12 +222,12 @@ const ReportALeak: React.FC = () => {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <Button danger>Cancel</Button>
-            <Button type="primary">Submit</Button>
+            <Button type="primary" htmlType="submit" loading={loading}>Submit</Button>
           </div>
         </Form>
       </div>
     </div>
   );
-
 };
+
 export default ReportALeak;
