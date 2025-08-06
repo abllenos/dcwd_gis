@@ -108,12 +108,7 @@ const DispatchOveride: React.FC = () => {
         />
       </div>
 
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
-        <Breadcrumb.Item>Dispatch Override</Breadcrumb.Item>
-      </Breadcrumb>
-
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
+      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
         <Table
           columns={columns}
           dataSource={filteredData()}
