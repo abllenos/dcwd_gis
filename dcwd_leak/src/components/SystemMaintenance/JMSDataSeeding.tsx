@@ -143,7 +143,7 @@ const JMSDataSeeding: React.FC = () => {
 
 
 
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
+      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
         <Table
           columns={columns}
           dataSource={filteredData()}

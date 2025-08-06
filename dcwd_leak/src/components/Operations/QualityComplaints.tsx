@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Table,
   Button,
-  Typography,
   Breadcrumb,
   Tabs,
   Card,
@@ -12,7 +11,6 @@ import {
 import { FileSearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title } = Typography;
 const { TabPane } = Tabs;
 
 interface ComplaintData {
@@ -159,7 +157,7 @@ const QualityComplaints: React.FC = () => {
         />
       </div>
 
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
+      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
