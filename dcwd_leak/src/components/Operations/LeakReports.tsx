@@ -55,30 +55,6 @@ const data: LeakData[] = [
     dateRepaired: 'Jun 26, 2025',
     teamLeader: 'John Doe',
     leakPressure: 'Low',
-  },
-  {
-    key: '2',
-    id: '53054',
-    leakType: 'SERVICELINE',
-    location: 'BERSABA DUMANLAS BUHANGIN',
-    landmark: 'LIKOD SA DUMANLAS ELEM. SCHOOL / NG LEAK GI REPAIR',
-    referenceMeter: '520626353J',
-    contactNo: '09986222382',
-    dateTimeReported: 'Jun 21, 2025 08:11 AM',
-    referenceNo: '2025062125604',
-  },
-  {
-    key: '3',
-    id: '53060',
-    leakType: 'MAINLINE',
-    location: 'MINTAL',
-    landmark: 'Near Market',
-    referenceMeter: '523456789J',
-    contactNo: '09123456789',
-    dateTimeReported: 'Jun 20, 2025 03:15 PM',
-    referenceNo: '202506202020',
-    jmsControlNo: 'JMS-045',
-    teamLeader: 'Jane Smith',
     dateTurnedOver: 'Jun 22, 2025',
     turnoverReason: 'Heavy traffic; need backhoe',
   },
@@ -194,8 +170,22 @@ const LeakReports: React.FC = () => {
   const getColumns = (tabKey: string): ColumnsType<LeakData> => {
     const keys = columnPresets[tabKey] || columnPresets['customer'];
     const cols = keys.map(k => columnMap[k]);
-    return [...cols, commonActionColumn];
-  };
+    
+    if (tabKey === 'repaired') {
+      const repairedActionColumn: ColumnsType<LeakData>[number] = {
+        title: 'Actions',
+        key: 'action',
+        render: (_, record) => (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
+            <Button icon={<FileSearchOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Reports Details', record)} />
+          </div>
+        ),  
+    };
+    return [...cols, repairedActionColumn];
+  }
+  return [...cols, commonActionColumn];
+};  
+
 
   const dispatchFields = [
     { label: 'REPORT ID', value: selectedRecord?.id },
@@ -205,7 +195,8 @@ const LeakReports: React.FC = () => {
     { label: 'CONTACT NO.', value: selectedRecord?.contactNo },
     { label: 'LEAK TYPE', value: selectedRecord?.leakType },
     { label: 'LEAK PRESSURE', value: selectedRecord?.leakPressure || 'N/A' },
-  ];
+    
+  ]; 
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
@@ -214,12 +205,7 @@ const LeakReports: React.FC = () => {
           <Breadcrumb.Item>Operation</Breadcrumb.Item>
         <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
         </Breadcrumb>
-        <Input.Search
-          placeholder="Search"
-          allowClear
-          style={{ width: 300 }}
-          onChange={e => setSearchText(e.target.value.toLowerCase())}
-        />
+        <Input.Search placeholder="Search" allowClear style={{ width: 300 }} onChange={e => setSearchText(e.target.value.toLowerCase())}/>
       </div>
 
 
@@ -233,19 +219,8 @@ const LeakReports: React.FC = () => {
         <span style={{ marginLeft: 8 }}>records per page</span>
       </div>
 
-      <Card
-        bodyStyle={{ padding: 0 }}
-        style={{
-          marginBottom: 24,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        }}
-      >
-        <Tabs
-          activeKey={activeTab}
-          onChange={key => setActiveTab(key)}
-          type="card"
-          className='custom-tabs'
-        >
+      <Card bodyStyle={{ padding: 25 }} style={{ marginBottom: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.05)', borderRadius: 8 }}>
+        <Tabs activeKey={activeTab} onChange={key => setActiveTab(key)} type="card" className='custom-tabs'>
           {Object.entries(tabLabels).map(([key, label]) => (
             <TabPane
               key={key}
@@ -253,13 +228,7 @@ const LeakReports: React.FC = () => {
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, width: '100%' }}>
                   {label}
                   {!['repaired', 'after', 'notfound'].includes(key) && (
-                    <Badge
-                      count={filteredData(key).length}
-                      color="blue"
-                      overflowCount={99}
-                      size="small"
-                      style={{ paddingInline: 6, borderRadius: 4 }}
-                    />
+                    <Badge count={filteredData(key).length} color="blue" overflowCount={99} size="small" style={{ paddingInline: 6, borderRadius: 4 }}/>
                   )}
                 </span>
               }
@@ -280,7 +249,10 @@ const LeakReports: React.FC = () => {
         visible={modalVisible}
         onCancel={handleCancel}
         footer={null}
-        width={720}
+        width= '60%'
+        style={{maxWidth: '200vw', padding: 0 }}
+        bodyStyle={{ padding: 24 }}
+        centered
       >
         {modalTitle === 'Dispatch' && selectedRecord ? (
           <div style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
@@ -326,14 +298,14 @@ const LeakReports: React.FC = () => {
                 <label>Nearest Meter:</label>
                 <Input value={formValues.referenceMeter} onChange={e => handleInputChange('referenceMeter', e.target.value)} />
               </div>
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label>DMA ID:</label>
                 <Select placeholder="- SELECT -" onChange={(value) => handleInputChange('dmaId' as keyof LeakData, value)}>
                   <Option value="DMA001">DMA001</Option>
                   <Option value="DMA002">DMA002</Option>
                 </Select>
               </div>
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label>Covering:</label>
                 <Select placeholder="- SELECT -" onChange={(value) => handleInputChange('covering' as keyof LeakData, value)}>
                   <Option value="SOIL">SOIL</Option>
@@ -356,17 +328,16 @@ const LeakReports: React.FC = () => {
           </div>
         ) : modalTitle === 'Report Details' && selectedRecord ? (
           <div style={{marginTop: 12 }}>
-            <div
-              style={{ backgroundColor: '#3B82F6', 
-              color: 'white', padding: '8px 16px', 
+            <div style={{ 
+              backgroundColor: '#3B82F6', 
+              color: 'white', 
+              padding: '8px 16px', 
               borderRadius: '10px 10px 0 0', 
               display: 'inline-block', 
               fontWeight: 600, 
               fontSize: 16 
-            }}
-            >
-              <FileSearchOutlined style={{ marginRight: 8 }} /
-              >
+            }}>
+              <FileSearchOutlined style={{ marginRight: 8 }} />
               Report Details
             </div>
 
@@ -390,19 +361,21 @@ const LeakReports: React.FC = () => {
                 <div><strong>Leak Pressure:</strong></div>
                 <div>{selectedRecord.leakPressure || 'N/A'}</div>
               </div>
-            </div>
-            
-            <div style={{ marginBottom: 12, display: 'flex', justifyContent:'flex-end' }}>
-              <Button
-                type="primary"
-                style={{
-                  backgroundColor: '#00B4D8',
-                  borderColor: '#00B4D8',
-                  fontWeight: 500,
 
-                }}
-                onClick={handleCancel}
-              >
+            {activeTab === 'repaired' && (
+              <div style={{ marginBottom: 12, padding: '12px', background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 6 }}>
+                <strong>Repaired Summary:</strong>
+                <ul style={{ marginTop: 8, paddingLeft: 20 }}>
+                  <li>Repaired Leak: {selectedRecord.repairedLeaks || 'N/A'}</li>
+                  <li>Date Repaired: {selectedRecord.dateRepaired || 'N/A'}</li>
+                  <li>Team Leader: {selectedRecord.teamLeader || 'N/A'} </li>
+                </ul>
+              </div>
+              
+            )}
+          </div>  
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent:'flex-end' }}>
+              <Button type="primary" style={{ backgroundColor: '#00B4D8', borderColor: '#00B4D8', fontWeight: 500, }} onClick={handleCancel}>
                 Close  
               </Button>
             </div>  

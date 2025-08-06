@@ -11,10 +11,11 @@ import {
   Col,
   InputNumber,
   Breadcrumb,
+  message,
 } from 'antd';
-import moment from 'moment';
 import { SearchOutlined } from '@ant-design/icons';
 import { DatePicker} from 'antd';
+import axios from 'axios';
 
 
 const { Text } = Typography;
@@ -33,18 +34,8 @@ const LeakDetection: React.FC = () => {
   const [lng, setLng] = useState<number>(125.6131);
   const [wscode, setWscode] = useState<string>('');
   const [CT_ID, setCaretaker] = useState<string>('');
-  const [Name, setName] = useState<string>('');
-  const [ContactNo, setContactNo] = useState<string>('');
-  const [Address, setAddress] = useState<string>('');
-  const [Landmark, setLandmark] = useState<string>('');
-  const [NearestMeter, setNearestMeter] = useState<string>('');
-  const [TypeID, setLeakType] = useState<string>('');
-  const [LeakIndicator, setLeakIndicator] = useState<string>('');
-  const [Covering, setCovering] = useState<string>('');
-  const [NrlwLevel, setNRWLevel] = useState<number>(0.0);
-  const [Dma, setDMA] = useState<string>('');
-  const [Remarks, setRemarks] = useState<string>('');
-  const [DateTime, setDateTime] = useState<Date>( new Date());
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   
   useEffect(() => {
     if (lat !== null && lng !== null) {
@@ -71,26 +62,77 @@ const LeakDetection: React.FC = () => {
   };
 
   const fetchCaretaker = async (lat: number, lng: number) => {
-  try {
-    const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
-    const data = await response.json();
-    
-    if (data && data.CT_ID) {
-      setCaretaker(data.CT_ID);
-    } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
-      setCaretaker(data.data[0].CT_ID);
+    try {
+      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
+      const data = await response.json();
+      
+      if (data && data.CT_ID) {
+        setCaretaker(data.CT_ID);
+      } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
+        setCaretaker(data.data[0].CT_ID);
+      }
+    } catch (error) {
+      console.error('Error fetching caretaker: ', error);
     }
-  } catch (error) {
-    console.error('Error fetching caretaker: ', error);
-  }
-};
+  };
 
   const handleMapClick = (clickedLat: number, clickedLng: number) => {
     setLat(clickedLat);
     setLng(clickedLng);
   };
 
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    const formattedReportedAt = values.ReportedAt
+      ? values.ReportedAt.format('YYYY-MM-DD HH:mm:ss')
+      : '';
+
+    formData.append('Name', values.Name || '');
+    formData.append('Number', values.Number || '');
+    formData.append('NearestMeter', values.NearestMeter || '');
+    formData.append('Address', values.address || '');
+    formData.append('Landmark', values.Landmark || '');
+    formData.append('NearestMeter', values.NearestMeter || '');
+    formData.append('ReportedAt', formattedReportedAt);
+    formData.append('TypeId', values.Leaktype || '');
+    formData.append('LeakIndicator', values.leakIndicator || '');
+    formData.append('Covering', values.covering || '');
+    formData.append('NrlwLevel', values.nrlwLevel?.toString() || '0.00');
+    formData.append('Dma', values.dma || '');
+    formData.append('Remarks', values.remarks || '');
+    formData.append('Latitude', lat.toString());
+    formData.append('Longitude', lng.toString());
+
+    if (fileList.length) {
+      fileList.forEach((file, index) => {
+        formData.append(`file_${index}`, file.originFileObj);
+      });
+    }  
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakDetection/saveLDreport',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      message.success('Report submitted successfully!');
+      form.resetFields();
+      setFileList([]);
+    } catch (error) {
+      console.error(error);
+      message.error('Failed to submit report.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
+
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
@@ -99,30 +141,15 @@ const LeakDetection: React.FC = () => {
 
 
       <div
-        style={{
-          backgroundColor: '#fff',
-          padding: 24,
-          borderRadius: 8,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        }}
-      >
-        <Form layout="vertical">
+        style={{ backgroundColor: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.05)',}}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Divider orientation="left">
-            <Text style={{ fontSize: 18 }} strong>
-              Contact Information
-            </Text>
+            <Text style={{ fontSize: 18 }} strong>Contact Information</Text>
           </Divider>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label={
-                  <span style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <SearchOutlined style={{ fontSize: 15 }} />
-                    Search Account No or Meter No
-                  </span>
-                }
-              >
+              <Form.Item label={<span style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 4 }}><SearchOutlined style={{ fontSize: 15 }} />Search Account No or Meter No</span>}>
                 <Input.Group compact style={{ display: 'flex' }}>
                   <Input style={{ flex: 1 }} placeholder="Enter Account or Meter Number" />
                   <Button type="primary">Search</Button>
@@ -133,31 +160,22 @@ const LeakDetection: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Name</span>}>
-                <Input value={Name} onChange={(e) => setName(e.target.value)} />
-              </Form.Item>
+              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}><Input/> </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Contact #</span>}>
-                <Input value={ContactNo} onChange ={(e) => setContactNo(e.target.value) }/>
-              </Form.Item>
+              <Form.Item name=''label={<span style={labelStyle}>Contact #</span>}><Input/> </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Address</span>}>
-                <Input value={Address} onChange={(e) => setAddress(e.target.value)} />
-              </Form.Item>
+              <Form.Item name='Address' label={<span style={labelStyle}>Address</span>}><Input/></Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Landmark</span>}>
-                <Input value={Landmark} onChange={(e)=> setLandmark(e.target.value)} />
-              </Form.Item>
+              <Form.Item name='Landmark' label={<span style={labelStyle}>Landmark</span>}><Input/></Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Nearest Meter</span>}>
-                <Input value={NearestMeter} onChange={(e) => setNearestMeter(e.target.value)}/>
+              <Form.Item name='NearestMeter'label={<span style={labelStyle}>Nearest Meter</span>}><Input/>
               </Form.Item>
             </Col>
           </Row>
@@ -170,20 +188,18 @@ const LeakDetection: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>Date & Time</span>}>
+              <Form.Item name='ReportedAt' label={<span style={labelStyle}>Date & Time</span>}>
                 <DatePicker
-                  showTime={{ format: 'hh:mm A' }}
-                  format="DD/MM/YY hh:mm A"
+                  showTime={{ format: 'hh:mm:ss A' }}
+                  format="YYYY/MM/DD hh:mm:ss A"
                   style={{ width: '100%' }}
-                  placeholder="dd/mm/yy --:-- --"
-                  value={moment(DateTime)}
-                  onChange={(value) => setDateTime(value?.toDate() ?? new Date())}
+                  placeholder="yy/mm/dd --:--:-- --"
                 />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>Leak Type</span>}>
-                <Select placeholder="-SELECT-" value={TypeID} onChange={(value) => setLeakType(value)}>
+              <Form.Item name='TypeId' label={<span style={labelStyle}>Leak Type</span>}>
+                <Select placeholder="-SELECT-">
                   <Option value="1">UnIdentified</Option>
                   <Option value="2">Serviceline</Option>
                   <Option value="3">Mainline</Option>
@@ -192,8 +208,8 @@ const LeakDetection: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>Leak Indicator</span>}>
-                <Select placeholder="-SELECT-" value={LeakIndicator} onChange={(value) => setLeakIndicator(value)}>
+              <Form.Item name='LeakIndicator' label={<span style={labelStyle}>Leak Indicator</span>}>
+                <Select placeholder="-SELECT-">
                   <Option value="1">Exposed/Surface</Option>
                   <Option value="2">Underground/Non-Surface</Option>
                 </Select>
@@ -203,8 +219,8 @@ const LeakDetection: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>Covering</span>}>
-                <Select placeholder="-SELECT-" value={Covering} onChange={(value) => setCovering(value)}>
+              <Form.Item name='Covering' label={<span style={labelStyle}>Covering</span>}>
+                <Select placeholder="-SELECT-">
                   <Option value="1">Concrete</Option>
                   <Option value="2">Gravel</Option>
                   <Option value="3">Soil</Option>
@@ -213,12 +229,12 @@ const LeakDetection: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>NRW Level</span>}>
+              <Form.Item name='NrlwLevel' label={<span style={labelStyle}>NRW Level</span>}>
                 <InputNumber<number>
                   min={0}
                   max={100}
+                  defaultValue={0.00}
                   step={0.01}
-                  value={NrlwLevel} onChange={(value) => setNRWLevel(value ?? 0)}
                   style={{ width: '100%' }}
                   formatter={(value) =>
                     !isNaN(Number(value)) ? Number(value).toFixed(2) : '0.00'
@@ -228,20 +244,14 @@ const LeakDetection: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>DMA</span>}>
-                <Input value={Dma} onChange={(e) => setDMA(e.target.value)}/>
-              </Form.Item>
+              <Form.Item name='Dma' label={<span style={labelStyle}>DMA</span>}><Input/></Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Remarks</span>}>
-                <Input.TextArea 
-                rows={3} 
-                value={Remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-                />
+              <Form.Item name='Remarks' label={<span style={labelStyle}>Remarks</span>}>
+                <Input.TextArea rows={3}/>
               </Form.Item>
             </Col>
           </Row>
@@ -262,7 +272,7 @@ const LeakDetection: React.FC = () => {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <Button danger>Cancel</Button>
-            <Button type="primary">Submit</Button>
+            <Button type="primary" htmlType='submit' loading={loading}>Submit</Button>
           </div>
         </Form>
       </div>

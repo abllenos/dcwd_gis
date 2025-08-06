@@ -46,7 +46,7 @@ const ReportALeak: React.FC = () => {
 
   const fetchWscode = async (lat: number, lng: number) => {
     try {
-      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
+      const response = await fetch('https://api-gis.davao-water.gov.ph/helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}');
       const data = await response.json();
       if (data.success && data.data && data.data.length > 0) {
         setWscode(data.data[0].wscode);
@@ -60,7 +60,7 @@ const ReportALeak: React.FC = () => {
 
   const fetchCaretaker = async (lat: number, lng: number) => {
     try {
-      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
+      const response = await fetch('https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}');
       const data = await response.json();
 
       if (data && data.CT_ID) {
