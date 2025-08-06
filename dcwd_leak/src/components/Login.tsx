@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   MailOutlined,
   LockOutlined,
@@ -8,6 +8,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LottieSpinner from '../components/LottieSpinner';
+import '../styles/LoadingOverlay.css';
 
 interface LoginProps {
   onLogin: (userData: any) => void;
@@ -18,12 +20,16 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const styles = getStyles(darkMode);
+  const pendingSubmitRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || pendingSubmitRef.current) return;
+    pendingSubmitRef.current = true;
+    setLoading(true);
 
     try {
       const response = await fetch(
@@ -38,32 +44,55 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       );
 
       const data = await response.json();
+      console.log('Submitted username:', username);
       console.log('API raw response:', data);
 
-      if (response.ok && data.statusCode === 200) {
+      if (data?.statusCode === 200 && data?.data) {
         if (data.data?.token) {
           localStorage.setItem('debug_token', data.data.token);
         }
-        if (data.data) {
-          localStorage.setItem('debug_user_data', JSON.stringify(data.data));
-        }
-
-        toast.success('You have logged in successfully.');
+        localStorage.setItem('debug_user_data', JSON.stringify(data.data));
         onLogin(data.data);
 
-        setTimeout(() => navigate('/home'), 1500);
+        // Delay fade-out and navigation
+        setTimeout(() => navigate('/home'), 1300);
       } else {
         toast.error(data.message || 'Invalid email or password');
+        setLoading(false);
+        pendingSubmitRef.current = false;
       }
     } catch (err) {
       console.error(err);
       toast.error('Failed to connect to server.');
+      setLoading(false);
+      pendingSubmitRef.current = false;
     }
   };
 
   return (
     <div style={styles.container}>
-      <ToastContainer position="top-center" autoClose={2500} aria-label={'Notification Toast'}/>
+      <ToastContainer position="top-center" autoClose={2500} />
+
+    {loading && (
+  <div
+    className="loading-overlay fade-in-only"
+    aria-live="polite"
+    aria-label="Loading"
+    style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 1000,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(255,255,255,0.9)',
+      opacity: 1,
+      animation: 'fadeIn 0.3s ease-in forwards',
+    }}
+  >
+    <LottieSpinner size={200} />
+  </div>
+)}
       <button onClick={() => setDarkMode(!darkMode)} style={styles.toggleButton}>
         {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
       </button>
@@ -71,7 +100,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <div style={styles.blurOverlay} />
 
       <div style={styles.overlay}>
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} style={styles.form} aria-busy={loading}>
           <img src="/logo-dcwd.webp" alt="Logo" style={styles.logo} />
           <h2 style={styles.title}>Login</h2>
           <p style={styles.subtitle}>Log in to your account</p>
@@ -85,6 +114,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               onChange={(e) => setUsername(e.target.value)}
               style={styles.input}
               required
+              disabled={loading}
+              autoComplete="username"
             />
           </div>
 
@@ -97,14 +128,28 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               onChange={(e) => setPassword(e.target.value)}
               style={{ ...styles.input, paddingRight: '30px' }}
               required
+              disabled={loading}
+              autoComplete="current-password"
             />
             <span onClick={() => setShowPassword(!showPassword)} style={styles.toggleIcon}>
               {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             </span>
           </div>
 
-          <button type="submit" style={styles.button}>
-            Log In
+          <button
+            type="submit"
+            style={{
+              ...styles.button,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              opacity: loading ? 0.85 : 1,
+              cursor: loading ? 'not-allowed' : 'pointer',
+            }}
+            disabled={loading}
+          >
+            {loading ? <LottieSpinner size={24} /> : 'Log In'}
           </button>
         </form>
       </div>
@@ -137,12 +182,15 @@ function getStyles(darkMode: boolean): { [key: string]: React.CSSProperties } {
       borderRadius: '4px',
       cursor: 'pointer',
       fontSize: '12px',
+      zIndex: 2,
     },
     overlay: {
       backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)',
       padding: '40px',
       borderRadius: '8px',
       boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
+      position: 'relative',
+      zIndex: 1,
     },
     logo: {
       width: '70px',
@@ -209,12 +257,14 @@ function getStyles(darkMode: boolean): { [key: string]: React.CSSProperties } {
       borderRadius: '4px',
       cursor: 'pointer',
       fontSize: '15px',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     blurOverlay: {
       position: 'absolute',
       inset: 0,
       backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)',
-      backdropFilter: 'blur(3px)',
       zIndex: -1,
     },
   };
