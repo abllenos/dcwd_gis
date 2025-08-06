@@ -17,6 +17,7 @@
     "antd": "^5.25.1",
     "apexcharts": "^4.7.0",
     "axios": "^1.11.0",
+    "moment": "^2.30.1",
     "npm": "^11.5.1",
     "react": "^19.1.0",
     "react-apexcharts": "^1.7.0",
@@ -54,6 +55,8 @@
     ]
   },
   "devDependencies": {
-    "@types/google.maps": "^3.58.1"
+    "@types/google.maps": "^3.58.1",
+    "@types/moment": "^2.11.29",
+    "@types/react-toastify": "^4.0.2"
   }
 }
