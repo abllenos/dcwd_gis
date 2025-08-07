@@ -16,6 +16,7 @@ import {
 import { SearchOutlined } from '@ant-design/icons';
 import { DatePicker} from 'antd';
 import axios from 'axios';
+import { apiGis, devApi } from '../Endpoints/Interceptor';
 
 
 const { Text } = Typography;
@@ -57,14 +58,14 @@ const LeakDetection: React.FC = () => {
         console.warn('No wscode found in response:', data);
       }
     } catch (error) {
-      console.error('Error fetching wscode: ', error);
+      console.error('Error fetching wscode:', error);
     }
   };
 
   const fetchCaretaker = async (lat: number, lng: number) => {
     try {
-      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
-      const data = await response.json();
+      const response = await apiGis.get(`helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
+      const data = response.data;
       
       if (data && data.CT_ID) {
         setCaretaker(data.CT_ID);
@@ -72,7 +73,7 @@ const LeakDetection: React.FC = () => {
         setCaretaker(data.data[0].CT_ID);
       }
     } catch (error) {
-      console.error('Error fetching caretaker: ', error);
+      console.error('Error fetching caretaker:', error);
     }
   };
 
@@ -102,6 +103,8 @@ const LeakDetection: React.FC = () => {
     formData.append('Remarks', values.remarks || '');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
+    formData.append('wscode', values.wscode || '');
+    formData.append('ct_code', values.CT_ID || '');
 
     if (fileList.length) {
       fileList.forEach((file, index) => {
