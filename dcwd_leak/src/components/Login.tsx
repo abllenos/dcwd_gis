@@ -10,6 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LottieSpinner from '../components/LottieSpinner';
 import '../styles/LoadingOverlay.css';
+import { devApi } from './Endpoints/Interceptor';
 
 interface LoginProps {
   onLogin: (userData: any) => void;
@@ -32,42 +33,35 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/userlogin/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        }
-      );
+         const response = await devApi.post(
+        'dcwd-gis/api/v1/admin/userlogin/login',
+        { username, password }
+         );
 
-      const data = await response.json();
-      console.log('Submitted username:', username);
-      console.log('API raw response:', data);
+         const data = response.data;
 
-      if (data?.statusCode === 200 && data?.data) {
-        if (data.data?.token) {
-          localStorage.setItem('debug_token', data.data.token);
-        }
-        localStorage.setItem('debug_user_data', JSON.stringify(data.data));
-        onLogin(data.data);
+         if (data?.statusCode === 200 && data?.data){
+          if (data.data?.token) {
+            localStorage.setItem('debug_token', data.data.token);
+          }
+          localStorage.setItem('debug_user_data', JSON.stringify(data.data));
+          onLogin(data.data);
 
-        // Delay fade-out and navigation
-        setTimeout(() => navigate('/home'), 1300);
-      } else {
-        toast.error(data.message || 'Invalid email or password');
-        setLoading(false);
-        pendingSubmitRef.current = false;
-      }
-    } catch (err) {
+          setTimeout(() => navigate('/home'), 1300);
+         } else {
+          toast.error(data.message || 'Invalid email or password');
+          setLoading(false);
+          pendingSubmitRef.current = false;
+         }
+    } catch (err){
       console.error(err);
       toast.error('Failed to connect to server.');
       setLoading(false);
       pendingSubmitRef.current = false;
     }
   };
+   
+        
 
   return (
     <div style={styles.container}>

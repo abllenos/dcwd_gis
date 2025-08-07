@@ -15,6 +15,7 @@ import {
 } from 'antd';
 import { EnvironmentOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { apiGis, devApi } from '../Endpoints/Interceptor';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -45,33 +46,35 @@ const ReportALeak: React.FC = () => {
   }, [lat, lng, wscode, CT_ID]);
 
   const fetchWscode = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
-      const data = await response.json();
-      if (data.success && data.data && data.data.length > 0) {
-        setWscode(data.data[0].wscode);
-      } else {
-        console.warn('No wscode found in response:', data);
-      }
-    } catch (error) {
-      console.error('Error fetching wscode: ', error);
+  try {
+    const response = await apiGis.get(`helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
+    const data = response.data;
+    if (data.success && data.data && data.data.length > 0) {
+      setWscode(data.data[0].wscode);
+    } else {
+      console.warn('No wscode found in response:', data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching wscode:', error);
+  }
+};
 
   const fetchCaretaker = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(`https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
-      const data = await response.json();
+  try {
+    const response = await apiGis.get(`helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
+    const data = response.data;
 
-      if (data && data.CT_ID) {
-        setCaretaker(data.CT_ID);
-      } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
-        setCaretaker(data.data[0].CT_ID);
-      }
-    } catch (error) {
-      console.error('Error fetching caretaker: ', error);
+    if (data && data.CT_ID) {
+      setCaretaker(data.CT_ID);
+    } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
+      setCaretaker(data.data[0].CT_ID);
+    } else {
+      console.warn('No caretaker found in response:', data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching caretaker:', error);
+  }
+};
 
   const handleMapClick = (clickedLat: number, clickedLng: number) => {
     setLat(clickedLat);
@@ -100,8 +103,8 @@ const ReportALeak: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
-        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakDetection/saveLeakReport',
+      const response = await devApi.post(
+        'dcwd-gis/api/v1/admin/LeakDetection/saveLeakReport',
         formData,
         {
           headers: {
@@ -214,16 +217,6 @@ const ReportALeak: React.FC = () => {
           <div style={{ height: 400, border: '1px solid #ccc', marginBottom: 24 }}>
             <MapComponent lat={lat} lng={lng} onMapClick={handleMapClick} />
           </div>
-
-          <Row gutter={16}>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Latitude</span>}><Input value={lat?.toFixed(6) || ''} readOnly /></Form.Item></Col>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Longitude</span>}><Input value={lng?.toFixed(6) || ''} readOnly /></Form.Item></Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Water Service Station Code</span>}><Input value={wscode} readOnly /></Form.Item></Col>
-            <Col span={12}><Form.Item label={<span style={labelStyle}>Caretaker</span>}><Input value={CT_ID} readOnly /></Form.Item></Col>
-          </Row>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <Button danger>Cancel</Button>
