@@ -13,7 +13,7 @@ import {
   Upload,
   message
 } from 'antd';
-import { EnvironmentOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { apiGis, devApi } from '../Endpoints/Interceptor';
 
@@ -41,40 +41,33 @@ const ReportALeak: React.FC = () => {
       fetchWscode(lat, lng);
       fetchCaretaker(lat, lng);
     }
-    console.log('WSCODE:', wscode);
-    console.log('Caretaker:', CT_ID);
-  }, [lat, lng, wscode, CT_ID]);
+  }, [lat, lng]);
 
   const fetchWscode = async (lat: number, lng: number) => {
-  try {
-    const response = await apiGis.get(`helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
-    const data = response.data;
-    if (data.success && data.data && data.data.length > 0) {
-      setWscode(data.data[0].wscode);
-    } else {
-      console.warn('No wscode found in response:', data);
+    try {
+      const response = await apiGis.get(`helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
+      const data = response.data;
+      if (data.success && data.data && data.data.length > 0) {
+        setWscode(data.data[0].wscode);
+      }
+    } catch (error) {
+      console.error('Error fetching wscode:', error);
     }
-  } catch (error) {
-    console.error('Error fetching wscode:', error);
-  }
-};
+  };
 
   const fetchCaretaker = async (lat: number, lng: number) => {
-  try {
-    const response = await apiGis.get(`helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
-    const data = response.data;
-
-    if (data && data.CT_ID) {
-      setCaretaker(data.CT_ID);
-    } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
-      setCaretaker(data.data[0].CT_ID);
-    } else {
-      console.warn('No caretaker found in response:', data);
+    try {
+      const response = await apiGis.get(`helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
+      const data = response.data;
+      if (data && data.CT_ID) {
+        setCaretaker(data.CT_ID);
+      } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
+        setCaretaker(data.data[0].CT_ID);
+      }
+    } catch (error) {
+      console.error('Error fetching caretaker:', error);
     }
-  } catch (error) {
-    console.error('Error fetching caretaker:', error);
-  }
-};
+  };
 
   const handleMapClick = (clickedLat: number, clickedLng: number) => {
     setLat(clickedLat);
@@ -94,9 +87,10 @@ const ReportALeak: React.FC = () => {
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
-
+    formData.append('wscode', wscode || '');
+    formData.append('ct_code', CT_ID || '');
     if (fileList.length) {
-      fileList.forEach((file, index) => {
+      fileList.forEach((file) => {
         formData.append('Images', file.originFileObj);
       });
     }
@@ -125,12 +119,9 @@ const ReportALeak: React.FC = () => {
   };
 
   return (
-
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <Title level={3} style={{ marginBottom: 0 }}>Report A Leak</Title>
-
       <Breadcrumb style={{ marginBottom: 24 }}>
-
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
       </Breadcrumb>
@@ -153,15 +144,30 @@ const ReportALeak: React.FC = () => {
           </Row>
 
           <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="Name"
+                label={<span style={labelStyle}>Name</span>}
+                rules={[{ required: true, message: 'Name is required' }, { pattern: /^[A-Za-z\s]+$/, message: 'Name must contain only letters' }]}
+                hasFeedback
+              >
+                <Input onKeyPress={(e) => { if (!/[A-Za-z\s]/.test(e.key)) e.preventDefault(); }} />
+              </Form.Item>
+            </Col>
 
             <Col span={12}>
-              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}><Input /></Form.Item>
+              <Form.Item
+                name="Number"
+                label={<span style={labelStyle}>Contact No.</span>}
+                rules={[
+                  { required: true, message: 'Contact number is required' },
+                  { pattern: /^\d{11}$/, message: 'Enter a valid 11-digit number' },
+                ]}
+                hasFeedback
+              >
+                <Input maxLength={11} onKeyPress={(e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }} />
+              </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>}><Input /></Form.Item>
-            </Col>
-
-
           </Row>
 
           <Divider orientation="left">
@@ -170,23 +176,40 @@ const ReportALeak: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>}>
+              <Form.Item
+                name="typeId"
+                label={<span style={labelStyle}>Leak Type</span>}
+                rules={[{ required: true, message: 'Please select leak type' }]}
+                hasFeedback
+              >
                 <Select placeholder="-SELECT-">
                   <Option value="1">Service Line</Option>
                   <Option value="2">Main Line</Option>
                 </Select>
               </Form.Item>
             </Col>
+
             <Col span={8}>
-              <Form.Item name="leakPressure" label={<span style={labelStyle}>Leak Pressure</span>}>
+              <Form.Item
+                name="leakPressure"
+                label={<span style={labelStyle}>Leak Pressure</span>}
+                rules={[{ required: true, message: 'Please select leak pressure' }]}
+                hasFeedback
+              >
                 <Select placeholder="-SELECT-">
                   <Option value="1">High</Option>
                   <Option value="2">Low</Option>
                 </Select>
               </Form.Item>
             </Col>
+
             <Col span={8}>
-              <Form.Item name="visibility" label={<span style={labelStyle}>Visibility</span>}>
+              <Form.Item
+                name="visibility"
+                label={<span style={labelStyle}>Visibility</span>}
+                rules={[{ required: true, message: 'Please select visibility' }]}
+                hasFeedback
+              >
                 <Select placeholder="-SELECT-">
                   <Option value="1">Exposed Leak</Option>
                   <Option value="2">Underground Leak</Option>
@@ -196,15 +219,47 @@ const ReportALeak: React.FC = () => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}><Form.Item name="address" label={<span style={labelStyle}>Address</span>}><Input /></Form.Item></Col>
-            <Col span={12}><Form.Item name="Landmark" label={<span style={labelStyle}>Landmark</span>}><Input /></Form.Item></Col>
+            <Col span={12}>
+              <Form.Item
+                name="address"
+                label={<span style={labelStyle}>Address</span>}
+                rules={[{ required: true, message: 'Address is required' }, { pattern: /^[A-Za-z0-9\s.,-]+$/, message: 'Address contains invalid characters' }]}
+                hasFeedback
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                name="Landmark"
+                label={<span style={labelStyle}>Landmark</span>}
+                rules={[{ required: true, message: 'Landmark is required' }, { pattern: /^[A-Za-z\s]+$/, message: 'Landmark must contain only letters' }]}
+                hasFeedback
+              >
+                <Input onKeyPress={(e) => { if (!/[A-Za-z\s]/.test(e.key)) e.preventDefault(); }} />
+              </Form.Item>
+            </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}><Form.Item name="NearestMeter" label={<span style={labelStyle}>Nearest Meter</span>}><Input /></Form.Item></Col>
-            <Col span={12}><Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}><Input.TextArea rows={3} /></Form.Item></Col>
-          </Row>
+            <Col span={12}>
+              <Form.Item
+                name="NearestMeter"
+                label={<span style={labelStyle}>Nearest Meter</span>}
+                rules={[{ required: true, message: 'Nearest Meter is required' }, { pattern: /^\d+$/, message: 'Meter number must be numeric' }]}
+                hasFeedback
+              >
+                <Input onKeyPress={(e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }} />
+              </Form.Item>
+            </Col>
 
+            <Col span={12}>
+              <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}>
+                <Input.TextArea rows={3} />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Divider orientation="left">
             <Text style={{ fontSize: 18 }} strong>Search Address</Text>
