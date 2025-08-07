@@ -13,12 +13,15 @@ import {
   EditOutlined,
   CarOutlined,
   FileSearchOutlined,
+  FileImageOutlined, 
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { LeakData } from '../../types/Leakdata';
 import DispatchModal from '../Modals/DispatchModal';
 import UpdateReport from '../Modals/UpdateReport';
 import ReportDetails from '../Modals/ReportDetails';
+import ImageModal from '../Modals/ImageModal';
+
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -87,13 +90,14 @@ const tabLabels: Record<string, string> = {
 
 const tabActionsMap: Record<
   string,
-  ('dispatch' | 'edit' | 'details')[]
+  ('dispatch' | 'edit' | 'details' | 'photos')[]
 > = {
   repaired: ['details'],
   dispatched: ['details'],
   turnover: ['dispatch', 'details'],
   after: ['details'],
-  notfound: ['details'], 
+  notfound: ['details'],
+  scheduled: ['details', 'photos', 'dispatch'], 
   default: ['dispatch', 'edit', 'details'],
   
 };
@@ -105,6 +109,9 @@ const LeakReports: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<LeakData | null>(null);
   const [formValues, setFormValues] = useState<Partial<LeakData>>({});
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+
 
   const showModal = (title: string, record?: LeakData) => {
     setModalTitle(title);
@@ -161,8 +168,17 @@ const LeakReports: React.FC = () => {
     return tabFiltered;
   };
 
+  const showImages = (record: LeakData) => {
+    const images = [
+      'https://via.placeholder.com/300x200?text=Repair+1',
+      'https://via.placeholder.com/300x200?text=Repair+2',
+    ];
+    setImageUrls(images);
+    setImageModalVisible(true);
+  };  
+
    const renderActionButtons = (
-    actions: ('dispatch' | 'edit' | 'details')[],
+    actions: ('dispatch' | 'edit' | 'photos' | 'details')[],
     record: LeakData
   ) => (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
@@ -179,6 +195,13 @@ const LeakReports: React.FC = () => {
           style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
           onClick={() => showModal('Update Report', record)}
         />
+      )}
+      {actions.includes('photos') && (
+      <Button
+        icon={<FileImageOutlined />}
+        style={{ backgroundColor: '#3a3ae6ff', border: 'none', color: '#FFFFFF' }}
+        onClick={() => showImages(record)}
+      />
       )}
       {actions.includes('details') && (
         <Button
@@ -283,6 +306,12 @@ const LeakReports: React.FC = () => {
         activeTab={activeTab}
         columnMap={columnMap}
         columnPresets={columnPresets}
+      />
+
+      <ImageModal
+        visible={imageModalVisible}
+        onCancel={() => setImageModalVisible(false)}
+        images={imageUrls}
       />
     </div>
   );

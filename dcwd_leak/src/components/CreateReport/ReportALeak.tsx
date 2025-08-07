@@ -14,10 +14,9 @@ import {
   message
 } from 'antd';
 import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import { apiGis, devApi } from '../Endpoints/Interceptor';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 const labelStyle: React.CSSProperties = {
@@ -87,8 +86,12 @@ const ReportALeak: React.FC = () => {
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
-    formData.append('wscode', wscode || '');
-    formData.append('ct_code', CT_ID || '');
+    formData.append('wscode', wscode);
+    formData.append('ct_code', CT_ID);
+
+    const dateReported = new Date().toISOString(); // YYYY-MM-DDTHH:MM:SS.sssZ
+    formData.append('DateReported', dateReported);
+
     if (fileList.length) {
       fileList.forEach((file) => {
         formData.append('Images', file.originFileObj);
@@ -120,8 +123,7 @@ const ReportALeak: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <Title level={3} style={{ marginBottom: 0 }}>Report A Leak</Title>
-      <Breadcrumb style={{ marginBottom: 24 }}>
+      <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
       </Breadcrumb>
@@ -247,10 +249,11 @@ const ReportALeak: React.FC = () => {
               <Form.Item
                 name="NearestMeter"
                 label={<span style={labelStyle}>Nearest Meter</span>}
-                rules={[{ required: true, message: 'Nearest Meter is required' }, { pattern: /^\d+$/, message: 'Meter number must be numeric' }]}
+                rules={[{ required: true, message: 'Nearest Meter is required' }, { pattern: /^[a-zA-Z0-9]+$/, }
+                ]}
                 hasFeedback
               >
-                <Input onKeyPress={(e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }} />
+                <Input onKeyPress={(e) => { if (!/[a-zA-Z0-9]/.test(e.key)) e.preventDefault(); }} />
               </Form.Item>
             </Col>
 
