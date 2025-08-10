@@ -345,7 +345,7 @@ const ReportALeak: React.FC = () => {
               <Form.Item name="NearestMeter" label="Nearest Meter">
                 <Input />
               </Form.Item>
-              <Form.Item name="refAccNo" label={<span style={labelStyle}>Account Number (Middle)</span>}>
+              <Form.Item name="refAccNo" label={<span style={labelStyle}>RecAddress</span>}>
                 <Input disabled />
               </Form.Item>
             </Col>
