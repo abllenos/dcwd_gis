@@ -12,6 +12,7 @@ import {
   Breadcrumb,
   message,
   Space,
+  Modal,
 } from 'antd';
 import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
 import { devApi } from '../Endpoints/Interceptor';
@@ -31,7 +32,6 @@ const ReportALeak: React.FC = () => {
   const [form] = Form.useForm();
   const [lat, setLat] = useState(7.0722);
   const [lng, setLng] = useState(125.6131);
-  const [updatePosition, setUpdatePosition] = useState(false);
   const [wscode, setWscode] = useState<string>('');
   const [CT_ID, setCaretaker] = useState<string>('');
   const [fileList, setFileList] = useState<any[]>([]);
@@ -39,6 +39,8 @@ const ReportALeak: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string }>({});
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<{ title: string; content: string }>({ title: '', content: '' });
 
   const navigate = useNavigate();
 
@@ -92,10 +94,19 @@ const ReportALeak: React.FC = () => {
     setLng(clickedLng);
   }, []);
 
+  const showModal = (title: string, content: string) => {
+    setModalContent({ title, content });
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = () => {
+    setIsModalVisible(false);
+  };
+
   const handleSubmit = async (values: any) => {
     const token = localStorage.getItem('debug_token');
     if (!token) {
-      message.error('Your session has expired. Please log in again.');
+      showModal('Session Expired', 'Your session has expired. Please log in again.');
       navigate('/login');
       return;
     }
@@ -145,10 +156,10 @@ const ReportALeak: React.FC = () => {
       setFileList([]);
     } catch (error: any) {
       if (error.response?.status === 401) {
-        message.error('Unauthorized. Please log in again.');
+        showModal('Unauthorized', 'Unauthorized. Please log in again.');
         navigate('/login');
       } else {
-        message.error('Failed to submit leak report');
+        showModal('Submission Failed', 'Failed to submit leak report.');
       }
       console.error(error);
     } finally {
@@ -157,59 +168,78 @@ const ReportALeak: React.FC = () => {
   };
 
   const handleSearchCustomer = async () => {
-  if (!searchValue.trim()) {
-    message.warning('Please enter an account number or meter number');
-    return;
-  }
-
-  const token = localStorage.getItem('debug_token');
-  if (!token) {
-    message.error('Your session has expired. Please log in again.');
-    navigate('/login');
-    return;
-  }
-
-  try {
-    setSearchLoading(true);
-    const response = await devApi.get(
-      `dcwd-gis/api/v1/admin/customer/SearchAccountOrMeterNumber`,
-      {
-        params: { searchValue },
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    if (response.data?.statusCode === 200 && response.data.data?.length > 0) {
-      const customer = response.data.data[0];
-
-      const accountNumber = customer.accountNumber || '';
-      const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
-
-      form.setFieldsValue({
-        address: customer.address || '',
-        NearestMeter: customer.meterNumber || '',
-        refAccNo: RefAccAddress,
-      });
-
-      const newLat = parseFloat(customer.latitude);
-      const newLng = parseFloat(customer.longitude);
-
-      if (!isNaN(newLat) && !isNaN(newLng)) {
-        setLat(newLat);
-        setLng(newLng);
-      }
-    } else {
-      message.info('No customer found for that search value');
+    if (!searchValue.trim()) {
+      showModal('Warning', 'Please enter an account number or meter number');
+      return;
     }
-  } catch (error) {
-    console.error('Search error:', error);
-    message.error('Failed to search customer');
-  } finally {
-    setSearchLoading(false);
-  }
-};
 
+    const token = localStorage.getItem('debug_token');
+    if (!token) {
+      showModal('Session Expired', 'Your session has expired. Please log in again.');
+      navigate('/login');
+      return;
+    }
 
+    try {
+      setSearchLoading(true);
+      const response = await devApi.get(
+        `dcwd-gis/api/v1/admin/customer/SearchAccountOrMeterNumber`,
+        {
+          params: { searchValue },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data?.statusCode === 200 && response.data.data?.length > 0) {
+        const customer = response.data.data[0];
+
+        const accountNumber = customer.accountNumber || '';
+        const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
+
+        form.setFieldsValue({
+          address: customer.address || '',
+          NearestMeter: customer.meterNumber || '',
+          refAccNo: RefAccAddress,
+        });
+
+        const newLat = parseFloat(customer.latitude);
+        const newLng = parseFloat(customer.longitude);
+
+        if (!isNaN(newLat) && !isNaN(newLng)) {
+          setLat(newLat);
+          setLng(newLng);
+        }
+      } else if (response.data?.statusCode === 404) {
+        showModal('Not Found', response.data.message || 'Account or Meter Number not found in the database.');
+
+        form.setFieldsValue({
+          address: '',
+          NearestMeter: '',
+          refAccNo: '',
+        });
+        setLat(7.0722);
+        setLng(125.6131);
+      } else {
+        showModal('Error', 'Unexpected response from the server');
+      }
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        showModal('Not Found', error.response.data?.message || 'Account or Meter Number not found in the database.');
+
+        form.setFieldsValue({
+          address: '',
+          NearestMeter: '',
+          refAccNo: '',
+        });
+        setLat(7.0722);
+        setLng(125.6131);
+      } else {
+        showModal('Error', 'Failed to search customer');
+      }
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
@@ -368,7 +398,6 @@ const ReportALeak: React.FC = () => {
 
           <div style={{ height: 400, border: '1px solid #ccc', marginBottom: 24 }}>
             <MapComponent lat={lat} lng={lng} onMapClick={handleMapClick} />
-
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
@@ -379,6 +408,16 @@ const ReportALeak: React.FC = () => {
           </div>
         </Form>
       </div>
+
+      <Modal
+        title={modalContent.title}
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalOk}
+        okText="OK"
+      >
+        <p>{modalContent.content}</p>
+      </Modal>
     </div>
   );
 };
