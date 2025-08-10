@@ -4,7 +4,6 @@ import {
   Button,
   Select,
   Breadcrumb,
-  Modal,
   Tabs,
   Card,
   Input,
@@ -14,30 +13,18 @@ import {
   EditOutlined,
   CarOutlined,
   FileSearchOutlined,
+  FileImageOutlined, 
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import type { LeakData } from '../../types/Leakdata';
+import DispatchModal from '../Modals/DispatchModal';
+import UpdateReport from '../Modals/UpdateReport';
+import ReportDetails from '../Modals/ReportDetails';
+import ImageModal from '../Modals/ImageModal';
+
 
 const { Option } = Select;
 const { TabPane } = Tabs;
-
-interface LeakData {
-  key: string;
-  id: string;
-  leakType: string;
-  location: string;
-  landmark: string;
-  referenceMeter: string;
-  contactNo: string;
-  dateTimeReported: string;
-  referenceNo: string;
-  repairedLeaks?: string;
-  jmsControlNo?: string;
-  dateRepaired?: string;
-  teamLeader?: string;
-  dateTurnedOver?: string;
-  turnoverReason?: string;
-  leakPressure?: string;
-}
 
 const data: LeakData[] = [
   {
@@ -49,7 +36,7 @@ const data: LeakData[] = [
     referenceMeter: '519449946J',
     contactNo: '09063425139',
     dateTimeReported: 'Jun 25, 2025 10:09 AM',
-    referenceNo: '202506241972',
+    referenceNo: 202506241972,
     repairedLeaks: 'Yes',
     jmsControlNo: 'JMS-001',
     dateRepaired: 'Jun 26, 2025',
@@ -57,6 +44,8 @@ const data: LeakData[] = [
     leakPressure: 'Low',
     dateTurnedOver: 'Jun 22, 2025',
     turnoverReason: 'Heavy traffic; need backhoe',
+    dmaId: 'DMA001',
+    covering: 'SOIL',
   },
 ];
 
@@ -99,6 +88,20 @@ const tabLabels: Record<string, string> = {
   notfound: 'Leak Not Found',
 };
 
+const tabActionsMap: Record<
+  string,
+  ('dispatch' | 'edit' | 'details' | 'photos')[]
+> = {
+  repaired: ['details'],
+  dispatched: ['details'],
+  turnover: ['dispatch', 'details'],
+  after: ['details'],
+  notfound: ['details'],
+  scheduled: ['details', 'photos', 'dispatch'], 
+  default: ['dispatch', 'edit', 'details'],
+  
+};
+
 const LeakReports: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -106,6 +109,9 @@ const LeakReports: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<LeakData | null>(null);
   const [formValues, setFormValues] = useState<Partial<LeakData>>({});
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+
 
   const showModal = (title: string, record?: LeakData) => {
     setModalTitle(title);
@@ -126,14 +132,21 @@ const LeakReports: React.FC = () => {
   };
 
   const handleUpdateSubmit = () => {
-    if (selectedRecord) {
-      const index = data.findIndex(item => item.key === selectedRecord.key);
-      if (index !== -1) {
-        data[index] = { ...data[index], ...formValues } as LeakData;
-      }
-      setModalVisible(false);
-      setFormValues({});
+    if (!selectedRecord) return;
+
+    const index = selectedRecord ? data.findIndex(item => item.key === selectedRecord.key) : -1;
+    if (index !== -1) {
+      const updateddata: LeakData = {
+        ...data[index],
+        ...formValues,
+        referenceNo: Number(formValues.referenceNo),
+      };
+
+      data[index] = updateddata;
     }
+
+    setModalVisible(false);
+    setFormValues({});
   };
 
   const filteredData = (tabKey: string) => {
@@ -155,39 +168,67 @@ const LeakReports: React.FC = () => {
     return tabFiltered;
   };
 
-  const commonActionColumn: ColumnsType<LeakData>[number] = {
-    title: 'Actions',
-    key: 'action',
-    render: (_, record) => (
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
-        <Button icon={<CarOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Dispatch', record)} />
-        <Button icon={<EditOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Update Report', record)} />
-        <Button icon={<FileSearchOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Report Details', record)} />
-      </div>
-    ),
-  };
+  const showImages = (record: LeakData) => {
+    const images = [
+      'https://via.placeholder.com/300x200?text=Repair+1',
+      'https://via.placeholder.com/300x200?text=Repair+2',
+    ];
+    setImageUrls(images);
+    setImageModalVisible(true);
+  };  
 
+   const renderActionButtons = (
+    actions: ('dispatch' | 'edit' | 'photos' | 'details')[],
+    record: LeakData
+  ) => (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
+      {actions.includes('dispatch') && (
+        <Button
+          icon={<CarOutlined />}
+          style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
+          onClick={() => showModal('Dispatch', record)}
+        />
+      )}
+      {actions.includes('edit') && (
+        <Button
+          icon={<EditOutlined />}
+          style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
+          onClick={() => showModal('Update Report', record)}
+        />
+      )}
+      {actions.includes('photos') && (
+      <Button
+        icon={<FileImageOutlined />}
+        style={{ backgroundColor: '#3a3ae6ff', border: 'none', color: '#FFFFFF' }}
+        onClick={() => showImages(record)}
+      />
+      )}
+      {actions.includes('details') && (
+        <Button
+          icon={<FileSearchOutlined />}
+          style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
+          onClick={() => showModal('Report Details', record)}
+        />
+      )}
+    </div>
+  );
   const getColumns = (tabKey: string): ColumnsType<LeakData> => {
     const keys = columnPresets[tabKey] || columnPresets['customer'];
     const cols = keys.map(k => columnMap[k]);
-    
-    if (tabKey === 'repaired') {
-      const repairedActionColumn: ColumnsType<LeakData>[number] = {
-        title: 'Actions',
-        key: 'action',
-        render: (_, record) => (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
-            <Button icon={<FileSearchOutlined />} style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }} onClick={() => showModal('Reports Details', record)} />
-          </div>
-        ),  
+
+    const actions = tabActionsMap[tabKey] || tabActionsMap['default'];
+
+    const actionColumn: ColumnsType<LeakData>[number] = {
+      title: 'Actions',
+      key: 'action',
+      render: (_, record) => renderActionButtons(actions, record),
     };
-    return [...cols, repairedActionColumn];
-  }
-  return [...cols, commonActionColumn];
-};  
+
+    return [...cols, actionColumn];
+  };
 
 
-  const dispatchFields = [
+  const dispatchField = [
     { label: 'REPORT ID', value: selectedRecord?.id },
     { label: 'REFERENCE METER', value: selectedRecord?.referenceMeter },
     { label: 'LOCATION', value: selectedRecord?.location },
@@ -195,19 +236,17 @@ const LeakReports: React.FC = () => {
     { label: 'CONTACT NO.', value: selectedRecord?.contactNo },
     { label: 'LEAK TYPE', value: selectedRecord?.leakType },
     { label: 'LEAK PRESSURE', value: selectedRecord?.leakPressure || 'N/A' },
-    
-  ]; 
+  ];
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
           <Breadcrumb.Item>Operation</Breadcrumb.Item>
-        <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
+          <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
         </Breadcrumb>
-        <Input.Search placeholder="Search" allowClear style={{ width: 300 }} onChange={e => setSearchText(e.target.value.toLowerCase())}/>
+        <Input.Search placeholder="Search" allowClear style={{ width: 300 }} onChange={e => setSearchText(e.target.value.toLowerCase())} />
       </div>
-
 
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <span style={{ marginRight: 8 }}>Display</span>
@@ -228,7 +267,7 @@ const LeakReports: React.FC = () => {
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, width: '100%' }}>
                   {label}
                   {!['repaired', 'after', 'notfound'].includes(key) && (
-                    <Badge count={filteredData(key).length} color="blue" overflowCount={99} size="small" style={{ paddingInline: 6, borderRadius: 4 }}/>
+                    <Badge count={filteredData(key).length} color="blue" overflowCount={99} size="small" style={{ paddingInline: 6, borderRadius: 4 }} />
                   )}
                 </span>
               }
@@ -244,146 +283,36 @@ const LeakReports: React.FC = () => {
         />
       </Card>
 
-      <Modal
-        title={modalTitle}
-        visible={modalVisible}
+      <DispatchModal
+        visible={modalVisible && modalTitle === 'Dispatch'}
         onCancel={handleCancel}
-        footer={null}
-        width= '60%'
-        style={{maxWidth: '200vw', padding: 0 }}
-        bodyStyle={{ padding: 24 }}
-        centered
-      >
-        {modalTitle === 'Dispatch' && selectedRecord ? (
-          <div style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-            {dispatchFields.map(({ label, value }) => (
-              <p key={label}>
-                <strong>{label}:</strong> {value}
-              </p>
-            ))}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
-              <Select
-                showSearch
-                placeholder="Select dispatcher"
-                optionFilterProp="children"
-                style={{ minWidth: 200 }}
-                filterOption={(input, option) =>
-                  typeof option?.children === 'string' &&
-                  (option.children as string).toLowerCase().includes(input.toLowerCase())
-                }
-              >
-                <Option value="dispatcher1">Dispatcher 1</Option>
-                <Option value="dispatcher2">Dispatcher 2</Option>
-                <Option value="dispatcher3">Dispatcher 3</Option>
-              </Select>
-              <Button type="primary">Dispatch Leak</Button>
-            </div>
-          </div>
-        ) : modalTitle === 'Update Report' && selectedRecord ? (
-          <div className="update-form">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div>
-                <label>Location:</label>
-                <Input value={formValues.location} disabled />
-              </div>
-              <div>
-                <label>Landmark:</label>
-                <Input value={formValues.landmark} onChange={e => handleInputChange('landmark', e.target.value)} />
-              </div>
-              <div>
-                <label>Contact No:</label>
-                <Input value={formValues.contactNo} onChange={e => handleInputChange('contactNo', e.target.value)} />
-              </div>
-              <div>
-                <label>Nearest Meter:</label>
-                <Input value={formValues.referenceMeter} onChange={e => handleInputChange('referenceMeter', e.target.value)} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label>DMA ID:</label>
-                <Select placeholder="- SELECT -" onChange={(value) => handleInputChange('dmaId' as keyof LeakData, value)}>
-                  <Option value="DMA001">DMA001</Option>
-                  <Option value="DMA002">DMA002</Option>
-                </Select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label>Covering:</label>
-                <Select placeholder="- SELECT -" onChange={(value) => handleInputChange('covering' as keyof LeakData, value)}>
-                  <Option value="SOIL">SOIL</Option>
-                  <Option value="CONCRETE">CONCRETE</Option>
-                </Select>
-              </div>
-              <div>
-                <label>NRW Level:</label>
-                <Input value={(formValues as any).nrwLevel || ''} onChange={e => handleInputChange('nrwLevel' as keyof LeakData, e.target.value)} />
-              </div>
-            </div>
-            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <Button onClick={handleCancel} style={{ background: '#00607A', color: '#fff' }}>
-                Close
-              </Button>
-              <Button type="primary" onClick={handleUpdateSubmit}>
-                Save
-              </Button>
-            </div>
-          </div>
-        ) : modalTitle === 'Report Details' && selectedRecord ? (
-          <div style={{marginTop: 12 }}>
-            <div style={{ 
-              backgroundColor: '#3B82F6', 
-              color: 'white', 
-              padding: '8px 16px', 
-              borderRadius: '10px 10px 0 0', 
-              display: 'inline-block', 
-              fontWeight: 600, 
-              fontSize: 16 
-            }}>
-              <FileSearchOutlined style={{ marginRight: 8 }} />
-              Report Details
-            </div>
+        record={selectedRecord}
+        fields={dispatchField}
+      />
 
-            <div   style={{
-              backgroundColor: '#f8fbfe',
-              border: '1px solid #bcdfff',
-              borderRadius: '0 0 10px 10px',
-              padding: '20px 24px',
-              marginBottom: 24,
-              fontSize: 15,
-              lineHeight: '1.8',
-            }}
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
-                {columnPresets[activeTab].map((key) => (
-                  <React.Fragment key={key}>
-                    <div><strong>{columnMap[key].title}:</strong></div>
-                    <div>{(selectedRecord as any)[key] || 'N/A'}</div>
-                  </React.Fragment>
-                ))}
-                <div><strong>Leak Pressure:</strong></div>
-                <div>{selectedRecord.leakPressure || 'N/A'}</div>
-              </div>
+      <UpdateReport
+        visible={modalVisible && modalTitle === 'Update Report'}
+        record={selectedRecord}
+        formValues={formValues}
+        onChange={handleInputChange}
+        onCancel={handleCancel}
+        onSubmit={handleUpdateSubmit}
+      />
 
-            {activeTab === 'repaired' && (
-              <div style={{ marginBottom: 12, padding: '12px', background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 6 }}>
-                <strong>Repaired Summary:</strong>
-                <ul style={{ marginTop: 8, paddingLeft: 20 }}>
-                  <li>Repaired Leak: {selectedRecord.repairedLeaks || 'N/A'}</li>
-                  <li>Date Repaired: {selectedRecord.dateRepaired || 'N/A'}</li>
-                  <li>Team Leader: {selectedRecord.teamLeader || 'N/A'} </li>
-                </ul>
-              </div>
-              
-            )}
-          </div>  
-            <div style={{ marginBottom: 12, display: 'flex', justifyContent:'flex-end' }}>
-              <Button type="primary" style={{ backgroundColor: '#00B4D8', borderColor: '#00B4D8', fontWeight: 500, }} onClick={handleCancel}>
-                Close  
-              </Button>
-            </div>  
-          </div>
-        ) : (
-          <p>This is the {modalTitle.toLowerCase()} modal content.</p>
-        )}
-      </Modal>
+      <ReportDetails
+        visible={modalVisible && modalTitle === 'Report Details'}
+        record={selectedRecord}
+        onCancel={handleCancel}
+        activeTab={activeTab}
+        columnMap={columnMap}
+        columnPresets={columnPresets}
+      />
+
+      <ImageModal
+        visible={imageModalVisible}
+        onCancel={() => setImageModalVisible(false)}
+        images={imageUrls}
+      />
     </div>
   );
 };
