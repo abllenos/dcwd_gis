@@ -13,9 +13,9 @@ import {
   message,
   Space,
 } from 'antd';
-import { EnvironmentOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import { apiGis, devApi } from '../Endpoints/Interceptor';
+import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import { devApi } from '../Endpoints/Interceptor';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -58,35 +58,34 @@ const ReportALeak: React.FC = () => {
   }, [lat, lng]);
 
   const fetchWscode = async (lat: number, lng: number) => {
-  try {
-    const response = await apiGis.get(`helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`);
-    const data = response.data;
-    if (data.success && data.data && data.data.length > 0) {
-      setWscode(data.data[0].wscode);
-    } else {
-      console.warn('No wscode found in response:', data);
+    try {
+      const response = await fetch(
+        `https://api-gis.davao-water.gov.ph/helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`
+      );
+      const data = await response.json();
+      if (data.success && data.data && data.data.length > 0) {
+        setWscode(data.data[0].wscode);
+      }
+    } catch (error) {
+      console.error('Error fetching wscode: ', error);
     }
-  } catch (error) {
-    console.error('Error fetching wscode:', error);
-  }
-};
+  };
 
   const fetchCaretaker = async (lat: number, lng: number) => {
-  try {
-    const response = await apiGis.get(`helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`);
-    const data = response.data;
-
-    if (data && data.CT_ID) {
-      setCaretaker(data.CT_ID);
-    } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
-      setCaretaker(data.data[0].CT_ID);
-    } else {
-      console.warn('No caretaker found in response:', data);
+    try {
+      const response = await fetch(
+        `https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`
+      );
+      const data = await response.json();
+      if (data?.CT_ID) {
+        setCaretaker(data.CT_ID);
+      } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
+        setCaretaker(data.data[0].CT_ID);
+      }
+    } catch (error) {
+      console.error('Error fetching caretaker: ', error);
     }
-  } catch (error) {
-    console.error('Error fetching caretaker:', error);
-  }
-};
+  };
 
   const handleMapClick = React.useCallback((clickedLat: number, clickedLng: number) => {
     setLat(clickedLat);
@@ -117,6 +116,11 @@ const ReportALeak: React.FC = () => {
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
+    formData.append('remarks', values.Remarks || '');
+    formData.append('ct_code', CT_ID || '');
+    formData.append('wscode', wscode || '');
+    formData.append('DT_Reported', DateReported);
+    formData.append('refAccNo', values.refAccNo || '');
 
     if (fileList.length) {
       fileList.forEach((file) => {
@@ -209,10 +213,11 @@ const ReportALeak: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <Title level={3} style={{ marginBottom: 0 }}>Report A Leak</Title>
+      <Title level={3} style={{ marginBottom: 0 }}>
+        Report A Leak
+      </Title>
 
       <Breadcrumb style={{ marginBottom: 24 }}>
-
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
       </Breadcrumb>
@@ -278,10 +283,14 @@ const ReportALeak: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}><Input /></Form.Item>
+              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}>
+                <Input />
+              </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>}><Input /></Form.Item>
+              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>}>
+                <Input />
+              </Form.Item>
             </Col>
           </Row>
 
@@ -332,8 +341,19 @@ const ReportALeak: React.FC = () => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}><Form.Item name="NearestMeter" label={<span style={labelStyle}>Nearest Meter</span>}><Input /></Form.Item></Col>
-            <Col span={12}><Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}><Input.TextArea rows={3} /></Form.Item></Col>
+            <Col span={12}>
+              <Form.Item name="NearestMeter" label="Nearest Meter">
+                <Input />
+              </Form.Item>
+              <Form.Item name="refAccNo" label={<span style={labelStyle}>Account Number (Middle)</span>}>
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}>
+                <Input.TextArea rows={3} />
+              </Form.Item>
+            </Col>
           </Row>
 
           <Divider orientation="left">
@@ -364,4 +384,3 @@ const ReportALeak: React.FC = () => {
 };
 
 export default ReportALeak;
-
