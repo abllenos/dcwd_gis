@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { loadGoogleMapsScript } from '../Utils/loadMapScript';
 /// <reference types="@types/google.maps" />
 
@@ -9,6 +9,10 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ lat, lng, onMapClick }) => {
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+
+  // Initialize map and marker once on mount
   useEffect(() => {
     loadGoogleMapsScript()
       .then(() => {
@@ -42,11 +46,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ lat, lng, onMapClick }) => 
             onMapClick(newLat, newLng);
           }
         });
+
+        mapRef.current = map;
+        markerRef.current = marker;
       })
       .catch((err) => {
         console.error('Google Maps failed to load:', err);
       });
-  }, [lat, lng, onMapClick]);
+  }, [onMapClick]); 
+  
+  useEffect(() => {
+    if (mapRef.current && markerRef.current) {
+      const newPosition = new google.maps.LatLng(lat, lng);
+      markerRef.current.setPosition(newPosition);
+      mapRef.current.setCenter(newPosition);
+      mapRef.current.setZoom(16);
+    }
+  }, [lat, lng]);
 
   return <div id="map" style={{ height: '100%', width: '100%' }} />;
 };

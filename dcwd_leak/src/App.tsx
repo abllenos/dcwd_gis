@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppstoreOutlined,
   HomeOutlined,
@@ -7,13 +7,19 @@ import {
   ClusterOutlined,
   FileOutlined,
   LogoutOutlined,
-  RightOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button } from 'antd';
 import type { MenuProps } from 'antd';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation
+} from 'react-router-dom';
 import Login from './components/Login';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
@@ -21,11 +27,9 @@ import Settings from './components/Settings';
 import ReportALeak from './components/CreateReport/ReportALeak';
 import LeakDetection from './components/CreateReport/LeakDetection';
 import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
-
 import LeakReports from './components/Operations/LeakReports';
 import SupplyComplaints from './components/Operations/SupplyComplaints';
 import QualityComplaints from './components/Operations/QualityComplaints';
-
 import DispatchOveride from './components/SystemMaintenance/DispatchOveride';
 import CaretakerAssignment from './components/SystemMaintenance/CaretakerAssignment';
 import AccessLevel from './components/SystemMaintenance/AccessLevel';
@@ -36,7 +40,6 @@ import Reports from './components/Report/Reports';
 import './styles/theme.css';
 
 const { Sider, Header, Content } = Layout;
-
 type MenuItem = Required<MenuProps>['items'][number];
 
 const iconSize = { fontSize: '17px' };
@@ -45,7 +48,6 @@ const bulletLabel = (text: string) => (
   <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
     <span
       style={{
-    
         width: 6,
         height: 6,
         borderRadius: '50%',
@@ -59,20 +61,16 @@ const bulletLabel = (text: string) => (
 );
 
 const items: MenuItem[] = [
-  {
-    key: 'home',
-    label: 'Home',
-    icon: <HomeOutlined style={iconSize} />,
-  },
+  { key: 'home', label: 'Home', icon: <HomeOutlined style={iconSize} /> },
   {
     key: 'create-report',
     label: 'Create a Report',
-    icon: <FileTextOutlined style={iconSize}/>,
+    icon: <FileTextOutlined style={iconSize} />,
     children: [
       { key: 'report-a-leak', label: bulletLabel('Report A Leak') },
       { key: 'leak-detection', label: bulletLabel('Leak Detection') },
       { key: 'supply-concerns', label: bulletLabel('Water Supply Concerns') },
-    ]
+    ],
   },
   {
     key: 'operation',
@@ -96,70 +94,22 @@ const items: MenuItem[] = [
       { key: 'jms-data-seeding', label: bulletLabel('JMS Data Seeding') },
     ],
   },
-  {
-    key: 'reports',
-    label: 'Reports',
-    icon: <FileOutlined style={iconSize} />,
-  },
-  {
-    key: 'settings',
-    label: 'Settings',
-    icon: <SettingOutlined style={iconSize} />,
-  },
-  {
-    key: 'logout',
-    label: 'Logout',
-    icon: <LogoutOutlined style={iconSize} />,
-  },
+  { key: 'reports', label: 'Reports', icon: <FileOutlined style={iconSize} /> },
+  { key: 'settings', label: 'Settings', icon: <SettingOutlined style={iconSize} /> },
+  { key: 'logout', label: 'Logout', icon: <LogoutOutlined style={iconSize} /> },
 ];
 
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedKey, setSelectedKey] = useState('home');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const onClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
       onLogout();
       navigate('/login');
     } else {
-      setSelectedKey(e.key);
       navigate(`/${e.key}`);
-    }
-  };
-
-  const renderContent = () => {
-    switch (selectedKey) {
-      case 'home':
-        return <Home />;
-      case 'report-a-leak':
-        return <ReportALeak />;
-      case 'leak-detection':
-        return <LeakDetection />;
-      case 'supply-concerns':
-        return <WaterSupplyConcerns />;
-      case 'leak-reports':
-        return <LeakReports />;
-      case 'supply-complaints':
-        return <SupplyComplaints />;
-      case 'quality-complaints':
-        return <QualityComplaints />;
-      case 'dispatch-override':
-        return <DispatchOveride />;
-      case 'caretaker-assignment':
-        return <CaretakerAssignment />;
-      case 'access-level':
-        return <AccessLevel />;
-      case 'user-accounts':
-        return <UserAccounts />;
-      case 'jms-data-seeding':
-        return <JMSDataSeeding />;
-      case 'settings':
-        return <Settings />;
-      case 'reports':
-        return <Reports />;
-      default:
-        return <div>Select a menu item.</div>;
     }
   };
 
@@ -191,17 +141,13 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             <img
               src={dcwd}
               alt="DCWD Logo"
-              style={{
-                maxWidth: '80%',
-                height: 'auto',
-                borderRadius: 8,
-              }}
+              style={{ maxWidth: '80%', height: 'auto', borderRadius: 8 }}
             />
           )}
         </div>
         <Menu
           onClick={onClick}
-          selectedKeys={[selectedKey]}
+          selectedKeys={[location.pathname.replace('/', '') || 'home']}
           mode="inline"
           items={items}
           style={{
@@ -249,7 +195,23 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             minHeight: 'calc(100vh - 64px)',
           }}
         >
-          {renderContent()}
+          <Routes>
+            <Route path="home" element={<Home />} />
+            <Route path="report-a-leak" element={<ReportALeak />} />
+            <Route path="leak-detection" element={<LeakDetection />} />
+            <Route path="supply-concerns" element={<WaterSupplyConcerns />} />
+            <Route path="leak-reports" element={<LeakReports />} />
+            <Route path="supply-complaints" element={<SupplyComplaints />} />
+            <Route path="quality-complaints" element={<QualityComplaints />} />
+            <Route path="dispatch-override" element={<DispatchOveride />} />
+            <Route path="caretaker-assignment" element={<CaretakerAssignment />} />
+            <Route path="access-level" element={<AccessLevel />} />
+            <Route path="user-accounts" element={<UserAccounts />} />
+            <Route path="jms-data-seeding" element={<JMSDataSeeding />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="*" element={<Navigate to="home" />} />
+          </Routes>
         </Content>
       </Layout>
     </Layout>
@@ -257,20 +219,38 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 };
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return !!localStorage.getItem("token");
+  });
+
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+  setIsLoggedIn(!!token);
+ }, []);
+
+  const handleLogin = (token: string) => {
+    localStorage.setItem("token", token);
+    setIsLoggedIn(true);
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("debug_user_data");
+    setIsLoggedIn(false);
+  };
 
   return (
     <Router>
       <Routes>
         <Route
           path="/login"
-          element={<Login onLogin={() => setIsLoggedIn(true)} />}
+          element={<Login onLogin={(token) => handleLogin(token)} />}
         />
         <Route
           path="/*"
           element={
             isLoggedIn ? (
-              <Dashboard onLogout={() => setIsLoggedIn(false)} />
+              <Dashboard onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" />
             )

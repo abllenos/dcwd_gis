@@ -40,15 +40,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
          const data = response.data;
 
-         if (data?.statusCode === 200 && data?.data){
-          if (data.data?.token) {
-            localStorage.setItem('debug_token', data.data.token);
-          }
-          localStorage.setItem('debug_user_data', JSON.stringify(data.data));
-          onLogin(data.data);
-
-          setTimeout(() => navigate('/home'), 1300);
-         } else {
+         if (data?.statusCode === 200 && data?.data) {
+            if (data.data?.token) {
+              localStorage.setItem('token', data.data.token);
+              onLogin(data.data.token); 
+            }
+            localStorage.setItem('debug_user_data', JSON.stringify(data.data));
+            setTimeout(() => navigate('/home'), 1300);
+          } else {
           toast.error(data.message || 'Invalid email or password');
           setLoading(false);
           pendingSubmitRef.current = false;
