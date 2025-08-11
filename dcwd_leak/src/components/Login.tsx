@@ -43,6 +43,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
          if (data?.statusCode === 200 && data?.data) {
             if (data.data?.token) {
               localStorage.setItem('token', data.data.token);
+              localStorage.setItem('username', username);
               onLogin(data.data.token); 
             }
             localStorage.setItem('debug_user_data', JSON.stringify(data.data));
