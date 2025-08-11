@@ -1,7 +1,9 @@
 import React from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import '../styles/Settings.css';
 import { Card, Avatar, Input, Button, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 interface EditProfileFormProps {
   employeeId: string;
@@ -59,16 +61,52 @@ function EditProfileForm({
 
 function Settings() {
   const [employeeId, setEmployeeId] = React.useState('EMP-00123');
-  const [profileEmail, setProfileEmail] = React.useState('alvinllenos@email.com');
-  const [firstName, setFirstName] = React.useState('Alvin');
-  const [lastName, setLastName] = React.useState('Llenos');
-  const [email, setEmail] = React.useState('alvinllenos@email.com');
-  const [mobile, setMobile] = React.useState('09171234567');
+  const [profileEmail, setProfileEmail] = React.useState('');
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [mobile, setMobile] = React.useState('');
   const [saving, setSaving] = React.useState(false);
   const [contactSaving, setContactSaving] = React.useState(false);
+  const [department, setDepartment] = React.useState('');
 
   const [showContactPreview, setShowContactPreview] = React.useState(false);
   const [showProfilePreview, setShowProfilePreview] = React.useState(false);
+
+  React.useEffect(() => {
+  const empId = localStorage.getItem('username');
+  const token = localStorage.getItem('token');
+  if (!empId) return;
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(
+        `https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID?empId=${empId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      if (data?.statusCode === 200 && data?.data) {
+        setEmployeeId(data.data.empID || '');
+        setProfileEmail(data.data.userName || '');
+        setFirstName(data.data.firstName || '');
+        setLastName(data.data.lastName || '');
+        setEmail(data.data.userName || '');
+        setMobile(data.data.mobileNo || '');
+        setDepartment(data.data.department || '');
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+    }
+  };
+
+  fetchProfile();
+}, []);
 
   const handleProfileSave = () => {
     setSaving(true);
@@ -142,7 +180,7 @@ function Settings() {
           {/* Info */}
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 20, color: '#174ea6', textTransform: 'uppercase' }}>
-              ALVIN LLENOS
+              {`${firstName} ${lastName}`}
             </div>
             <div style={{ fontSize: 14, color: '#333', marginTop: 4 }}>
               INFORMATION AND COMMUNICATION TECHNOLOGY DEPARTMENT
