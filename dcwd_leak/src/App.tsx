@@ -21,13 +21,11 @@ import {
   useNavigate,
   useLocation
 } from 'react-router-dom';
+
 import Login from './components/Login';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
 import Settings from './components/Settings';
-import ReportALeak from './components/CreateReport/ReportALeak';
-import LeakDetection from './components/CreateReport/LeakDetection';
-import WaterSupplyConcerns from './components/CreateReport/WaterSupplyConcerns';
 import LeakReports from './components/Operations/LeakReports';
 import SupplyComplaints from './components/Operations/SupplyComplaints';
 import QualityComplaints from './components/Operations/QualityComplaints';
@@ -37,6 +35,8 @@ import AccessLevel from './components/SystemMaintenance/AccessLevel';
 import UserAccounts from './components/SystemMaintenance/UserAccounts';
 import JMSDataSeeding from './components/SystemMaintenance/JMSDataSeeding';
 import Reports from './components/Report/Reports';
+import LeakOptionsModal from './components/Modals/LeakOptionsModal';
+import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
 
 import './styles/theme.css';
 
@@ -67,11 +67,6 @@ const items: MenuItem[] = [
     key: 'create-report',
     label: 'Create a Report',
     icon: <FileTextOutlined style={iconSize} />,
-    children: [
-      { key: 'report-a-leak', label: bulletLabel('Report A Leak') },
-      { key: 'leak-detection', label: bulletLabel('Leak Detection') },
-      { key: 'supply-concerns', label: bulletLabel('Water Supply Concerns') },
-    ],
   },
   {
     key: 'operation',
@@ -102,6 +97,8 @@ const items: MenuItem[] = [
 
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -109,114 +106,153 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     if (e.key === 'logout') {
       onLogout();
       navigate('/login');
+    } else if (e.key === 'create-report') {
+      setModalVisible(true);
     } else {
       navigate(`/${e.key}`);
+    }
+  };
+
+  const handleModalSelect = (option: string) => {
+    setModalVisible(false);
+
+    switch(option) {
+      case 'no_water':
+        navigate('/water-supply-concerns', { state: { formType: 'no_water' } });
+        break;
+      case 'low_pressure':
+        navigate('/water-supply-concerns', { state: { formType: 'low_pressure' } });
+        break;
+      case 'no_water_supply':
+        navigate('/water-supply-concerns', { state: { formType: 'no_water_supply' } });
+        break;
+      case 'leak_report':
+        navigate('/leak-reports');
+        break;
+      default:
+        break;
     }
   };
 
   const siderWidth = collapsed ? 80 : 280;
 
   return (
-    <Layout style={{ minHeight: '100vh', fontFamily: 'Noto Sans, sans-serif' }}>
-      <Sider
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-        collapsedWidth={80}
-        width={280}
-        style={{
-          position: 'fixed',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          zIndex: 1000,
-          height: '100vh',
-          backgroundColor: '#D0EBFF',
-          overflowY: 'auto',
-          boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
-          transition: 'all 0.2s ease',
-        }}
-      >
-        <div style={{ padding: 20, textAlign: 'center' }}>
-          {!collapsed && (
-            <img
-              src={dcwd}
-              alt="DCWD Logo"
-              style={{ maxWidth: '80%', height: 'auto', borderRadius: 8 }}
-            />
-          )}
-        </div>
-        <Menu
-          onClick={onClick}
-          selectedKeys={[location.pathname.replace('/', '') || 'home']}
-          mode="inline"
-          items={items}
-          style={{
-            fontSize: '16px',
-            backgroundColor: '#D0EBFF',
-            color: 'white',
-            border: 'none',
-          }}
-          theme="light"
-        />
-      </Sider>
-
-      <Layout style={{ marginLeft: siderWidth, transition: 'margin-left 0.2s ease' }}>
-        <Header
+    <>
+      <Layout style={{ minHeight: '100vh', fontFamily: 'Noto Sans, sans-serif' }}>
+        <Sider
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          collapsedWidth={80}
+          width={280}
           style={{
             position: 'fixed',
             top: 0,
-            left: siderWidth,
-            right: 0,
-            height: 64,
-            padding: '0 24px',
-            backgroundColor: '#E7F2FF',
-            borderBottom: '1px solid #D0EBFF',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '18px',
-            fontWeight: 600,
+            bottom: 0,
+            left: 0,
             zIndex: 1000,
+            height: '100vh',
+            backgroundColor: '#D0EBFF',
+            overflowY: 'auto',
+            boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
+            transition: 'all 0.2s ease',
           }}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{ fontSize: '16px', marginRight: 16 }}
+          <div style={{ padding: 20, textAlign: 'center' }}>
+            {!collapsed && (
+              <img
+                src={dcwd}
+                alt="DCWD Logo"
+                style={{ maxWidth: '80%', height: 'auto', borderRadius: 8 }}
+              />
+            )}
+          </div>
+          <Menu
+            onClick={onClick}
+            selectedKeys={[location.pathname.replace('/', '') || 'home']}
+            mode="inline"
+            items={items}
+            style={{
+              fontSize: '16px',
+              backgroundColor: '#D0EBFF',
+              color: 'white',
+              border: 'none',
+            }}
+            theme="light"
           />
-          <span>Leak Reporting System</span>
-        </Header>
+        </Sider>
 
-        <Content
-          style={{
-            marginTop: 64,
-            padding: 24,
-            backgroundColor: '#E7F2FF',
-            minHeight: 'calc(100vh - 64px)',
-          }}
-        >
-          <Routes>
-            <Route path="home" element={<Home />} />
-            <Route path="report-a-leak" element={<ReportALeak />} />
-            <Route path="leak-detection" element={<LeakDetection />} />
-            <Route path="supply-concerns" element={<WaterSupplyConcerns />} />
-            <Route path="leak-reports" element={<LeakReports />} />
-            <Route path="supply-complaints" element={<SupplyComplaints />} />
-            <Route path="quality-complaints" element={<QualityComplaints />} />
-            <Route path="dispatch-override" element={<DispatchOveride />} />
-            <Route path="caretaker-assignment" element={<CaretakerAssignment />} />
-            <Route path="access-level" element={<AccessLevel />} />
-            <Route path="user-accounts" element={<UserAccounts />} />
-            <Route path="jms-data-seeding" element={<JMSDataSeeding />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="*" element={<Navigate to="home" />} />
-          </Routes>
-        </Content>
+        <Layout style={{ marginLeft: siderWidth, transition: 'margin-left 0.2s ease' }}>
+          <Header
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: siderWidth,
+              right: 0,
+              height: 64,
+              padding: '0 24px',
+              backgroundColor: '#E7F2FF',
+              borderBottom: '1px solid #D0EBFF',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '18px',
+              fontWeight: 600,
+              zIndex: 1000,
+            }}
+          >
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{ fontSize: '16px', marginRight: 16 }}
+            />
+            <span>Leak Reporting System</span>
+          </Header>
+
+          <Content
+            style={{
+              marginTop: 64,
+              padding: 24,
+              backgroundColor: '#E7F2FF',
+              minHeight: 'calc(100vh - 64px)',
+            }}
+          >
+            <Routes>
+              <Route path="home" element={<Home />} />
+              <Route path="leak-reports" element={<LeakReports />} />
+              <Route path="supply-complaints" element={<SupplyComplaints />} />
+              <Route path="quality-complaints" element={<QualityComplaints />} />
+              <Route path="dispatch-override" element={<DispatchOveride />} />
+              <Route path="caretaker-assignment" element={<CaretakerAssignment />} />
+              <Route path="access-level" element={<AccessLevel />} />
+              <Route path="user-accounts" element={<UserAccounts />} />
+              <Route path="jms-data-seeding" element={<JMSDataSeeding />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
+              <Route path="*" element={<Navigate to="home" />} />
+            </Routes>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+
+      {/* LeakOptionsModal usage */}
+      <LeakOptionsModal
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        onSelect={handleModalSelect}
+      />
+    </>
   );
+};
+
+// Wrapper to extract formType from location state and pass to WaterSupplyConcern
+const WaterSupplyConcernsWrapper: React.FC = () => {
+  const location = useLocation();
+  const formType =
+    (location.state as any)?.formType ?? 'no_water';
+
+  return <WaterSupplyConcern formType={formType} />;
 };
 
 const App: React.FC = () => {
@@ -224,15 +260,15 @@ const App: React.FC = () => {
     return !!localStorage.getItem("token");
   });
 
- useEffect(() => {
-  const token = localStorage.getItem("token");
-  setIsLoggedIn(!!token);
- }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleLogin = (token: string) => {
     localStorage.setItem("token", token);
     setIsLoggedIn(true);
-  }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -245,7 +281,7 @@ const App: React.FC = () => {
       <Routes>
         <Route
           path="/login"
-          element={<Login onLogin={() => setIsLoggedIn(true)} />}
+          element={<Login onLogin={handleLogin} />}
         />
         <Route
           path="/*"

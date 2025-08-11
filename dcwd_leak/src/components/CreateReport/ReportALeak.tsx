@@ -18,7 +18,7 @@ import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
 import { devApi } from '../Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 const labelStyle: React.CSSProperties = {
@@ -243,11 +243,8 @@ const ReportALeak: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <Title level={3} style={{ marginBottom: 0 }}>
-        Report A Leak
-      </Title>
 
-      <Breadcrumb style={{ marginBottom: 24 }}>
+      <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
       </Breadcrumb>
@@ -276,20 +273,7 @@ const ReportALeak: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label={
-                  <span
-                    style={{
-                      ...labelStyle,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <SearchOutlined style={{ fontSize: 15 }} /> Search Account No or Meter No
-                  </span>
-                }
-              >
+              <Form.Item label={<span style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 4 }}><SearchOutlined style={{ fontSize: 15 }} /> Search Account No or Meter No</span>}>
                 <Space.Compact style={{ display: 'flex' }}>
                   <Input
                     style={{ flex: 1 }}
