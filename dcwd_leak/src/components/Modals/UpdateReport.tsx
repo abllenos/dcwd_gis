@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Input, Button, Select } from 'antd';
 import type { LeakData } from '../../types/Leakdata';
+import { EditOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -13,6 +14,12 @@ interface UpdateReportProps {
   onSubmit: () => void;
 }
 
+const labelStyle: React.CSSProperties = {
+  fontWeight: 500,
+  marginBottom: 0,
+  display: 'block',
+};
+
 const UpdateReport: React.FC<UpdateReportProps> = ({
   visible,
   record,
@@ -23,79 +30,130 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
 }) => {
   return (
     <Modal
-      title="Update Report"
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       footer={null}
       width="60%"
       centered
-      style={{ maxWidth: '200vw', padding: 0 }}
-      bodyStyle={{ padding: 24 }}
+      style={{ maxWidth: '200vw' }}
+      bodyStyle={{ padding: 0 }}
+      title={
+        <div
+          style={{
+            backgroundColor: '#3B82F6',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '10px 10px 0 0',
+            fontWeight: 600,
+            fontSize: 16,
+          }}
+        >
+          <EditOutlined style={{ marginRight: 8 }} />
+          Update Report
+        </div>
+      }
     >
       {record && (
-        <div className="update-form">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div
+          style={{
+            backgroundColor: '#f8fbfe',
+            border: '1px solid #bcdfff',
+            borderRadius: '0 0 10px 10px',
+            padding: '24px',
+            fontSize: 15,
+            lineHeight: '1.8',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 20,
+            }}
+          >
             <div>
-              <label>Location:</label>
+              <label style={labelStyle}>Location:</label>
               <Input value={formValues.location} disabled />
             </div>
             <div>
-              <label>Landmark:</label>
+              <label style={labelStyle}>Landmark:</label>
               <Input
                 value={formValues.landmark}
                 onChange={e => onChange('landmark', e.target.value)}
               />
             </div>
             <div>
-              <label>Contact No:</label>
+              <label style={labelStyle}>Contact No:</label>
               <Input
                 value={formValues.contactNo}
                 onChange={e => onChange('contactNo', e.target.value)}
               />
             </div>
             <div>
-              <label>Nearest Meter:</label>
+              <label style={labelStyle}>Nearest Meter:</label>
               <Input
                 value={formValues.referenceMeter}
                 onChange={e => onChange('referenceMeter', e.target.value)}
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <label>DMA ID:</label>
+            <div>
+              <label style={labelStyle}>DMA ID:</label>
               <Select
                 value={formValues.dmaId || undefined}
                 placeholder="- SELECT -"
-                onChange={value => onChange('dmaId' as keyof LeakData, value)}
+                onChange={value => onChange('dmaId', value)}
               >
                 <Option value="DMA001">DMA001</Option>
                 <Option value="DMA002">DMA002</Option>
               </Select>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <label>Covering:</label>
+            <div>
+              <label style={labelStyle}>Covering:</label>
               <Select
                 value={formValues.covering || undefined}
                 placeholder="- SELECT -"
-                onChange={value => onChange('covering' as keyof LeakData, value)}
+                onChange={value => onChange('covering', value)}
               >
                 <Option value="SOIL">SOIL</Option>
                 <Option value="CONCRETE">CONCRETE</Option>
               </Select>
             </div>
             <div>
-              <label>NRW Level:</label>
+              <label style={labelStyle}>NRW Level:</label>
               <Input
                 value={formValues.nrwLevel || ''}
-                onChange={e => onChange('nrwLevel' as keyof LeakData, e.target.value)}
+                onChange={e => onChange('nrwLevel', e.target.value)}
               />
             </div>
           </div>
-
-          <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            <Button onClick={onCancel} style={{ background: '#00607A', color: '#fff' }}>
+          
+          <div
+            style={{
+              marginTop: 32,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 12,
+            }}
+          >
+            <Button
+              onClick={onCancel}
+              style={{
+                background: '#00607A',
+                color: '#fff',
+                borderRadius: 6,
+                padding: '0 20px',
+              }}
+            >
               Close
             </Button>
-            <Button type="primary" onClick={onSubmit}>
+            <Button
+              type="primary"
+              onClick={onSubmit}
+              style={{
+                borderRadius: 6,
+                padding: '0 20px',
+              }}
+            >
               Save
             </Button>
           </div>

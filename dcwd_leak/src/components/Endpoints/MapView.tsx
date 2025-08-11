@@ -12,55 +12,73 @@ const MapComponent: React.FC<MapComponentProps> = ({ lat, lng, onMapClick }) => 
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
 
-  // Initialize map and marker once on mount
   useEffect(() => {
     loadGoogleMapsScript()
       .then(() => {
         const map = new google.maps.Map(
           document.getElementById('map') as HTMLElement,
           {
-            center: { lat, lng },
-            zoom: 16,
+            center: { lat: 7.0720282, lng: 125.6120311 },
+            zoom: 13,
           }
         );
-
-        const marker = new google.maps.Marker({
-          position: { lat, lng },
-          map,
-          draggable: true,
-        });
-
-        marker.addListener('dragend', (e: google.maps.MapMouseEvent) => {
-          const newLat = e.latLng?.lat();
-          const newLng = e.latLng?.lng();
-          if (newLat !== undefined && newLng !== undefined) {
-            onMapClick(newLat, newLng);
-          }
-        });
 
         map.addListener('click', (e: google.maps.MapMouseEvent) => {
           const newLat = e.latLng?.lat();
           const newLng = e.latLng?.lng();
           if (newLat !== undefined && newLng !== undefined) {
-            marker.setPosition({ lat: newLat, lng: newLng });
+            if (!markerRef.current) {
+              markerRef.current = new google.maps.Marker({
+                position: { lat: newLat, lng: newLng },
+                map,
+                draggable: true,
+              });
+
+              markerRef.current.addListener('dragend', (ev: google.maps.MapMouseEvent) => {
+                const dragLat = ev.latLng?.lat();
+                const dragLng = ev.latLng?.lng();
+                if (dragLat !== undefined && dragLng !== undefined) {
+                  onMapClick(dragLat, dragLng);
+                }
+              });
+            } else {
+              markerRef.current.setPosition({ lat: newLat, lng: newLng });
+            }
             onMapClick(newLat, newLng);
           }
         });
 
         mapRef.current = map;
-        markerRef.current = marker;
       })
       .catch((err) => {
         console.error('Google Maps failed to load:', err);
       });
-  }, [onMapClick]); 
+  }, [onMapClick]);
+
   
   useEffect(() => {
-    if (mapRef.current && markerRef.current) {
+    if (mapRef.current && lat && lng) {
       const newPosition = new google.maps.LatLng(lat, lng);
-      markerRef.current.setPosition(newPosition);
       mapRef.current.setCenter(newPosition);
       mapRef.current.setZoom(16);
+
+      if (!markerRef.current) {
+        markerRef.current = new google.maps.Marker({
+          position: newPosition,
+          map: mapRef.current,
+          draggable: true,
+        });
+
+        markerRef.current.addListener('dragend', (e: google.maps.MapMouseEvent) => {
+          const dragLat = e.latLng?.lat();
+          const dragLng = e.latLng?.lng();
+          if (dragLat !== undefined && dragLng !== undefined) {
+            onMapClick(dragLat, dragLng);
+          }
+        });
+      } else {
+        markerRef.current.setPosition(newPosition);
+      }
     }
   }, [lat, lng]);
 
