@@ -116,6 +116,8 @@ const SupplyComplaints: React.FC = () => {
     {
       title: 'Actions',
       key: 'action',
+      fixed: 'right',
+      width: '120',      
       render: (_, record) => (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button

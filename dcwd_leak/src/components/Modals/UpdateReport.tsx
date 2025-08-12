@@ -15,8 +15,8 @@ interface UpdateReportProps {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontWeight: 500,
-  marginBottom: 0,
+  fontWeight: 600,
+  marginBottom: 6,
   display: 'block',
 };
 
@@ -44,7 +44,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
             color: 'white',
             padding: '8px 16px',
             borderRadius: '10px 10px 0 0',
-            fontWeight: 600,
+            fontWeight: 700,
             fontSize: 16,
           }}
         >
@@ -59,27 +59,30 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
             backgroundColor: '#f8fbfe',
             border: '1px solid #bcdfff',
             borderRadius: '0 0 10px 10px',
-            padding: '24px',
+            padding: '24px 32px',
             fontSize: 15,
+            marginTop: -16,
             lineHeight: '1.8',
+            boxSizing: 'border-box',
           }}
         >
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 20,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '24px 32px',
             }}
           >
             <div>
               <label style={labelStyle}>Location:</label>
-              <Input value={formValues.location} disabled />
+              <Input value={formValues.location} disabled style={{ padding: '8px 12px' }} />
             </div>
             <div>
               <label style={labelStyle}>Landmark:</label>
               <Input
                 value={formValues.landmark}
                 onChange={e => onChange('landmark', e.target.value)}
+                style={{ padding: '8px 12px' }}
               />
             </div>
             <div>
@@ -87,6 +90,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
               <Input
                 value={formValues.contactNo}
                 onChange={e => onChange('contactNo', e.target.value)}
+                style={{ padding: '8px 12px' }}
               />
             </div>
             <div>
@@ -94,6 +98,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
               <Input
                 value={formValues.referenceMeter}
                 onChange={e => onChange('referenceMeter', e.target.value)}
+                style={{ padding: '8px 12px' }}
               />
             </div>
             <div>
@@ -102,6 +107,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
                 value={formValues.dmaId || undefined}
                 placeholder="- SELECT -"
                 onChange={value => onChange('dmaId', value)}
+                style={{ width: '100%' }}
               >
                 <Option value="DMA001">DMA001</Option>
                 <Option value="DMA002">DMA002</Option>
@@ -113,6 +119,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
                 value={formValues.covering || undefined}
                 placeholder="- SELECT -"
                 onChange={value => onChange('covering', value)}
+                style={{ width: '100%' }}
               >
                 <Option value="SOIL">SOIL</Option>
                 <Option value="CONCRETE">CONCRETE</Option>
@@ -123,16 +130,17 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
               <Input
                 value={formValues.nrwLevel || ''}
                 onChange={e => onChange('nrwLevel', e.target.value)}
+                style={{ padding: '8px 12px' }}
               />
             </div>
           </div>
-          
+
           <div
             style={{
-              marginTop: 32,
+              marginTop: 40,
               display: 'flex',
               justifyContent: 'flex-end',
-              gap: 12,
+              gap: 16,
             }}
           >
             <Button
@@ -141,7 +149,8 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
                 background: '#00607A',
                 color: '#fff',
                 borderRadius: 6,
-                padding: '0 20px',
+                padding: '6px 24px',
+                fontWeight: 600,
               }}
             >
               Close
@@ -151,7 +160,8 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
               onClick={onSubmit}
               style={{
                 borderRadius: 6,
-                padding: '0 20px',
+                padding: '6px 24px',
+                fontWeight: 600,
               }}
             >
               Save
