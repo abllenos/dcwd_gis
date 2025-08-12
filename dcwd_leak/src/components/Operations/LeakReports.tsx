@@ -221,6 +221,8 @@ const LeakReports: React.FC = () => {
     const actionColumn: ColumnsType<LeakData>[number] = {
       title: 'Actions',
       key: 'action',
+      fixed: 'right',
+      width: '120',
       render: (_, record) => renderActionButtons(actions, record),
     };
 

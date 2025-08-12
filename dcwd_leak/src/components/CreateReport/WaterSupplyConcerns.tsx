@@ -52,7 +52,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = ({ formType }) =
   }, [lat, lng]);
 
   useEffect(() => {
-    // When formType changes, set JMS Code field value
+
     const jmsCode = formTypeToJMSCodeMap[formType]?.value;
     form.setFieldsValue({ jmsCode });
   }, [formType, form]);
@@ -96,7 +96,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = ({ formType }) =
   };
 
   return (
-    <div style={{ padding: '4px 24px 24px 24px' }}>
+    <div style={{ padding: "4px 24px 24px 24px" }}>
       <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
         <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
         <Breadcrumb.Item>Water Supply Concerns</Breadcrumb.Item>
@@ -104,127 +104,102 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = ({ formType }) =
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: "#fff",
           padding: 24,
           borderRadius: 8,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         }}
       >
-        <Form layout="vertical" form={form}>
-          {/* Contact Info */}
-          <Divider orientation="left">
-            <Text style={{ fontSize: 18 }} strong>
-              Contact Information
-            </Text>
-          </Divider>
+        <Row gutter={24}>
+          <Col span={10}>
+            <Form layout="vertical" form={form}>
+              <Divider orientation="left">
+                <Text style={{ fontSize: 18 }} strong>
+                  Contact Information
+                </Text>
+              </Divider>
 
-          <Row gutter={16}>
-            <Col span={12}>
               <Form.Item
                 label={
-                  <span
-                    style={{
-                      ...labelStyle,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
+                  <span style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
                     <SearchOutlined style={{ fontSize: 15 }} />
                     Search Account No or Meter No
                   </span>
                 }
               >
-                <Input.Group compact style={{ display: 'flex' }}>
+                <Input.Group compact style={{ display: "flex" }}>
                   <Input style={{ flex: 1 }} placeholder="Enter Account or Meter Number" />
                   <Button type="primary">Search</Button>
                 </Input.Group>
               </Form.Item>
-            </Col>
-          </Row>
 
-          <Row gutter={16}>
-            <Col span={8}>
               <Form.Item label={<span style={labelStyle}>Name</span>}>
                 <Input />
               </Form.Item>
-            </Col>
-            <Col span={8}>
+
               <Form.Item label={<span style={labelStyle}>Nearest Meter</span>}>
                 <Input />
               </Form.Item>
-            </Col>
-          </Row>
 
-          <Row gutter={16}>
-            <Col span={8}>
               <Form.Item label={<span style={labelStyle}>Location</span>}>
                 <Input />
               </Form.Item>
-            </Col>
-            <Col span={8}>
+
               <Form.Item label={<span style={labelStyle}>Contact No.</span>}>
                 <Input />
               </Form.Item>
-            </Col>
-          </Row>
 
-          <Divider orientation="left">
-            <Text style={{ fontSize: 18 }} strong>
-              Complaint Details
-            </Text>
-          </Divider>
+              <Divider orientation="left">
+                <Text style={{ fontSize: 18 }} strong>
+                  Complaint Details
+                </Text>
+              </Divider>
 
-          <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item name="jmsCode" label={<span style={labelStyle}>JMS Code</span>}>
-                <Select placeholder="-SELECT-">
-                  <Option value="1">No Water</Option>
-                  <Option value="2">Low Pressure</Option>
-                  <Option value="3">Water Quality Complaints</Option>
-                  <Option value="4">Leak Report</Option>
-                </Select>
+              <Form.Item name="jmsCode" hidden>
+                <Input />
               </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label={<span style={labelStyle}>Complaint Details</span>}>
-                <Select placeholder="-SELECT-" />
+
+              <div style={{ marginBottom: 13 }}>
+                <span style={labelStyle}>JMS Code</span>
+                <div
+                  style={{
+                    padding: "6px 11px",
+                    border: "1px solid #d9d9d9",
+                    borderRadius: 4,
+                    marginTop: 8,
+                  }}
+                >
+                  {formTypeToJMSCodeMap[formType]?.label || "N/A"}
+                </div>
+              </div>
+
+              <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}>
+                <Input.TextArea rows={3} />
               </Form.Item>
-            </Col>
-          </Row>
+            </Form>
+          </Col>
 
-          <Divider orientation="left">
-            <Text style={{ fontSize: 18 }} strong>
-              Search Address
-            </Text>
-          </Divider>
+          <Col span={14}>
+            <Divider orientation="left">
+              <Text style={{ fontSize: 18 }} strong>
+                Search Address
+              </Text>
+            </Divider>
 
-          <Form.Item label={<span style={labelStyle}>Search</span>}>
-            <Input placeholder="e.g., Matina, Davao City, Davao del Sur" />
-          </Form.Item>
+            <Form.Item>
+              <Input placeholder="e.g., Matina, Davao City, Davao del Sur" />
+            </Form.Item>
 
-          <div style={{ height: 400, border: '1px solid #ccc', marginBottom: 24 }}>
-            <MapComponent lat={lat} lng={lng} onMapClick={handleMapClick} />
-          </div>
+            <div style={{ height: 613, border: "1px solid #ccc", borderRadius: 6 }}>
+              <MapComponent lat={lat} lng={lng} onMapClick={handleMapClick} />
+            </div>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Latitude</span>}>
-                <Input value={lat?.toFixed(6) || ''} readOnly />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label={<span style={labelStyle}>Longitude</span>}>
-                <Input value={lng?.toFixed(6) || ''} readOnly />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            <Button danger>Cancel</Button>
-            <Button type="primary">Submit</Button>
-          </div>
-        </Form>
+            <div style={{width: '100%', display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+              <Button danger>Cancel</Button>
+              <Button type="primary">Submit</Button>
+            </div>
+          </Col>
+        </Row>
       </div>
     </div>
   );
