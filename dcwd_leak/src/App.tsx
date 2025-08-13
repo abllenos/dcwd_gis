@@ -37,6 +37,7 @@ import JMSDataSeeding from './components/SystemMaintenance/JMSDataSeeding';
 import Reports from './components/Report/Reports';
 import LeakOptionsModal from './components/Modals/LeakOptionsModal';
 import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
+import ReportALeak from './components/CreateReport/ReportALeak';
 
 import './styles/theme.css';
 
@@ -126,8 +127,8 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       case 'no_water_supply':
         navigate('/water-supply-concerns', { state: { formType: 'no_water_supply' } });
         break;
-      case 'leak_report':
-        navigate('/leak-reports');
+      case 'report_leak':
+        navigate('/report-a-leak', { state: { formType: 'report_leak' } });
         break;
       default:
         break;
@@ -138,7 +139,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
   return (
     <>
-      <Layout style={{ minHeight: '100vh', fontFamily: 'Noto Sans, sans-serif' }}>
+      <Layout style={{ minHeight: '100vh' }}>
         <Sider
           trigger={null}
           collapsible
@@ -191,7 +192,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               right: 0,
               height: 64,
               padding: '0 24px',
-              backgroundColor: '#E7F2FF',
+              backgroundColor: '#d9edff',
               borderBottom: '1px solid #D0EBFF',
               display: 'flex',
               alignItems: 'center',
@@ -230,13 +231,13 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               <Route path="settings" element={<Settings />} />
               <Route path="reports" element={<Reports />} />
               <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
+              <Route path="report-a-leak" element={<ReportALeak />} />
               <Route path="*" element={<Navigate to="home" />} />
             </Routes>
           </Content>
         </Layout>
       </Layout>
 
-      {/* LeakOptionsModal usage */}
       <LeakOptionsModal
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
@@ -246,7 +247,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   );
 };
 
-// Wrapper to extract formType from location state and pass to WaterSupplyConcern
+
 const WaterSupplyConcernsWrapper: React.FC = () => {
   const location = useLocation();
   const formType =

@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   MailOutlined,
   LockOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LottieSpinner from '../components/LottieSpinner';
@@ -33,71 +33,90 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-         const response = await devApi.post(
+      const response = await devApi.post(
         'dcwd-gis/api/v1/admin/userlogin/login',
         { username, password }
-         );
+      );
 
-         const data = response.data;
+      const data = response.data;
 
-         if (data?.statusCode === 200 && data?.data) {
-            if (data.data?.token) {
-              localStorage.setItem('token', data.data.token);
-              localStorage.setItem('username', username);
-              onLogin(data.data.token); 
-            }
-            localStorage.setItem('debug_user_data', JSON.stringify(data.data));
-            setTimeout(() => navigate('/home'), 1300);
-          } else {
-          toast.error(data.message || 'Invalid email or password');
-          setLoading(false);
-          pendingSubmitRef.current = false;
-         }
-    } catch (err){
+      if (data?.statusCode === 200 && data?.data) {
+        if (data.data?.token) {
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('username', username);
+          onLogin(data.data.token);
+        }
+        localStorage.setItem('debug_user_data', JSON.stringify(data.data));
+        setTimeout(() => navigate('/home', { replace: true }), 1300);
+      } else {
+        toast.error(data.message || 'Invalid email or password');
+        setLoading(false);
+        pendingSubmitRef.current = false;
+      }
+    } catch (err) {
       console.error(err);
       toast.error('Failed to connect to server.');
       setLoading(false);
       pendingSubmitRef.current = false;
     }
   };
-   
-        
 
   return (
     <div style={styles.container}>
+      <style>
+        {`
+          @keyframes waterFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,180,255,0.6), 0 0 20px rgba(0,180,255,0.4); }
+            50% { box-shadow: 0 0 20px rgba(0,180,255,0.9), 0 0 40px rgba(0,180,255,0.6); }
+          }
+          @keyframes inputGlow {
+            0%, 100% { text-shadow: 0 0 3px rgba(0,200,255,0.6); }
+            50% { text-shadow: 0 0 6px rgba(0,200,255,1); }
+          }
+          .glow-input {
+            animation: inputGlow 2s infinite;
+          }
+          ::placeholder {
+            color: rgba(200, 240, 255, 0.7) !important;
+            text-shadow: 0 0 5px rgba(0,200,255,0.5);
+          }
+        `}
+      </style>
+
       <ToastContainer position="top-center" autoClose={2500} />
 
-    {loading && (
-  <div
-    className="loading-overlay fade-in-only"
-    aria-live="polite"
-    aria-label="Loading"
-    style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(255,255,255,0.9)',
-      opacity: 1,
-      animation: 'fadeIn 0.3s ease-in forwards',
-    }}
-  >
-    <LottieSpinner size={200} />
-  </div>
-)}
+      {loading && (
+        <div
+          className="loading-overlay fade-in-only"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+          }}
+        >
+          <LottieSpinner size={200} />
+        </div>
+      )}
+
       <button onClick={() => setDarkMode(!darkMode)} style={styles.toggleButton}>
         {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
       </button>
 
-      <div style={styles.blurOverlay} />
-
       <div style={styles.overlay}>
-        <form onSubmit={handleSubmit} style={styles.form} aria-busy={loading}>
-          <img src="/logo-dcwd.webp" alt="Logo" style={styles.logo} />
+        <img src="/logo-dcwd.webp" alt="Logo" style={styles.logo} />
+
+        <form onSubmit={handleSubmit} style={styles.form}>
           <h2 style={styles.title}>Login</h2>
-          <p style={styles.subtitle}>Log in to your account</p>
+          <p style={styles.subtitle}>LEAK REPORTING SYSTEM</p>
 
           <div style={styles.inputGroup}>
             <MailOutlined style={styles.icon} />
@@ -107,6 +126,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               style={styles.input}
+              className="glow-input"
               required
               disabled={loading}
               autoComplete="username"
@@ -121,11 +141,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{ ...styles.input, paddingRight: '30px' }}
+              className="glow-input"
               required
               disabled={loading}
               autoComplete="current-password"
             />
-            <span onClick={() => setShowPassword(!showPassword)} style={styles.toggleIcon}>
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={styles.toggleIcon}
+            >
               {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             </span>
           </div>
@@ -134,10 +158,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             type="submit"
             style={{
               ...styles.button,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
               opacity: loading ? 0.85 : 1,
               cursor: loading ? 'not-allowed' : 'pointer',
             }}
@@ -156,14 +176,14 @@ function getStyles(darkMode: boolean): { [key: string]: React.CSSProperties } {
     container: {
       display: 'flex',
       height: '100vh',
-      backgroundImage: `url('/login-bg.jpg')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
+      background: darkMode
+        ? 'linear-gradient(135deg, #02101d, #03263b, #06445e)'
+        : 'linear-gradient(135deg, #07304b, #0d4f6e, #0d3e53ff)',
+      backgroundSize: '400% 400%',
+      animation: 'waterFlow 15s ease infinite',
       justifyContent: 'center',
       alignItems: 'center',
       position: 'relative',
-      overflow: 'hidden',
     },
     toggleButton: {
       position: 'absolute',
@@ -179,60 +199,80 @@ function getStyles(darkMode: boolean): { [key: string]: React.CSSProperties } {
       zIndex: 2,
     },
     overlay: {
-      backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)',
-      padding: '40px',
-      borderRadius: '8px',
-      boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
+      backgroundColor: darkMode
+        ? 'rgba(10, 20, 30, 0.55)'
+        : 'rgba(0, 0, 0, 0.45)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      borderRadius: '16px',
+      border: '1px solid rgba(0,255,255,0.4)',
+      padding: '60px 30px 40px',
+      width: '350px',
+      minHeight: '60vh',
+      textAlign: 'center',
       position: 'relative',
-      zIndex: 1,
+      animation: 'pulseGlow 3s infinite',
+      color: '#fff',
     },
     logo: {
-      width: '70px',
-      height: '70px',
-      margin: '0 auto 10px auto',
-      display: 'block',
+      width: '80px',
+      height: 'auto',
+      position: 'absolute',
+      top: '-40px',
+      left: '50%',
+      transform: 'translateX(-50%)',
     },
     form: {
-      width: '250px',
       display: 'flex',
       flexDirection: 'column',
     },
-    title: {
-      marginBottom: '0px',
-      textAlign: 'center',
-      fontSize: '25px',
-      fontWeight: 'bold',
-      color: darkMode ? '#fff' : '#333',
-    },
-    subtitle: {
-      marginBottom: '16px',
-      textAlign: 'center',
-      fontSize: '14px',
-      color: darkMode ? '#ccc' : '#666',
-    },
+title: {
+  fontSize: '26px',
+  fontWeight: 800,
+  fontFamily: ' Arial',
+  letterSpacing: '0.5px',
+  marginBottom: '10px',
+  background: 'linear-gradient(90deg, #dfe9f3, #a1c4fd)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 0 8px rgba(0, 123, 255, 0.4)',
+},
+
+subtitle: {
+  fontSize: '14px',
+  fontWeight: 500,
+  fontFamily: 'sans-serif',
+  letterSpacing: '0.3px',
+  color: '#e0e0e0',
+  marginBottom: '20px',
+  textShadow: '0 1px 4px rgba(0,0,0,0.4), 0 0 4px rgba(0, 123, 255, 0.2)',
+},
+
     inputGroup: {
       display: 'flex',
       alignItems: 'center',
       position: 'relative',
-      background: darkMode ? '#2a2a2a' : '#f5f5f5',
-      borderRadius: '4px',
-      marginBottom: '16px',
-      border: '1px solid #ddd',
+      background: darkMode
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(255,255,255,0.15)',
+      borderRadius: '8px',
+      marginBottom: '28px',
       paddingLeft: '10px',
     },
     icon: {
       fontSize: '16px',
-      color: darkMode ? '#aaa' : '#888',
+      color: '#fff',
       marginRight: '6px',
     },
     input: {
       flex: 1,
-      padding: '8px',
+      padding: '14px 12px',
       border: 'none',
       outline: 'none',
       background: 'transparent',
-      color: darkMode ? '#fff' : '#333',
       fontSize: '14px',
+      color: 'inherit',
+
     },
     toggleIcon: {
       position: 'absolute',
@@ -240,26 +280,17 @@ function getStyles(darkMode: boolean): { [key: string]: React.CSSProperties } {
       top: '50%',
       transform: 'translateY(-50%)',
       cursor: 'pointer',
-      color: darkMode ? '#aaa' : '#888',
+      color: '#fff',
     },
     button: {
-      padding: '10px',
-      backgroundColor: '#113983ff',
+      padding: '14px 24px',
+      background: 'linear-gradient(135deg, #00aaff, #004466)',
       color: '#ffffff',
       border: 'none',
       fontWeight: 'bold',
-      borderRadius: '4px',
+      borderRadius: '8px',
       cursor: 'pointer',
       fontSize: '15px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    blurOverlay: {
-      position: 'absolute',
-      inset: 0,
-      backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)',
-      zIndex: -1,
     },
   };
 }

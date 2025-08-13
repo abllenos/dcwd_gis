@@ -1,7 +1,4 @@
-
-
-import React from 'react';
-import { Table, Tag, Card, Row, Col } from 'antd';
+import { Table, Tag, Card, Row, Col, } from 'antd';
 import {
   FileTextOutlined,
   ClockCircleOutlined,

@@ -18,4 +18,7 @@ export interface LeakData {
   dateTurnedOver?: string;
   turnoverReason?: string;
   leakPressure?: string;
+  latitude?: number;
+  longitude?: number;
+  images?: string[];
 }
