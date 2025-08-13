@@ -40,6 +40,8 @@ import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
 import ReportALeak from './components/CreateReport/ReportALeak';
 
 import './styles/theme.css';
+import 'antd/dist/reset.css';
+
 
 const { Sider, Header, Content } = Layout;
 type MenuItem = Required<MenuProps>['items'][number];

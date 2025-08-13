@@ -21,11 +21,17 @@ import { useNavigate } from 'react-router-dom';
 const { Text } = Typography;
 const { Option } = Select;
 
+message.config({
+  top: 0,     
+  duration: 3,  
+  maxCount: 3,  
+});
+
 const labelStyle: React.CSSProperties = {
   fontWeight: 500,
   textTransform: 'uppercase' as const,
   fontSize: 12,
-  fontFamily: 'Arial, sans-serif',
+  fontFamily: 'Noto Sans, sans-serif',
 };
 
 const ReportALeak: React.FC = () => {
@@ -132,6 +138,7 @@ const ReportALeak: React.FC = () => {
     formData.append('wscode', wscode || '');
     formData.append('DT_Reported', DateReported);
     formData.append('refAccNo', values.refAccNo || '');
+    formData.append('dispatchStat', '1');
 
     if (fileList.length) {
       fileList.forEach((file) => {
@@ -151,9 +158,11 @@ const ReportALeak: React.FC = () => {
           },
         }
       );
-      message.success('Leak report submitted successfully');
+      
+      showModal('Success','Leak report submitted successfully');
       form.resetFields();
       setFileList([]);
+      
     } catch (error: any) {
       if (error.response?.status === 401) {
         showModal('Unauthorized', 'Unauthorized. Please log in again.');
@@ -256,11 +265,16 @@ const ReportALeak: React.FC = () => {
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
         }}
       >
-        {/* Form wraps the entire row now */}
+
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleSubmit}
+          onFinish={(values) => {
+            handleSubmit(values);
+          }}
+          onFinishFailed={() => {
+            message.error('Please complete all required fields before submitting.')
+          }}  
           onValuesChange={(changedValues, allValues) => {
             setFormValues(allValues);
           }}
@@ -306,11 +320,11 @@ const ReportALeak: React.FC = () => {
                 </Space.Compact>
               </Form.Item>
 
-              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>}>
+              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>} rules={[{required: true, message: 'Enter Name'}]}>
                 <Input />
               </Form.Item>
 
-              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>}>
+              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>} rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}>
                 <Input />
               </Form.Item>
 
@@ -321,7 +335,7 @@ const ReportALeak: React.FC = () => {
               </Divider>
               <Row gutter={16}> 
                 <Col span={12}>  
-                  <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>}>
+                  <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>} rules={[{required: true, message: 'Enter Leak Type'}]}>
                     <Select placeholder="-SELECT-">
                       <Option value="1">Service Line</Option>
                       <Option value="2">Main Line</Option>
@@ -329,7 +343,7 @@ const ReportALeak: React.FC = () => {
                   </Form.Item>
                 </Col> 
                 <Col span={12}>
-                  <Form.Item name="leakPressure" label={<span style={labelStyle}>Leak Pressure</span>}>
+                  <Form.Item name="leakPressure" label={<span style={labelStyle}>Leak Pressure</span>} rules={[{required: true, message: 'Enter Leak Pressure'}]}>
                     <Select placeholder="-SELECT-">
                       <Option value="1">High</Option>
                       <Option value="2">Low</Option>
@@ -339,7 +353,7 @@ const ReportALeak: React.FC = () => {
               </Row>
               <Row gutter={16}>
                 <Col span={12}>  
-                  <Form.Item name="visibility" label={<span style={labelStyle}>Visibility</span>}>
+                  <Form.Item name="visibility" label={<span style={labelStyle}>Visibility</span>} rules={[{required: true, message: 'Enter Visibility'}]}>
                     <Select placeholder="-SELECT-">
                       <Option value="1">Exposed Leak</Option>
                       <Option value="2">Underground Leak</Option>
@@ -347,19 +361,19 @@ const ReportALeak: React.FC = () => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item name="address" label="Address">
+                  <Form.Item name="address" label={<span style={labelStyle}>Address</span>} rules={[{required: true, message: 'Enter Address '}]}>
                     <Input />
                   </Form.Item>
                 </Col>   
               </Row>
               <Row gutter={16}>
                 <Col span={12}> 
-                  <Form.Item name="Landmark" label={<span style={labelStyle}>Landmark</span>}>
+                  <Form.Item name="Landmark" label={<span style={labelStyle}>Landmark</span>} rules={[{required: true, message: 'Enter Landmark '}]}>
                     <Input />
                   </Form.Item>
                 </Col>   
                 <Col span={12}> 
-                  <Form.Item name="NearestMeter" label="Nearest Meter">
+                  <Form.Item name="NearestMeter" label={<span style={labelStyle}>Nearest Meter</span>} rules={[{required: true, message: 'Enter Nearest Meter '} , { pattern: /^[a-zA-Z0-9]+$/}]}>
                     <Input />
                   </Form.Item>
                 </Col>
@@ -371,7 +385,7 @@ const ReportALeak: React.FC = () => {
                   </Form.Item>
                 </Col>   
                 <Col span={12}>
-                  <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}>
+                  <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>} rules={[{required: true, message: 'Enter Remarks'}]}>
                     <Input.TextArea rows={3} />
                   </Form.Item>
                 </Col> 
@@ -409,7 +423,7 @@ const ReportALeak: React.FC = () => {
 
       <Modal
         title={modalContent.title}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalOk}
         okText="OK"
