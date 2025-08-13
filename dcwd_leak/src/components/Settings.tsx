@@ -4,6 +4,7 @@ import '../styles/Settings.css';
 import { Card, Avatar, Input, Button, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { devApi } from '../components/Endpoints/Interceptor';
 
 interface EditProfileFormProps {
   employeeId: string;
@@ -66,6 +67,7 @@ function Settings() {
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [mobile, setMobile] = React.useState('');
+  const [middlename, setMiddleName] = React.useState('');
   const [saving, setSaving] = React.useState(false);
   const [contactSaving, setContactSaving] = React.useState(false);
   const [department, setDepartment] = React.useState('');
@@ -75,26 +77,23 @@ function Settings() {
 
   React.useEffect(() => {
   const empId = localStorage.getItem('username');
-  const token = localStorage.getItem('token');
   if (!empId) return;
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch(
-        `https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID?empId=${empId}`,
+      const res = await devApi.get(
+        `dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
+          params: { empId }
         }
       );
-      const data = await res.json();
+
+      const data = res.data;
       if (data?.statusCode === 200 && data?.data) {
         setEmployeeId(data.data.empID || '');
         setProfileEmail(data.data.userName || '');
         setFirstName(data.data.firstName || '');
+        setMiddleName(data.data.MiddleName || '');
         setLastName(data.data.lastName || '');
         setEmail(data.data.userName || '');
         setMobile(data.data.mobileNo || '');
@@ -137,7 +136,7 @@ function Settings() {
         gap: 24,
       }}
     >
-      {/* Header background */}
+  
       <div
         style={{
           width: '100%',
@@ -163,7 +162,7 @@ function Settings() {
             gap: 32,
           }}
         >
-          {/* Animated Avatar */}
+
           <div className="animated-avatar" style={{
             backgroundColor: '#dbeafe',
             borderRadius: '50%',
@@ -177,17 +176,17 @@ function Settings() {
             />
           </div>
 
-          {/* Info */}
+
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 20, color: '#174ea6', textTransform: 'uppercase' }}>
-              {`${firstName} ${lastName}`}
+              {`${firstName} ${middlename} ${lastName}`}
             </div>
             <div style={{ fontSize: 14, color: '#333', marginTop: 4 }}>
-              INFORMATION AND COMMUNICATION TECHNOLOGY DEPARTMENT
+              {`${department}`}
             </div>
           </div>
 
-          {/* Preview */}
+
           {(showContactPreview || showProfilePreview) && (
             <div
               style={{
@@ -219,7 +218,7 @@ function Settings() {
         </div>
       </div>
 
-      {/* Contact & Profile Cards */}
+
       <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap' }}>
         <Card
           title="Contact Details"
