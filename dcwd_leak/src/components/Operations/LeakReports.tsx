@@ -187,7 +187,7 @@ const LeakReports: React.FC = () => {
         leakType: item.typeid,
         location: item.address,
         landmark: item.landmark,
-        referenceMeter: item.nearestMtrAccNo || item.nearestMtr,
+        referenceMeter: item.nearestMtrAccNo || item.nearestMeter,
         contactNo: item.mobileNo,
         dateReported: item.dT_Reported,
         referenceNo: item.refAccNo,
