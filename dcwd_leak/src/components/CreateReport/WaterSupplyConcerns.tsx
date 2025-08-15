@@ -156,22 +156,8 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = ({ formType }) =
               </Divider>
 
               <Form.Item name="jmsCode" hidden>
-                <Input />
+                <Input type='hidden' />
               </Form.Item>
-
-              <div style={{ marginBottom: 13 }}>
-                <span style={labelStyle}>JMS Code</span>
-                <div
-                  style={{
-                    padding: "6px 11px",
-                    border: "1px solid #d9d9d9",
-                    borderRadius: 4,
-                    marginTop: 8,
-                  }}
-                >
-                  {formTypeToJMSCodeMap[formType]?.label || "N/A"}
-                </div>
-              </div>
 
               <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>}>
                 <Input.TextArea rows={3} />

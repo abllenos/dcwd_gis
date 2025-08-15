@@ -69,6 +69,9 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
             borderRadius: '10px 10px 0 0',
             fontWeight: 600,
             fontSize: 16,
+            top: '-28px',
+            position: 'absolute',
+            height: 'auto',            
           }}
         >
           <CarOutlined style={{ marginRight: 8 }} />

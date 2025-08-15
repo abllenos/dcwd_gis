@@ -53,7 +53,7 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
       bodyStyle={{ paddingTop: 0, paddingBottom: 8 }}
       centered
       title={
-        <div
+        <div 
           style={{
             backgroundColor: '#3B82F6',
             color: 'white',
@@ -61,6 +61,9 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
             borderRadius: '10px 10px 0 0',
             fontWeight: 600,
             fontSize: 16,
+            top: '-28px',
+            position: 'absolute',
+            height: 'auto',
           }}
         >
           <FileSearchOutlined style={{ marginRight: 8 }} />
