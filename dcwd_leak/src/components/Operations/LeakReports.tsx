@@ -281,11 +281,19 @@ const LeakReports: React.FC = () => {
         </Tabs>
 
         <Table
-          columns={columnPresets[activeTab] || []}
-          dataSource={filteredData(activeTab)}
+          columns={columnPresets[activeTab]} // ✅ pick the correct column set
+          dataSource={filteredData(activeTab)} // optionally filter data per tab
           loading={loading}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            current: pageIndex,
+            pageSize: pageSize,
+            total: total,
+            onChange: (page, size) => {
+              setPageIndex(page);
+              setPageSize(size);
+            },
+          }}
+          rowKey="id" // should match your normalized data key
         />
       </Card>
 
