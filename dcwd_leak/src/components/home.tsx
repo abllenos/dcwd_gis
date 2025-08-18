@@ -1,4 +1,4 @@
-import { Table, Tag, Card, Row, Col } from 'antd';
+import { Table, Card, Row, Col } from 'antd';
 import {
   FileTextOutlined,
   ClockCircleOutlined,
@@ -39,14 +39,43 @@ const columns = [
     key: 'status',
     render: (tags: string[]) => (
       <>
-        {tags.map(tag => (
-          <Tag color={tag === 'dispatched' ? 'green' : 'orange'} key={tag}>
-            {tag.toUpperCase()}
-          </Tag>
-        ))}
+        {tags.map(tag => {
+          const styles: Record<string, React.CSSProperties> = {
+            dispatched: {
+              backgroundColor: '#22aa52ff',   
+              color: '#ebf7efff',             
+              border: '1px solid #14bb51ff',  
+            },
+            pending: {
+              backgroundColor: '#e67930ff',   
+              color: '#f3e9e3ff',             
+              border: '1px solid #e97e26ff',  
+            },
+          };
+
+          const style = tag === 'dispatched' ? styles.dispatched : styles.pending;
+
+          return (
+            <span
+              key={tag}
+              style={{
+                ...style,
+                padding: '2px 8px',
+                borderRadius: '9999px', 
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                display: 'inline-block',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
+              {tag}
+            </span>
+          );
+        })}
       </>
     ),
-  },
+  }, 
 ];
 
 const data: DataType[] = [
@@ -158,17 +187,17 @@ const Home: React.FC = () => {
         <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
           <Card
             title="Monthly Leak Reports"
-            bordered={false}
+           bordered={false}
             style={{
-              height: '100%',
-              minHeight: 360,
-              width: '100%',
-              minWidth: 350,
-              backgroundColor: '#F8FBFF',
-              border: '1px solid #D0E4F7',
-              borderRadius: 8,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-            }}
+           height: '100%',
+           minHeight: 360,
+           width: '100%',
+           minWidth: 350,
+           backgroundColor: '#ffffffff',   
+           border: '1px solid #e0ddddff',  
+           borderRadius: 8,
+           boxShadow: 'none',            
+           }}
             bodyStyle={{
               flex: 1,
               display: 'flex',
@@ -196,7 +225,7 @@ const Home: React.FC = () => {
     <Line 
       type="monotone" 
       dataKey="reports" 
-      stroke="#1890ff" 
+      stroke="#0e41a0ff"
       strokeWidth={1.5} 
       dot={false} 
     />
@@ -208,25 +237,44 @@ const Home: React.FC = () => {
 
         <Col xs={24}>
           <div style={{
-            backgroundColor: '#F8FBFF',
-            border: '1px solid #D0E4F7',
+            backgroundColor: '#ffffff',
             borderRadius: 8,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+            boxShadow: 'none',
             padding: '12px',
           }}>
-            <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered style={{ width: '100%' }} />
+<Table<DataType>
+              columns={columns}
+              dataSource={data}
+              pagination={false}
+              bordered
+              style={{ width: '100%' }}
+            />
           </div>
         </Col>
       </Row>
 
-      <style>
-        {`
-          .ant-card:hover {
-            box-shadow: 0 6px 24px rgba(24, 144, 255, 0.25), 0 1.5px 6px rgba(0,0,0,0.08);
-            transform: translateY(-4px) scale(1.03);
-          }
-        `}
-      </style>
+<style>
+  {`
+    .ant-card:hover {
+      box-shadow: none;
+      transform: translateY(-2px);
+    }
+
+    .ant-table-thead > tr > th {
+      background-color: #d1cdcdff !important;
+      font-weight: 600 !important;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .ant-table,
+    .ant-table-container,
+    .ant-table-tbody > tr > td,
+    .ant-table-thead > tr > th {
+      border-color: #d2d4d8ff !important;
+    }
+  `}
+     </style>
     </div>
   );
 };
