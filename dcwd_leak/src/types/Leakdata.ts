@@ -21,4 +21,6 @@ export interface LeakData {
   latitude?: number;
   longitude?: number;
   images?: string[];
+  dispatchStat: number;
+  flgLeakDetection: number;
 }
