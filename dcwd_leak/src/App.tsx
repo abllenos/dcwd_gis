@@ -159,7 +159,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             left: 0,
             zIndex: 1000,
             height: '100vh',
-            backgroundColor: '#D0EBFF',
+            backgroundColor: '#d0e8faff',
             overflowY: 'auto',
             boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
             transition: 'all 0.2s ease',
@@ -181,11 +181,12 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             items={items}
             style={{
               fontSize: '16px',
-              backgroundColor: '#D0EBFF',
+              backgroundColor: '#d0e8faff',
               color: 'white',
               border: 'none',
             }}
             theme="light"
+            className="custom-sidebar-menu"
           />
         </Sider>
 
@@ -198,8 +199,8 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               right: 0,
               height: 64,
               padding: '0 24px',
-              backgroundColor: '#d9edff',
-              borderBottom: '1px solid #D0EBFF',
+              backgroundColor: '#d0e8faff',
+              borderBottom: '1px solid #b6daf5ff',
               display: 'flex',
               alignItems: 'center',
               fontSize: '18px',
@@ -220,7 +221,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             style={{
               marginTop: 64,
               padding: 24,
-              backgroundColor: '#E7F2FF',
+              backgroundColor: '#ffffff',
               minHeight: 'calc(100vh - 64px)',
             }}
           >
