@@ -1,123 +1,254 @@
-import React, { useState } from 'react';
-import {
-  Table,
-  Button,
-  Select,
-  Breadcrumb,
-  Tabs,
-  Card,
-  Input,
-  Badge,
-} from 'antd';
-import {
-  EditOutlined,
-  CarOutlined,
-  FileSearchOutlined,
-  FileImageOutlined, 
-} from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import type { LeakData } from '../../types/Leakdata';
+import React, { useEffect, useState } from 'react';
+import { Table, Tabs, Button, Input, Badge, Card } from 'antd';
+import { EditOutlined, CarOutlined, FileSearchOutlined, FileImageOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import DispatchModal from '../Modals/DispatchModal';
 import UpdateReport from '../Modals/UpdateReport';
 import ReportDetails from '../Modals/ReportDetails';
 import ImageModal from '../Modals/ImageModal';
+import type { ColumnsType } from 'antd/es/table';
+import type { LeakData } from '../../types/Leakdata';
 
-
-const { Option } = Select;
 const { TabPane } = Tabs;
-
-const data: LeakData[] = [
-  {
-    key: '1',
-    id: '53056',
-    leakType: 'SERVICELINE',
-    location: 'TEST',
-    landmark: 'TEST',
-    referenceMeter: '519449946J',
-    contactNo: '09063425139',
-    dateTimeReported: 'Jun 25, 2025 10:09 AM',
-    referenceNo: 202506241972,
-    repairedLeaks: 'Yes',
-    jmsControlNo: 'JMS-001',
-    dateRepaired: 'Jun 26, 2025',
-    teamLeader: 'John Doe',
-    leakPressure: 'Low',
-    dateTurnedOver: 'Jun 22, 2025',
-    turnoverReason: 'Heavy traffic; need backhoe',
-    dmaId: 'DMA001',
-    covering: 'SOIL',
-  },
-];
-
-const columnMap = {
-  id: { title: 'ID', dataIndex: 'id', sorter: true },
-  leakType: { title: 'Type of Leak', dataIndex: 'leakType' },
-  location: { title: 'Reported Location', dataIndex: 'location' },
-  landmark: { title: 'Landmark', dataIndex: 'landmark' },
-  referenceMeter: { title: 'Ref. Meter No.', dataIndex: 'referenceMeter' },
-  contactNo: { title: 'Contact Number', dataIndex: 'contactNo' },
-  dateTimeReported: { title: 'Date/Time Reported', dataIndex: 'dateTimeReported', sorter: true },
-  referenceNo: { title: 'Ref. Number', dataIndex: 'referenceNo' },
-  repairedLeaks: { title: 'Repaired Leaks', dataIndex: 'repairedLeaks' },
-  jmsControlNo: { title: 'JMS Control No.', dataIndex: 'jmsControlNo' },
-  dateRepaired: { title: 'Date Repaired', dataIndex: 'dateRepaired' },
-  teamLeader: { title: 'Team Leader', dataIndex: 'teamLeader' },
-  dateTurnedOver: { title: 'Date Turned-Over', dataIndex: 'dateTurnedOver' },
-  turnoverReason: { title: 'Reason', dataIndex: 'turnoverReason' },
-};
-
-const columnPresets: Record<string, (keyof typeof columnMap)[]> = {
-  customer: ['id', 'leakType', 'location', 'landmark', 'referenceMeter', 'contactNo', 'dateTimeReported', 'referenceNo'],
-  serviceline: ['id', 'leakType', 'location', 'landmark', 'referenceMeter', 'referenceNo'],
-  dispatched: ['id', 'leakType', 'location', 'landmark', 'referenceMeter', 'contactNo', 'dateTimeReported', 'referenceNo'],
-  repaired: ['id', 'repairedLeaks', 'leakType', 'jmsControlNo', 'referenceMeter', 'location', 'landmark', 'dateTimeReported', 'dateRepaired', 'teamLeader'],
-  turnover: ['id', 'leakType', 'jmsControlNo', 'referenceMeter', 'location', 'landmark', 'dateTimeReported', 'teamLeader', 'dateTurnedOver', 'turnoverReason'],
-  scheduled: ['id', 'leakType', 'referenceNo', 'referenceMeter', 'location', 'landmark', 'dateTimeReported', 'teamLeader', 'dateTurnedOver', 'turnoverReason'],
-  after: ['id', 'location', 'landmark', 'jmsControlNo', 'referenceMeter', 'dateTimeReported', 'teamLeader', 'referenceNo'],
-  notfound: ['id', 'jmsControlNo', 'referenceMeter', 'location', 'landmark', 'dateTimeReported', 'teamLeader'],
-};
 
 const tabLabels: Record<string, string> = {
   customer: 'Customer',
+  leakdetection: 'Leak Detection',
   dispatched: 'Dispatched',
-  serviceline: 'Leak Detection',
-  turnover: 'Repair Turn-over',
-  scheduled: 'Repair Scheduled',
   repaired: 'Repaired Leaks',
+  scheduled: 'Repair Scheduled',
+  turnover: 'Repair Turn-over',
   after: 'Leak After the Meter',
   notfound: 'Leak Not Found',
 };
 
-const tabActionsMap: Record<
-  string,
-  ('dispatch' | 'edit' | 'details' | 'photos')[]
-> = {
-  repaired: ['details'],
-  dispatched: ['details'],
-  turnover: ['dispatch', 'details'],
-  after: ['details'],
-  notfound: ['details'],
-  scheduled: ['details', 'photos', 'dispatch'], 
-  default: ['dispatch', 'edit', 'details'],
-  
+const tabFilters: Record<string, { dispatchStat: number; flgLeakDetection?: number }> = {
+  customer: { dispatchStat: 1, flgLeakDetection: 0 },
+  leakdetection: { dispatchStat: 1, flgLeakDetection: 1 },
+  dispatched: { dispatchStat: 2 },
+  repaired: { dispatchStat: 3 },
+  scheduled: { dispatchStat: 4 },
+  turnover: { dispatchStat: 5 },
+  after: { dispatchStat: 6 },
+  notfound: { dispatchStat: 7 },
 };
 
 const LeakReports: React.FC = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
+  const [data, setData] = useState<LeakData[]>([]);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('customer');
   const [searchText, setSearchText] = useState('');
+  const [pageIndex, setPageIndex] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<LeakData | null>(null);
   const [formValues, setFormValues] = useState<Partial<LeakData>>({});
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
 
+  const fetchCounts = async () => {
+    const counts: Record<string, number> = {};
+    await Promise.all(
+      Object.entries(tabFilters).map(async ([key, filter]) => {
+        try {
+          const params: Record<string, number> = {
+            dispatchStat: filter.dispatchStat,
+            pageIndex: 1,
+            pageSize: 1,
+          };
+          if (filter.flgLeakDetection !== undefined) {
+            params.flgLeakDetection = filter.flgLeakDetection;
+          }
+          const res = await axios.get(
+            'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered',
+            { params }
+          );
+          counts[key] = res.data.data.count || 0;
+        } catch (err) {
+          console.error(`Error fetching count for ${key}`, err);
+          counts[key] = 0;
+        }
+      })
+    );
+    setTabCounts(counts);
+  };
+
+  const fetchData = async (tabKey: string, page: number, size: number) => {
+    setLoading(true);
+    try {
+      const filter = tabFilters[tabKey];
+      const params: Record<string, number> = {
+        dispatchStat: filter.dispatchStat,
+        pageIndex: page,
+        pageSize: size,
+      };
+      if (filter.flgLeakDetection !== undefined) {
+        params.flgLeakDetection = filter.flgLeakDetection;
+      }
+
+      const res = await axios.get(
+        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered',
+        { params }
+      );
+
+      const apiData = res.data.data;
+      setTotal(apiData.count);
+
+      const normalized = apiData.data.map((item: any) => ({
+        id: String(item.spool_ID),
+        leakType: item.typeid,
+        location: item.address,
+        landmark: item.landmark,
+        referenceMeter: item.nearestMtrAccNo || item.nearestMeter,
+        contactNo: item.mobileNo,
+        dateReported: item.dT_Reported,
+        referenceNo: item.refAccNo,
+        dispatchStat: item.dispatchStat,
+        flgLeakDetection: item.flgLeakDetection,
+      }));
+
+      setData(normalized);
+    } catch (error) {
+      console.error('Error fetching leak reports', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCounts(); 
+    fetchData(activeTab, pageIndex, pageSize); 
+  }, []);
+
+  useEffect(() => {
+    fetchData(activeTab, pageIndex, pageSize); 
+  }, [activeTab, pageIndex, pageSize]);
+
+  const renderActionButtons = (record: LeakData) => (
+    <div style={{ display: 'flex', gap: 4 }}>
+      <Button icon={<CarOutlined />} onClick={() => showModal('Dispatch', record)} />
+      <Button icon={<EditOutlined />} onClick={() => showModal('Update Report', record)} />
+      <Button
+        icon={<FileImageOutlined />}
+        onClick={() => {
+          setImageUrls(['https://via.placeholder.com/300', 'https://via.placeholder.com/300']);
+          setImageModalVisible(true);
+        }}
+      />
+      <Button icon={<FileSearchOutlined />} onClick={() => showModal('Report Details', record)} />
+    </div>
+  );
+
+const columnPresets: Record<string, ColumnsType<LeakData>> = {
+  customer: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Contact No.', dataIndex: 'contactNo', key: 'contactNo' },
+    { title: 'Date & Time Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
+    { title: 'Action', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  leakdetection: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Date & Time Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
+    { title: 'Action', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  dispatched: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Contact No.', dataIndex: 'contactNo', key: 'contactNo' },
+    { title: 'Date & Time Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
+    { title: 'Action', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  repaired: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
+    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Date Repaired', dataIndex: 'dateRepaired', key: 'dateRepaired' },
+    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
+    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  scheduled: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
+    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
+    { title: 'Date Turn-overed', dataIndex: 'dateTurnOvered', key: 'dateTurnOvered' },
+    { title: 'Reason', dataIndex: 'reason', key: 'reason' },
+    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  turnover: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
+    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
+    { title: 'Date Turn-overed', dataIndex: 'dateTurnOvered', key: 'dateTurnOvered' },
+    { title: 'Reason', dataIndex: 'reason', key: 'reason' },
+    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  after: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
+    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
+    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+
+  notfound: [
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
+    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
+    { title: 'Location', dataIndex: 'location', key: 'location' },
+    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
+    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
+    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
+    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
+  ],
+};
+
   const showModal = (title: string, record?: LeakData) => {
     setModalTitle(title);
-    setSelectedRecord(record || null);
+    setSelectedRecord(record ?? null);
     if (title === 'Update Report' && record) {
-      setFormValues({ ...record });
+      setFormValues({ ...record, id: String(record.id) });
     }
     setModalVisible(true);
   };
@@ -125,189 +256,88 @@ const LeakReports: React.FC = () => {
   const handleCancel = () => {
     setModalVisible(false);
     setFormValues({});
+    setSelectedRecord(null);
   };
-
-  const handleInputChange = (field: keyof LeakData, value: string) => {
-    setFormValues(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleUpdateSubmit = () => {
-    if (!selectedRecord) return;
-
-    const index = selectedRecord ? data.findIndex(item => item.key === selectedRecord.key) : -1;
-    if (index !== -1) {
-      const updateddata: LeakData = {
-        ...data[index],
-        ...formValues,
-        referenceNo: Number(formValues.referenceNo),
-      };
-
-      data[index] = updateddata;
-    }
-
-    setModalVisible(false);
-    setFormValues({});
-  };
-
-  const filteredData = (tabKey: string) => {
-    let tabFiltered = data;
-
-    if (tabKey === 'serviceline') {
-      tabFiltered = tabFiltered.filter(d => d.leakType === 'SERVICELINE');
-    }
-
-    if (searchText.trim()) {
-      const keyword = searchText.toLowerCase();
-      tabFiltered = tabFiltered.filter(record =>
-        Object.values(record)
-          .filter(val => typeof val === 'string')
-          .some(val => (val as string).toLowerCase().includes(keyword))
-      );
-    }
-
-    return tabFiltered;
-  };
-
-  const showImages = (record: LeakData) => {
-    const images = [
-      'https://via.placeholder.com/300x200?text=Repair+1',
-      'https://via.placeholder.com/300x200?text=Repair+2',
-    ];
-    setImageUrls(images);
-    setImageModalVisible(true);
-  };  
-
-   const renderActionButtons = (
-    actions: ('dispatch' | 'edit' | 'photos' | 'details')[],
-    record: LeakData
-  ) => (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
-      {actions.includes('dispatch') && (
-        <Button
-          icon={<CarOutlined />}
-          style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
-          onClick={() => showModal('Dispatch', record)}
-        />
-      )}
-      {actions.includes('edit') && (
-        <Button
-          icon={<EditOutlined />}
-          style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
-          onClick={() => showModal('Update Report', record)}
-        />
-      )}
-      {actions.includes('photos') && (
-      <Button
-        icon={<FileImageOutlined />}
-        style={{ backgroundColor: '#3a3ae6ff', border: 'none', color: '#FFFFFF' }}
-        onClick={() => showImages(record)}
-      />
-      )}
-      {actions.includes('details') && (
-        <Button
-          icon={<FileSearchOutlined />}
-          style={{ backgroundColor: '#00008B', border: 'none', color: '#FFFFFF' }}
-          onClick={() => showModal('Report Details', record)}
-        />
-      )}
-    </div>
-  );
-  const getColumns = (tabKey: string): ColumnsType<LeakData> => {
-    const keys = columnPresets[tabKey] || columnPresets['customer'];
-    const cols = keys.map(k => columnMap[k]);
-
-    const actions = tabActionsMap[tabKey] || tabActionsMap['default'];
-
-    const actionColumn: ColumnsType<LeakData>[number] = {
-      title: 'Actions',
-      key: 'action',
-      fixed: 'right',
-      width: '120',
-      render: (_, record) => renderActionButtons(actions, record),
-    };
-
-    return [...cols, actionColumn];
-  };
-
-
-  const dispatchField = [
-    { label: 'REPORT ID', value: selectedRecord?.id },
-    { label: 'REFERENCE METER', value: selectedRecord?.referenceMeter },
-    { label: 'LOCATION', value: selectedRecord?.location },
-    { label: 'LANDMARK', value: selectedRecord?.landmark },
-    { label: 'CONTACT NO.', value: selectedRecord?.contactNo },
-    { label: 'LEAK TYPE', value: selectedRecord?.leakType },
-    { label: 'LEAK PRESSURE', value: selectedRecord?.leakPressure || 'N/A' },
-  ];
 
   return (
-    <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Operation</Breadcrumb.Item>
-          <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
-        </Breadcrumb>
-        <Input.Search placeholder="Search" allowClear style={{ width: 300 }} onChange={e => setSearchText(e.target.value.toLowerCase())} />
-      </div>
+    <div style={{ padding: 24 }}>
+      <Input.Search
+        placeholder="Search..."
+        allowClear
+        style={{ width: 300, marginBottom: 16 }}
+        onChange={(e) => setSearchText(e.target.value)}
+      />
 
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-        <span style={{ marginRight: 8 }}>Display</span>
-        <Select defaultValue="10" style={{ width: 80 }}>
-          <Option value="10">10</Option>
-          <Option value="20">20</Option>
-          <Option value="50">50</Option>
-        </Select>
-        <span style={{ marginLeft: 8 }}>records per page</span>
-      </div>
-
-      <Card bodyStyle={{ padding: 25 }} style={{ marginBottom: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.05)', borderRadius: 8 }}>
-        <Tabs activeKey={activeTab} onChange={key => setActiveTab(key)} type="card" className='custom-tabs'>
+      <Card bodyStyle={{ padding: 16 }}>
+        <Tabs activeKey={activeTab} onChange={setActiveTab}>
           {Object.entries(tabLabels).map(([key, label]) => (
             <TabPane
               key={key}
               tab={
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, width: '100%' }}>
-                  {label}
-                  {!['repaired', 'after', 'notfound'].includes(key) && (
-                    <Badge count={filteredData(key).length} color="blue" overflowCount={99} size="small" style={{ paddingInline: 6, borderRadius: 4 }} />
-                  )}
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {label}
+                  </span>
+                  <Badge count={tabCounts[key] ?? 0} size="small" />
                 </span>
               }
             />
           ))}
         </Tabs>
+
         <Table
-          columns={getColumns(activeTab)}
-          dataSource={filteredData(activeTab)}
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: 'max-content' }}
-          bordered
+          columns={columnPresets[activeTab]}
+          dataSource={data}
+          loading={loading}
+          pagination={{
+            current: pageIndex,
+            pageSize,
+            total,
+            onChange: (page, size) => {
+              setPageIndex(page);
+              setPageSize(size);
+            },
+          }}
+          rowKey="id"
         />
       </Card>
 
       <DispatchModal
         visible={modalVisible && modalTitle === 'Dispatch'}
         onCancel={handleCancel}
-        record={selectedRecord}
-        fields={dispatchField}
+        record={selectedRecord ?? undefined}
+        fields={
+          selectedRecord
+            ? [
+                { label: 'REPORT ID', value: String(selectedRecord.id) },
+                { label: 'REFERENCE METER', value: selectedRecord.referenceMeter },
+                { label: 'LOCATION', value: selectedRecord.location },
+              ]
+            : []
+        }
       />
 
       <UpdateReport
         visible={modalVisible && modalTitle === 'Update Report'}
-        record={selectedRecord}
+        record={selectedRecord ? { ...selectedRecord, id: String(selectedRecord.id) } : null}
         formValues={formValues}
-        onChange={handleInputChange}
+        onChange={(field, value) => setFormValues((prev) => ({ ...prev, [field]: value }))}
         onCancel={handleCancel}
-        onSubmit={handleUpdateSubmit}
+        onSubmit={() => {
+          if (!selectedRecord) return;
+          const index = data.findIndex((d) => d.id === selectedRecord.id);
+          if (index !== -1) data[index] = { ...data[index], ...formValues } as LeakData;
+          handleCancel();
+        }}
       />
 
       <ReportDetails
         visible={modalVisible && modalTitle === 'Report Details'}
-        record={selectedRecord}
-        onCancel={handleCancel}
+        record={selectedRecord ? { ...selectedRecord, id: String(selectedRecord.id) } : null}
         activeTab={activeTab}
-        columnMap={columnMap}
-        columnPresets={columnPresets}
+        columnMap={{}}
+        columnPresets={{}}
+        onCancel={handleCancel}
       />
 
       <ImageModal
