@@ -23,6 +23,7 @@ import {
 } from 'react-router-dom';
 
 import Login from './components/Login';
+import dcwdIcon from './assets/image/dcwd.jpg';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
 import Settings from './components/Settings';
@@ -55,7 +56,7 @@ const bulletLabel = (text: string) => (
         width: 6,
         height: 6,
         borderRadius: '50%',
-        backgroundColor: '#333',
+        backgroundColor: '#ffffff',
         marginRight: 8,
         marginLeft: 2,
       }}
@@ -66,25 +67,15 @@ const bulletLabel = (text: string) => (
 
 const items: MenuItem[] = [
   { key: 'home', label: 'Home', icon: <HomeOutlined style={iconSize} /> },
-  {
-    key: 'create-report',
-    label: 'Create a Report',
-    icon: <FileTextOutlined style={iconSize} />,
-  },
-  {
-    key: 'operation',
-    label: 'Operation',
-    icon: <AppstoreOutlined style={iconSize} />,
+  { key: 'create-report', label: 'Create a Report', icon: <FileTextOutlined style={iconSize} />},
+  { key: 'operation', label: 'Operation', icon: <AppstoreOutlined style={iconSize} />,
     children: [
       { key: 'leak-reports', label: bulletLabel('Leak Reports') },
       { key: 'supply-complaints', label: bulletLabel('Supply Complaints') },
       { key: 'quality-complaints', label: bulletLabel('Quality Complaints') },
     ],
   },
-  {
-    key: 'maintenance',
-    label: 'System Maintenance',
-    icon: <ClusterOutlined style={iconSize} />,
+  { key: 'maintenance', label: 'System Maintenance', icon: <ClusterOutlined style={iconSize} />,
     children: [
       { key: 'dispatch-override', label: bulletLabel('Dispatch Override') },
       { key: 'caretaker-assignment', label: bulletLabel('Caretaker Assignment') },
@@ -98,12 +89,29 @@ const items: MenuItem[] = [
   { key: 'logout', label: 'Logout', icon: <LogoutOutlined style={iconSize} /> },
 ];
 
+const getSidebarWidth = () => {
+  const screenWidth = window.innerWidth;
+  if (screenWidth >= 1600) return Math.min(screenWidth * 0.2, 300); 
+  if (screenWidth >= 1200) return Math.min(screenWidth * 0.22, 280); 
+  return 280;
+};
+
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
+      
+  
   const navigate = useNavigate();
   const location = useLocation();
+
+    useEffect(() => {
+      const handleResize = () => setSidebarWidth(getSidebarWidth());
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    
+
 
   const onClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
@@ -137,77 +145,55 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
-  const siderWidth = collapsed ? 80 : 280;
-
   return (
     <>
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout>
         <Sider
+          breakpoint='lg'
+          onBreakpoint={(broken) => setCollapsed(broken)}
           trigger={null}
           collapsible
           collapsed={collapsed}
-          collapsedWidth={80}
-          width={280}
-          style={{
-            position: 'fixed',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            zIndex: 1000,
-            height: '100vh',
-            backgroundColor: '#D0EBFF',
-            overflowY: 'auto',
-            boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
-            transition: 'all 0.2s ease',
-          }}
+          width={sidebarWidth}
+          className={`custom-sider ${collapsed ? 'collapsed' : ''}`}
         >
-          <div style={{ padding: 20, textAlign: 'center' }}>
-            {!collapsed && (
+          <div className = 'sider-logo-wrapper'>
+            {collapsed ? (
+              <img
+                src={dcwdIcon}
+                alt="DCWD Icon"
+                className='sider-logo collapsed-logo'
+              />
+            ):(
               <img
                 src={dcwd}
-                alt="DCWD Logo"
-                style={{ maxWidth: '80%', height: 'auto', borderRadius: 8 }}
+                alt ="DCWD Logo"
+                className= 'sider-logo expanded-logo'
               />
             )}
           </div>
           <Menu
+            className="custom-sidebar-menu"
             onClick={onClick}
             selectedKeys={[location.pathname.replace('/', '') || 'home']}
             mode="inline"
             items={items}
-            style={{
-              fontSize: '16px',
-              backgroundColor: '#D0EBFF',
-              color: 'white',
-              border: 'none',
-            }}
             theme="light"
           />
         </Sider>
 
-        <Layout style={{ marginLeft: siderWidth, transition: 'margin-left 0.2s ease' }}>
+        <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease' }}>
           <Header
+            className='custom-header'
             style={{
-              position: 'fixed',
-              top: 0,
-              left: siderWidth,
-              right: 0,
-              height: 64,
-              padding: '0 24px',
-              backgroundColor: '#d9edff',
-              borderBottom: '1px solid #D0EBFF',
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '18px',
-              fontWeight: 600,
-              zIndex: 1000,
+              left: collapsed? 80: sidebarWidth,
             }}
           >
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={() => setCollapsed(!collapsed)}
-              style={{ fontSize: '16px', marginRight: 16 }}
+              style={{ fontSize: '16px', marginRight: 16, color: 'white'}}
             />
             <span>Leak Reporting System</span>
           </Header>
@@ -216,7 +202,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             style={{
               marginTop: 64,
               padding: 24,
-              backgroundColor: '#E7F2FF',
+              backgroundColor: '#ffffff',
               minHeight: 'calc(100vh - 64px)',
             }}
           >
@@ -252,8 +238,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
 const WaterSupplyConcernsWrapper: React.FC = () => {
   const location = useLocation();
-  const formType =
-    (location.state as any)?.formType ?? 'no_water';
+  const formType = (location.state as any)?.formType ?? 'no_water';
 
   return <WaterSupplyConcern formType={formType} />;
 };
@@ -265,16 +250,52 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    const expiry = localStorage.getItem("token_expiry");
+
+    if (token && expiry) {
+      const now = Date.now();
+      const expiryTime = parseInt(expiry, 10);
+
+      if (now > expiryTime) {
+        handleLogout();
+      } else {
+        setIsLoggedIn(true);
+
+        const timeout = expiryTime - now;
+        const timer = setTimeout(() => {
+          handleLogout();
+        }, timeout);
+
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setIsLoggedIn(false);
+    }
   }, []);
 
   const handleLogin = (token: string) => {
+    const expiry = new Date().getTime() + 24 * 60 * 60 * 1000;
     localStorage.setItem("token", token);
+    localStorage.setItem("token_expiry", expiry.toString());
     setIsLoggedIn(true);
+
+    setupAutoLogout(expiry);
+  };
+
+  const setupAutoLogout = (expiry:number) => {
+    const timeout = expiry - new Date ().getTime();
+    if (timeout > 0) {
+      setTimeout (() => {
+        handleLogout();
+      }, timeout);
+    } else {
+      handleLogout();
+    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("token_expiry"); 
     localStorage.removeItem("debug_user_data");
     setIsLoggedIn(false);
   };

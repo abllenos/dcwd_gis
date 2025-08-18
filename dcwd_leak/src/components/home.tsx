@@ -127,7 +127,7 @@ const Home: React.FC = () => {
                 <Card
                   bordered={false}
                   style={{
-                    backgroundColor: '#6ba5f7ff',
+                    backgroundColor: '#2d7be9ff',
                     color: 'white',
                     transition: 'box-shadow 0.3s, transform 0.3s',
                     boxShadow: '0 2px 12px rgba(24, 144, 255, 0.15)',
