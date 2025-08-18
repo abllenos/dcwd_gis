@@ -11,7 +11,7 @@ import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu, Button, Modal } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   BrowserRouter as Router,
@@ -99,14 +99,14 @@ const items: MenuItem[] = [
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false); 
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const onClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
-      onLogout();
-      navigate('/login');
+      setLogoutModalVisible(true);
     } else if (e.key === 'create-report') {
       setModalVisible(true);
     } else {
@@ -114,10 +114,16 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
+  const handleLogoutConfirmed = () => {
+    setLogoutModalVisible(false);
+    onLogout();
+    navigate('/login');
+  };
+
   const handleModalSelect = (option: string) => {
     setModalVisible(false);
 
-    switch(option) {
+    switch (option) {
       case 'no_water':
         navigate('/water-supply-concerns', { state: { formType: 'no_water' } });
         break;
@@ -153,7 +159,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             left: 0,
             zIndex: 1000,
             height: '100vh',
-            backgroundColor: '#D0EBFF',
+            backgroundColor: '#d0e8faff',
             overflowY: 'auto',
             boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
             transition: 'all 0.2s ease',
@@ -175,11 +181,12 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             items={items}
             style={{
               fontSize: '16px',
-              backgroundColor: '#D0EBFF',
+              backgroundColor: '#d0e8faff',
               color: 'white',
               border: 'none',
             }}
             theme="light"
+            className="custom-sidebar-menu"
           />
         </Sider>
 
@@ -192,8 +199,8 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               right: 0,
               height: 64,
               padding: '0 24px',
-              backgroundColor: '#d9edff',
-              borderBottom: '1px solid #D0EBFF',
+              backgroundColor: '#d0e8faff',
+              borderBottom: '1px solid #b6daf5ff',
               display: 'flex',
               alignItems: 'center',
               fontSize: '18px',
@@ -214,7 +221,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             style={{
               marginTop: 64,
               padding: 24,
-              backgroundColor: '#E7F2FF',
+              backgroundColor: '#ffffff',
               minHeight: 'calc(100vh - 64px)',
             }}
           >
@@ -243,10 +250,71 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         onCancel={() => setModalVisible(false)}
         onSelect={handleModalSelect}
       />
+<Modal
+  title={
+    <div style={{ textAlign: 'center', width: '100%' }}>
+      <span style={{ fontSize: '20px', fontWeight: 600, color: '#17212eff' }}>
+        Confirm Logout
+      </span>
+    </div>
+  }
+  visible={logoutModalVisible}
+  onOk={handleLogoutConfirmed}
+  onCancel={() => setLogoutModalVisible(false)}
+  okText="Logout"
+  cancelText="Cancel"
+  centered
+  width={500}
+  closeIcon={null}
+  okButtonProps={{
+     type: 'primary', 
+     danger: true,  
+     style: {
+      padding: '6px 20px',
+      fontSize: '15px',
+      borderRadius: '6px',
+      width: '120px',
+    },
+  }}
+  cancelButtonProps={{
+    style: {
+      padding: '6px 20px',
+      fontSize: '15px',
+      borderRadius: '6px',
+      width: '120px',
+    },
+  }}
+  style={{ textAlign: 'center' }} 
+  footer={(_, { OkBtn, CancelBtn }) => (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+      <CancelBtn />
+      <OkBtn />
+    </div>
+  )}
+>
+  <div
+    style={{
+      background: '#E7F4FF',
+      padding: '20px 30px',
+      borderRadius: 8,
+    }}
+  >
+    <p
+      style={{
+        color: '#003A8C',
+        margin: 0,
+        fontSize: '16px',
+        fontWeight: 500,
+        textAlign: 'center',
+      }}
+    >
+      Do you really want to log out of the system?
+    </p>
+  </div>
+</Modal>
     </>
   );
 };
-
 
 const WaterSupplyConcernsWrapper: React.FC = () => {
   const location = useLocation();

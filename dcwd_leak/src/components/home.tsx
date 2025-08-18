@@ -1,4 +1,4 @@
-import { Table, Tag, Card, Row, Col, } from 'antd';
+import { Table, Tag, Card, Row, Col } from 'antd';
 import {
   FileTextOutlined,
   ClockCircleOutlined,
@@ -13,7 +13,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-
 
 interface DataType {
   key: string;
@@ -98,11 +97,8 @@ const Home: React.FC = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <Row gutter={[24, 24]}>
-        {/* Left Column */}
-        {/* Cards and Chart in the same row */}
         <Col xs={24} lg={16}>
           <Row gutter={[16, 16]}>
-            {/* Welcome Card Full Width */}
             <Col xs={24}>
               <Card
                 bordered={false}
@@ -115,33 +111,19 @@ const Home: React.FC = () => {
                   animation: 'gradientLoop 6s ease infinite',
                   padding: '26px 22px 18px 22px',
                   marginBottom: 8,
+                   transform: 'none',   
+                  transition: 'none',      
+                 cursor: 'default'   
                 }}
               >
                 <h1 style={{ fontSize: '2.1rem', fontWeight: 'bold', marginBottom: 8, letterSpacing: 1 }}>Welcome, Bam!</h1>
                 <p style={{ opacity: 0.92 }}>You're now viewing the latest leak report dashboard.</p>
               </Card>
             </Col>
-            {/* Stat Cards in a Row */}
+
             <Col xs={24}>
               <div style={{ display: 'flex', gap: 16 }}>
-                <Card
-                  bordered={false}
-                  style={{
-                    backgroundColor: '#6ba5f7ff',
-                    color: 'white',
-                    transition: 'box-shadow 0.3s, transform 0.3s',
-                    boxShadow: '0 2px 12px rgba(24, 144, 255, 0.15)',
-                    cursor: 'pointer',
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: 115,
-                    maxHeight: 150,
-                    height: 140,
-                  }}
-                  bodyStyle={{ width: '100%' }}
-                  className="stat-card stat-card-total"
-                >
+                <Card bordered={false} style={statCardStyle('#6ba5f7ff', 'rgba(24, 144, 255, 0.15)')}>
                   <div className="flex justify-between items-center">
                     <div>
                       <div style={{ fontSize: '1.1rem' }}>Total Reports</div>
@@ -150,24 +132,7 @@ const Home: React.FC = () => {
                     <FileTextOutlined style={{ fontSize: 22, opacity: 0.3 }} />
                   </div>
                 </Card>
-                <Card
-                  bordered={false}
-                  style={{
-                    backgroundColor: '#49862aff',
-                    color: 'white',
-                    transition: 'box-shadow 0.3s, transform 0.3s',
-                    boxShadow: '0 2px 12px rgba(73, 134, 42, 0.15)',
-                    cursor: 'pointer',
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: 115,
-                    maxHeight: 150,
-                    height: 140,
-                  }}
-                  bodyStyle={{ width: '100%' }}
-                  className="stat-card stat-card-dispatched"
-                >
+                <Card bordered={false} style={statCardStyle('#49862aff', 'rgba(73, 134, 42, 0.15)')}>
                   <div className="flex justify-between items-center">
                     <div>
                       <div style={{ fontSize: '1.1rem' }}>Dispatched</div>
@@ -176,24 +141,7 @@ const Home: React.FC = () => {
                     <CheckCircleOutlined style={{ fontSize: 22, opacity: 0.3 }} />
                   </div>
                 </Card>
-                <Card
-                  bordered={false}
-                  style={{
-                    backgroundColor: '#df811dff',
-                    color: 'white',
-                    transition: 'box-shadow 0.3s, transform 0.3s',
-                    boxShadow: '0 2px 12px rgba(223, 129, 29, 0.15)',
-                    cursor: 'pointer',
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: 115,
-                    maxHeight: 150,
-                    height: 140,
-                  }}
-                  bodyStyle={{ width: '100%' }}
-                  className="stat-card stat-card-pending"
-                >
+                <Card bordered={false} style={statCardStyle('#df811dff', 'rgba(223, 129, 29, 0.15)')}>
                   <div className="flex justify-between items-center">
                     <div>
                       <div style={{ fontSize: '1.1rem' }}>Pending</div>
@@ -205,48 +153,97 @@ const Home: React.FC = () => {
               </div>
             </Col>
           </Row>
-          <style>
-            {`
-              .stat-card:hover {
-                box-shadow: 0 6px 24px rgba(24, 144, 255, 0.25), 0 1.5px 6px rgba(0,0,0,0.08);
-                transform: translateY(-4px) scale(1.03);
-              }
-            `}
-          </style>
         </Col>
+
         <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
           <Card
             title="Monthly Leak Reports"
             bordered={false}
-            style={{ height: '100%', minHeight: 360, width: '100%', minWidth: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-            bodyStyle={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 10px 0 10px', height: '100%', minHeight: 360 }}
+            style={{
+              height: '100%',
+              minHeight: 360,
+              width: '100%',
+              minWidth: 350,
+              backgroundColor: '#F8FBFF',
+              border: '1px solid #D0E4F7',
+              borderRadius: 8,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+            }}
+            bodyStyle={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '10px 10px 0 10px',
+              height: '100%',
+              minHeight: 360,
+            }}
           >
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData} margin={{ top: 10, right: 30, bottom: 10, left: 40 }}>
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  interval={0}
-                  tick={{ dy: 10, fontSize: 13 }}
-                />
-                <YAxis axisLine={false} tickLine={false} width={30} />
-                <Tooltip contentStyle={{ fontSize: 12 }} />
-                <Line type="monotone" dataKey="reports" stroke="#1890ff" strokeWidth={1.5} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+<ResponsiveContainer width="100%" height={300}>
+  <LineChart 
+    data={chartData} 
+    margin={{ top: 10, right: 30, bottom: 30, left: 40 }}
+  >
+    <XAxis 
+      dataKey="name" 
+      axisLine={false} 
+      tickLine={false} 
+      interval={0} 
+      tick={{ dy: 8, fontSize: 13 }} 
+    />
+    <YAxis axisLine={false} tickLine={false} width={30} />
+    <Tooltip contentStyle={{ fontSize: 12 }} />
+    <Line 
+      type="monotone" 
+      dataKey="reports" 
+      stroke="#1890ff" 
+      strokeWidth={1.5} 
+      dot={false} 
+    />
+  </LineChart>
+</ResponsiveContainer>
+
           </Card>
         </Col>
 
-        {/* Table below cards and chart */}
         <Col xs={24}>
-          <h2 className="text-xl font-semibold mb-4 mt-4"></h2>
-          <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered style={{ width: '100%' }} />
+          <div style={{
+            backgroundColor: '#F8FBFF',
+            border: '1px solid #D0E4F7',
+            borderRadius: 8,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+            padding: '12px',
+          }}>
+            <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered style={{ width: '100%' }} />
+          </div>
         </Col>
-
       </Row>
+
+      <style>
+        {`
+          .ant-card:hover {
+            box-shadow: 0 6px 24px rgba(24, 144, 255, 0.25), 0 1.5px 6px rgba(0,0,0,0.08);
+            transform: translateY(-4px) scale(1.03);
+          }
+        `}
+      </style>
     </div>
   );
 };
+
+const statCardStyle = (bgColor: string, shadowColor: string) => ({
+  backgroundColor: bgColor,
+  color: 'white',
+  transition: 'box-shadow 0.3s, transform 0.3s',
+  boxShadow: `0 2px 12px ${shadowColor}`,
+  cursor: 'pointer',
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  minHeight: 115,
+  maxHeight: 150,
+  height: 140,
+  borderRadius: 8,
+});
 
 export default Home;
