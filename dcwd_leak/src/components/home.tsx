@@ -132,7 +132,7 @@ const Home: React.FC = () => {
               <Card
                 bordered={false}
                 style={{
-                  background: 'linear-gradient(200deg, #726e6eff, #4c85d4ff, #726e6eff, #1b1a1aff)',
+                  background: 'linear-gradient(200deg, #b3b0b0ff, #49758aff, #726e6eff, #e4dfdfff)',
                   backgroundSize: '750% 750%',
                   color: 'white',
                   borderRadius: '12px',
@@ -201,30 +201,38 @@ const Home: React.FC = () => {
           </Row>
         </Col>
 
-        <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
-          <Card
-            title="Monthly Leak Reports"
-           bordered={false}
-            style={{
-           height: '100%',
-           minHeight: 360,
-           width: '100%',
-           minWidth: 350,
-           backgroundColor: '#ffffffff',   
-           border: '1px solid #e0ddddff',  
-           borderRadius: 8,
-           boxShadow: 'none',            
-           }}
-            bodyStyle={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '10px 10px 0 10px',
-              height: '100%',
-              minHeight: 360,
-            }}
-          >
+         <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
+<Card
+  title="Monthly Leak Reports"
+  bordered={false}
+  headStyle={{
+    backgroundColor: '#c9c7c7ff',   
+    color: '#1d1b1bff',            
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    fontSize: '0.85rem',
+  }}
+  style={{
+    height: '80%',
+    minHeight: 353,
+    width: '100%',
+    minWidth: 350,
+    backgroundColor: '#ffffffff',
+    border: '1px solid #a3a8aaff',
+    borderRadius: 8,
+    boxShadow: 'none',
+    overflow: 'hidden',
+  }}
+  bodyStyle={{
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 10px 0 10px',
+    height: '90%',
+  }}
+>
+            
 <ResponsiveContainer width="100%" height={300}>
   <LineChart 
     data={chartData} 
@@ -242,7 +250,7 @@ const Home: React.FC = () => {
     <Line 
       type="monotone" 
       dataKey="reports" 
-      stroke="#0e41a0ff"
+      stroke="#354785ff"
       strokeWidth={1.5} 
       dot={false} 
     />
@@ -259,6 +267,7 @@ const Home: React.FC = () => {
             boxShadow: 'none',
             padding: '12px',
           }}>
+
 <Table<DataType>
               columns={columns}
               dataSource={data}
@@ -277,21 +286,29 @@ const Home: React.FC = () => {
       transform: translateY(-2px);
     }
 
+    /* Header style */
     .ant-table-thead > tr > th {
-      background-color: #d1cdcdff !important;
+      background-color: #0c4a67 !important;
+      color: #ffffff !important;
       font-weight: 600 !important;
       text-transform: uppercase;
       font-size: 0.85rem;
     }
 
-    .ant-table,
-    .ant-table-container,
-    .ant-table-tbody > tr > td,
-    .ant-table-thead > tr > th {
-      border-color: #d2d4d8ff !important;
+    /* ✅ Only blue border around the table */
+    .ant-table {
+      border: 2px solid #0f6288ff !important; /* Ant Design blue */
+      border-radius: 6px; /* optional */
+      overflow: hidden;
+    }
+
+    /* Remove inner borders */
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+      border: none !important;
     }
   `}
-     </style>
+      </style>
     </div>
   );
 };

@@ -39,10 +39,10 @@ import Reports from './components/Report/Reports';
 import LeakOptionsModal from './components/Modals/LeakOptionsModal';
 import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
 import ReportALeak from './components/CreateReport/ReportALeak';
+import LogoutModal from './components/Modals/LogoutModal'; 
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
-
 
 const { Sider, Header, Content } = Layout;
 type MenuItem = Required<MenuProps>['items'][number];
@@ -99,24 +99,21 @@ const getSidebarWidth = () => {
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
       
-  
   const navigate = useNavigate();
   const location = useLocation();
 
-    useEffect(() => {
-      const handleResize = () => setSidebarWidth(getSidebarWidth());
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-    
-
+  useEffect(() => {
+    const handleResize = () => setSidebarWidth(getSidebarWidth());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const onClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
-      onLogout();
-      navigate('/login');
+      setLogoutModalVisible(true); 
     } else if (e.key === 'create-report') {
       setModalVisible(true);
     } else {
@@ -145,6 +142,12 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
+  const handleLogoutConfirmed = () => {
+    setLogoutModalVisible(false);
+    onLogout();
+    navigate('/login');
+  };
+
   return (
     <>
       <Layout>
@@ -159,17 +162,9 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         >
           <div className = 'sider-logo-wrapper'>
             {collapsed ? (
-              <img
-                src={dcwdIcon}
-                alt="DCWD Icon"
-                className='sider-logo collapsed-logo'
-              />
-            ):(
-              <img
-                src={dcwd}
-                alt ="DCWD Logo"
-                className= 'sider-logo expanded-logo'
-              />
+              <img src={dcwdIcon} alt="DCWD Icon" className='sider-logo collapsed-logo' />
+            ) : (
+              <img src={dcwd} alt ="DCWD Logo" className= 'sider-logo expanded-logo' />
             )}
           </div>
           <Menu
@@ -185,9 +180,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease' }}>
           <Header
             className='custom-header'
-            style={{
-              left: collapsed? 80: sidebarWidth,
-            }}
+            style={{ left: collapsed? 80: sidebarWidth }}
           >
             <Button
               type="text"
@@ -231,15 +224,19 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         onCancel={() => setModalVisible(false)}
         onSelect={handleModalSelect}
       />
+
+      <LogoutModal
+        visible={logoutModalVisible}
+        onConfirm={handleLogoutConfirmed}
+        onCancel={() => setLogoutModalVisible(false)}
+      />
     </>
   );
 };
 
-
 const WaterSupplyConcernsWrapper: React.FC = () => {
   const location = useLocation();
   const formType = (location.state as any)?.formType ?? 'no_water';
-
   return <WaterSupplyConcern formType={formType} />;
 };
 
@@ -303,10 +300,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/login"
-          element={<Login onLogin={handleLogin} />}
-        />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route
           path="/*"
           element={
