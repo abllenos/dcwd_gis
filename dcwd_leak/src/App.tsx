@@ -182,7 +182,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           />
         </Sider>
 
-        <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease' }}>
+        <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.7)', }}>
           <Header
             className='custom-header'
             style={{

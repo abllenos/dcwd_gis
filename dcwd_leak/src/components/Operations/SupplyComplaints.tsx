@@ -149,14 +149,14 @@ const SupplyComplaints: React.FC = () => {
         </Breadcrumb>
         
         <Input.Search
-          placeholder="Search"
+          placeholder="Search..."
           allowClear
           style={{ width: 300 }}
           onChange={e => setSearchText(e.target.value.toLowerCase())}
         />
       </div>
 
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
+      <Card className='custom-card'>
         <Tabs
           activeKey={activeTab}
           onChange={key => setActiveTab(key)}
@@ -166,7 +166,7 @@ const SupplyComplaints: React.FC = () => {
           <TabPane tab="Reports" key="reports" />
           <TabPane tab="On-Process" key="onprocess" />
           <TabPane tab="Completed" key="completed" />
-        </Tabs>
+        </Tabs> 
         <Table
           columns={columns}
           dataSource={filteredData()}

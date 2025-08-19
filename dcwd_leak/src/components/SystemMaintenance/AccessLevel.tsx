@@ -7,9 +7,9 @@ import {
   Input,
   Modal,
 } from 'antd';
-import { FileSearchOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, HomeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-
+import { useNavigate } from 'react-router-dom';
 
 interface AccessLevelData {
   key: string;
@@ -32,6 +32,12 @@ const AccessLevel: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<AccessLevelData | null>(null);
+
+  const navigate = useNavigate();
+
+   const handleHomeClick = () => {
+    navigate('/home');
+  };
 
   const showDetails = (record: AccessLevelData) => {
     setSelectedRecord(record);
@@ -84,12 +90,20 @@ const AccessLevel: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
-        <Breadcrumb.Item>Operation</Breadcrumb.Item>
-        <Breadcrumb.Item>Supply Complaints</Breadcrumb.Item>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+         <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+            icon={<HomeOutlined />}
+            onClick={handleHomeClick}
+            type="text"
+            style={{ fontSize: 16, color: '#00008B', margin: 0 }}
+            shape="circle"
+          />
+        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
+        <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
+        <Breadcrumb.Item>Access Level</Breadcrumb.Item>
         </Breadcrumb>
-        
+        </div>
         <Input.Search
           placeholder="Search"
           allowClear
@@ -98,7 +112,7 @@ const AccessLevel: React.FC = () => {
         />
       </div>
 
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
+      <Card className='custom-card'>
         <Table
           columns={columns}
           dataSource={filteredData()}
