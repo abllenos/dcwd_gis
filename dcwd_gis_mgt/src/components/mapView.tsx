@@ -34,9 +34,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ geometry, center }) => {
       return;
     }
 
+    const apiKey = process.env.REACT_APP_GOOLGE_MAPS_API_KEY;
+
     const googleMapsScript = document.createElement('script');
     googleMapsScript.id = 'google-maps-script';
-    googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=A&libraries=places&callback=initMap`;
+    googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
     googleMapsScript.async = true;
     googleMapsScript.defer = true;
     googleMapsScript.onerror = () => console.error('Error loading Google Maps script.');
