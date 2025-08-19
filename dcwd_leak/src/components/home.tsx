@@ -152,7 +152,24 @@ const Home: React.FC = () => {
 
             <Col xs={24}>
               <div style={{ display: 'flex', gap: 16 }}>
-                <Card bordered={false} style={statCardStyle('#6ba5f7ff', 'rgba(24, 144, 255, 0.15)')}>
+                <Card
+                  bordered={false}
+                  style={{
+                    backgroundColor: '#2d7be9ff',
+                    color: 'white',
+                    transition: 'box-shadow 0.3s, transform 0.3s',
+                    boxShadow: '0 2px 12px rgba(24, 144, 255, 0.15)',
+                    cursor: 'pointer',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: 115,
+                    maxHeight: 150,
+                    height: 140,
+                  }}
+                  bodyStyle={{ width: '100%' }}
+                  className="stat-card stat-card-total"
+                >
                   <div className="flex justify-between items-center">
                     <div>
                       <div style={{ fontSize: '1.1rem' }}>Total Reports</div>

@@ -46,6 +46,9 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
             borderRadius: '10px 10px 0 0',
             fontWeight: 700,
             fontSize: 16,
+            top: '-28px',
+            position: 'absolute',
+            height: 'auto',            
           }}
         >
           <EditOutlined style={{ marginRight: 8 }} />
