@@ -51,22 +51,17 @@
 
 .custom-sidebar-menu .ant-menu-item,
 .custom-sidebar-menu .ant-menu-submenu-title {
-<<<<<<< HEAD
   font-size: 16px;
   border: 1px solid rgba(250, 250, 250, 0.2);
   background-color: #0c4a67 !important; 
   color: white !important;
   margin-bottom: 12px; 
   border-radius: 6px;         
-=======
-  color: #003366 !important;
->>>>>>> 03edde4fac47f90e80704fed1e549dc81d51414f
 }
 
 
 .custom-sidebar-menu .ant-menu-item:hover,
 .custom-sidebar-menu .ant-menu-submenu-title:hover {
-<<<<<<< HEAD
   background-color: #0c4a67 !important; 
   color: #d0ebff !important;            
   font-weight: 600;
@@ -99,24 +94,6 @@
 
 .custom-sidebar-menu .ant-menu-submenu-arrow {
   color: #ffffff !important;
-=======
-  background-color: white !important;
-  color: #D0EBFF !important;
-}
-
-.custom-sidebar-menu .ant-menu-item-selected {
-  background-color: transparent !important;
-  color: #003366 !important;
-}
-
-.custom-sidebar-menu .ant-menu-item-selected .ant-menu-title-content,
-.custom-sidebar-menu .ant-menu-item:hover .ant-menu-title-content {
-  color: #003366 !important;
-}
-
-.custom-sidebar-menu .ant-menu-submenu-arrow {
-  color: #003366 !important;
->>>>>>> 03edde4fac47f90e80704fed1e549dc81d51414f
 }
 
 .custom-sidebar-menu .ant-menu-submenu-open > .ant-menu-submenu-title {
@@ -184,28 +161,9 @@
   margin-left: 80px;
 }
 
-.custom-sidebar-menu .ant-menu-item .anticon svg,
-.custom-sidebar-menu .ant-menu-submenu-title .anticon svg {
-  width: 20px !important;
-  height: 20px !important;
-  fill: #002244 !important; 
-  transition: all 0.2s ease-in-out !important;
-}
-
-.custom-sidebar-menu .ant-menu-item:hover .anticon svg,
-.custom-sidebar-menu .ant-menu-submenu-title:hover .anticon svg {
-  fill: #001122 !important; 
-  filter: drop-shadow(0 0 4px rgba(0, 51, 102, 0.6)) !important;
-  transform: scale(1.15);
-}
-
-.custom-sidebar-menu .ant-menu-item-selected .anticon svg {
-  fill: #001122 !important;
-  filter: drop-shadow(0 0 5px rgba(0, 51, 102, 0.7)) !important;
-}
 .custom-tabs .ant-tabs-nav-list {
   display: flex;
-  width: 150%;
+  width: 100%;
   overflow-x: auto;
 }
 
@@ -213,7 +171,6 @@
   flex: 1 1 auto;
   justify-content: center;
   text-align: center;
-<<<<<<< HEAD
   min-width: 150px; 
   color: #0c4a67; 
 }
@@ -242,19 +199,3 @@
   flex: none;
 }
 } */
-=======
-  min-width: 150px;
-}
-
-@media (max-width: 768px) {
-  .custom-tabs .ant-tabs-nav-list {
-    display: inline-flex;
-    width: auto;
-    min-width: max-content;
-  }
-
-  .custom-tabs .ant-tabs-tab {
-    flex: none;
-  }
-}
->>>>>>> 03edde4fac47f90e80704fed1e549dc81d51414f
