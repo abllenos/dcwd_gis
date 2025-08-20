@@ -8,7 +8,7 @@ import {
   Modal,
   Select,
 } from 'antd';
-import { FileSearchOutlined, PlusOutlined, DeleteOutlined, HomeOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, PlusOutlined, DeleteOutlined, HomeFilled } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 
@@ -155,7 +155,7 @@ const CaretakerAssignment: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Button
-            icon={<HomeOutlined />}
+            icon={<HomeFilled />}
             onClick={handleHomeClick}
             type="text"
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}

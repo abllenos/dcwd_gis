@@ -144,6 +144,7 @@
   z-index: 1100;
   transition: all 0.2s ease;
   left: 280px;
+  justify-content: space-between;
 }
 
 .custom-sider.collapsed ~ .custom-header {

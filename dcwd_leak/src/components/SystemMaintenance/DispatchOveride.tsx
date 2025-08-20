@@ -7,7 +7,7 @@ import {
   Input,
   Modal,
 } from 'antd';
-import { FileSearchOutlined, HomeOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, HomeFilled } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 
@@ -106,7 +106,7 @@ const DispatchOveride: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Button
-            icon={<HomeOutlined />}
+            icon={<HomeFilled />}
             onClick={handleHomeClick}
             type="text"
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}

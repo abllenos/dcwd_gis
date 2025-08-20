@@ -3,7 +3,7 @@ import 'antd/dist/reset.css';
 import {
   AppstoreOutlined,
   HomeOutlined,
-  SettingOutlined,
+  UserOutlined,
   FileTextOutlined,
   ClusterOutlined,
   FileOutlined,
@@ -85,14 +85,13 @@ const items: MenuItem[] = [
     ],
   },
   { key: 'reports', label: 'Reports', icon: <FileOutlined style={iconSize} /> },
-  { key: 'settings', label: 'Settings', icon: <SettingOutlined style={iconSize} /> },
-  { key: 'logout', label: 'Logout', icon: <LogoutOutlined style={iconSize} /> },
+
 ];
 
 const getSidebarWidth = () => {
   const screenWidth = window.innerWidth;
   if (screenWidth >= 1600) return Math.min(screenWidth * 0.2, 300); 
-  if (screenWidth >= 1200) return Math.min(screenWidth * 0.22, 280); 
+  if (screenWidth >= 1200) return Math.min(screenWidth * 0.22, 285); 
   return 280;
 };
 
@@ -189,6 +188,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               left: collapsed? 80: sidebarWidth,
             }}
           >
+          <div style={{display: 'flex', alignItems: 'center'}}>  
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -196,6 +196,25 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               style={{ fontSize: '16px', marginRight: 16, color: 'white'}}
             />
             <span>Leak Reporting System</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Button
+              type="text"
+              icon={<UserOutlined />}
+              style={{ color: 'white' }}
+              onClick={() => navigate('/settings')}
+            />
+            <Button
+              type="text"
+              icon={<LogoutOutlined />}
+              style={{ color: 'white' }}
+              onClick={() => {
+                onLogout();
+                navigate('/login');
+              }}
+            />
+          </div>  
           </Header>
 
           <Content

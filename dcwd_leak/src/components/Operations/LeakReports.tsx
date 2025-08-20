@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Tabs, Button, Input, Badge, Card, Breadcrumb } from 'antd';
-import { EditOutlined, CarOutlined, FileSearchOutlined, FileImageOutlined } from '@ant-design/icons';
+import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled } from '@ant-design/icons';
 import axios from 'axios';
 import DispatchModal from '../Modals/DispatchModal';
 import UpdateReport from '../Modals/UpdateModal';
@@ -8,6 +8,7 @@ import ReportDetails from '../Modals/ReportModal';
 import ImageModal from '../Modals/ImageModal';
 import type { ColumnsType } from 'antd/es/table';
 import type { LeakData } from '../../types/Leakdata';
+import { useNavigate } from 'react-router-dom';
 
 import '../../styles/card.css';
 
@@ -64,7 +65,12 @@ const LeakReports: React.FC = () => {
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-
+   const navigate = useNavigate();
+ 
+   const handleHomeClick = () => {
+     navigate('/home');
+   };
+  
   const fetchCounts = async () => {
     const counts: Record<string, number> = {};
     await Promise.all(
@@ -144,8 +150,8 @@ const LeakReports: React.FC = () => {
   }, [activeTab, pageIndex, pageSize]);
 
   const renderActionButtons = (record: LeakData) => (
-    <div style={{ display: 'flex', gap: 4 }}>
-      <Button icon={<CarOutlined />} onClick={() => showModal('Dispatch', record)} />
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
+      <Button icon={<TruckOutlined />} onClick={() => showModal('Dispatch', record)} />
       <Button icon={<EditOutlined />} onClick={() => showModal('Update Report', record)} />
       <Button
         icon={<FileImageOutlined />}
@@ -276,12 +282,20 @@ const columnPresets: Record<string, ColumnsType<LeakData>> = {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+            icon={<HomeFilled />}
+            onClick={handleHomeClick}
+            type="text"
+            style={{ fontSize: 16, color: '#00008B', margin: 0 }}
+            shape="circle"
+          />
+        <Breadcrumb style={{fontSize: 16, fontWeight: 500 }}>
           <Breadcrumb.Item>Operation</Breadcrumb.Item>
           <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
         </Breadcrumb>
-
+        </div>
       <Input.Search
         placeholder="Search..."
         allowClear
