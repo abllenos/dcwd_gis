@@ -22,7 +22,7 @@ const baseButtonStyle: React.CSSProperties = {
   justifyContent: "center",
   alignItems: "center",
   borderRadius: 8,
-  backgroundColor: "#71AEEA",
+  backgroundColor: "#0c4a67",
   color: "#fff",
   boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
   transition: "all 0.25s ease-in-out",
@@ -34,7 +34,7 @@ const handleMouseOver = (e: React.MouseEvent<HTMLButtonElement>) => {
 };
 
 const handleMouseOut = (e: React.MouseEvent<HTMLButtonElement>) => {
-  e.currentTarget.style.backgroundColor = "#71AEEA";
+  e.currentTarget.style.backgroundColor = "#0c4a67";
   e.currentTarget.style.transform = "translateY(0)";
 };
 

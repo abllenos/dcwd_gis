@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tabs, Button, Input, Badge, Card } from 'antd';
-import { EditOutlined, CarOutlined, FileSearchOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Table, Tabs, Button, Input, Badge, Card, Breadcrumb } from 'antd';
+import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled } from '@ant-design/icons';
 import axios from 'axios';
 import DispatchModal from '../Modals/DispatchModal';
-import UpdateReport from '../Modals/UpdateReport';
-import ReportDetails from '../Modals/ReportDetails';
+import UpdateReport from '../Modals/UpdateModal';
+import ReportDetails from '../Modals/ReportModal';
 import ImageModal from '../Modals/ImageModal';
 import type { ColumnsType } from 'antd/es/table';
 import type { LeakData } from '../../types/Leakdata';
+import { useNavigate } from 'react-router-dom';
+
+import '../../styles/card.css';
 
 const { TabPane } = Tabs;
 
@@ -33,6 +36,19 @@ const tabFilters: Record<string, { dispatchStat: number; flgLeakDetection?: numb
   notfound: { dispatchStat: 7 },
 };
 
+// const tabActionsMap: Record<
+//   string,
+//   ('dispatch' | 'edit' | 'details' | 'photos')[]
+// > = {
+//   repaired: ['details'],
+//   dispatched: ['details'],
+//   turnover: ['dispatch', 'details'],
+//   after: ['details'],
+//   notfound: ['details'],
+//   scheduled: ['details', 'photos', 'dispatch'], 
+//   default: ['dispatch', 'edit', 'details'],
+  
+// };
 const LeakReports: React.FC = () => {
   const [data, setData] = useState<LeakData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,7 +65,12 @@ const LeakReports: React.FC = () => {
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-
+   const navigate = useNavigate();
+ 
+   const handleHomeClick = () => {
+     navigate('/home');
+   };
+  
   const fetchCounts = async () => {
     const counts: Record<string, number> = {};
     await Promise.all(
@@ -129,8 +150,8 @@ const LeakReports: React.FC = () => {
   }, [activeTab, pageIndex, pageSize]);
 
   const renderActionButtons = (record: LeakData) => (
-    <div style={{ display: 'flex', gap: 4 }}>
-      <Button icon={<CarOutlined />} onClick={() => showModal('Dispatch', record)} />
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
+      <Button icon={<TruckOutlined />} onClick={() => showModal('Dispatch', record)} />
       <Button icon={<EditOutlined />} onClick={() => showModal('Update Report', record)} />
       <Button
         icon={<FileImageOutlined />}
@@ -260,25 +281,50 @@ const columnPresets: Record<string, ColumnsType<LeakData>> = {
   };
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: '4px 24px 24px 24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+            icon={<HomeFilled />}
+            onClick={handleHomeClick}
+            type="text"
+            style={{ fontSize: 16, color: '#00008B', margin: 0 }}
+            shape="circle"
+          />
+        <Breadcrumb style={{fontSize: 16, fontWeight: 500 }}>
+          <Breadcrumb.Item>Operation</Breadcrumb.Item>
+          <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
+        </Breadcrumb>
+        </div>
       <Input.Search
         placeholder="Search..."
         allowClear
-        style={{ width: 300, marginBottom: 16 }}
+        style={{ width: 300 }}
         onChange={(e) => setSearchText(e.target.value)}
       />
+      </div>
+      
+      {/* <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+        <span style={{ marginRight: 8 }}>Display</span>
+        <Select defaultValue="10" style={{ width: 80 }}>
+          <Option value="10">10</Option>
+          <Option value="20">20</Option>
+          <Option value="50">50</Option>
+        </Select>
+        <span style={{ marginLeft: 8 }}>records per page</span>
+      </div> */}
 
-      <Card bodyStyle={{ padding: 16 }}>
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
+      <Card className='custom-card' >
+        <Tabs activeKey={activeTab} onChange={key => setActiveTab(key)} type="card" className='custom-tabs'>
           {Object.entries(tabLabels).map(([key, label]) => (
             <TabPane
               key={key}
               tab={
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {label}
                   </span>
-                  <Badge count={tabCounts[key] ?? 0} size="small" />
+                  <Badge count={tabCounts[key] ?? 0} size="small" color ='blue' style={{paddingInline: 6, borderRadius: 4}}/>
                 </span>
               }
             />
