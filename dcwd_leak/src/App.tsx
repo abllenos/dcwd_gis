@@ -322,21 +322,17 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/login"
-          element={<Login onLogin={handleLogin} />}
-        />
-        <Route
-          path="/*"
-          element={
-            isLoggedIn ? (
-              <Dashboard onLogout={handleLogout} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-      </Routes>
+  <Route
+    path="/login"
+    element={<Login onLogin={handleLogin} />} 
+  />
+  <Route
+    path="/*"
+    element={
+      isLoggedIn ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />
+    }
+  />
+</Routes>
     </Router>
   );
 };
