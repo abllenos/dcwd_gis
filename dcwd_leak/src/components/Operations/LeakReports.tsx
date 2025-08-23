@@ -1,330 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Tabs, Button, Input, Badge, Card, Breadcrumb } from 'antd';
-import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled } from '@ant-design/icons';
-import axios from 'axios';
-import DispatchModal from '../Modals/DispatchModal';
-import UpdateReport from '../Modals/UpdateModal';
-import ReportDetails from '../Modals/ReportModal';
-import ImageModal from '../Modals/ImageModal';
-import type { ColumnsType } from 'antd/es/table';
-import type { LeakData } from '../../types/Leakdata';
-import { useNavigate } from 'react-router-dom';
-
-import '../../styles/card.css';
+import React, { useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import { Table, Tabs, Button, Input, Badge, Card, Breadcrumb } from "antd";
+import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import DispatchModal from "../Modals/DispatchModal";
+import UpdateReport from "../Modals/UpdateModal";
+import ReportDetails from "../Modals/ReportModal";
+import ImageModal from "../Modals/ImageModal";
+import { leakReportsStore } from "../../stores/leakReportsStore";
+import type { ColumnsType } from "antd/es/table";
+import type { LeakData } from "../../types/Leakdata";
 
 const { TabPane } = Tabs;
 
 const tabLabels: Record<string, string> = {
-  customer: 'Customer',
-  leakdetection: 'Leak Detection',
-  dispatched: 'Dispatched',
-  repaired: 'Repaired Leaks',
-  scheduled: 'Repair Scheduled',
-  turnover: 'Repair Turn-over',
-  after: 'Leak After the Meter',
-  notfound: 'Leak Not Found',
+  customer: "Customer",
+  leakdetection: "Leak Detection",
+  dispatched: "Dispatched",
+  repaired: "Repaired Leaks",
+  scheduled: "Repair Scheduled",
+  turnover: "Repair Turn-over",
+  after: "Leak After the Meter",
+  notfound: "Leak Not Found",
 };
 
-const tabFilters: Record<string, { dispatchStat: number; flgLeakDetection?: number }> = {
-  customer: { dispatchStat: 1, flgLeakDetection: 0 },
-  leakdetection: { dispatchStat: 1, flgLeakDetection: 1 },
-  dispatched: { dispatchStat: 2 },
-  repaired: { dispatchStat: 3 },
-  scheduled: { dispatchStat: 4 },
-  turnover: { dispatchStat: 5 },
-  after: { dispatchStat: 6 },
-  notfound: { dispatchStat: 7 },
-};
-
-// const tabActionsMap: Record<
-//   string,
-//   ('dispatch' | 'edit' | 'details' | 'photos')[]
-// > = {
-//   repaired: ['details'],
-//   dispatched: ['details'],
-//   turnover: ['dispatch', 'details'],
-//   after: ['details'],
-//   notfound: ['details'],
-//   scheduled: ['details', 'photos', 'dispatch'], 
-//   default: ['dispatch', 'edit', 'details'],
-  
-// };
-const LeakReports: React.FC = () => {
-  const [data, setData] = useState<LeakData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('customer');
-  const [searchText, setSearchText] = useState('');
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [selectedRecord, setSelectedRecord] = useState<LeakData | null>(null);
-  const [formValues, setFormValues] = useState<Partial<LeakData>>({});
-  const [imageModalVisible, setImageModalVisible] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-
-   const navigate = useNavigate();
- 
-   const handleHomeClick = () => {
-     navigate('/home');
-   };
-  
-  const fetchCounts = async () => {
-    const counts: Record<string, number> = {};
-    await Promise.all(
-      Object.entries(tabFilters).map(async ([key, filter]) => {
-        try {
-          const params: Record<string, number> = {
-            dispatchStat: filter.dispatchStat,
-            pageIndex: 1,
-            pageSize: 1,
-          };
-          if (filter.flgLeakDetection !== undefined) {
-            params.flgLeakDetection = filter.flgLeakDetection;
-          }
-          const res = await axios.get(
-            'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered',
-            { params }
-          );
-          counts[key] = res.data.data.count || 0;
-        } catch (err) {
-          console.error(`Error fetching count for ${key}`, err);
-          counts[key] = 0;
-        }
-      })
-    );
-    setTabCounts(counts);
-  };
-
-  const fetchData = async (tabKey: string, page: number, size: number) => {
-    setLoading(true);
-    try {
-      const filter = tabFilters[tabKey];
-      const params: Record<string, number> = {
-        dispatchStat: filter.dispatchStat,
-        pageIndex: page,
-        pageSize: size,
-      };
-      if (filter.flgLeakDetection !== undefined) {
-        params.flgLeakDetection = filter.flgLeakDetection;
-      }
-
-      const res = await axios.get(
-        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered',
-        { params }
-      );
-
-      const apiData = res.data.data;
-      setTotal(apiData.count);
-
-      const normalized = apiData.data.map((item: any) => ({
-        id: String(item.spool_ID),
-        leakType: item.typeid,
-        location: item.address,
-        landmark: item.landmark,
-        referenceMeter: item.nearestMtrAccNo || item.nearestMeter,
-        contactNo: item.mobileNo,
-        dateReported: item.dT_Reported,
-        referenceNo: item.refAccNo,
-        dispatchStat: item.dispatchStat,
-        flgLeakDetection: item.flgLeakDetection,
-      }));
-
-      setData(normalized);
-    } catch (error) {
-      console.error('Error fetching leak reports', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const LeakReports: React.FC = observer(() => {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCounts(); 
-    fetchData(activeTab, pageIndex, pageSize); 
+    leakReportsStore.fetchCounts();
+    leakReportsStore.fetchData();
   }, []);
 
-  useEffect(() => {
-    fetchData(activeTab, pageIndex, pageSize); 
-  }, [activeTab, pageIndex, pageSize]);
+  const handleHomeClick = () => navigate("/home");
 
   const renderActionButtons = (record: LeakData) => (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
-      <Button icon={<TruckOutlined />} onClick={() => showModal('Dispatch', record)} />
-      <Button icon={<EditOutlined />} onClick={() => showModal('Update Report', record)} />
+    <div style={{ display: "flex", justifyContent: "center", gap: 4 }}>
+      <Button icon={<TruckOutlined />} onClick={() => leakReportsStore.showModal("Dispatch", record)} />
+      <Button icon={<EditOutlined />} onClick={() => leakReportsStore.showModal("Update Report", record)} />
       <Button
         icon={<FileImageOutlined />}
-        onClick={() => {
-          setImageUrls(['https://via.placeholder.com/300', 'https://via.placeholder.com/300']);
-          setImageModalVisible(true);
-        }}
+        onClick={() => leakReportsStore.setImageModal(true, ["https://via.placeholder.com/300", "https://via.placeholder.com/300"])}
       />
-      <Button icon={<FileSearchOutlined />} onClick={() => showModal('Report Details', record)} />
+      <Button icon={<FileSearchOutlined />} onClick={() => leakReportsStore.showModal("Report Details", record)} />
     </div>
   );
 
-const columnPresets: Record<string, ColumnsType<LeakData>> = {
-  customer: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Contact No.', dataIndex: 'contactNo', key: 'contactNo' },
-    { title: 'Date & Time Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
-    { title: 'Action', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
+  const generateColumns = (tab: string) => {
+  const baseColumns: ColumnsType<LeakData> = [
+    { title: "ID", dataIndex: "id", key: "id" },
+    { title: "Leak Type", dataIndex: "leakType", key: "leakType" },
+    { title: "Reference Meter", dataIndex: "referenceMeter", key: "referenceMeter" },
+    { title: "Location", dataIndex: "location", key: "location" },
+    { title: "Landmark", dataIndex: "landmark", key: "landmark" },
+    { title: "Date Reported", dataIndex: "dateReported", key: "dateReported" },
+    { title: "Team Leader", dataIndex: "teamLeader", key: "teamLeader", hidden: tab === "customer" || tab === "leakdetection" || tab === "dispatched" },
+    { title: "Reference No.", dataIndex: "referenceNo", key: "referenceNo" },
+    { title: "JMS Control No.", dataIndex: "jmsControlNo", key: "jmsControlNo", hidden: tab === "customer" || tab === "leakdetection" || tab === "scheduled" || tab === "dispatched" },
+    { title: "Date Repaired", dataIndex: "dateRepaired", key: "dateRepaired", hidden: tab !== "repaired" },
+    { title: "Date Turn-overed", dataIndex: "dateTurnOvered", key: "dateTurnOvered", hidden: tab !== "scheduled" && tab !== "turnover" },
+    { title: "Reason", dataIndex: "reason", key: "reason", hidden: tab !== "scheduled" && tab !== "turnover" },
+  ];
 
-  leakdetection: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Date & Time Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
-    { title: 'Action', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
+  const actionColumn = {
+    title: "Actions",
+    key: "action",
+    render: (_: any, record: LeakData) => renderActionButtons(record),
+  };
 
-  dispatched: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Contact No.', dataIndex: 'contactNo', key: 'contactNo' },
-    { title: 'Date & Time Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
-    { title: 'Action', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
-
-  repaired: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
-    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Date Repaired', dataIndex: 'dateRepaired', key: 'dateRepaired' },
-    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
-    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
-
-  scheduled: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
-    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
-    { title: 'Date Turn-overed', dataIndex: 'dateTurnOvered', key: 'dateTurnOvered' },
-    { title: 'Reason', dataIndex: 'reason', key: 'reason' },
-    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
-
-  turnover: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Leak Type', dataIndex: 'leakType', key: 'leakType' },
-    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
-    { title: 'Date Turn-overed', dataIndex: 'dateTurnOvered', key: 'dateTurnOvered' },
-    { title: 'Reason', dataIndex: 'reason', key: 'reason' },
-    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
-
-  after: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
-    { title: 'Reference No.', dataIndex: 'referenceNo', key: 'referenceNo' },
-    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
-
-  notfound: [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'JMS Control No.', dataIndex: 'jmsControlNo', key: 'jmsControlNo' },
-    { title: 'Reference Meter', dataIndex: 'referenceMeter', key: 'referenceMeter' },
-    { title: 'Location', dataIndex: 'location', key: 'location' },
-    { title: 'Landmark', dataIndex: 'landmark', key: 'landmark' },
-    { title: 'Date Reported', dataIndex: 'dateReported', key: 'dateReported' },
-    { title: 'Team Leader', dataIndex: 'teamLeader', key: 'teamLeader' },
-    { title: 'Actions', key: 'action', render: (_, record) => renderActionButtons(record) },
-  ],
+  return [...baseColumns.filter((c) => !c.hidden), actionColumn];
 };
 
-  const showModal = (title: string, record?: LeakData) => {
-    setModalTitle(title);
-    setSelectedRecord(record ?? null);
-    if (title === 'Update Report' && record) {
-      setFormValues({ ...record, id: String(record.id) });
-    }
-    setModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setModalVisible(false);
-    setFormValues({});
-    setSelectedRecord(null);
-  };
-
   return (
-    <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button
-            icon={<HomeFilled />}
-            onClick={handleHomeClick}
-            type="text"
-            style={{ fontSize: 16, color: '#00008B', margin: 0 }}
-            shape="circle"
-          />
-        <Breadcrumb style={{fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Operation</Breadcrumb.Item>
-          <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
-        </Breadcrumb>
+    <div style={{ padding: "4px 24px 24px 24px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
+          <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
+            <Breadcrumb.Item>Operation</Breadcrumb.Item>
+            <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
+          </Breadcrumb>
         </div>
-      <Input.Search
-        placeholder="Search..."
-        allowClear
-        style={{ width: 300 }}
-        onChange={(e) => setSearchText(e.target.value)}
-      />
+        <Input.Search placeholder="Search..." allowClear style={{ width: 300 }} onChange={(e) => leakReportsStore.setSearchText(e.target.value)} />
       </div>
-      
-      {/* <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-        <span style={{ marginRight: 8 }}>Display</span>
-        <Select defaultValue="10" style={{ width: 80 }}>
-          <Option value="10">10</Option>
-          <Option value="20">20</Option>
-          <Option value="50">50</Option>
-        </Select>
-        <span style={{ marginLeft: 8 }}>records per page</span>
-      </div> */}
 
-      <Card className='custom-card' >
-        <Tabs activeKey={activeTab} onChange={key => setActiveTab(key)} type="card" className='custom-tabs'>
+      <Card className="custom-card">
+        <Tabs activeKey={leakReportsStore.activeTab} onChange={(key) => leakReportsStore.setActiveTab(key)} type="card" className="custom-tabs">
           {Object.entries(tabLabels).map(([key, label]) => (
             <TabPane
               key={key}
               tab={
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {label}
-                  </span>
-                  <Badge count={tabCounts[key] ?? 0} size="small" color ='blue' style={{paddingInline: 6, borderRadius: 4}}/>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>
+                  <Badge count={leakReportsStore.tabCounts[key] ?? 0} size="small" color="blue" style={{ paddingInline: 6, borderRadius: 4 }} />
                 </span>
               }
             />
@@ -332,67 +100,51 @@ const columnPresets: Record<string, ColumnsType<LeakData>> = {
         </Tabs>
 
         <Table
-          columns={columnPresets[activeTab]}
-          dataSource={data}
-          loading={loading}
+          columns={generateColumns(leakReportsStore.activeTab)}
+          dataSource={leakReportsStore.data}
+          loading={leakReportsStore.loading}
           pagination={{
-            current: pageIndex,
-            pageSize,
-            total,
-            onChange: (page, size) => {
-              setPageIndex(page);
-              setPageSize(size);
-            },
+            current: leakReportsStore.pageIndex,
+            pageSize: leakReportsStore.pageSize,
+            total: leakReportsStore.total,
+            onChange: (page, size) => leakReportsStore.setPagination(page, size),
           }}
           rowKey="id"
         />
       </Card>
 
-      <DispatchModal
-        visible={modalVisible && modalTitle === 'Dispatch'}
-        onCancel={handleCancel}
-        record={selectedRecord ?? undefined}
-        fields={
-          selectedRecord
-            ? [
-                { label: 'REPORT ID', value: String(selectedRecord.id) },
-                { label: 'REFERENCE METER', value: selectedRecord.referenceMeter },
-                { label: 'LOCATION', value: selectedRecord.location },
-              ]
-            : []
-        }
-      />
+      <DispatchModal visible={leakReportsStore.modalVisible && leakReportsStore.modalTitle === "Dispatch"} onCancel={() => leakReportsStore.hideModal()} record={leakReportsStore.selectedRecord ?? undefined} fields={leakReportsStore.selectedRecord ? [
+        { label: "REPORT ID", value: String(leakReportsStore.selectedRecord.id) },
+        { label: "REFERENCE METER", value: leakReportsStore.selectedRecord.referenceMeter },
+        { label: "LOCATION", value: leakReportsStore.selectedRecord.location },
+      ] : []} />
 
       <UpdateReport
-        visible={modalVisible && modalTitle === 'Update Report'}
-        record={selectedRecord ? { ...selectedRecord, id: String(selectedRecord.id) } : null}
-        formValues={formValues}
-        onChange={(field, value) => setFormValues((prev) => ({ ...prev, [field]: value }))}
-        onCancel={handleCancel}
+        visible={leakReportsStore.modalVisible && leakReportsStore.modalTitle === "Update Report"}
+        record={leakReportsStore.selectedRecord ? { ...leakReportsStore.selectedRecord, id: String(leakReportsStore.selectedRecord.id) } : null}
+        formValues={leakReportsStore.formValues}
+        onChange={(field, value) => leakReportsStore.setFormValue(field, value)}
+        onCancel={() => leakReportsStore.hideModal()}
         onSubmit={() => {
-          if (!selectedRecord) return;
-          const index = data.findIndex((d) => d.id === selectedRecord.id);
-          if (index !== -1) data[index] = { ...data[index], ...formValues } as LeakData;
-          handleCancel();
+          if (!leakReportsStore.selectedRecord) return;
+          const index = leakReportsStore.data.findIndex((d) => d.id === leakReportsStore.selectedRecord?.id);
+          if (index !== -1) leakReportsStore.data[index] = { ...leakReportsStore.data[index], ...leakReportsStore.formValues } as LeakData;
+          leakReportsStore.hideModal();
         }}
       />
 
       <ReportDetails
-        visible={modalVisible && modalTitle === 'Report Details'}
-        record={selectedRecord ? { ...selectedRecord, id: String(selectedRecord.id) } : null}
-        activeTab={activeTab}
+        visible={leakReportsStore.modalVisible && leakReportsStore.modalTitle === "Report Details"}
+        record={leakReportsStore.selectedRecord ? { ...leakReportsStore.selectedRecord, id: String(leakReportsStore.selectedRecord.id) } : null}
+        activeTab={leakReportsStore.activeTab}
         columnMap={{}}
         columnPresets={{}}
-        onCancel={handleCancel}
+        onCancel={() => leakReportsStore.hideModal()}
       />
 
-      <ImageModal
-        visible={imageModalVisible}
-        onCancel={() => setImageModalVisible(false)}
-        images={imageUrls}
-      />
+      <ImageModal visible={leakReportsStore.imageModalVisible} onCancel={() => leakReportsStore.setImageModal(false)} images={leakReportsStore.imageUrls} />
     </div>
   );
-};
+});
 
 export default LeakReports;
