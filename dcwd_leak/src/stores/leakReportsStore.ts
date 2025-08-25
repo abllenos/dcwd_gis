@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
 import type { LeakData } from "../types/Leakdata";
+import { devApi } from "../components/Endpoints/Interceptor";
 
 const tabFilters: Record<string, { dispatchStat: number; flgLeakDetection?: number }> = {
   customer: { dispatchStat: 1, flgLeakDetection: 0 },
@@ -85,10 +86,7 @@ export class LeakReportsStore {
           if (filter.flgLeakDetection !== undefined) {
             params.flgLeakDetection = filter.flgLeakDetection;
           }
-          const res = await axios.get(
-            "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered",
-            { params }
-          );
+          const res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered", { params });
           counts[key] = res.data.data.count || 0;
         } catch (err) {
           console.error(`Error fetching count for ${key}`, err);
@@ -114,10 +112,7 @@ export class LeakReportsStore {
         params.flgLeakDetection = filter.flgLeakDetection;
       }
 
-      const res = await axios.get(
-        "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered",
-        { params }
-      );
+      const res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered", {params});
 
       const apiData = res.data.data;
       runInAction(() => {
