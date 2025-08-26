@@ -12,6 +12,7 @@ import {
   SunOutlined,
   SearchOutlined,
   AppstoreOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, ConfigProvider, Avatar, Typography } from 'antd';
 import type { MenuProps } from 'antd';
@@ -328,11 +329,13 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                 }}
                 onClick={() => navigate('/settings')}
               />
-              <Text 
+              <Button
+                type="primary"
+                icon={<LogoutOutlined />}
                 style={{ 
-                  color: '#6782f5', 
-                  fontSize: '14px',
-                  cursor: 'pointer',
+                  backgroundColor: '#6782f5',
+                  borderColor: '#6782f5',
+                  color: '#ffffff',
                   padding: '4px 8px'
                 }}
                 onClick={() => {
@@ -341,7 +344,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                 }}
               >
                 Log out
-              </Text>
+              </Button>
             </div>  
           </Header>
 
@@ -416,6 +419,7 @@ function App() {
     return !!localStorage.getItem("token");
   });
 
+  // Token expiry check
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expiry = localStorage.getItem("token_expiry");
@@ -472,6 +476,7 @@ function App() {
     <ConfigProvider theme={theme}>
     <Router>
       <Routes>
+  {/* Login route */}
   <Route
     path="/login"
     element={<Login onLogin={handleLogin} />} 
