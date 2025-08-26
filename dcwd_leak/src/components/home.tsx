@@ -233,37 +233,97 @@ const Home: React.FC = () => {
           </Row>
         </Col>
 
+
         <Col xs={24} lg={12} style={{ display: 'flex' }}>
           <Card
             title="Monthly Leak Reports"
             bordered={false}
             style={{
-              flex: 1,
-              backgroundColor: '#ffffff',
-              border: '1px solid #e0ddddff',
-              borderRadius: 8,
-              display: 'flex',
-              flexDirection: 'column',
+            height: '80%',
+            minHeight: 353,
+            width: '100%',
+            minWidth: 350,
+            backgroundColor: '#ffffffff',   
+            border: '1px solid #e0ddddff',  
+            borderRadius: 8,
+            boxShadow: 'none',            
             }}
-            bodyStyle={{ flex: 1, padding: 16 }}
+              bodyStyle={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 10px 0 10px',
+                height: '90%',
+              }}
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 30, bottom: 30, left: 40 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} tick={{ dy: 8, fontSize: 13 }} />
-                <YAxis axisLine={false} tickLine={false} width={30} />
-                <Tooltip contentStyle={{ fontSize: 12 }} />
-                <Line type="monotone" dataKey="reports" stroke="#0e41a0ff" strokeWidth={1.5} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+<ResponsiveContainer width="100%" height={300}>
+  <LineChart 
+    data={chartData} 
+    margin={{ top: 10, right: 30, bottom: 30, left: 40 }}
+  >
+    <XAxis 
+      dataKey="name" 
+      axisLine={false} 
+      tickLine={false} 
+      interval={0} 
+      tick={{ dy: 8, fontSize: 13 }} 
+    />  
+    <YAxis axisLine={false} tickLine={false} width={30} />
+    <Tooltip contentStyle={{ fontSize: 12 }} />
+    <Line 
+      type="monotone" 
+      dataKey="reports" 
+      stroke="#0e41a0ff"
+      strokeWidth={1.5} 
+      dot={false} 
+    />
+  </LineChart>
+</ResponsiveContainer>
+
           </Card>
         </Col>
 
         <Col xs={24}>
-          <div style={{ borderRadius: 8, boxShadow: 'none', padding: '12px' }}>
-            <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered style={{ width: '100%' }} />
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: 8,
+            boxShadow: 'none',
+            padding: '12px',
+          }}>
+<Table<DataType>
+              columns={columns}
+              dataSource={data}
+              pagination={false}
+              bordered
+              style={{ width: '100%' }}
+            />
           </div>
         </Col>
       </Row>
+
+<style>
+  {`
+    .ant-card:hover {
+      box-shadow: none;
+      transform: translateY(-2px);
+    }
+
+    .ant-table-thead > tr > th {
+      background-color: #d1cdcdff !important;
+      font-weight: 600 !important;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .ant-table,
+    .ant-table-container,
+    .ant-table-tbody > tr > td,
+    .ant-table-thead > tr > th {
+      border-color: #d2d4d8ff !important;
+    }
+  `}
+     </style>
     </div>
   );
 };
