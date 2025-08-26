@@ -39,13 +39,15 @@ import Reports from './components/Report/Reports';
 import LeakOptionsModal from './components/Modals/LeakOptionsModal';
 import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
 import ReportALeak from './components/CreateReport/ReportALeak';
+
 import { devApi } from './components/Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
+
+import LogoutModal from './components/Modals/LogoutModal'; 
 
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
-
 
 const { Sider, Header, Content } = Layout;
 const { Text } = Typography;
@@ -97,10 +99,13 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     department: '',
     empId: ''
   });
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
+
       
-  
   const navigate = useNavigate();
   const location = useLocation();
+
 
   // Fetch user profile data
   useEffect(() => {
@@ -131,12 +136,16 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     };
 
     fetchUserProfile();
+
+  useEffect(() => {
+    const handleResize = () => setSidebarWidth(getSidebarWidth());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const onClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
-      onLogout();
-      navigate('/login');
+      setLogoutModalVisible(true); 
     } else if (e.key === 'create-report') {
       setModalVisible(true);
     } else {
@@ -165,6 +174,12 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
+  const handleLogoutConfirmed = () => {
+    setLogoutModalVisible(false);
+    onLogout();
+    navigate('/login');
+  };
+
   return (
     <>
       <Layout>
@@ -181,6 +196,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
           }}
         >
+
           {/* Logo Section */}
           <div style={{ 
             padding: '24px 20px', 
@@ -210,6 +226,13 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                   objectFit: 'cover'
                 }}
               />
+
+          <div className = 'sider-logo-wrapper'>
+            {collapsed ? (
+              <img src={dcwdIcon} alt="DCWD Icon" className='sider-logo collapsed-logo' />
+            ) : (
+              <img src={dcwd} alt ="DCWD Logo" className= 'sider-logo expanded-logo' />
+
             )}
           </div>
 
@@ -262,6 +285,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           transition: 'margin-left 0.2s ease',
         }}>
           <Header
+
             style={{
               position: 'fixed',
               top: 0,
@@ -278,6 +302,10 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               transition: 'left 0.2s ease',
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}
+
+            className='custom-header'
+            style={{ left: collapsed? 80: sidebarWidth }}
+
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>  
               <Button
@@ -379,15 +407,19 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         onCancel={() => setModalVisible(false)}
         onSelect={handleModalSelect}
       />
+
+      <LogoutModal
+        visible={logoutModalVisible}
+        onConfirm={handleLogoutConfirmed}
+        onCancel={() => setLogoutModalVisible(false)}
+      />
     </>
   );
 };
 
-
 const WaterSupplyConcernsWrapper: React.FC = () => {
   const location = useLocation();
   const formType = (location.state as any)?.formType ?? 'no_water';
-
   return <WaterSupplyConcern formType={formType} />;
 };
 
@@ -476,7 +508,7 @@ function App() {
     <ConfigProvider theme={theme}>
     <Router>
       <Routes>
-  {/* Login route */}
+
   <Route
     path="/login"
     element={<Login onLogin={handleLogin} />} 
@@ -488,6 +520,7 @@ function App() {
     }
   />
 </Routes>
+
     </Router>
     </ConfigProvider>
   );

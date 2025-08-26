@@ -132,7 +132,7 @@ const Home: React.FC = () => {
               <Card
                 bordered={false}
                 style={{
-                  background: 'linear-gradient(200deg, #726e6eff, #4c85d4ff, #726e6eff, #1b1a1aff)',
+                  background: 'linear-gradient(200deg, #b3b0b0ff, #49758aff, #726e6eff, #e4dfdfff)',
                   backgroundSize: '750% 750%',
                   color: 'white',
                   borderRadius: '12px',
@@ -184,6 +184,7 @@ const Home: React.FC = () => {
           </Row>
         </Col>
 
+
         <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
           <Card
             title="Monthly Leak Reports"
@@ -207,6 +208,7 @@ const Home: React.FC = () => {
                 height: '90%',
               }}
           >
+
 <ResponsiveContainer width="100%" height={300}>
   <LineChart 
     data={chartData} 
@@ -224,7 +226,9 @@ const Home: React.FC = () => {
     <Line 
       type="monotone" 
       dataKey="reports" 
+
       stroke="#0e41a0ff"
+
       strokeWidth={1.5} 
       dot={false} 
     />
@@ -241,6 +245,8 @@ const Home: React.FC = () => {
             boxShadow: 'none',
             padding: '12px',
           }}>
+
+
 <Table<DataType>
               columns={columns}
               dataSource={data}
@@ -259,12 +265,15 @@ const Home: React.FC = () => {
       transform: translateY(-2px);
     }
 
+
     .ant-table-thead > tr > th {
       background-color: #d1cdcdff !important;
+
       font-weight: 600 !important;
       text-transform: uppercase;
       font-size: 0.85rem;
     }
+
 
     .ant-table,
     .ant-table-container,
@@ -274,6 +283,7 @@ const Home: React.FC = () => {
     }
   `}
      </style>
+
     </div>
   );
 };
