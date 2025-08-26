@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import axios from "axios";
 import type { LeakData } from "../types/Leakdata";
 import { devApi } from "../components/Endpoints/Interceptor";
 
