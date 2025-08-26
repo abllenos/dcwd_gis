@@ -221,7 +221,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             style={{
               marginTop: 64,
               padding: 24,
-              backgroundColor: '#ffffff',
+              backgroundColor: '#f7f2f2ff',
               minHeight: 'calc(100vh - 64px)',
             }}
           >
