@@ -9,6 +9,7 @@ import "../styles/LoadingOverlay.css";
 import { loginStore } from "../stores/loginStore";
 
 interface LoginProps {
+  
   onLogin: (userData: any) => void;
 }
 

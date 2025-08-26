@@ -12,9 +12,8 @@ import {
   Breadcrumb,
   message,
   Space,
-  Modal,
 } from 'antd';
-import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, HomeFilled, SearchOutlined } from '@ant-design/icons';
 import { devApi } from '../Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 import CustomModal from '../Modals/CustomModal';
@@ -47,10 +46,10 @@ const ReportALeak: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string }>({});
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState<{ title: string; content: string }>({ title: '', content: '' });
-
+  
   const navigate = useNavigate();
+
+  const handleHomeClick = () => navigate("/home");
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -113,9 +112,6 @@ const ReportALeak: React.FC = () => {
     setModalData({visible:true, title, content, type});
   };
 
-  const handleModalOk = () => {
-    setIsModalVisible(false);
-  };
 
   const handleSubmit = async (values: any) => {
     const token = localStorage.getItem('debug_token');
@@ -261,11 +257,15 @@ const ReportALeak: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px'}}>
-      <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
-        <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
-        <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
-      </Breadcrumb>
-
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+        <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
+        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
+          <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
+          <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
+        </Breadcrumb>
+        </div>
+      </div>
       <div
         style={{
           backgroundColor: '#fff',
@@ -433,7 +433,7 @@ const ReportALeak: React.FC = () => {
         type={modalData.type}
         onClose={() => setModalData(prev => ({ ...prev, visible: false }))}
       />
-        <p>{modalContent.content}</p>
+
     </div>
   );
 };
