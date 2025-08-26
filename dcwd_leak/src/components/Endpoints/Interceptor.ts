@@ -9,9 +9,9 @@ export const apiGis = axios.create({
 
 export const devApi = axios.create({
   baseURL: 'https://dev-api.davao-water.gov.ph/',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 
+    'Content-Type': 'application/json'
+   },
 });
 
 let isRefreshing = false;

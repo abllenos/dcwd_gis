@@ -7,7 +7,7 @@ import {
   Input,
   Modal,
 } from 'antd';
-import { FileSearchOutlined, HomeOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, HomeFilled } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 
@@ -119,10 +119,10 @@ const JMSDataSeeding: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
          <div style={{ display: 'flex', alignItems: 'center' }}>
             <Button
-              icon={<HomeOutlined />}
+              icon={<HomeFilled />}
               onClick={handleHomeClick}
               type="text"
               style={{ fontSize: 16, color: '#00008B', margin: 0 }}
@@ -143,7 +143,7 @@ const JMSDataSeeding: React.FC = () => {
 
 
 
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
+      <Card className='custom-card'>
         <Table
           columns={columns}
           dataSource={filteredData()}

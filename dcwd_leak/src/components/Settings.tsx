@@ -1,9 +1,9 @@
-import React from 'react';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useEffect } from 'react';
+import { makeAutoObservable, runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import '../styles/Settings.css';
 import { Card, Avatar, Input, Button, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import { devApi } from '../components/Endpoints/Interceptor';
 
 interface EditProfileFormProps {
@@ -18,6 +18,80 @@ interface EditProfileFormProps {
   onSave: () => void;
   saving: boolean;
 }
+
+
+class ProfileStore {
+  employeeId = 'EMP-00123';
+  profileEmail = '';
+  firstName = '';
+  lastName = '';
+  middlename = '';
+  email = '';
+  mobile = '';
+  department = '';
+  saving = false;
+  contactSaving = false;
+  showContactPreview = false;
+  showProfilePreview = false;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  async fetchProfile() {
+    const empId = localStorage.getItem('username');
+    if (!empId) return;
+
+    try {
+      const res = await devApi.get(
+        `dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID`,
+        { params: { empId } }
+      );
+
+      const data = res.data;
+      if (data?.statusCode === 200 && data?.data) {
+        const user = data.data;
+        runInAction(() => {
+          this.employeeId = user.empId || '';
+          this.profileEmail = user.username || '';
+          this.firstName = user.firstname || '';
+          this.middlename = user.middlename || '';
+          this.lastName = user.lastname || '';
+          this.email = user.username || '';
+          this.mobile = user.mobileNo || '';
+          this.department = user.department || '';
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+    }
+  }
+
+  handleProfileSave() {
+    this.saving = true;
+    setTimeout(() => {
+      runInAction(() => {
+        this.saving = false;
+        this.showProfilePreview = true;
+      });
+      message.success('Profile updated!');
+    }, 1000);
+  }
+
+  handleContactSave() {
+    this.contactSaving = true;
+    setTimeout(() => {
+      runInAction(() => {
+        this.contactSaving = false;
+        this.showContactPreview = true;
+      });
+      message.success('Contact details updated!');
+    }, 1000);
+  }
+}
+
+const profileStore = new ProfileStore();
+
 
 function EditProfileForm({
   employeeId,
@@ -60,70 +134,11 @@ function EditProfileForm({
   );
 }
 
-function Settings() {
-  const [employeeId, setEmployeeId] = React.useState('EMP-00123');
-  const [profileEmail, setProfileEmail] = React.useState('');
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [mobile, setMobile] = React.useState('');
-  const [middlename, setMiddleName] = React.useState('');
-  const [saving, setSaving] = React.useState(false);
-  const [contactSaving, setContactSaving] = React.useState(false);
-  const [department, setDepartment] = React.useState('');
 
-  const [showContactPreview, setShowContactPreview] = React.useState(false);
-  const [showProfilePreview, setShowProfilePreview] = React.useState(false);
-
-  React.useEffect(() => {
-  const empId = localStorage.getItem('username');
-  if (!empId) return;
-
-  const fetchProfile = async () => {
-    try {
-      const res = await devApi.get(
-        `dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID`,
-        {
-          params: { empId }
-        }
-      );
-
-      const data = res.data;
-      if (data?.statusCode === 200 && data?.data) {
-        setEmployeeId(data.data.empID || '');
-        setProfileEmail(data.data.userName || '');
-        setFirstName(data.data.firstName || '');
-        setMiddleName(data.data.MiddleName || '');
-        setLastName(data.data.lastName || '');
-        setEmail(data.data.userName || '');
-        setMobile(data.data.mobileNo || '');
-        setDepartment(data.data.department || '');
-      }
-    } catch (err) {
-      console.error('Failed to fetch profile:', err);
-    }
-  };
-
-  fetchProfile();
-}, []);
-
-  const handleProfileSave = () => {
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      setShowProfilePreview(true);
-      message.success('Profile updated!');
-    }, 1000);
-  };
-
-  const handleContactSave = () => {
-    setContactSaving(true);
-    setTimeout(() => {
-      setContactSaving(false);
-      setShowContactPreview(true);
-      message.success('Contact details updated!');
-    }, 1000);
-  };
+const Settings: React.FC = observer(() => {
+  useEffect(() => {
+    profileStore.fetchProfile();
+  }, []);
 
   return (
     <div
@@ -136,7 +151,7 @@ function Settings() {
         gap: 24,
       }}
     >
-  
+
       <div
         style={{
           width: '100%',
@@ -163,12 +178,15 @@ function Settings() {
           }}
         >
 
-          <div className="animated-avatar" style={{
-            backgroundColor: '#dbeafe',
-            borderRadius: '50%',
-            padding: 14,
-            border: '3px solid #174ea6',
-          }}>
+          <div
+            className="animated-avatar"
+            style={{
+              backgroundColor: '#dbeafe',
+              borderRadius: '50%',
+              padding: 14,
+              border: '3px solid #174ea6',
+            }}
+          >
             <Avatar
               size={100}
               icon={<UserOutlined />}
@@ -178,16 +196,16 @@ function Settings() {
 
 
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: 20, color: '#174ea6', textTransform: 'uppercase' }}>
-              {`${firstName} ${middlename} ${lastName}`}
+            <div
+              style={{ fontWeight: 700, fontSize: 20, color: '#174ea6', textTransform: 'uppercase' }}
+            >
+              {`${profileStore.firstName} ${profileStore.middlename} ${profileStore.lastName}`}
             </div>
-            <div style={{ fontSize: 14, color: '#333', marginTop: 4 }}>
-              {`${department}`}
-            </div>
+            <div style={{ fontSize: 14, color: '#333', marginTop: 4 }}>{`${profileStore.department}`}</div>
           </div>
 
-
-          {(showContactPreview || showProfilePreview) && (
+    
+          {(profileStore.showContactPreview || profileStore.showProfilePreview) && (
             <div
               style={{
                 flex: 1,
@@ -199,18 +217,18 @@ function Settings() {
               }}
             >
               <div style={{ fontWeight: 500, marginBottom: 8 }}>Preview:</div>
-              {showContactPreview && (
+              {profileStore.showContactPreview && (
                 <>
-                  <div>Email: {email}</div>
-                  <div>Mobile: {mobile}</div>
+                  <div>Email: {profileStore.email}</div>
+                  <div>Mobile: {profileStore.mobile}</div>
                 </>
               )}
-              {showProfilePreview && (
+              {profileStore.showProfilePreview && (
                 <>
-                  <div style={{ marginTop: 12 }}>Employee ID: {employeeId}</div>
-                  <div>Email: {profileEmail}</div>
-                  <div>First Name: {firstName}</div>
-                  <div>Last Name: {lastName}</div>
+                  <div style={{ marginTop: 12 }}>Employee ID: {profileStore.employeeId}</div>
+                  <div>Email: {profileStore.profileEmail}</div>
+                  <div>First Name: {profileStore.firstName}</div>
+                  <div>Last Name: {profileStore.lastName}</div>
                 </>
               )}
             </div>
@@ -218,31 +236,29 @@ function Settings() {
         </div>
       </div>
 
-
+  
       <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap' }}>
-        <Card
-          title="Contact Details"
-          style={{
-            flex: 1,
-            minWidth: 280,
-            borderRadius: 14,
-            background: '#fff',
-            boxShadow: '0 4px 18px rgba(44, 98, 186, 0.08)',
-          }}
-        >
+    
+        <Card title="Contact Details" style={{ flex: 1, minWidth: 280 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
               <span style={{ fontWeight: 500 }}>Email Address:</span>
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                value={profileStore.email}
+                onChange={(e) => (profileStore.email = e.target.value)}
+              />
             </div>
             <div>
               <span style={{ fontWeight: 500 }}>Mobile No.:</span>
-              <Input value={mobile} onChange={(e) => setMobile(e.target.value)} />
+              <Input
+                value={profileStore.mobile}
+                onChange={(e) => (profileStore.mobile = e.target.value)}
+              />
             </div>
             <Button
               type="primary"
-              loading={contactSaving}
-              onClick={handleContactSave}
+              loading={profileStore.contactSaving}
+              onClick={() => profileStore.handleContactSave()}
               style={{ alignSelf: 'flex-end' }}
             >
               Update
@@ -250,32 +266,23 @@ function Settings() {
           </div>
         </Card>
 
-        <Card
-          title="Edit Profile"
-          style={{
-            flex: 1,
-            minWidth: 280,
-            borderRadius: 14,
-            background: '#fff',
-            boxShadow: '0 4px 18px rgba(44, 98, 186, 0.08)',
-          }}
-        >
+        <Card title="Edit Profile" style={{ flex: 1, minWidth: 280 }}>
           <EditProfileForm
-            employeeId={employeeId}
-            setEmployeeId={setEmployeeId}
-            profileEmail={profileEmail}
-            setProfileEmail={setProfileEmail}
-            firstName={firstName}
-            setFirstName={setFirstName}
-            lastName={lastName}
-            setLastName={setLastName}
-            onSave={handleProfileSave}
-            saving={saving}
+            employeeId={profileStore.employeeId}
+            setEmployeeId={(val) => (profileStore.employeeId = val)}
+            profileEmail={profileStore.profileEmail}
+            setProfileEmail={(val) => (profileStore.profileEmail = val)}
+            firstName={profileStore.firstName}
+            setFirstName={(val) => (profileStore.firstName = val)}
+            lastName={profileStore.lastName}
+            setLastName={(val) => (profileStore.lastName = val)}
+            onSave={() => profileStore.handleProfileSave()}
+            saving={profileStore.saving}
           />
         </Card>
       </div>
     </div>
   );
-}
+});
 
 export default Settings;
