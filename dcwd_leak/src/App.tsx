@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import 'antd/dist/reset.css';
 import {
-  AppstoreOutlined,
   HomeOutlined,
   SettingOutlined,
   FileTextOutlined,
   ClusterOutlined,
-  FileOutlined,
-  LogoutOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  BellOutlined,
+  SunOutlined,
+  SearchOutlined,
+  AppstoreOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu, Button, ConfigProvider, Avatar, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-  useNavigate,
   useLocation
 } from 'react-router-dom';
 
@@ -33,60 +34,50 @@ import QualityComplaints from './components/Operations/QualityComplaints';
 import DispatchOveride from './components/SystemMaintenance/DispatchOveride';
 import CaretakerAssignment from './components/SystemMaintenance/CaretakerAssignment';
 import AccessLevel from './components/SystemMaintenance/AccessLevel';
-import UserAccounts from './components/SystemMaintenance/UserAccounts';
-import JMSDataSeeding from './components/SystemMaintenance/JMSDataSeeding';
 import Reports from './components/Report/Reports';
 import LeakOptionsModal from './components/Modals/LeakOptionsModal';
 import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
 import ReportALeak from './components/CreateReport/ReportALeak';
+
+import { devApi } from './components/Endpoints/Interceptor';
+import { useNavigate } from 'react-router-dom';
+
 import LogoutModal from './components/Modals/LogoutModal'; 
+
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
 
 const { Sider, Header, Content } = Layout;
+const { Text } = Typography;
 type MenuItem = Required<MenuProps>['items'][number];
 
-const iconSize = { fontSize: '17px' };
-
-const bulletLabel = (text: string) => (
-  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <span
-      style={{
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        backgroundColor: '#ffffff',
-        marginRight: 8,
-        marginLeft: 2,
-      }}
-    />
-    {text}
-  </span>
-);
+const iconSize = { fontSize: '18px' };
 
 const items: MenuItem[] = [
-  { key: 'home', label: 'Home', icon: <HomeOutlined style={iconSize} /> },
+  { key: 'home', label: 'Dashboard', icon: <HomeOutlined style={iconSize} /> },
   { key: 'create-report', label: 'Create a Report', icon: <FileTextOutlined style={iconSize} />},
-  { key: 'operation', label: 'Operation', icon: <AppstoreOutlined style={iconSize} />,
+  { 
+    key: 'operations', 
+    label: 'Operations', 
+    icon: <AppstoreOutlined style={iconSize} />,
     children: [
-      { key: 'leak-reports', label: bulletLabel('Leak Reports') },
-      { key: 'supply-complaints', label: bulletLabel('Supply Complaints') },
-      { key: 'quality-complaints', label: bulletLabel('Quality Complaints') },
+      { key: 'leak-reports', label: 'Leak Reports' },
+      { key: 'supply-complaints', label: 'Water Supply Complaints' },
+      { key: 'quality-complaints', label: 'Water Quality Complaints' },
     ],
   },
-  { key: 'maintenance', label: 'System Maintenance', icon: <ClusterOutlined style={iconSize} />,
+  { 
+    key: 'system-maintenance', 
+    label: 'System Maintenance', 
+    icon: <SettingOutlined style={iconSize} />,
     children: [
-      { key: 'dispatch-override', label: bulletLabel('Dispatch Override') },
-      { key: 'caretaker-assignment', label: bulletLabel('Caretaker Assignment') },
-      { key: 'access-level', label: bulletLabel('Access Level') },
-      { key: 'user-accounts', label: bulletLabel('User Accounts') },
-      { key: 'jms-data-seeding', label: bulletLabel('JMS Data Seeding') },
+      { key: 'dispatch-overide', label: 'Dispatch Override' },
+      { key: 'caretaker-assignment', label: 'Caretaker Assignment' },
+      { key: 'access-level', label: 'Access Level' },
     ],
   },
-  { key: 'reports', label: 'Reports', icon: <FileOutlined style={iconSize} /> },
-  { key: 'settings', label: 'Settings', icon: <SettingOutlined style={iconSize} /> },
-  { key: 'logout', label: 'Logout', icon: <LogoutOutlined style={iconSize} /> },
+  { key: 'reports', label: 'Reports', icon: <ClusterOutlined style={iconSize} /> },
 ];
 
 const getSidebarWidth = () => {
@@ -99,11 +90,51 @@ const getSidebarWidth = () => {
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
+ const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
+const [userProfile, setUserProfile] = useState({
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  department: '',
+  empId: ''
+});
+const [logoutModalVisible, setLogoutModalVisible] = useState(false);
       
   const navigate = useNavigate();
   const location = useLocation();
+
+
+   useEffect(() => {
+    const fetchUserProfile = async () => {
+      const empId = localStorage.getItem('username');
+      if (!empId) return;
+
+      try {
+        const res = await devApi.get(
+          `dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID`,
+          { params: { empId } }
+        );
+
+        const data = res.data;
+        if (data?.statusCode === 200 && data?.data) {
+          const user = data.data;
+          setUserProfile({
+            firstName: user.firstname || '',
+            middleName: user.middlename || '',
+            lastName: user.lastname || '',
+            department: user.department || '',
+            empId: user.empId || ''
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch user profile:', err);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);  
+
+
 
   useEffect(() => {
     const handleResize = () => setSidebarWidth(getSidebarWidth());
@@ -157,31 +188,95 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           trigger={null}
           collapsible
           collapsed={collapsed}
-          width={sidebarWidth}
-          className={`custom-sider ${collapsed ? 'collapsed' : ''}`}
+          width={280}
+          className="modern-sidebar"
+          style={{
+            background: '#fff',
+            boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
+          }}
         >
-          <div className = 'sider-logo-wrapper'>
+
+          <div className="sider-logo-wrapper" style={{ padding: '24px 20px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
             {collapsed ? (
-              <img src={dcwdIcon} alt="DCWD Icon" className='sider-logo collapsed-logo' />
+              <img 
+                src={dcwdIcon} 
+                alt="DCWD Icon" 
+                className="sider-logo collapsed-logo" 
+                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+              />
             ) : (
-              <img src={dcwd} alt ="DCWD Logo" className= 'sider-logo expanded-logo' />
+              <img 
+                src={dcwd} 
+                alt="DCWD Logo" 
+                className="sider-logo expanded-logo" 
+                style={{ maxWidth: '120px', maxHeight: '40px', objectFit: 'contain' }} 
+              />
             )}
-          </div>
+          </div>        
+
+          {!collapsed && (
+            <div style={{
+              padding: '20px',
+              borderBottom: '1px solid #f0f0f0',
+              textAlign: 'center'
+            }}>
+              <Avatar 
+                size={95} 
+                icon={<ClusterOutlined />} 
+                style={{ 
+                  backgroundColor: '#6782f5',
+                  marginBottom: '12px'
+                }}
+              />
+              <div>
+                <Text strong style={{ display: 'block', fontSize: '14px', color: '#262626' }}>
+                  {`${userProfile.firstName} ${userProfile.middleName} ${userProfile.lastName}`.trim() || 'Loading...'}
+                </Text>
+                <Text style={{ display: 'block', fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>
+                  {userProfile.department || 'Loading department...'}
+                </Text>
+                <Text style={{ display: 'block', fontSize: '11px', color: '#bfbfbf', marginTop: '2px' }}>
+                  {userProfile.empId || 'Loading ID...'}
+                </Text>
+              </div>
+            </div>
+          )}
+
           <Menu
-            className="custom-sidebar-menu"
+            className="modern-menu"
             onClick={onClick}
             selectedKeys={[location.pathname.replace('/', '') || 'home']}
             mode="inline"
             items={items}
-            theme="light"
+            style={{
+              border: 'none',
+              background: 'transparent',
+              fontSize: '14px'
+            }}
           />
         </Sider>
 
-        <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease' }}>
+        <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.7)', }}>
           <Header
             className='custom-header'
-            style={{ left: collapsed? 80: sidebarWidth }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              left: collapsed ? 80 : sidebarWidth,
+              height: '88px',
+              padding: '0 24px',
+              background: '#fff',
+              borderBottom: '1px solid #f0f0f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              zIndex: 1000,
+              transition: 'left 0.2s ease',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+            }}
           >
+          <div style={{display: 'flex', alignItems: 'center'}}>  
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -189,14 +284,33 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               style={{ fontSize: '16px', marginRight: 16, color: 'white'}}
             />
             <span>Leak Reporting System</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Button
+              type="text"
+              icon={<ClusterOutlined />}
+              style={{ color: 'white' }}
+              onClick={() => navigate('/settings')}
+            />
+            <Button
+              type="text"
+              icon={<LogoutOutlined />}
+              style={{ color: 'white' }}
+              onClick={() => {
+                onLogout();
+                navigate('/login');
+              }}
+            />
+          </div>  
           </Header>
 
           <Content
             style={{
-              marginTop: 64,
+              marginTop: 88,
               padding: 24,
-              backgroundColor: '#ffffff',
-              minHeight: 'calc(100vh - 64px)',
+              backgroundColor: '#f5f6fa',
+              minHeight: 'calc(100vh - 88px)',
             }}
           >
             <Routes>
@@ -204,13 +318,11 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               <Route path="leak-reports" element={<LeakReports />} />
               <Route path="supply-complaints" element={<SupplyComplaints />} />
               <Route path="quality-complaints" element={<QualityComplaints />} />
-              <Route path="dispatch-override" element={<DispatchOveride />} />
+              <Route path="dispatch-overide" element={<DispatchOveride />} />
               <Route path="caretaker-assignment" element={<CaretakerAssignment />} />
               <Route path="access-level" element={<AccessLevel />} />
-              <Route path="user-accounts" element={<UserAccounts />} />
-              <Route path="jms-data-seeding" element={<JMSDataSeeding />} />
-              <Route path="settings" element={<Settings />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
               <Route path="report-a-leak" element={<ReportALeak />} />
               <Route path="*" element={<Navigate to="home" />} />
@@ -240,11 +352,35 @@ const WaterSupplyConcernsWrapper: React.FC = () => {
   return <WaterSupplyConcern formType={formType} />;
 };
 
-const App: React.FC = () => {
+const theme = {
+  token: {
+    colorPrimary: '#1890ff',
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError: '#ff4d4f',
+    fontFamily: 'Noto Sans, -apple-system, BlinkMacSystemFont, sans-serif',
+    borderRadius: 8,
+  },
+  components: {
+    Form: {
+      labelFontSize: 12,
+      labelColor: '#262626',
+    },
+    Button: {
+      borderRadius: 8,
+    },
+    Card: {
+      borderRadius: 12,
+    },
+  },
+};
+
+function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return !!localStorage.getItem("token");
   });
 
+  // Token expiry check
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expiry = localStorage.getItem("token_expiry");
@@ -298,6 +434,7 @@ const App: React.FC = () => {
   };
 
   return (
+    <ConfigProvider theme={theme}>
     <Router>
       <Routes>
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
@@ -313,6 +450,7 @@ const App: React.FC = () => {
         />
       </Routes>
     </Router>
+    </ConfigProvider>
   );
 };
 
