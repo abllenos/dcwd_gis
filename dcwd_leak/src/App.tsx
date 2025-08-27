@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import 'antd/dist/reset.css';
 import {
   HomeOutlined,
-  UserOutlined,
+  SettingOutlined,
   FileTextOutlined,
   ClusterOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  SettingOutlined,
   BellOutlined,
   SunOutlined,
   SearchOutlined,
@@ -84,7 +83,7 @@ const items: MenuItem[] = [
 const getSidebarWidth = () => {
   const screenWidth = window.innerWidth;
   if (screenWidth >= 1600) return Math.min(screenWidth * 0.2, 300); 
-  if (screenWidth >= 1200) return Math.min(screenWidth * 0.22, 285); 
+  if (screenWidth >= 1200) return Math.min(screenWidth * 0.22, 280); 
   return 280;
 };
 
@@ -223,7 +222,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
             }}>
               <Avatar 
                 size={95} 
-                icon={<UserOutlined />} 
+                icon={<ClusterOutlined />} 
                 style={{ 
                   backgroundColor: '#6782f5',
                   marginBottom: '12px'
@@ -257,10 +256,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
           />
         </Sider>
 
-        <Layout style={{ 
-          marginLeft: collapsed ? 80 : 280, 
-          transition: 'margin-left 0.2s ease',
-        }}>
+        <Layout style={{ marginLeft: collapsed? 80: sidebarWidth, transition: 'margin-left 0.2s ease', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.7)', }}>
           <Header
             className='custom-header'
             style={{
@@ -280,73 +276,33 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>  
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                style={{ 
-                  fontSize: '16px',
-                  color: '#595959',
-                  padding: '4px 8px'
-                }}
-              />
-              <Text strong style={{ fontSize: '16px', color: '#262626' }}>
-                Leak Reporting System
-              </Text>
-            </div>
+          <div style={{display: 'flex', alignItems: 'center'}}>  
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{ fontSize: '16px', marginRight: 16, color: 'white'}}
+            />
+            <span>Leak Reporting System</span>
+          </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Button
-                type="text"
-                icon={<SearchOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
-              />
-              <Button
-                type="text"
-                icon={<SunOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
-              />
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
-              />
-              <Button
-                type="text"
-                icon={<SettingOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
-                onClick={() => navigate('/settings')}
-              />
-              <Button
-                type="primary"
-                icon={<LogoutOutlined />}
-                style={{ 
-                  backgroundColor: '#6782f5',
-                  borderColor: '#6782f5',
-                  color: '#ffffff',
-                  padding: '4px 8px'
-                }}
-                onClick={() => {
-                  onLogout();
-                  navigate('/login');
-                }}
-              >
-                Log out
-              </Button>
-            </div>  
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Button
+              type="text"
+              icon={<ClusterOutlined />}
+              style={{ color: 'white' }}
+              onClick={() => navigate('/settings')}
+            />
+            <Button
+              type="text"
+              icon={<LogoutOutlined />}
+              style={{ color: 'white' }}
+              onClick={() => {
+                onLogout();
+                navigate('/login');
+              }}
+            />
+          </div>  
           </Header>
 
           <Content
@@ -481,19 +437,18 @@ function App() {
     <ConfigProvider theme={theme}>
     <Router>
       <Routes>
-
-  <Route
-    path="/login"
-    element={<Login onLogin={handleLogin} />} 
-  />
-  <Route
-    path="/*"
-    element={
-      isLoggedIn ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />
-    }
-  />
-</Routes>
-
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route
+          path="/*"
+          element={
+            isLoggedIn ? (
+              <Dashboard onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
     </Router>
     </ConfigProvider>
   );

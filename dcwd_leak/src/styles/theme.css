@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+.custom-sider {
+=======
 :root {
   /* DCWD Brand Colors */
   --dcwd-primary: #1890ff;
@@ -82,6 +86,7 @@
 
 /* Modern Sidebar Styles */
 .modern-sidebar {
+>>>>>>> 9010b473832881d8238a422c985ba2dfb40cbd43
   position: fixed;
   top: 0;
   bottom: 0;
@@ -89,6 +94,13 @@
   z-index: 1000;
   height: 100vh;
   overflow-y: auto;
+<<<<<<< HEAD
+  box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+  background-color: #0c4a67; 
+  transition: width 0.2s ease, all 0.2s ease;
+
+  width: clamp(220px, 20%, 280px);
+=======
   transition: width 0.2s ease;
 }
 
@@ -166,6 +178,7 @@
   .modern-sidebar .ant-layout-sider-children > div:nth-child(2) {
     display: none;
   }
+>>>>>>> 9010b473832881d8238a422c985ba2dfb40cbd43
 }
 
 .sider-logo-wrapper {
@@ -201,6 +214,7 @@
 .custom-sidebar-menu .ant-menu-item,
 .custom-sidebar-menu .ant-menu-submenu-title {
   font-size: 16px;
+  border: 1px solid rgba(250, 250, 250, 0.2);
   background-color: #0c4a67 !important; 
   color: white !important;
   margin-bottom: 12px; 
@@ -216,7 +230,6 @@
 }
 
 .custom-sidebar-menu .ant-menu-item-selected {
-  border: 1px solid rgba(250, 250, 250, 0.2);
   background-color: #0c4a67 !important; 
   color: #d0ebff !important;           
   font-weight: 700;
@@ -261,7 +274,7 @@
   justify-content: center;
   width: 32px;         
   height: 32px;        
-  border: 1px solid rgba(255, 250, 250, 0.6);
+  border: 1px solid rgba(111, 110, 110, 0.6);
   border-radius: 6px; 
   margin-right: 3px;  
   background-color: rgba(255, 255, 255, 0.05);
@@ -277,6 +290,10 @@
   border-color: #d0ebff;
   background-color: rgba(208, 235, 255, 0.15);
 }
+
+
+
+
 
 .custom-header {
   position: fixed;
@@ -294,12 +311,12 @@
   z-index: 1100;
   transition: all 0.2s ease;
   left: 280px;
-  justify-content: space-between;
 }
 
 .custom-sider.collapsed ~ .custom-header {
   left: 80px;
 }
+
 
 
 .custom-sider.collapsed ~ .custom-content {

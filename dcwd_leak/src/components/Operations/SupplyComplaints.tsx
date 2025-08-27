@@ -11,7 +11,6 @@ import {
 } from 'antd';
 import { FileSearchOutlined, HomeFilled, DownOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -161,22 +160,14 @@ const SupplyComplaints: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button
-            icon={< HomeFilled />}
-            onClick={handleHomeClick}
-            type="text"
-            style={{ fontSize: 16, color: '#00008B', margin: 0 }}
-            shape="circle"
-        />
-        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
           <Breadcrumb.Item>Operation</Breadcrumb.Item>
           <Breadcrumb.Item>Water Supply Complaints</Breadcrumb.Item>
         </Breadcrumb>
-        </div>
+        
         <Input.Search
-          placeholder="Search..."
+          placeholder="Search"
           allowClear
           style={{ width: 300 }}
           onChange={e => setSearchText(e.target.value.toLowerCase())}

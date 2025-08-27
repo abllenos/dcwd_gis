@@ -109,7 +109,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
           backgroundColor: "#fff",
           padding: 24,
           borderRadius: 8,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         }}
       >
         <Row gutter={24}>

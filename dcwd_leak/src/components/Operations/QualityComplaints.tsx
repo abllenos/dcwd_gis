@@ -166,20 +166,12 @@ const QualityComplaints: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30}}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button
-            icon={<HomeFilled />}
-            onClick={handleHomeClick}
-            type="text"
-            style={{ fontSize: 16, color: '#00008B', margin: 0 }}
-            shape="circle"
-          />
-        <Breadcrumb style={{fontSize: 16, fontWeight: 500 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
           <Breadcrumb.Item>Operation</Breadcrumb.Item>
           <Breadcrumb.Item>Water Quality Complaints</Breadcrumb.Item>
         </Breadcrumb>
-        </div>
+
         <Input.Search
           placeholder="Search"
           allowClear
