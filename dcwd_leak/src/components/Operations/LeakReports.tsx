@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Tabs, Button, Input, Badge, Card } from 'antd';
-import { EditOutlined, CarOutlined, FileSearchOutlined, FileImageOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import DispatchModal from '../Modals/DispatchModal';
-import UpdateReport from '../Modals/UpdateReport';
-import ReportDetails from '../Modals/ReportDetails';
-import ImageModal from '../Modals/ImageModal';
-import type { ColumnsType } from 'antd/es/table';
-import type { LeakData } from '../../types/Leakdata';
+import React, { useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import { Table, Button, Input, Badge, Card, Breadcrumb, Select } from "antd";
+import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled, DownOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import DispatchModal from "../Modals/DispatchModal";
+import UpdateReport from "../Modals/UpdateModal";
+import ReportDetails from "../Modals/ReportModal";
+import ImageModal from "../Modals/ImageModal";
+import { leakReportsStore } from "../../stores/leakReportsStore";
+import type { ColumnsType } from "antd/es/table";
+import type { LeakData } from "../../types/Leakdata";
 
-const { TabPane } = Tabs;
+const { Option } = Select;
 
 const tabLabels: Record<string, string> = {
   customer: 'Customer',
@@ -268,22 +270,31 @@ const columnPresets: Record<string, ColumnsType<LeakData>> = {
         onChange={(e) => setSearchText(e.target.value)}
       />
 
-      <Card bodyStyle={{ padding: 16 }}>
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          {Object.entries(tabLabels).map(([key, label]) => (
-            <TabPane
-              key={key}
-              tab={
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {label}
-                  </span>
-                  <Badge count={tabCounts[key] ?? 0} size="small" />
-                </span>
-              }
-            />
-          ))}
-        </Tabs>
+      <Card className="custom-card">
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 16 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#595959" }}>Filter by Status:</span>
+          <Select
+            value={leakReportsStore.activeTab}
+            onChange={(value) => leakReportsStore.setActiveTab(value)}
+            style={{ width: 300 }}
+            suffixIcon={<DownOutlined />}
+            placeholder="Select status"
+          >
+            {Object.entries(tabLabels).map(([key, label]) => (
+              <Option key={key} value={key}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                  <span>{label}</span>
+                  <Badge 
+                    count={leakReportsStore.tabCounts[key] ?? 0} 
+                    size="small" 
+                    color="blue" 
+                    style={{ marginLeft: 8 }}
+                  />
+                </div>
+              </Option>
+            ))}
+          </Select>
+        </div>
 
         <Table
           columns={columnPresets[activeTab]}

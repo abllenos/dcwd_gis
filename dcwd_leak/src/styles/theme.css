@@ -1,5 +1,92 @@
+<<<<<<< HEAD
 
 .custom-sider {
+=======
+:root {
+  /* DCWD Brand Colors */
+  --dcwd-primary: #1890ff;
+  --dcwd-secondary: #52c41a;
+  --dcwd-accent: #faad14;
+  --dcwd-error: #ff4d4f;
+  
+  /* Typography */
+  --font-primary: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  
+  /* Spacing Scale */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.15);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.25);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.35);
+  
+  /* Layout */
+  --header-height: 64px;
+  --sidebar-width: 256px;
+  --container-max-width: 1200px;
+  
+  /* Common component styles */
+  --card-padding: 24px;
+  --card-radius: 8px;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+/* Form styles that you can reuse */
+.form-card {
+  background: white;
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.form-label {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #262626;
+  margin-bottom: var(--spacing-xs);
+}
+
+.button-group {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .form-card {
+    padding: var(--spacing-md);
+  }
+}
+
+/* Modern Sidebar Styles */
+.modern-sidebar {
+>>>>>>> 9010b473832881d8238a422c985ba2dfb40cbd43
   position: fixed;
   top: 0;
   bottom: 0;
@@ -7,17 +94,92 @@
   z-index: 1000;
   height: 100vh;
   overflow-y: auto;
+<<<<<<< HEAD
   box-shadow: 2px 0 8px rgba(0,0,0,0.05);
   background-color: #0c4a67; 
   transition: width 0.2s ease, all 0.2s ease;
 
   width: clamp(220px, 20%, 280px);
+=======
+  transition: width 0.2s ease;
 }
 
-.custom-sider.collapsed {
-  width: 80px;
+.modern-sidebar.ant-layout-sider-collapsed {
+  width: 80px !important;
 }
 
+.modern-menu {
+  padding: 8px 16px;
+}
+
+.modern-menu .ant-menu-item {
+  height: 40px;
+  line-height: 40px;
+  margin: 4px 0;
+  border-radius: 6px;
+  color: #595959;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.modern-menu .ant-menu-item:hover {
+  background-color: #f5f5f5;
+  color: #6782f5;
+}
+
+.modern-menu .ant-menu-item-selected {
+  background-color: #6782f5;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.modern-menu .ant-menu-item-icon {
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.modern-menu .ant-menu-submenu-title {
+  height: 40px;
+  line-height: 40px;
+  margin: 4px 0;
+  border-radius: 6px;
+  color: #595959;
+  font-weight: 500;
+  padding-left: 24px;
+}
+
+.modern-menu .ant-menu-submenu-title:hover {
+  background-color: #f5f5f5;
+  color: #6782f5;
+}
+
+.modern-menu .ant-menu-submenu-open > .ant-menu-submenu-title {
+  background-color: #e6f7ff;
+  color: #6782f5;
+}
+
+.modern-menu .ant-menu-sub .ant-menu-item {
+  padding-left: 48px !important;
+  height: 36px;
+  line-height: 36px;
+  font-size: 13px;
+}
+
+.modern-menu .ant-menu-submenu-arrow {
+  color: #8c8c8c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .modern-sidebar {
+    width: 80px !important;
+  }
+  
+  .modern-sidebar .ant-layout-sider-children > div:nth-child(2) {
+    display: none;
+  }
+>>>>>>> 9010b473832881d8238a422c985ba2dfb40cbd43
+}
 
 .sider-logo-wrapper {
   text-align: center;

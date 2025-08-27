@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import {
   Table,
   Button,
-  Typography,
   Breadcrumb,
-  Tabs,
   Card,
   Input,
   Modal,
+  Select,
+  Badge,
 } from 'antd';
-import { FileSearchOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, HomeFilled, DownOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title } = Typography;
-const { TabPane } = Tabs;
+const { Option } = Select;
 
 interface ComplaintData {
   key: string;
@@ -66,6 +65,25 @@ const SupplyComplaints: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<ComplaintData | null>(null);
+
+  const navigate = useNavigate();
+
+  // Tab counts for badges
+  const tabCounts = {
+    reports: reportData.length,
+    onprocess: onProcessData.length,
+    completed: completedData.length,
+  };
+
+  const tabLabels = {
+    reports: 'Reports',
+    onprocess: 'On-Process',
+    completed: 'Completed',
+  };
+
+  const handleHomeClick = () => {
+    navigate('/home');
+  };
 
   const showDetails = (record: ComplaintData) => {
     setSelectedRecord(record);
@@ -156,17 +174,31 @@ const SupplyComplaints: React.FC = () => {
         />
       </div>
 
-      <Card style={{ marginBottom: 0, width: '100%', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 25 }}>
-        <Tabs
-          activeKey={activeTab}
-          onChange={key => setActiveTab(key)}
-          type="card"
-          className='custom-tabs'
-        >
-          <TabPane tab="Reports" key="reports" />
-          <TabPane tab="On-Process" key="onprocess" />
-          <TabPane tab="Completed" key="completed" />
-        </Tabs>
+      <Card className='custom-card'>
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 16 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#595959" }}>Filter by Status:</span>
+          <Select
+            value={activeTab}
+            onChange={(value) => setActiveTab(value)}
+            style={{ width: 300 }}
+            suffixIcon={<DownOutlined />}
+            placeholder="Select status"
+          >
+            {Object.entries(tabLabels).map(([key, label]) => (
+              <Option key={key} value={key}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                  <span>{label}</span>
+                  <Badge 
+                    count={tabCounts[key as keyof typeof tabCounts] ?? 0} 
+                    size="small" 
+                    color="blue" 
+                    style={{ marginLeft: 8 }}
+                  />
+                </div>
+              </Option>
+            ))}
+          </Select>
+        </div>
         <Table
           columns={columns}
           dataSource={filteredData()}

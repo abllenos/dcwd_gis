@@ -8,6 +8,7 @@ import '../styles/LoadingOverlay.css';
 import { devApi } from './Endpoints/Interceptor';
 
 interface LoginProps {
+  
   onLogin: (userData: any) => void;
 }
 

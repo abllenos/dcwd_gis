@@ -12,9 +12,8 @@
     Breadcrumb,
     message,
     Space,
-    Modal,
-  } from 'antd';
-  import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+    } from 'antd';
+  import { EnvironmentOutlined, HomeFilled, SearchOutlined } from '@ant-design/icons';
   import { devApi } from '../Endpoints/Interceptor';
   import { useNavigate } from 'react-router-dom';
   import CustomModal from '../Modals/CustomModal';
@@ -36,21 +35,21 @@
     fontFamily: 'Noto Sans, sans-serif',
   };
 
-  const ReportALeak: React.FC = () => {
-    const [form] = Form.useForm();
-    const [lat, setLat] = useState(7.0722);
-    const [lng, setLng] = useState(125.6131);
-    const [wscode, setWscode] = useState<string>('');
-    const [CT_ID, setCaretaker] = useState<string>('');
-    const [fileList, setFileList] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [searchValue, setSearchValue] = useState('');
-    const [searchLoading, setSearchLoading] = useState(false);
-    const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string }>({});
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [modalContent, setModalContent] = useState<{ title: string; content: string }>({ title: '', content: '' });
+const ReportALeak: React.FC = () => {
+  const [form] = Form.useForm();
+  const [lat, setLat] = useState(7.0722);
+  const [lng, setLng] = useState(125.6131);
+  const [wscode, setWscode] = useState<string>('');
+  const [CT_ID, setCaretaker] = useState<string>('');
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string }>({});
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<{ title: string; content: string }>({ title: '', content: '' });
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
     useEffect(() => {
       const token = localStorage.getItem('token');
@@ -113,9 +112,9 @@
       setModalData({visible:true, title, content, type});
     };
 
-    const handleModalOk = () => {
-      setIsModalVisible(false);
-    };
+  const handleModalOk = () => {
+    setIsModalVisible(false);
+  };
 
     const handleSubmit = async (values: any) => {
       const token = localStorage.getItem('debug_token');
@@ -259,21 +258,21 @@
       }
     };
 
-    return (
-      <div style={{ padding: '4px 24px 24px 24px' }}>
-        <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
-          <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
-        </Breadcrumb>
+  return (
+    <div style={{ padding: '4px 24px 24px 24px'}}>
+      <Breadcrumb style={{ marginBottom: 30, fontSize: 16, fontWeight: 500 }}>
+        <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
+        <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
+      </Breadcrumb>
 
-        <div
-          style={{
-            backgroundColor: '#fff',
-            padding: 24,
-            borderRadius: 8,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          }}
-        >
+      <div
+        style={{
+          backgroundColor: '#fff',
+          padding: 24,
+          borderRadius: 8,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+        }}
+      >
 
           <Form
             form={form}
@@ -426,16 +425,16 @@
           </Form>
         </div>
 
-        <CustomModal
-          visible={modalData.visible}
-          title={modalData.title}
-          content={modalData.content}
-          type={modalData.type}
-          onClose={() => setModalData(prev => ({ ...prev, visible: false }))}
-        />
-          <p>{modalContent.content}</p>
-      </div>
-    );
-  };
+      <CustomModal
+        visible={modalData.visible}
+        title={modalData.title}
+        content={modalData.content}
+        type={modalData.type}
+        onClose={() => setModalData(prev => ({ ...prev, visible: false }))}
+      />
+        <p>{modalContent.content}</p>
+    </div>
+  );
+};
 
   export default ReportALeak;
