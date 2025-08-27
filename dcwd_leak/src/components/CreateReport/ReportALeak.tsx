@@ -121,10 +121,6 @@ const ReportALeak: React.FC = () => {
       return;
     }
 
-    const DateReported = new Date()
-      .toISOString()
-      .replace('T', ' ')
-      .replace('Z', '+00:00');
     const formData = new FormData();
     formData.append('Name', values.Name || '');
     formData.append('Number', values.Number || '');
@@ -132,7 +128,7 @@ const ReportALeak: React.FC = () => {
     formData.append('Address', values.address || '');
     formData.append('Landmark', values.Landmark || '');
     formData.append('LeakPressure', values.leakPressure || '');
-    formData.append('Visibility', values.visibility || '');
+    formData.append('LeakLocation', values.visibility || '');
     formData.append('TypeId', values.typeId || '');
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
@@ -140,7 +136,7 @@ const ReportALeak: React.FC = () => {
     formData.append('remarks', values.Remarks || '');
     formData.append('ct_code', CT_ID || '');
     formData.append('wscode', wscode || '');
-    formData.append('DT_Reported', DateReported);
+    formData.append('DT_Reported', new Date().toISOString());
     formData.append('refAccNo', values.refAccNo || '');
     formData.append('dispatchStat', '1');
     formData.append('flgLeakDetection', '0')

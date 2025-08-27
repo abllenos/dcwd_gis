@@ -39,6 +39,11 @@
   --card-padding: 24px;
   --card-radius: 8px;
   --card-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  
+  /* Button Colors */
+  --btn-primary-color: #6782f5;
+  --btn-gray-color: #595959;
+  --btn-white-color: #ffffff;
 }
 
 /* Form styles that you can reuse */
@@ -68,6 +73,39 @@
   gap: var(--spacing-md);
   justify-content: flex-end;
   margin-top: var(--spacing-lg);
+}
+
+/* Header Button Styles */
+.header-btn {
+  padding: 4px 8px !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.header-btn-menu {
+  font-size: 16px !important;
+  color: var(--btn-gray-color) !important;
+}
+
+.header-btn-icon {
+  color: var(--btn-primary-color) !important;
+}
+
+.header-btn-icon:hover {
+  background-color: rgba(103, 130, 245, 0.1) !important;
+  color: var(--btn-primary-color) !important;
+}
+
+.header-btn-primary {
+  background-color: var(--btn-primary-color) !important;
+  border-color: var(--btn-primary-color) !important;
+  color: var(--btn-white-color) !important;
+}
+
+.header-btn-primary:hover {
+  background-color: rgba(103, 130, 245, 0.8) !important;
+  border-color: rgba(103, 130, 245, 0.8) !important;
+  color: var(--btn-white-color) !important;
 }
 
 @media (max-width: 768px) {
@@ -170,28 +208,33 @@
 
 .sider-logo-wrapper {
   text-align: center;
-  padding: 17px;
+  padding: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .sider-logo {
   display: block;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .expanded-logo {
-  max-width: 80%;
-  height: auto;               
-  max-height: 55px;           
+  max-width: 120px;
+  height: 32px;           
   border-radius: 8px;
-  margin-bottom: 16px;  
+  margin: 0;  
   object-fit: contain;  
 }
 
 .collapsed-logo {
-  max-width: 90%;
-  height: clamp(30px, 8%, 45px) !important;
+  width: 32px;
+  height: 32px !important;
   border-radius: 50%;
-  margin-bottom: 25px;
+  margin: 0;
+  object-fit: cover;
 }
 
 .custom-sidebar-menu.ant-menu-light {

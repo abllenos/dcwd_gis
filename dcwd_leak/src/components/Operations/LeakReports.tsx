@@ -36,13 +36,14 @@ const LeakReports: React.FC = observer(() => {
 
   const renderActionButtons = (record: LeakData) => (
     <div style={{ display: "flex", justifyContent: "center", gap: 4 }}>
-      <Button icon={<TruckOutlined />} onClick={() => leakReportsStore.showModal("Dispatch", record)} />
-      <Button icon={<EditOutlined />} onClick={() => leakReportsStore.showModal("Update Report", record)} />
+      <Button icon={<TruckOutlined />} onClick={() => leakReportsStore.showModal("Dispatch", record)} style={{ backgroundColor: "#6782f5", borderColor: "#6782f5", color: "white" }} />
+      <Button icon={<EditOutlined />} onClick={() => leakReportsStore.showModal("Update Report", record)} style={{ backgroundColor: "#6782f5", borderColor: "#6782f5", color: "white" }} />
       <Button
         icon={<FileImageOutlined />}
         onClick={() => leakReportsStore.setImageModal(true, ["https://via.placeholder.com/300", "https://via.placeholder.com/300"])}
+        style={{ backgroundColor: "#6782f5", borderColor: "#6782f5", color: "white" }}
       />
-      <Button icon={<FileSearchOutlined />} onClick={() => leakReportsStore.showModal("Report Details", record)} />
+      <Button icon={<FileSearchOutlined />} onClick={() => leakReportsStore.showModal("Report Details", record)} style={{ backgroundColor: "#6782f5", borderColor: "#6782f5", color: "white" }} />
     </div>
   );
 
