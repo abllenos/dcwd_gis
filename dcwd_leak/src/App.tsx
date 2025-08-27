@@ -91,24 +91,21 @@ const getSidebarWidth = () => {
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(280);
-  const [userProfile, setUserProfile] = useState({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    department: '',
-    empId: ''
-  });
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
-
+ const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
+const [userProfile, setUserProfile] = useState({
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  department: '',
+  empId: ''
+});
+const [logoutModalVisible, setLogoutModalVisible] = useState(false);
       
   const navigate = useNavigate();
   const location = useLocation();
 
 
-  // Fetch user profile data
-  useEffect(() => {
+   useEffect(() => {
     const fetchUserProfile = async () => {
       const empId = localStorage.getItem('username');
       if (!empId) return;
@@ -136,6 +133,9 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     };
 
     fetchUserProfile();
+  }, []);  
+
+
 
   useEffect(() => {
     const handleResize = () => setSidebarWidth(getSidebarWidth());
@@ -197,46 +197,24 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           }}
         >
 
-          {/* Logo Section */}
-          <div style={{ 
-            padding: '24px 20px', 
-            textAlign: 'center',
-            borderBottom: '1px solid #f0f0f0'
-          }}>
-            {!collapsed && (
-              <img
-                src={dcwd}
-                alt="DCWD Logo"
-                style={{
-                  maxWidth: '120px',
-                  height: 'auto',
-                  maxHeight: '40px',
-                  objectFit: 'contain'
-                }}
-              />
-            )}
-            {collapsed && (
-              <img
-                src={dcwdIcon}
-                alt="DCWD Icon"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-
-          <div className = 'sider-logo-wrapper'>
+          <div className="sider-logo-wrapper" style={{ padding: '24px 20px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
             {collapsed ? (
-              <img src={dcwdIcon} alt="DCWD Icon" className='sider-logo collapsed-logo' />
+              <img 
+                src={dcwdIcon} 
+                alt="DCWD Icon" 
+                className="sider-logo collapsed-logo" 
+                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+              />
             ) : (
-              <img src={dcwd} alt ="DCWD Logo" className= 'sider-logo expanded-logo' />
-
+              <img 
+                src={dcwd} 
+                alt="DCWD Logo" 
+                className="sider-logo expanded-logo" 
+                style={{ maxWidth: '120px', maxHeight: '40px', objectFit: 'contain' }} 
+              />
             )}
-          </div>
+          </div>        
 
-          {/* User Profile Section */}
           {!collapsed && (
             <div style={{
               padding: '20px',
@@ -265,7 +243,6 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             </div>
           )}
 
-          {/* Navigation Menu */}
           <Menu
             className="modern-menu"
             onClick={onClick}
@@ -285,12 +262,12 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           transition: 'margin-left 0.2s ease',
         }}>
           <Header
-
+            className='custom-header'
             style={{
               position: 'fixed',
               top: 0,
               right: 0,
-              left: collapsed ? 80 : 280,
+              left: collapsed ? 80 : sidebarWidth,
               height: '88px',
               padding: '0 24px',
               background: '#fff',
@@ -302,10 +279,6 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
               transition: 'left 0.2s ease',
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}
-
-            className='custom-header'
-            style={{ left: collapsed? 80: sidebarWidth }}
-
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>  
               <Button
