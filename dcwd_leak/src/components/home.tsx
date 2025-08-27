@@ -1,8 +1,9 @@
-import { Table, Card, Row, Col } from 'antd';
+import { Table, Card, Row, Col, List, Typography } from 'antd';
 import {
   FileTextOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import {
   LineChart,
@@ -13,7 +14,9 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useState, useEffect } from 'react';
-import axios from 'axios'; // Using axios for API request
+import axios from 'axios';
+
+const { Title, Text } = Typography;
 
 interface DataType {
   key: string;
@@ -27,7 +30,6 @@ interface DataType {
   tags: string[];
 }
 
-// Table columns and mock data
 const columns = [
   { title: 'ID', dataIndex: 'id', key: 'id' },
   { title: 'Date & Time', dataIndex: 'date_time_reported', key: 'date_time_reported' },
@@ -131,6 +133,18 @@ const Home: React.FC = () => {
     empId: '',
   });
 
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const logs = [
+    { id: 1, user: 'ALVIN LLENOS', action: 'Created a ticket' },
+    { id: 2, user: 'ALVIN LLENOS', action: 'Took a break' },
+  ];
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       const empId = localStorage.getItem('username');
@@ -169,39 +183,31 @@ const Home: React.FC = () => {
               <Card
                 bordered={false}
                 style={{
-                  background: 'linear-gradient(200deg, #3b67dfff, #4c85d4ff, #726e6eff, #1b1a1aff)',
-                  backgroundSize: '750% 750%',
+                  background: 'linear-gradient(200deg, #3e67e2ff,  #8fa5e7ff)',
                   color: 'white',
                   borderRadius: '12px',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.11)',
-                  animation: 'gradientLoop 6s ease infinite',
                   padding: '26px 22px 18px 22px',
                   marginBottom: 8,
-                  transform: 'none',
-                  transition: 'none',
-                  cursor: 'default',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   textAlign: 'center',
                 }}
               >
-                <h1 style={{ fontSize: '2.1rem', fontWeight: 'bold', marginBottom: 8, letterSpacing: 1 }}>
+                <h1 style={{ fontSize: '2.1rem', fontWeight: 'bold', marginBottom: 8 }}>
                   {userProfile.firstName ? `Welcome, ${userProfile.firstName}!` : 'Welcome!'}
                 </h1>
-                <p style={{ opacity: 0.92 }}>
-                  You're now viewing the latest leak report dashboard.
-                </p>
+                <p style={{ opacity: 0.92 }}>You're now viewing the latest leak report dashboard.</p>
               </Card>
             </Col>
 
             <Col xs={12}>
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ marginTop: '-50px' }}>
                   <div style={labelStyle}>Total Reports</div>
                   <div style={numberStyle}>{total}</div>
                 </div>
-                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)' }}>
+                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
                   <FileTextOutlined style={iconStyle} />
                 </div>
               </Card>
@@ -209,11 +215,11 @@ const Home: React.FC = () => {
 
             <Col xs={12}>
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ marginTop: '-50px' }}>
                   <div style={labelStyle}>Dispatched</div>
                   <div style={numberStyle}>{dispatched}</div>
                 </div>
-                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)' }}>
+                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
                   <CheckCircleOutlined style={iconStyle} />
                 </div>
               </Card>
@@ -221,11 +227,11 @@ const Home: React.FC = () => {
 
             <Col xs={24}>
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ marginTop: '-50px' }}>
                   <div style={labelStyle}>Pending</div>
                   <div style={numberStyle}>{pending}</div>
                 </div>
-                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)' }}>
+                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
                   <ClockCircleOutlined style={iconStyle} />
                 </div>
               </Card>
@@ -233,105 +239,131 @@ const Home: React.FC = () => {
           </Row>
         </Col>
 
-
         <Col xs={24} lg={12} style={{ display: 'flex' }}>
           <Card
             title="Monthly Leak Reports"
             bordered={false}
             style={{
-            height: '80%',
-            minHeight: 353,
-            width: '100%',
-            minWidth: 350,
-            backgroundColor: '#ffffffff',   
-            border: '1px solid #e0ddddff',  
-            borderRadius: 8,
-            boxShadow: 'none',            
+              flex: 1,
+              backgroundColor: '#ffffff',
+              border: '1px solid #e0ddddff',
+              borderRadius: 8,
+              display: 'flex',
+              flexDirection: 'column',
             }}
-              bodyStyle={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '10px 10px 0 10px',
-                height: '90%',
-              }}
+            bodyStyle={{ flex: 1, padding: 16 }}
           >
-<ResponsiveContainer width="100%" height={300}>
-  <LineChart 
-    data={chartData} 
-    margin={{ top: 10, right: 30, bottom: 30, left: 40 }}
-  >
-    <XAxis 
-      dataKey="name" 
-      axisLine={false} 
-      tickLine={false} 
-      interval={0} 
-      tick={{ dy: 8, fontSize: 13 }} 
-    />  
-    <YAxis axisLine={false} tickLine={false} width={30} />
-    <Tooltip contentStyle={{ fontSize: 12 }} />
-    <Line 
-      type="monotone" 
-      dataKey="reports" 
-      stroke="#0e41a0ff"
-      strokeWidth={1.5} 
-      dot={false} 
-    />
-  </LineChart>
-</ResponsiveContainer>
-
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 10, right: 30, bottom: 30, left: 40 }}>
+                <XAxis dataKey="name" axisLine={false} tickLine={false}  interval={0} tick={{ dy: 8, fontSize: 13 }} />
+                <YAxis axisLine={false} tickLine={false} width={30} />
+                <Tooltip contentStyle={{ fontSize: 12 }} />
+                <Line type="monotone" dataKey="reports" stroke="#0e41a0ff" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+              </LineChart>
+            </ResponsiveContainer>
           </Card>
-        </Col>
-
-        <Col xs={24}>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 8,
-            boxShadow: 'none',
-            padding: '12px',
-          }}>
-<Table<DataType>
-              columns={columns}
-              dataSource={data}
-              pagination={false}
-              bordered
-              style={{ width: '100%' }}
-            />
-          </div>
         </Col>
       </Row>
 
-<style>
-  {`
-    .ant-card:hover {
-      box-shadow: none;
-      transform: translateY(-2px);
-    }
+<Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+  <Col xs={24} lg={16}>
+    <Card
+      bordered={false}
+      style={{
+        background: "transparent", 
+        boxShadow: "none",
+        padding: 0,
+      }}
+      bodyStyle={{ padding: 0 }}
+    >
+      <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered />
+    </Card>
+  </Col>
 
-    .ant-table-thead > tr > th {
-      background-color: #d1cdcdff !important;
-      font-weight: 600 !important;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-    }
+  <Col xs={24} lg={8}>
+    <Card
+      bordered={false}
+      className="mb-4"
+      style={{
+        background: "linear-gradient(200deg, #3e67e2ff,  #8fa5e7ff)",
+        color: "white",
+        borderRadius: 12,
+        padding: "10px 14px",   
+        height: 90,            
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <div style={{ textAlign: "left" }}>
+          <Title
+            level={2}
+            style={{
+              margin: 0,
+              color: "white",
+              fontWeight: 600,
+              fontSize: "1.5rem", 
+              lineHeight: 1.1,
+            }}
+          >
+            {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </Title>
+          <Text style={{ color: "rgba(255,255,255,0.9)" }}>
+            {time.toLocaleDateString(undefined, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </Text>
+        </div>
 
-    .ant-table,
-    .ant-table-container,
-    .ant-table-tbody > tr > td,
-    .ant-table-thead > tr > th {
-      border-color: #d2d4d8ff !important;
-    }
-  `}
-     </style>
+        <div style={{ textAlign: "right" }}>
+          <Text style={{ color: "white", fontWeight: 600 }}>Davao, PH</Text>
+          <br />
+          <Text style={{ color: "white" }}>30°C ☀️</Text>
+        </div>
+      </div>
+    </Card>
+
+    <Card
+      title="Activity Logs"
+      bordered={false}
+      style={{
+        maxHeight: 150,
+        overflowY: "auto",
+      }}
+    >
+      <List
+        itemLayout="horizontal"
+        dataSource={logs}
+        renderItem={(item) => (
+          <List.Item>
+            <List.Item.Meta
+              avatar={<UserOutlined />}
+              title={<Text strong>{item.user}</Text>}
+              description={item.action}
+            />
+          </List.Item>
+        )}
+      />
+    </Card>
+  </Col>
+</Row>
     </div>
   );
 };
 
 const statCardStyle = () => ({
   backgroundColor: '#ffffff',
-  color: '#1a1a1a',
-  transition: 'box-shadow 0.3s, transform 0.3s',
+  color: '#444',
   boxShadow: `0 2px 8px rgba(0,0,0,0.08)`,
   cursor: 'default',
   display: 'flex',
@@ -342,22 +374,22 @@ const statCardStyle = () => ({
 });
 
 const labelStyle: React.CSSProperties = {
-  fontSize: '1.25rem',
-  lineHeight: 1.2,
+  fontSize: '1.10rem',
+  lineHeight: 1.1,
   color: '#444',
-  fontWeight: 600,
+  fontWeight: 500,
 };
 
 const numberStyle: React.CSSProperties = {
   fontSize: '1.35rem',
-  fontWeight: 700,
-  lineHeight: 1.3,
+  fontWeight: 600,
+  lineHeight: 1.2,
   marginTop: 2,
 };
 
 const iconWrapperStyle: React.CSSProperties = {
   borderRadius: '50%',
-  padding: 12,
+  padding: 10,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -366,7 +398,7 @@ const iconWrapperStyle: React.CSSProperties = {
 
 const iconStyle: React.CSSProperties = {
   fontSize: 34,
-  color: '#135fcaff',
+  color: '#4169E1',
   fontWeight: 700,
 };
 
