@@ -226,54 +226,6 @@ const Home: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-<<<<<<< HEAD
-              <div style={{ display: 'flex', gap: 16 }}>
-                <Card
-                  bordered={false}
-                  style={{
-                    backgroundColor: '#2d7be9ff',
-                    color: 'white',
-                    transition: 'box-shadow 0.3s, transform 0.3s',
-                    boxShadow: '0 2px 12px rgba(24, 144, 255, 0.15)',
-                    cursor: 'pointer',
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: 115,
-                    maxHeight: 150,
-                    height: 140,
-                  }}
-                  bodyStyle={{ width: '100%' }}
-                  className="stat-card stat-card-total"
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div style={{ fontSize: '1.1rem' }}>Total Reports</div>
-                      <div style={{ fontSize: '1.1rem' }}>{total}</div>
-                    </div>
-                    <FileTextOutlined style={{ fontSize: 22, opacity: 0.3 }} />
-                  </div>
-                </Card>
-                <Card bordered={false} style={statCardStyle('#49862aff', 'rgba(73, 134, 42, 0.15)')}>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div style={{ fontSize: '1.1rem' }}>Dispatched</div>
-                      <div style={{ fontSize: '1.1rem' }}>{dispatched}</div>
-                    </div>
-                    <CheckCircleOutlined style={{ fontSize: 22, opacity: 0.3 }} />
-                  </div>
-                </Card>
-                <Card bordered={false} style={statCardStyle('#df811dff', 'rgba(223, 129, 29, 0.15)')}>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div style={{ fontSize: '1.1rem' }}>Pending</div>
-                      <div style={{ fontSize: '1.1rem' }}>{pending}</div>
-                    </div>
-                    <ClockCircleOutlined style={{ fontSize: 22, opacity: 0.3 }} />
-                  </div>
-                </Card>
-              </div>
-=======
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
                 <div style={{ marginTop: '-50px' }}>
                   <div style={labelStyle}>Pending</div>
@@ -283,89 +235,10 @@ const Home: React.FC = () => {
                   <ClockCircleOutlined style={iconStyle} />
                 </div>
               </Card>
->>>>>>> 886e7f84321e5dfecab61459f4f851d49345a4e3
             </Col>
           </Row>
         </Col>
 
-<<<<<<< HEAD
-         <Col xs={24} lg={8} style={{ display: 'flex', flexDirection: 'column', height: 380 }}>
-<Card
-  title="Monthly Leak Reports"
-  bordered={false}
-  headStyle={{
-    backgroundColor: '#c9c7c7ff',   
-    color: '#1d1b1bff',            
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    fontSize: '0.85rem',
-  }}
-  style={{
-    height: '80%',
-    minHeight: 353,
-    width: '100%',
-    minWidth: 350,
-    backgroundColor: '#ffffffff',
-    border: '1px solid #a3a8aaff',
-    borderRadius: 8,
-    boxShadow: 'none',
-    overflow: 'hidden',
-  }}
-  bodyStyle={{
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '10px 10px 0 10px',
-    height: '90%',
-  }}
->
-            
-<ResponsiveContainer width="100%" height={300}>
-  <LineChart 
-    data={chartData} 
-    margin={{ top: 10, right: 30, bottom: 30, left: 40 }}
-  >
-    <XAxis 
-      dataKey="name" 
-      axisLine={false} 
-      tickLine={false} 
-      interval={0} 
-      tick={{ dy: 8, fontSize: 13 }} 
-    />
-    <YAxis axisLine={false} tickLine={false} width={30} />
-    <Tooltip contentStyle={{ fontSize: 12 }} />
-    <Line 
-      type="monotone" 
-      dataKey="reports" 
-      stroke="#354785ff"
-      strokeWidth={1.5} 
-      dot={false} 
-    />
-  </LineChart>
-</ResponsiveContainer>
-
-          </Card>
-        </Col>
-
-        <Col xs={24}>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 8,
-            boxShadow: 'none',
-            padding: '12px',
-          }}>
-
-<Table<DataType>
-              columns={columns}
-              dataSource={data}
-              pagination={false}
-              bordered
-              style={{ width: '100%' }}
-            />
-          </div>
-        </Col>
-=======
         <Col xs={24} lg={12} style={{ display: 'flex' }}>
           <Card
             title="Monthly Leak Reports"
@@ -390,7 +263,6 @@ const Home: React.FC = () => {
             </ResponsiveContainer>
           </Card>
         </Col>
->>>>>>> 886e7f84321e5dfecab61459f4f851d49345a4e3
       </Row>
 
 <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
@@ -408,31 +280,6 @@ const Home: React.FC = () => {
     </Card>
   </Col>
 
-<<<<<<< HEAD
-    /* Header style */
-    .ant-table-thead > tr > th {
-      background-color: #0c4a67 !important;
-      color: #ffffff !important;
-      font-weight: 600 !important;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-    }
-
-    /* ✅ Only blue border around the table */
-    .ant-table {
-      border: 2px solid #0f6288ff !important; /* Ant Design blue */
-      border-radius: 6px; /* optional */
-      overflow: hidden;
-    }
-
-    /* Remove inner borders */
-    .ant-table-thead > tr > th,
-    .ant-table-tbody > tr > td {
-      border: none !important;
-    }
-  `}
-      </style>
-=======
   <Col xs={24} lg={8}>
     <Card
       bordered={false}
@@ -510,7 +357,6 @@ const Home: React.FC = () => {
     </Card>
   </Col>
 </Row>
->>>>>>> 886e7f84321e5dfecab61459f4f851d49345a4e3
     </div>
   );
 };
@@ -527,8 +373,6 @@ const statCardStyle = () => ({
   borderRadius: 8,
 });
 
-<<<<<<< HEAD
-=======
 const labelStyle: React.CSSProperties = {
   fontSize: '1.10rem',
   lineHeight: 1.1,
@@ -558,5 +402,4 @@ const iconStyle: React.CSSProperties = {
   fontWeight: 700,
 };
 
->>>>>>> 886e7f84321e5dfecab61459f4f851d49345a4e3
 export default Home;
