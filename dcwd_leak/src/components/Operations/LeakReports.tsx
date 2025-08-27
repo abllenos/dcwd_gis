@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Table, Tabs, Button, Input, Badge, Card, Breadcrumb } from "antd";
-import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled } from "@ant-design/icons";
+import { Table, Button, Input, Badge, Card, Breadcrumb, Select } from "antd";
+import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled, DownOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import DispatchModal from "../Modals/DispatchModal";
 import UpdateReport from "../Modals/UpdateModal";
@@ -11,7 +11,7 @@ import { leakReportsStore } from "../../stores/leakReportsStore";
 import type { ColumnsType } from "antd/es/table";
 import type { LeakData } from "../../types/Leakdata";
 
-const { TabPane } = Tabs;
+const { Option } = Select;
 
 const tabLabels: Record<string, string> = {
   customer: "Customer",
@@ -85,19 +85,30 @@ const LeakReports: React.FC = observer(() => {
       </div>
 
       <Card className="custom-card">
-        <Tabs activeKey={leakReportsStore.activeTab} onChange={(key) => leakReportsStore.setActiveTab(key)} type="card" className="custom-tabs">
-          {Object.entries(tabLabels).map(([key, label]) => (
-            <TabPane
-              key={key}
-              tab={
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>
-                  <Badge count={leakReportsStore.tabCounts[key] ?? 0} size="small" color="blue" style={{ paddingInline: 6, borderRadius: 4 }} />
-                </span>
-              }
-            />
-          ))}
-        </Tabs>
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 16 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#595959" }}>Filter by Status:</span>
+          <Select
+            value={leakReportsStore.activeTab}
+            onChange={(value) => leakReportsStore.setActiveTab(value)}
+            style={{ width: 300 }}
+            suffixIcon={<DownOutlined />}
+            placeholder="Select status"
+          >
+            {Object.entries(tabLabels).map(([key, label]) => (
+              <Option key={key} value={key}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                  <span>{label}</span>
+                  <Badge 
+                    count={leakReportsStore.tabCounts[key] ?? 0} 
+                    size="small" 
+                    color="blue" 
+                    style={{ marginLeft: 8 }}
+                  />
+                </div>
+              </Option>
+            ))}
+          </Select>
+        </div>
 
         <Table
           columns={generateColumns(leakReportsStore.activeTab)}
