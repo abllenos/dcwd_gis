@@ -288,11 +288,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Button
-                type="text"
-                icon={<SearchOutlined />}
-                className="header-btn header-btn-icon"
-              />
+
               <Button
                 type="text"
                 icon={<SunOutlined />}
