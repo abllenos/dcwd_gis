@@ -5,15 +5,8 @@ import {
   CheckCircleOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import { useState, useEffect } from 'react';
+import MonthlyLeakChart from './MonthlyLeakChart';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
@@ -145,34 +138,40 @@ const Home: React.FC = () => {
     { id: 2, user: 'ALVIN LLENOS', action: 'Took a break' },
   ];
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const empId = localStorage.getItem('username');
-      if (!empId) return;
+useEffect(() => {
+  const fetchUserProfile = async () => {
+    const empId = localStorage.getItem("username");
+    const token = localStorage.getItem("token"); 
+    if (!empId || !token) return;
 
-      try {
-        const res = await axios.get(
-          'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID',
-          { params: { empId } }
-        );
-
-        const user = res?.data?.data;
-        if (user) {
-          setUserProfile({
-            firstName: user.firstname || '',
-            middleName: user.middlename || '',
-            lastName: user.lastname || '',
-            department: user.department || '',
-            empId: user.empId || '',
-          });
+    try {
+      const res = await axios.get(
+        "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/useraccounts/GetByEmployeeID",
+        {
+          params: { empId },
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
         }
-      } catch (err) {
-        console.error('Failed to fetch user profile:', err);
-      }
-    };
+      );
 
-    fetchUserProfile();
-  }, []);
+      const user = res?.data?.data;
+      if (user) {
+        setUserProfile({
+          firstName: user.firstname || "",
+          middleName: user.middlename || "",
+          lastName: user.lastname || "",
+          department: user.department || "",
+          empId: user.empId || "",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch user profile:", err);
+    }
+  };
+
+  fetchUserProfile();
+}, []);
 
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen pt-20 sm:pt-24 md:pt-28">
@@ -203,21 +202,22 @@ const Home: React.FC = () => {
 
             <Col xs={12}>
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
-                <div style={{ marginTop: '-50px' }}>
-                  <div style={labelStyle}>Total Reports</div>
-                  <div style={numberStyle}>{total}</div>
-                </div>
-                <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
-                  <FileTextOutlined style={iconStyle} />
-                </div>
-              </Card>
-            </Col>
+               <div style={{ textAlign: 'left', width: '100%' }}>
+                <div style={labelStyle}>Total Reports</div>
+                <div style={{ ...numberStyle, marginTop: 8 }}>{total}</div>
+             </div>
+             <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
+               <FileTextOutlined style={iconStyle} />
+             </div>
+           </Card>
+         </Col>
+
 
             <Col xs={12}>
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
-                <div style={{ marginTop: '-50px' }}>
+                <div style={{ textAlign: 'left', width: '100%' }}>
                   <div style={labelStyle}>Dispatched</div>
-                  <div style={numberStyle}>{dispatched}</div>
+                  <div style={{ ...numberStyle, marginTop: 8 }}>{total}</div>
                 </div>
                 <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
                   <CheckCircleOutlined style={iconStyle} />
@@ -227,9 +227,9 @@ const Home: React.FC = () => {
 
             <Col xs={24}>
               <Card bordered={false} style={{ ...statCardStyle(), position: 'relative' }}>
-                <div style={{ marginTop: '-50px' }}>
+               <div style={{ textAlign: 'left', width: '100%' }}>
                   <div style={labelStyle}>Pending</div>
-                  <div style={numberStyle}>{pending}</div>
+                  <div style={{ ...numberStyle, marginTop: 8 }}>{total}</div>
                 </div>
                 <div style={{ ...iconWrapperStyle, position: 'absolute', right: 12, bottom: 12 }}>
                   <ClockCircleOutlined style={iconStyle} />
@@ -240,45 +240,89 @@ const Home: React.FC = () => {
         </Col>
 
         <Col xs={24} lg={12} style={{ display: 'flex' }}>
-          <Card
-            title="Monthly Leak Reports"
-            bordered={false}
-            style={{
-              flex: 1,
-              backgroundColor: '#ffffff',
-              border: '1px solid #e0ddddff',
-              borderRadius: 8,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            bodyStyle={{ flex: 1, padding: 16 }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 30, bottom: 30, left: 40 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false}  interval={0} tick={{ dy: 8, fontSize: 13 }} />
-                <YAxis axisLine={false} tickLine={false} width={30} />
-                <Tooltip contentStyle={{ fontSize: 12 }} />
-                <Line type="monotone" dataKey="reports" stroke="#0e41a0ff" strokeWidth={1.5} dot={false} isAnimationActive={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
+  <Card
+    title="Monthly Leak Reports"
+    bordered={false}
+    style={{
+      flex: 1,
+      backgroundColor: '#ffffff',
+      border: '1px solid #e0ddddff',
+      borderRadius: 8,
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    bodyStyle={{ flex: 1, padding: 16 }}
+  >
+    <MonthlyLeakChart data={chartData} />
+        </Card>
+       </Col>
       </Row>
 
 <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-  <Col xs={24} lg={16}>
-    <Card
-      bordered={false}
-      style={{
-        background: "transparent", 
-        boxShadow: "none",
-        padding: 0,
-      }}
-      bodyStyle={{ padding: 0 }}
-    >
-      <Table<DataType> columns={columns} dataSource={data} pagination={false} bordered />
-    </Card>
-  </Col>
+<Col xs={24} lg={16}>
+<Card
+  bordered={false}
+  style={{
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 12,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    marginTop: -8,
+  }}
+>
+  <Title level={5} style={{ marginBottom: 12 }}>
+    Leak Reports
+  </Title>
+
+  <Row gutter={[12, 8]} style={{ fontWeight: 600, padding: "8px 10px", borderBottom: "2px solid #f0f0f0" }}>
+    <Col xs={12} sm={4}>ID</Col>
+    <Col xs={12} sm={6}>Date</Col>
+    <Col xs={12} sm={4}>Type</Col>
+    <Col xs={12} sm={5}>Meter</Col>
+    <Col xs={12} sm={5}>Status</Col>
+  </Row>
+
+  <List
+    dataSource={data}
+    renderItem={(item) => (
+      <List.Item
+        style={{
+          padding: "9px 10px",
+          borderBottom: "1px solid #f0f0f0",
+        }}
+      >
+        <Row gutter={[12, 8]} style={{ width: "100%" }}>
+          <Col xs={12} sm={4}>{item.id}</Col>
+          <Col xs={12} sm={6}>{item.date_time_reported}</Col>
+          <Col xs={12} sm={4}>{item.leak_type}</Col>
+          <Col xs={12} sm={5}>{item.ref_meter}</Col>
+          <Col xs={12} sm={5}>
+            {item.tags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  backgroundColor: tag === "dispatched" ? "#22aa52ff" : "#e67930ff",
+                  color: tag === "dispatched" ? "#ebf7efff" : "#f3e9e3ff",
+                  border: `1px solid ${tag === "dispatched" ? "#14bb51ff" : "#e97e26ff"}`,
+                  padding: "2px 8px",
+                  borderRadius: "9999px",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  textTransform: "uppercase",
+                  marginTop: 4,
+                  display: "inline-block",
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </Col>
+        </Row>
+      </List.Item>
+    )}
+  />
+</Card>
+</Col>
 
   <Col xs={24} lg={8}>
     <Card
@@ -325,7 +369,7 @@ const Home: React.FC = () => {
           </Text>
         </div>
 
-        <div style={{ textAlign: "right" }}>
+        <div style={{ textAlign: "right", marginLeft: 100}}>
           <Text style={{ color: "white", fontWeight: 600 }}>Davao, PH</Text>
           <br />
           <Text style={{ color: "white" }}>30°C ☀️</Text>
@@ -375,16 +419,18 @@ const statCardStyle = () => ({
 
 const labelStyle: React.CSSProperties = {
   fontSize: '1.10rem',
-  lineHeight: 1.1,
-  color: '#444',
-  fontWeight: 500,
+  lineHeight: 1.0,
+  color: '#504f4fff',
+  fontWeight: 300,
+  position: 'relative',
+  top: '-15px',  
 };
 
 const numberStyle: React.CSSProperties = {
-  fontSize: '1.35rem',
+  fontSize: '1.40rem',
   fontWeight: 600,
   lineHeight: 1.2,
-  marginTop: 2,
+  marginTop: 10, 
 };
 
 const iconWrapperStyle: React.CSSProperties = {
