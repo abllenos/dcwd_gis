@@ -8,7 +8,7 @@ interface MonthlyLeakChartProps {
 
 const MonthlyLeakChart: React.FC<MonthlyLeakChartProps> = ({ data }) => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height={250}>
       <LineChart
         data={data}
         margin={{ top: 10, right: 30, bottom: 30, left: 40 }}
