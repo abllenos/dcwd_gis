@@ -100,7 +100,6 @@ const Home: React.FC = observer(() => {
                   <Col xs={6}>Status</Col>
                 </Row>
 
-                {/* Data Rows */}
                 <List
                   dataSource={dashboardStore.reports}
                   loading={dashboardStore.loading}
