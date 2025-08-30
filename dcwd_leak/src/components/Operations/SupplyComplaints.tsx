@@ -170,10 +170,14 @@ const SupplyComplaints: React.FC = () => {
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}
             shape="circle"
         />
-        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Operation</Breadcrumb.Item>
-          <Breadcrumb.Item>Water Supply Complaints</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb
+          style={{fontSize: 16, fontWeight: 500}}
+          items={[
+            { title: "Operations"},
+            { title: "Water Supply Complaints"}
+          ]}
+        />
+        
         </div>
         <Input.Search
           placeholder="Search..."
@@ -223,7 +227,7 @@ const SupplyComplaints: React.FC = () => {
         onCancel={handleCancel}
         footer={null}
         width={720}
-        bodyStyle={{ padding: '24px' }}      
+        styles={{ body: {padding: '24px' }}}      
         >
         {selectedRecord && (
           <div style={{ marginTop: 12 }}>

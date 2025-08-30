@@ -52,7 +52,7 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
       ]}
       width={1000}
       closeIcon={false}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: {padding: 0 } }}
       centered
       title={null}
     >
@@ -215,11 +215,11 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
 
           {/* Image Preview Modal */}
           <Modal
-            visible={!!previewImage}
+            open={!!previewImage}
             footer={null}
             onCancel={() => setPreviewImage(null)}
             centered
-            bodyStyle={{ padding: 0 }}
+            styles={{body:{ padding: 0 }}}
           >
             {previewImage && (
               <img

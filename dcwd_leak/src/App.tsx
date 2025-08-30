@@ -394,7 +394,6 @@ function App() {
     return !!localStorage.getItem("token");
   });
 
-  // Token expiry check
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expiry = localStorage.getItem("token_expiry");

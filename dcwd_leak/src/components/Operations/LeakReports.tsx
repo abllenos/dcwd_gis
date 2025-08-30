@@ -176,10 +176,13 @@ const LeakReports: React.FC = observer(() => {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
-          <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
-            <Breadcrumb.Item>Operation</Breadcrumb.Item>
-            <Breadcrumb.Item>Leak Reports</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            style={{ fontSize: 16, fontWeight: 500 }}
+            items={[
+              { title: "Operation" },
+              { title: "Leak Reports" }
+            ]}
+          />
         </div>
         <Input.Search placeholder="Search..." allowClear style={{ width: 300 }} onChange={(e) => leakReportsStore.setSearchText(e.target.value)} />
       </div>

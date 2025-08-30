@@ -128,10 +128,13 @@ const JMSDataSeeding: React.FC = () => {
               style={{ fontSize: 16, color: '#00008B', margin: 0 }}
               shape='circle'
             />
-          <Breadcrumb style={{fontSize: 16, fontWeight: 500, }}>
-            <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
-            <Breadcrumb.Item>User Accounts</Breadcrumb.Item>
-          </Breadcrumb>
+            <Breadcrumb
+              style={{fontSize: 16, fontWeight: 500}}
+              items={[
+                { title: "Maintenance" },
+                { title: "User Accounts" }
+              ]}
+            />
         </div>  
           <Input.Search
             placeholder="Search"

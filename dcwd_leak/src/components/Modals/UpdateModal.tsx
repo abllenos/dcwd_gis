@@ -36,7 +36,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
       width="60%"
       centered
       style={{ maxWidth: '200vw' }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: {padding: 0} }}
       title={
         <div
           style={{

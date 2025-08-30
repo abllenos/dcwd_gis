@@ -256,10 +256,13 @@ const ReportALeak: React.FC = () => {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
         <div style={{ display: "flex", alignItems: "center" }}>
         <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
-        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
-          <Breadcrumb.Item>Report A Leak</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb
+          style={{ fontSize: 16, fontWeight: 500}}
+          items={[
+            { title: "Create A Report" },
+            { title: "Report A Leak"}
+          ]}
+        />
         </div>
       </div>
       <div

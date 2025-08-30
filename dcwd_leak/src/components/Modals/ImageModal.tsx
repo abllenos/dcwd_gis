@@ -12,13 +12,13 @@ const RepairPhotoModal: React.FC<RepairPhotoModalProps> = ({ visible, onCancel, 
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Report Images"
       footer={null}
       onCancel={onCancel}
       width={1000}
       centered
-      bodyStyle={{ padding: 16 }}
+      styles={{ body: {padding: 16 }}}
     >
       <div
         style={{
@@ -97,11 +97,11 @@ const RepairPhotoModal: React.FC<RepairPhotoModalProps> = ({ visible, onCancel, 
 
       {/* Image Preview Modal */}
       <Modal
-        visible={!!previewImage}
+        open={!!previewImage}
         footer={null}
         onCancel={() => setPreviewImage(null)}
         centered
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: {padding: 0 }}}
       >
         {previewImage && (
           <img
