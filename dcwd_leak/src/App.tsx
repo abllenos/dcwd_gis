@@ -42,7 +42,7 @@ import ReportALeak from './components/CreateReport/ReportALeak';
 import { devApi } from './components/Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 import LogoutModal from './components/Modals/LogoutModal'; 
-
+import DailyAccomplishmentReport from './components/Report/rpt_DailyAccomplishmentReport';
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
@@ -225,13 +225,13 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 }}
               />
               <div>
-                <Text strong style={{ display: 'block', fontSize: '14px', color: '#262626' }}>
+                <Text strong style={{ display: 'block', fontSize: '18px', color: '#262626' }}>
                   {`${userProfile.firstName} ${userProfile.middleName} ${userProfile.lastName}`.trim() || 'Loading...'}
                 </Text>
-                <Text style={{ display: 'block', fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>
+                <Text style={{ display: 'block', fontSize: '13px', color: '#8c8c8c', marginTop: '4px' }}>
                   {userProfile.department || 'Loading department...'}
                 </Text>
-                <Text style={{ display: 'block', fontSize: '11px', color: '#bfbfbf', marginTop: '2px' }}>
+                <Text style={{ display: 'block', fontSize: '12px', color: '#bfbfbf', marginTop: '2px' }}>
                   {userProfile.empId || 'Loading ID...'}
                 </Text>
               </div>
@@ -340,6 +340,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
               <Route path="report-a-leak" element={<ReportALeak />} />
               <Route path="*" element={<Navigate to="home" />} />
+              <Route path="rpt_DailyAccomplishmentReport" element={<DailyAccomplishmentReport/>}/>
             </Routes>
           </Content>
         </Layout>
