@@ -25,43 +25,47 @@
 }
 
 .dispatch-modal .ant-modal-content {
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
   border: 1px solid #e8e8e8;
   padding: 0;
 }
 
 .dispatch-modal-header {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #495057;
-  padding: 16px 20px;
-  font-weight: 500;
-  font-size: 15px;
+  background: transparent;
+  color: #333;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 0;
-  position: relative;
-}
-
-.dispatch-modal-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #6c757d 0%, #8e9ba8 100%);
+  border-radius: 6px 6px 0 0;
 }
 
 .dispatch-modal-title {
-  color: #495057;
-  font-size: 15px;
-  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
   font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   align-items: center;
+}
+
+.dispatch-modal-close-btn {
+  color: #333 !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 16px;
+  padding: 4px !important;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.dispatch-modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: #333 !important;
 }
 
 .dispatch-modal-api-status {
@@ -77,91 +81,46 @@
 }
 
 .dispatch-modal-body {
-  padding: 48px 32px 32px 32px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 24px;
+  background: #fff;
   text-align: center;
-  position: relative;
-}
-
-.dispatch-modal-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 20%;
-  right: 20%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, #6c757d 50%, transparent 100%);
 }
 
 .dispatch-modal-warning-icon {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%);
+  background: #ff4d4f;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 32px auto;
+  margin: 0 auto 24px auto;
   color: white;
-  font-size: 32px;
-  box-shadow: 0 8px 24px rgba(255, 149, 0, 0.3);
-  animation: pulse-warning 2s infinite;
-  position: relative;
-}
-
-.dispatch-modal-warning-icon::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%);
-  opacity: 0.3;
-  transform: scale(1.2);
-  animation: ripple 2s infinite;
-}
-
-@keyframes pulse-warning {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes ripple {
-  0% { transform: scale(1.2); opacity: 0.3; }
-  100% { transform: scale(1.6); opacity: 0; }
+  font-size: 40px;
+  font-weight: 900;
 }
 
 .dispatch-modal-main-text {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 600;
-  background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 32px;
+  color: #333;
+  margin-bottom: 24px;
   font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dispatch-modal-form-section {
-  max-width: 450px;
-  margin: 0 auto;
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e9ecef;
+  margin-bottom: 24px;
+  text-align: left;
 }
 
 .dispatch-modal-label-text {
-  font-size: 15px;
-  color: #495057;
-  margin-bottom: 12px;
+  font-size: 12px;
+  color: #333;
+  margin-bottom: 8px;
   text-align: left;
   font-weight: 600;
   font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  display: flex;
-  align-items: center;
+  text-transform: uppercase;
 }
 
 .dispatch-modal-select {
@@ -189,12 +148,8 @@
 
 .dispatch-modal-button-container {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 32px;
-  max-width: 450px;
-  margin-left: auto;
-  margin-right: auto;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .dispatch-modal-cancel-btn {
@@ -217,7 +172,7 @@
 }
 
 .dispatch-modal-dispatch-btn {
-  background: #6782f5 !important;
+  background: #ff4d4f !important;
   border: none !important;
   color: white !important;
   height: 44px;
@@ -226,9 +181,11 @@
   font-weight: 600;
   font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(103, 130, 245, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 77, 79, 0.3);
   position: relative;
   overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .dispatch-modal-dispatch-btn::before {
@@ -247,9 +204,10 @@
 }
 
 .dispatch-modal-dispatch-btn:hover {
-  background: #5a6fd4 !important;
+  background: #ff7875 !important;
+  border-color: #ff7875 !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(103, 130, 245, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
 }
 
 .dispatch-modal-dispatch-btn:disabled {
@@ -257,11 +215,6 @@
   color: #6c757d !important;
   transform: none !important;
   box-shadow: none !important;
-}
-
-.dispatch-modal-dispatch-btn:hover {
-  background-color: #ff7875 !important;
-  border-color: #ff7875 !important;
 }
 
 .dispatch-modal-body {
@@ -390,6 +343,63 @@
   font-weight: 500;
   height: 36px;
   padding: 0 20px;
+}
+
+/* ===== LEAK OPTIONS MODAL ===== */
+.leak-options-modal {
+  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.leak-options-modal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.leak-options-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  border-bottom: 2px solid #6782f5;
+}
+
+.leak-options-modal-header-icon {
+  font-size: 20px;
+  color: #6782f5;
+  margin-right: 8px;
+}
+
+.leak-options-modal-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6782f5;
+}
+
+.leak-options-modal-button {
+  height: 120px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 8px !important;
+  background-color: #6782f5 !important;
+  border-color: #6782f5 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.25s ease-in-out !important;
+}
+
+.leak-options-modal-button:hover {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  transform: translateY(-4px) !important;
+}
+
+.leak-options-modal-button .anticon {
+  font-size: 28px;
+  margin-bottom: 8px;
 }
 
 /* ===== COMMON MODAL COMPONENTS ===== */

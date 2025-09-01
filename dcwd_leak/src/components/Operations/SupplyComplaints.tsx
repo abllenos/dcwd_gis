@@ -5,13 +5,13 @@ import {
   Breadcrumb,
   Card,
   Input,
-  Modal,
   Select,
   Badge,
 } from 'antd';
 import { FileSearchOutlined, HomeFilled, DownOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
+import SupplyComplaintDetailsModal from '../Modals/SupplyComplaintDetailsModal';
 
 const { Option } = Select;
 
@@ -93,6 +93,11 @@ const SupplyComplaints: React.FC = () => {
 
   const handleCancel = () => setModalVisible(false);
 
+  const handleSubmitRemarks = (remarks: string) => {
+    console.log('Submitted remarks:', remarks);
+    // Add your logic here to handle the submitted remarks
+  };
+
   const filteredData = (): ComplaintData[] => {
     let tabData: ComplaintData[] = [];
 
@@ -141,18 +146,21 @@ const SupplyComplaints: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button
             icon={<FileSearchOutlined />}
-            style={{
-              backgroundColor: '#00008B',
-              border: 'none',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 32,
-              height: 32,
-              padding: 0,
-            }}
             onClick={() => showDetails(record)}
+            style={{ 
+              borderColor: "#27cc3f", 
+              color: "#27cc3f",
+              backgroundColor: "transparent",
+              transition: "all 0.3s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#27cc3f";
+              e.currentTarget.style.color = "white";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#27cc3f";
+            }}
           />
         </div>
       ),
@@ -217,70 +225,12 @@ const SupplyComplaints: React.FC = () => {
         />
       </Card>
 
-      <Modal
-        title="Complaint Details"
-        open={modalVisible}
+      <SupplyComplaintDetailsModal
+        visible={modalVisible}
         onCancel={handleCancel}
-        footer={null}
-        width={720}
-        bodyStyle={{ padding: '24px' }}      
-        >
-        {selectedRecord && (
-          <div style={{ marginTop: 12 }}>
-
-            <div
-              style={{
-                backgroundColor: '#3B82F6',
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '10px 10px 0 0',
-                display: 'inline-block',
-                fontWeight: 600,
-                fontSize: 16,
-              }}
-            >
-              <FileSearchOutlined style={{ marginRight: 8 }} />
-              Report Details
-            </div>
-
-            <div
-              style={{
-                backgroundColor: '#f8fbfe',
-                border: '1px solid #bcdfff',
-                borderRadius: '0 0 10px 10px',
-                padding: '20px 24px',
-                marginBottom: 24,
-                fontSize: 15,
-                lineHeight: '1.8',
-              }}
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
-                <div><strong>COMPLAINT ID</strong>      :</div>       <div>{selectedRecord.id}</div>
-                <div><strong>LOCATION</strong>          :</div>           <div>{selectedRecord.location}</div>
-                <div><strong>REMARKS</strong>           :</div>            <div>{selectedRecord.remarks}</div>
-                <div><strong>REFERENCE METER</strong>   :</div>    <div>{selectedRecord.referenceMeter}</div>
-                <div><strong>CONTACT</strong>           :</div>            <div>{selectedRecord.contactNo}</div>
-                <div><strong>DATE/TIME REPORTED</strong>:</div> <div>{selectedRecord.dateTimeReported}</div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>
-                Remarks:
-              </label>
-              <Input.TextArea
-                placeholder="Enter your remarks here..."
-                rows={4}
-                style={{ resize: 'none' }}
-              />
-            </div>
-
-            <Button type="primary" style={{ backgroundColor: '#00B4D8', borderColor: '#00B4D8', fontWeight: 500, }}>
-              Submit Remarks
-            </Button>
-          </div>
-        )}
-      </Modal>
+        selectedRecord={selectedRecord}
+        onSubmitRemarks={handleSubmitRemarks}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Image, Tabs } from 'antd';
 import { FileSearchOutlined, EnvironmentOutlined, FileImageOutlined } from '@ant-design/icons';
 import { LeakData } from '../../types/Leakdata';
+import { MODAL_SIZES, SECTION_STYLES, BUTTON_STYLES, GRID_LAYOUTS } from './ModalDesignSystem';
 
 interface ReportDetailsProps {
   visible: boolean;
@@ -44,15 +45,15 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
         <Button
           key="close"
           type="primary"
-          style={{ backgroundColor: '#00B4D8', borderColor: '#00B4D8', fontWeight: 500 }}
+          style={BUTTON_STYLES.primary}
           onClick={onCancel}
         >
           Close
         </Button>,
       ]}
-      width={1000}
+      width={MODAL_SIZES.large}
       closeIcon={false}
-      bodyStyle={{ padding: 0 }}
+      style={{ padding: 0 }}
       centered
       title={null}
     >
@@ -78,15 +79,8 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
                 children: (
                   <div style={{ padding: '16px 0' }}>
                     {/* Details Section */}
-                    <div
-                      style={{
-                        padding: 24,
-                        background: '#f0f9ff',
-                        border: '1px solid #91d5ff',
-                        borderRadius: 8,
-                      }}
-                    >
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 40 }}>
+                    <div style={SECTION_STYLES.content}>
+                      <div style={GRID_LAYOUTS.twoColumn}>
                         {/* Left Column */}
                         <div style={{ display: 'grid', gridTemplateColumns: '140px 20px 1fr', rowGap: 12, columnGap: 10 }}>
                           <div><strong>REPORT ID</strong></div>
@@ -219,7 +213,7 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
             footer={null}
             onCancel={() => setPreviewImage(null)}
             centered
-            bodyStyle={{ padding: 0 }}
+            style={{ padding: 0 }}
           >
             {previewImage && (
               <img

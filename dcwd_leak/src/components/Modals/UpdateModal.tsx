@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Input, Button, Select } from 'antd';
 import type { LeakData } from '../../types/Leakdata';
 import { EditOutlined } from '@ant-design/icons';
+import { MODAL_SIZES, SECTION_STYLES, BUTTON_STYLES, GRID_LAYOUTS } from './ModalDesignSystem';
 
 const { Option } = Select;
 
@@ -32,149 +33,118 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
     <Modal
       open={visible}
       onCancel={onCancel}
-      footer={null}
-      width="60%"
-      centered
-      style={{ maxWidth: '200vw' }}
-      bodyStyle={{ padding: 0 }}
-      title={
-        <div
-          style={{
-            backgroundColor: '#3B82F6',
-            color: 'white',
-            padding: '12px 16px',
-            margin: '-20px -24px 0 -24px',
-            borderRadius: '8px 8px 0 0',
-            fontWeight: 700,
-            fontSize: 16,
-          }}
+      footer={[
+        <Button
+          key="cancel"
+          style={BUTTON_STYLES.secondary}
+          onClick={onCancel}
         >
-          <EditOutlined style={{ marginRight: 8 }} />
+          Cancel
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          style={BUTTON_STYLES.primary}
+          onClick={onSubmit}
+        >
           Update Report
-        </div>
-      }
+        </Button>,
+      ]}
+      width={MODAL_SIZES.large}
+      centered
+      closeIcon={false}
+      title={null}
+      style={{ padding: 0 }}
     >
       {record && (
-        <div
-          style={{
-            backgroundColor: '#f8fbfe',
-            border: '1px solid #bcdfff',
-            borderRadius: '0 0 8px 8px',
-            padding: '24px',
-            fontSize: 15,
-            lineHeight: '1.8',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '20px 32px',
-            }}
-          >
-            <div>
-              <label style={labelStyle}>Location:</label>
-              <Input value={formValues.location} disabled style={{ padding: '8px 12px' }} />
-            </div>
-            <div>
-              <label style={labelStyle}>Landmark:</label>
-              <Input
-                value={formValues.landmark}
-                onChange={e => onChange('landmark', e.target.value)}
-                style={{ padding: '8px 12px' }}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Contact No:</label>
-              <Input
-                value={formValues.contactNo}
-                onChange={e => onChange('contactNo', e.target.value)}
-                style={{ padding: '8px 12px' }}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Nearest Meter:</label>
-              <Input
-                value={formValues.referenceMeter}
-                onChange={e => onChange('referenceMeter', e.target.value)}
-                style={{ padding: '8px 12px' }}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>DMA ID:</label>
-              <Select
-                value={formValues.dmaId || undefined}
-                placeholder="- SELECT -"
-                onChange={value => onChange('dmaId', value)}
-                style={{ width: '100%' }}
-              >
-                <Option value="DMA001">DMA001</Option>
-                <Option value="DMA002">DMA002</Option>
-              </Select>
-            </div>
-            <div>
-              <label style={labelStyle}>Covering:</label>
-              <Select
-                value={formValues.covering || undefined}
-                placeholder="- SELECT -"
-                onChange={value => onChange('covering', value)}
-                style={{ width: '100%' }}
-              >
-                <Option value="SOIL">SOIL</Option>
-                <Option value="CONCRETE">CONCRETE</Option>
-                <Option value="ASPHALT">ASPHALT</Option>
-              </Select>
-            </div>
-            <div>
-              <label style={labelStyle}>Location Leak:</label>
-              <Input
-                value={formValues.leakType || ''}
-                onChange={e => onChange('leakType', e.target.value)}
-                style={{ padding: '8px 12px' }}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>NRW LEVEL - %:</label>
-              <Input
-                value={formValues.nrwLevel || ''}
-                onChange={e => onChange('nrwLevel', e.target.value)}
-                style={{ padding: '8px 12px' }}
-              />
-            </div>
+        <div style={{ padding: 16 }}>
+          <div style={{ 
+            textAlign: "center",
+            marginBottom: 16,
+            padding: "16px 0",
+          }}>
+            <EditOutlined style={{ fontSize: 20, color: '#3B82F6', marginRight: 8 }} />
+            <span style={{ 
+              fontSize: 18, 
+              fontWeight: 600, 
+              color: '#3B82F6'
+            }}>
+              Update Report
+            </span>
           </div>
-
-          <div
-            style={{
-              marginTop: 32,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: 12,
-            }}
-          >
-            <Button
-              onClick={onCancel}
-              style={{
-                background: '#00607A',
-                color: '#fff',
-                borderRadius: 6,
-                padding: '6px 24px',
-                fontWeight: 600,
-              }}
-            >
-              Close
-            </Button>
-            <Button
-              type="primary"
-              onClick={onSubmit}
-              style={{
-                borderRadius: 6,
-                padding: '6px 24px',
-                fontWeight: 600,
-              }}
-            >
-              Save
-            </Button>
+          
+          <div style={SECTION_STYLES.form}>
+            <div style={GRID_LAYOUTS.twoColumn}>
+              <div>
+                <label style={labelStyle}>Location:</label>
+                <Input value={formValues.location} disabled style={{ padding: '8px 12px' }} />
+              </div>
+              <div>
+                <label style={labelStyle}>Landmark:</label>
+                <Input
+                  value={formValues.landmark}
+                  onChange={e => onChange('landmark', e.target.value)}
+                  style={{ padding: '8px 12px' }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Contact No:</label>
+                <Input
+                  value={formValues.contactNo}
+                  onChange={e => onChange('contactNo', e.target.value)}
+                  style={{ padding: '8px 12px' }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Nearest Meter:</label>
+                <Input
+                  value={formValues.referenceMeter}
+                  onChange={e => onChange('referenceMeter', e.target.value)}
+                  style={{ padding: '8px 12px' }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>DMA ID:</label>
+                <Select
+                  value={formValues.dmaId || undefined}
+                  placeholder="- SELECT -"
+                  onChange={value => onChange('dmaId', value)}
+                  style={{ width: '100%' }}
+                >
+                  <Option value="DMA001">DMA001</Option>
+                  <Option value="DMA002">DMA002</Option>
+                </Select>
+              </div>
+              <div>
+                <label style={labelStyle}>Covering:</label>
+                <Select
+                  value={formValues.covering || undefined}
+                  placeholder="- SELECT -"
+                  onChange={value => onChange('covering', value)}
+                  style={{ width: '100%' }}
+                >
+                  <Option value="SOIL">SOIL</Option>
+                  <Option value="CONCRETE">CONCRETE</Option>
+                  <Option value="ASPHALT">ASPHALT</Option>
+                </Select>
+              </div>
+              <div>
+                <label style={labelStyle}>Location Leak:</label>
+                <Input
+                  value={formValues.leakType || ''}
+                  onChange={e => onChange('leakType', e.target.value)}
+                  style={{ padding: '8px 12px' }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>NRW LEVEL - %:</label>
+                <Input
+                  value={formValues.nrwLevel || ''}
+                  onChange={e => onChange('nrwLevel', e.target.value)}
+                  style={{ padding: '8px 12px' }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}

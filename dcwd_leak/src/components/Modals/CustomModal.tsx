@@ -1,10 +1,11 @@
 import React from 'react';
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons';
+import { MODAL_SIZES, MODAL_COLORS, BUTTON_STYLES } from './ModalDesignSystem';
 
 interface CustomModalProps {
   visible: boolean;
@@ -24,11 +25,11 @@ const CustomModal: React.FC<CustomModalProps> = ({
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return <CheckCircleOutlined style={{ fontSize: 'clamp(36px, 4vw, 48px)', color: '#52c41a' }} />;
+        return <CheckCircleOutlined style={{ fontSize: 48, color: MODAL_COLORS.success }} />;
       case 'error':
-        return <CloseCircleOutlined style={{ fontSize: 'clamp(36px, 4vw, 48px)', color: '#ff4d4f' }} />;
+        return <CloseCircleOutlined style={{ fontSize: 48, color: MODAL_COLORS.danger }} />;
       case 'warning':
-        return <ExclamationCircleOutlined style={{ fontSize: 'clamp(36px, 4vw, 48px)', color: '#faad14' }} />;
+        return <ExclamationCircleOutlined style={{ fontSize: 48, color: MODAL_COLORS.warning }} />;
       default:
         return null;
     }
@@ -37,23 +38,41 @@ const CustomModal: React.FC<CustomModalProps> = ({
   return (
     <Modal
       open={visible}
-      footer={null}
+      footer={[
+        <Button
+          key="close"
+          type="primary"
+          style={BUTTON_STYLES.primary}
+          onClick={onClose}
+        >
+          Close
+        </Button>,
+      ]}
       onCancel={onClose}
       centered
-      width="clamp(300px, 40vw, 500px)"
+      width={MODAL_SIZES.small}
+      closeIcon={false}
+      title={null}
     >
-      <div style={{ textAlign: 'center', padding: '1rem' }}>
+      <div style={{ textAlign: 'center', padding: 24 }}>
         {getIcon()}
-        <h2 style={{ marginTop: 16, fontSize: 'clamp(18px, 2vw, 24px)', fontWeight: 'bold' }}>
+        <h2 style={{ 
+          marginTop: 16, 
+          fontSize: 20, 
+          fontWeight: 600,
+          color: '#262626',
+          marginBottom: 12
+        }}>
           {title}
         </h2>
-        <p style={{ fontSize: 'clamp(14px, 1.5vw, 18px)' }}>{content}</p>
-        <button
-          onClick={onClose}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          OK
-        </button>
+        <p style={{ 
+          fontSize: 16, 
+          color: '#595959',
+          lineHeight: 1.5,
+          margin: 0
+        }}>
+          {content}
+        </p>
       </div>
     </Modal>
   );
