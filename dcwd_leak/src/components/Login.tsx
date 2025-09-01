@@ -144,7 +144,7 @@ const getStyles = (darkMode: boolean): { [key: string]: React.CSSProperties } =>
   },
 leftSide: {
   flex: 1.2,
-  backgroundColor: "#fff",           // background behind the image
+  backgroundColor: "#fff",           
   backgroundImage: "url('login-bg.jpg')",
   backgroundSize: "cover",
   backgroundPosition: "center",
