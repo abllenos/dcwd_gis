@@ -7,11 +7,11 @@ import {
   Input,
   Select,
   Badge,
+  Modal, // ✅ added
 } from 'antd';
 import { FileSearchOutlined, HomeFilled, DownOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
-import QualityComplaintDetailsModal from '../Modals/QualityComplaintDetailsModal';
 
 const { Option } = Select;
 
@@ -56,7 +56,7 @@ const completedData: ComplaintData[] = [
   {
     key: '3',
     id: '30126',
-    accountNumber: '3221-5123-71523',    
+    accountNumber: '3221-5123-71523',
     location: 'Zone 6 - Barangay F',
     remarks: 'Resolved taste issue',
     referenceMeter: 'RM-112233',
@@ -147,8 +147,8 @@ const QualityComplaints: React.FC = () => {
           <Button
             icon={<FileSearchOutlined />}
             onClick={() => showDetails(record)}
-            style={{ 
-              borderColor: "#27cc3f", 
+            style={{
+              borderColor: "#27cc3f",
               color: "#27cc3f",
               backgroundColor: "transparent",
               transition: "all 0.3s ease"
@@ -169,7 +169,7 @@ const QualityComplaints: React.FC = () => {
 
   return (
     <div style={{ padding: '4px 24px 24px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30}}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Button
             icon={<HomeFilled />}
@@ -179,13 +179,12 @@ const QualityComplaints: React.FC = () => {
             shape="circle"
           />
           <Breadcrumb
-            style={{ fontSize: 16, fontWeight: 500}}
+            style={{ fontSize: 16, fontWeight: 500 }}
             items={[
               { title: "Operation" },
-              { title: "Water Quality Complaints"}
+              { title: "Water Quality Complaints" }
             ]}
           />
-        
         </div>
         <Input.Search
           placeholder="Search"
@@ -209,10 +208,10 @@ const QualityComplaints: React.FC = () => {
               <Option key={key} value={key}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                   <span>{label}</span>
-                  <Badge 
-                    count={tabCounts[key as keyof typeof tabCounts] ?? 0} 
-                    size="small" 
-                    color="blue" 
+                  <Badge
+                    count={tabCounts[key as keyof typeof tabCounts] ?? 0}
+                    size="small"
+                    color="blue"
                     style={{ marginLeft: 8 }}
                   />
                 </div>
@@ -230,15 +229,13 @@ const QualityComplaints: React.FC = () => {
         />
       </Card>
 
-      <QualityComplaintDetailsModal
-        visible={modalVisible}
+      {/* ✅ Inline Modal */}
+      <Modal
+        open={modalVisible} // use "visible" if AntD v4
         onCancel={handleCancel}
-        selectedRecord={selectedRecord}
-      />
-
         footer={null}
         width={720}
-        styles={{ body: {padding: '24px' }}}
+        styles={{ body: { padding: '24px' } }}
       >
         {selectedRecord && (
           <div style={{ marginTop: 12 }}>
@@ -269,15 +266,15 @@ const QualityComplaints: React.FC = () => {
               }}
             >
               <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
-              <div><strong>ID:</strong> </div> <div> {selectedRecord.id}</div>
-              <div><strong>Account Number:</strong> </div> <div>{selectedRecord.accountNumber}</div>
-              <div><strong>Location:</strong></div> <div> {selectedRecord.location}</div>
-              <div><strong>Remarks:</strong> </div> <div>{selectedRecord.remarks}</div>
-              <div><strong>Reference Meter:</strong> </div> <div>{selectedRecord.referenceMeter}</div>
-              <div><strong>Contact No.:</strong> </div> <div>{selectedRecord.contactNo}</div>
-              <div><strong>Date/Time Reported:</strong> </div>  <div>{selectedRecord.dateTimeReported}</div>
-          </div>
-        </div>
+                <div><strong>ID:</strong></div> <div>{selectedRecord.id}</div>
+                <div><strong>Account Number:</strong></div> <div>{selectedRecord.accountNumber}</div>
+                <div><strong>Location:</strong></div> <div>{selectedRecord.location}</div>
+                <div><strong>Remarks:</strong></div> <div>{selectedRecord.remarks}</div>
+                <div><strong>Reference Meter:</strong></div> <div>{selectedRecord.referenceMeter}</div>
+                <div><strong>Contact No.:</strong></div> <div>{selectedRecord.contactNo}</div>
+                <div><strong>Date/Time Reported:</strong></div> <div>{selectedRecord.dateTimeReported}</div>
+              </div>
+            </div>
 
             <div style={{ marginBottom: 12 }}>
               <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>
