@@ -79,7 +79,6 @@ export class LeakReportsStore {
       Object.entries(tabFilters).map(async ([key, filter]) => {
         try {
           if (key === "all") {
-            // For "all" tab, get total count without filters using unfiltered endpoint
             const res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", { 
               params: { PageIndex: 1, PageSize: 1 }
             });
@@ -98,10 +97,7 @@ export class LeakReportsStore {
               const res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered", { params });
               counts[key] = res.data.data.totalCount || res.data.data.count || 0;
               
-              // Special handling for leak detection if count is 0
               if (key === "leakdetection" && counts[key] === 0) {
-                console.log("Leak detection count is 0, trying fallback count...");
-                
                 const fallbackRes = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", { 
                   params: { PageIndex: 1, PageSize: 100 }
                 });
@@ -113,23 +109,18 @@ export class LeakReportsStore {
                   ).length;
                   
                   if (leakDetectionCount === 0) {
-                    // Try just flgLeakDetection = 1
                     const alternativeCount = allData.filter((item: any) => item.flgLeakDetection === 1).length;
                     counts[key] = alternativeCount;
-                    console.log(`Using alternative count for leak detection: ${alternativeCount}`);
                   } else {
                     counts[key] = leakDetectionCount;
-                    console.log(`Fallback count for leak detection: ${leakDetectionCount}`);
                   }
                 }
               }
             } catch (apiError) {
-              console.error(`Error with filtered API for ${key}:`, apiError);
               counts[key] = 0;
             }
           }
         } catch (err) {
-          console.error(`Error fetching count for ${key}`, err);
           counts[key] = 0;
         }
       })
@@ -152,7 +143,6 @@ export class LeakReportsStore {
           }
         });
       } else {
-        // For specific tabs, use the filtered endpoint
         const filter = tabFilters[this.activeTab];
         if (filter) {
           const params: Record<string, number> = {
@@ -164,34 +154,25 @@ export class LeakReportsStore {
             params.flgLeakDetection = filter.flgLeakDetection;
           }
           
-          console.log(`Fetching data for tab: ${this.activeTab}`, params);
           
           res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered", {params});
           
-          console.log(`API response for ${this.activeTab}:`, res?.data?.data);
           
-          // If no data for leak detection, try fallback
           if (this.activeTab === "leakdetection" && (!res?.data?.data?.data || res.data.data.data.length === 0)) {
-            console.log("No leak detection data from filtered endpoint, using fallback...");
             
-            // Fallback: Get all data and filter client-side
             const fallbackRes = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", {
               params: { PageIndex: 1, PageSize: 100 }
             });
             
             if (fallbackRes?.data?.data?.data) {
               const allData = fallbackRes.data.data.data;
-              console.log(`Total records available: ${allData.length}`);
               
-              // Filter for leak detection records
               const filteredData = allData.filter((item: any) => 
                 item.dispatchStat === 1 && item.flgLeakDetection === 1
               );
               
-              console.log(`Found ${filteredData.length} leak detection records via client-side filtering`);
               
               if (filteredData.length > 0) {
-                // Override response with filtered data
                 res = {
                   data: {
                     data: {
@@ -202,15 +183,10 @@ export class LeakReportsStore {
                   }
                 };
               } else {
-                // Check what values actually exist
                 const flgValues = [...new Set(allData.map((item: any) => item.flgLeakDetection))];
                 const dispatchValues = [...new Set(allData.map((item: any) => item.dispatchStat))];
-                console.log("Available flgLeakDetection values:", flgValues);
-                console.log("Available dispatchStat values:", dispatchValues);
                 
-                // Try alternative filtering
                 const alternativeFiltered = allData.filter((item: any) => item.flgLeakDetection === 1);
-                console.log(`Records with just flgLeakDetection=1: ${alternativeFiltered.length}`);
                 
                 if (alternativeFiltered.length > 0) {
                   res = {
