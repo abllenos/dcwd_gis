@@ -8,12 +8,10 @@ import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   SettingOutlined,
-  BellOutlined,
   SunOutlined,
   MoonOutlined,
   AppstoreOutlined,
   LogoutOutlined,
-  SearchOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, ConfigProvider, Avatar, Typography } from 'antd';
 import type { MenuProps } from 'antd';
@@ -25,7 +23,7 @@ import {
   useLocation
 } from 'react-router-dom';
 
-import { Login } from './components/Login';
+import Login from './components/Login';
 import dcwdIcon from './assets/image/dcwd.jpg';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
@@ -43,7 +41,7 @@ import ReportALeak from './components/CreateReport/ReportALeak';
 import { devApi } from './components/Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 import LogoutModal from './components/Modals/LogoutModal'; 
-import DailyAccomplishmentReport from './components/Report/rpt_DailyAccomplishmentReport';
+
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
@@ -232,7 +230,6 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 }}
               />
               <div>
-
                 <Text strong style={{ display: 'block', fontSize: '14px', color: 'var(--text-primary)' }}>
                   {`${userProfile.firstName} ${userProfile.middleName} ${userProfile.lastName}`.trim() || 'Loading...'}
                 </Text>
@@ -240,7 +237,6 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                   {userProfile.department || 'Loading department...'}
                 </Text>
                 <Text style={{ display: 'block', fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
-
                   {userProfile.empId || 'Loading ID...'}
                 </Text>
               </div>
@@ -315,7 +311,10 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 type="primary"
                 icon={<LogoutOutlined />}
                 className="header-btn header-btn-primary"
-                onClick={() => setLogoutModalVisible(true)}
+                onClick={() => {
+                  onLogout();
+                  navigate('/login');
+                }}
               >
                 Log out
               </Button>
@@ -343,7 +342,6 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
               <Route path="report-a-leak" element={<ReportALeak />} />
               <Route path="*" element={<Navigate to="home" />} />
-              <Route path="rpt_DailyAccomplishmentReport" element={<DailyAccomplishmentReport/>}/>
             </Routes>
           </Content>
         </Layout>
@@ -425,6 +423,7 @@ function App() {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
+  // Token expiry check
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expiry = localStorage.getItem("token_expiry");

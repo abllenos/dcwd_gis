@@ -7,6 +7,7 @@ export interface LeakData {
   referenceMeter: string;
   contactNo: string;
   dateTimeReported: string;
+  dateReported?: string;
   referenceNo: number;
   dmaId: string;
   covering: string;
@@ -23,4 +24,5 @@ export interface LeakData {
   images?: string[];
   dispatchStat: number;
   flgLeakDetection: number;
+  status?: string; // Added for the "all" tab
 }

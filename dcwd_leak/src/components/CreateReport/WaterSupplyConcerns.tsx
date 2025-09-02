@@ -5,7 +5,6 @@ import {
   Form,
   Input,
   Button,
-  Select,
   Divider,
   Typography,
   Row,
@@ -18,6 +17,7 @@ import CustomModal from '../Modals/CustomModal';
 import { waterSupplyConcernsStore } from '../../stores/waterSupplyConcernsStore';
 import { useNavigate } from 'react-router-dom';
 import { Space } from 'antd';
+import '../../styles/theme.css';
 
 
 const { Text } = Typography;
@@ -33,6 +33,7 @@ const labelStyle: React.CSSProperties = {
   textTransform: 'uppercase' as const,
   fontSize: 12,
   fontFamily: 'Noto Sans, sans-serif',
+  color: 'var(--text-primary)',
 };
 
 interface WaterSupplyConcernsProps {
@@ -95,12 +96,22 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
   };
 
   return (
-    <div style={{ padding: "4px 24px 24px 24px" }}>
+    <div style={{ padding: "4px 24px 24px 24px", backgroundColor: 'var(--bg-secondary)', minHeight: '100vh' }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
         <div style={{ display: "flex", alignItems: "center" }}>
-        <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
+        <Button 
+          icon={<HomeFilled />} 
+          onClick={handleHomeClick} 
+          type="text" 
+          style={{ 
+            fontSize: 16, 
+            color: "var(--btn-primary-color)",
+            backgroundColor: 'transparent'
+          }} 
+          shape="circle" 
+        />
         <Breadcrumb
-          style={{ fontSize: 16, fontWeight: 500}}
+          style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-primary)' }}
           items={[
             { title: "Create A Report"},
             { title: "Water Supply Concerns"}
@@ -111,10 +122,10 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
       </div>
       <div
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: 'var(--bg-primary)',
           padding: 24,
           borderRadius: 8,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+          boxShadow: 'var(--card-shadow)',
         }}
       >
         <Row gutter={24}>
@@ -131,7 +142,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
               }}
             >
               <Divider orientation="left">
-                <Text style={{ fontSize: 18 }} strong>
+                <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
                   Contact Information
                 </Text>
               </Divider>
@@ -198,7 +209,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
               </Form.Item>
 
               <Divider orientation="left">
-                <Text style={{ fontSize: 18 }} strong>
+                <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
                   Complaint Details
                 </Text>
               </Divider>
@@ -219,16 +230,23 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
 
           <Col span={14}>
             <Divider orientation="left">
-              <Text style={{ fontSize: 18 }} strong>
+              <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
                 Search Address
               </Text>
             </Divider>
 
             <Form.Item>
-              <Input placeholder="e.g., Matina, Davao City, Davao del Sur" />
+              <Input 
+                placeholder="e.g., Matina, Davao City, Davao del Sur"
+                style={{ 
+                  backgroundColor: 'var(--bg-primary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)'
+                }}
+              />
             </Form.Item>
 
-            <div style={{ height: 613, border: "1px solid #ccc", borderRadius: 6 }}>
+            <div style={{ height: 613, border: "1px solid var(--border-color)", borderRadius: 6 }}>
               <MapComponent 
                 lat={waterSupplyConcernsStore.lat} 
                 lng={waterSupplyConcernsStore.lng} 
