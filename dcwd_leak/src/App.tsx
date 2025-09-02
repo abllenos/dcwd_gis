@@ -10,9 +10,9 @@ import {
   SettingOutlined,
   BellOutlined,
   SunOutlined,
-  SearchOutlined,
   AppstoreOutlined,
   LogoutOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, ConfigProvider, Avatar, Typography } from 'antd';
 import type { MenuProps } from 'antd';
@@ -24,7 +24,7 @@ import {
   useLocation
 } from 'react-router-dom';
 
-import Login from './components/Login';
+import { Login } from './components/Login';
 import dcwdIcon from './assets/image/dcwd.jpg';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
@@ -39,16 +39,13 @@ import Reports from './components/Report/Reports';
 import LeakOptionsModal from './components/Modals/LeakOptionsModal';
 import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
 import ReportALeak from './components/CreateReport/ReportALeak';
-
 import { devApi } from './components/Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
-
 import LogoutModal from './components/Modals/LogoutModal'; 
-
+import DailyAccomplishmentReport from './components/Report/rpt_DailyAccomplishmentReport';
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
-
 const { Sider, Header, Content } = Layout;
 const { Text } = Typography;
 type MenuItem = Required<MenuProps>['items'][number];
@@ -91,14 +88,14 @@ const getSidebarWidth = () => {
 const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
- const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
-const [userProfile, setUserProfile] = useState({
-  firstName: '',
-  middleName: '',
-  lastName: '',
-  department: '',
-  empId: ''
-});
+  const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
+  const [userProfile, setUserProfile] = useState({
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    department: '',
+    empId: ''
+  });
 const [logoutModalVisible, setLogoutModalVisible] = useState(false);
       
   const navigate = useNavigate();
@@ -197,20 +194,18 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
           }}
         >
 
-          <div className="sider-logo-wrapper" style={{ padding: '24px 20px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
+          <div className="sider-logo-wrapper">
             {collapsed ? (
               <img 
                 src={dcwdIcon} 
                 alt="DCWD Icon" 
                 className="sider-logo collapsed-logo" 
-                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
               />
             ) : (
               <img 
                 src={dcwd} 
                 alt="DCWD Logo" 
                 className="sider-logo expanded-logo" 
-                style={{ maxWidth: '120px', maxHeight: '40px', objectFit: 'contain' }} 
               />
             )}
           </div>        
@@ -230,13 +225,13 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 }}
               />
               <div>
-                <Text strong style={{ display: 'block', fontSize: '14px', color: '#262626' }}>
+                <Text strong style={{ display: 'block', fontSize: '18px', color: '#262626' }}>
                   {`${userProfile.firstName} ${userProfile.middleName} ${userProfile.lastName}`.trim() || 'Loading...'}
                 </Text>
-                <Text style={{ display: 'block', fontSize: '12px', color: '#8c8c8c', marginTop: '4px' }}>
+                <Text style={{ display: 'block', fontSize: '13px', color: '#8c8c8c', marginTop: '4px' }}>
                   {userProfile.department || 'Loading department...'}
                 </Text>
-                <Text style={{ display: 'block', fontSize: '11px', color: '#bfbfbf', marginTop: '2px' }}>
+                <Text style={{ display: 'block', fontSize: '12px', color: '#bfbfbf', marginTop: '2px' }}>
                   {userProfile.empId || 'Loading ID...'}
                 </Text>
               </div>
@@ -267,9 +262,9 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               position: 'fixed',
               top: 0,
               right: 0,
-              left: collapsed ? 80 : sidebarWidth,
-              height: '88px',
-              padding: '0 24px',
+              left: collapsed ? 80 : 280,
+              height: '64px',
+              padding: '0 20px',
               background: '#fff',
               borderBottom: '1px solid #f0f0f0',
               display: 'flex',
@@ -280,16 +275,12 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>  
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginLeft: '-4px' }}>  
               <Button
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={() => setCollapsed(!collapsed)}
-                style={{ 
-                  fontSize: '16px',
-                  color: '#595959',
-                  padding: '4px 8px'
-                }}
+                className="header-btn header-btn-menu"
               />
               <Text strong style={{ fontSize: '16px', color: '#262626' }}>
                 Leak Reporting System
@@ -297,52 +288,28 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Button
-                type="text"
-                icon={<SearchOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
-              />
+
               <Button
                 type="text"
                 icon={<SunOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
+                className="header-btn header-btn-icon"
               />
               <Button
                 type="text"
                 icon={<BellOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
+                className="header-btn header-btn-icon"
               />
               <Button
                 type="text"
                 icon={<SettingOutlined />}
-                style={{ 
-                  color: '#6782f5',
-                  padding: '4px 8px'
-                }}
+                className="header-btn header-btn-icon"
                 onClick={() => navigate('/settings')}
               />
               <Button
                 type="primary"
                 icon={<LogoutOutlined />}
-                style={{ 
-                  backgroundColor: '#6782f5',
-                  borderColor: '#6782f5',
-                  color: '#ffffff',
-                  padding: '4px 8px'
-                }}
-                onClick={() => {
-                  onLogout();
-                  navigate('/login');
-                }}
+                className="header-btn header-btn-primary"
+                onClick={() => setLogoutModalVisible(true)}
               >
                 Log out
               </Button>
@@ -351,10 +318,10 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
           <Content
             style={{
-              marginTop: 88,
+              marginTop: 64,
               padding: 24,
               backgroundColor: '#f5f6fa',
-              minHeight: 'calc(100vh - 88px)',
+              minHeight: 'calc(100vh - 64px)',
             }}
           >
             <Routes>
@@ -370,6 +337,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
               <Route path="report-a-leak" element={<ReportALeak />} />
               <Route path="*" element={<Navigate to="home" />} />
+              <Route path="rpt_DailyAccomplishmentReport" element={<DailyAccomplishmentReport/>}/>
             </Routes>
           </Content>
         </Layout>
@@ -424,7 +392,6 @@ function App() {
     return !!localStorage.getItem("token");
   });
 
-  // Token expiry check
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expiry = localStorage.getItem("token_expiry");

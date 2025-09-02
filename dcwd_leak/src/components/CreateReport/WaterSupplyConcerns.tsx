@@ -17,6 +17,7 @@ import { SearchOutlined, HomeFilled } from '@ant-design/icons';
 import CustomModal from '../Modals/CustomModal';
 import { waterSupplyConcernsStore } from '../../stores/waterSupplyConcernsStore';
 import { useNavigate } from 'react-router-dom';
+import { Space } from 'antd';
 
 
 const { Text } = Typography;
@@ -98,10 +99,14 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
         <div style={{ display: "flex", alignItems: "center" }}>
         <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
-        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Create A Report</Breadcrumb.Item>
-          <Breadcrumb.Item>Water Supply Concerns</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb
+          style={{ fontSize: 16, fontWeight: 500}}
+          items={[
+            { title: "Create A Report"},
+            { title: "Water Supply Concerns"}
+          ]}
+        />
+
         </div>
       </div>
       <div
@@ -139,7 +144,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
                   </span>
                 }
               >
-                <Input.Group compact style={{ display: "flex" }}>
+                <Space.Compact style={{ width: '100%' }}>
                   <Input 
                     style={{ flex: 1 }} 
                     placeholder="Enter Account or Meter Number"
@@ -154,7 +159,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
                   >
                     Search
                   </Button>
-                </Input.Group>
+                </Space.Compact>
               </Form.Item>
 
               <Form.Item 

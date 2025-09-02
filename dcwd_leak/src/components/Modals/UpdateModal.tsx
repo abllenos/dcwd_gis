@@ -36,19 +36,17 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
       width="60%"
       centered
       style={{ maxWidth: '200vw' }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: {padding: 0} }}
       title={
         <div
           style={{
             backgroundColor: '#3B82F6',
             color: 'white',
-            padding: '8px 16px',
-            borderRadius: '10px 10px 0 0',
+            padding: '12px 16px',
+            margin: '-20px -24px 0 -24px',
+            borderRadius: '8px 8px 0 0',
             fontWeight: 700,
             fontSize: 16,
-            top: '-28px',
-            position: 'absolute',
-            height: 'auto',            
           }}
         >
           <EditOutlined style={{ marginRight: 8 }} />
@@ -61,10 +59,9 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
           style={{
             backgroundColor: '#f8fbfe',
             border: '1px solid #bcdfff',
-            borderRadius: '0 0 10px 10px',
-            padding: '24px 32px',
+            borderRadius: '0 0 8px 8px',
+            padding: '24px',
             fontSize: 15,
-            marginTop: -16,
             lineHeight: '1.8',
             boxSizing: 'border-box',
           }}
@@ -72,8 +69,8 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '24px 32px',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px 32px',
             }}
           >
             <div>
@@ -126,10 +123,19 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
               >
                 <Option value="SOIL">SOIL</Option>
                 <Option value="CONCRETE">CONCRETE</Option>
+                <Option value="ASPHALT">ASPHALT</Option>
               </Select>
             </div>
             <div>
-              <label style={labelStyle}>NRW Level:</label>
+              <label style={labelStyle}>Location Leak:</label>
+              <Input
+                value={formValues.leakType || ''}
+                onChange={e => onChange('leakType', e.target.value)}
+                style={{ padding: '8px 12px' }}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>NRW LEVEL - %:</label>
               <Input
                 value={formValues.nrwLevel || ''}
                 onChange={e => onChange('nrwLevel', e.target.value)}
@@ -140,10 +146,10 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
 
           <div
             style={{
-              marginTop: 40,
+              marginTop: 32,
               display: 'flex',
               justifyContent: 'flex-end',
-              gap: 16,
+              gap: 12,
             }}
           >
             <Button

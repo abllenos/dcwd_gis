@@ -70,7 +70,7 @@ const LeakOptionsModal: React.FC<LeakOptionsModalProps> = ({
           SELECT ISSUE TYPE
         </div>
       }
-      bodyStyle={{ paddingTop: 24, paddingBottom: 24 }}
+      styles={{ body: {paddingTop: 24, paddingBottom: 24} }}
       maskClosable={false}
     >
       <Row gutter={[16, 16]}>
