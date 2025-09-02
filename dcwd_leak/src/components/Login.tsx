@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Lottie from "lottie-react";
+import spinnerAnimation from "../assets/spinner.json";
 import {
   MailOutlined,
   LockOutlined,
@@ -6,8 +8,6 @@ import {
   EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 interface LoginProps {
   onLogin?: (token: string) => void;
@@ -18,11 +18,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const styles = getStyles();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch(
         "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/userlogin/login",
@@ -42,12 +45,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         if (data.data) {
           localStorage.setItem("debug_user_data", JSON.stringify(data.data));
         }
-        setTimeout(() => navigate("/home"), 1500);
+        setTimeout(() => {
+          setLoading(false);
+          navigate("/home");
+        }, 1500);
       } else {
-        toast.error(data.message || "Invalid email or password");
+        setError(data.message || "Incorrect username or password");
+        setLoading(false);
       }
     } catch {
-      toast.error("Failed to connect to server.");
+      setError("Failed to connect to server.");
+      setLoading(false);
     }
   };
 
@@ -55,66 +63,77 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     <div style={styles.pageWrapper}>
       <div style={styles.leftPanel} />
       <div style={styles.rightPanel}>
-        <ToastContainer position="top-center" autoClose={2500} />
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <img src="/logo-dcwd.webp" alt="Logo" style={styles.logo} />
-          <h2 style={styles.title}>Login</h2>
-          <p style={styles.subtitle}>LEAK REPORTING SYSTEM</p>
-
-          <div
-            style={{
-              ...styles.inputGroup,
-              background:
-                activeInput === "username"
-                  ? "#e6f0fa"
-                  : styles.inputGroup.background,
-            }}
-          >
-            <MailOutlined style={styles.icon} />
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onFocus={() => setActiveInput("username")}
-              onBlur={() => setActiveInput(null)}
-              style={styles.input}
-              required
-            />
+        {loading ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
+            <Lottie animationData={spinnerAnimation} loop={true} style={{ width: 120, height: 120 }} />
+            <span style={{ marginTop: 16, color: "#113983", fontWeight: "bold" }}>Logging in...</span>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={styles.form}>
+            <img src="/logo-dcwd.webp" alt="Logo" style={styles.logo} />
+            <h2 style={styles.title}>Login</h2>
+            <p style={styles.subtitle}>LEAK REPORTING SYSTEM</p>
 
-          <div
-            style={{
-              ...styles.inputGroup,
-              background:
-                activeInput === "password"
-                  ? "#e6f0fa"
-                  : styles.inputGroup.background,
-            }}
-          >
-            <LockOutlined style={styles.icon} />
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setActiveInput("password")}
-              onBlur={() => setActiveInput(null)}
-              style={{ ...styles.input, paddingRight: "30px" }}
-              required
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              style={styles.toggleIcon}
+            <div
+              style={{
+                ...styles.inputGroup,
+                background:
+                  activeInput === "username"
+                    ? "#e6f0fa"
+                    : styles.inputGroup.background,
+              }}
             >
-              {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-            </span>
-          </div>
+              <MailOutlined style={styles.icon} />
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                onFocus={() => setActiveInput("username")}
+                onBlur={() => setActiveInput(null)}
+                style={styles.input}
+                required
+              />
+            </div>
 
-          <button type="submit" style={styles.button}>
-            Log In
-          </button>
-        </form>
+            <div
+              style={{
+                ...styles.inputGroup,
+                background:
+                  activeInput === "password"
+                    ? "#e6f0fa"
+                    : styles.inputGroup.background,
+              }}
+            >
+              <LockOutlined style={styles.icon} />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                onFocus={() => setActiveInput("password")}
+                onBlur={() => setActiveInput(null)}
+                style={{ ...styles.input, paddingRight: "30px" }}
+                required
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                style={styles.toggleIcon}
+              >
+                {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+              </span>
+            </div>
+
+            <button type="submit" style={styles.button}>
+              Log In
+            </button>
+            {error && (
+              <div style={{ color: '#ff0000ff', marginTop: 10, fontSize: 14, textAlign: 'center' }}>
+                {error}
+              </div>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );
