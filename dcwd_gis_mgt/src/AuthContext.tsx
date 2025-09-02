@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getTokenExpiration } from "./components/util/auth";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -6,25 +8,50 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => JSON.parse(localStorage.getItem('isAuthenticated') || 'false')
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+  let logoutTimer: NodeJS.Timeout;
 
   const login = () => {
     setIsAuthenticated(true);
-    localStorage.setItem('isAuthenticated', 'true');
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      const exp = getTokenExpiration(token);
+      if (exp) {
+        const timeout = exp - Date.now();
+        logoutTimer = setTimeout(() => {
+          logout();
+        }, timeout);
+      }
+    }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   useEffect(() => {
-    setIsAuthenticated(JSON.parse(localStorage.getItem('isAuthenticated') || 'false'));
+    const token = localStorage.getItem("token");
+    if (token) {
+      const exp = getTokenExpiration(token);
+      if (exp && Date.now() < exp) {
+        setIsAuthenticated(true);
+        const timeout = exp - Date.now();
+        logoutTimer = setTimeout(() => {
+          logout();
+        }, timeout);
+      } else {
+        logout();
+      }
+    }
+    return () => clearTimeout(logoutTimer);
   }, []);
 
   return (
@@ -35,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 };

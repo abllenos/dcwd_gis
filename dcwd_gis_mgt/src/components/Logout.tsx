@@ -1,4 +1,3 @@
-// src/pages/Logout.tsx
 import React, { useState } from 'react';
 import { Modal, Result, Spin, Button, Space } from 'antd';
 import { LoadingOutlined, LogoutOutlined, CloseCircleOutlined } from '@ant-design/icons';
