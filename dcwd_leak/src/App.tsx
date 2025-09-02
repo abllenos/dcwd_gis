@@ -24,7 +24,7 @@ import {
   useLocation
 } from 'react-router-dom';
 
-import Login from './components/Login';
+import { Login } from './components/Login';
 import dcwdIcon from './assets/image/dcwd.jpg';
 import dcwd from './assets/image/logo.png';
 import Home from './components/home';
@@ -309,10 +309,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 type="primary"
                 icon={<LogoutOutlined />}
                 className="header-btn header-btn-primary"
-                onClick={() => {
-                  onLogout();
-                  navigate('/login');
-                }}
+                onClick={() => setLogoutModalVisible(true)}
               >
                 Log out
               </Button>
