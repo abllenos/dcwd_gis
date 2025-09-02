@@ -33,6 +33,7 @@ const labelStyle: React.CSSProperties = {
   textTransform: 'uppercase' as const,
   fontSize: 12,
   fontFamily: 'Noto Sans, sans-serif',
+  color: 'var(--text-primary)',
 };
 
 const ReportALeak: React.FC = () => {
@@ -252,12 +253,12 @@ const ReportALeak: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '4px 24px 24px 24px'}}>
+    <div style={{ padding: '4px 24px 24px 24px', backgroundColor: 'var(--bg-secondary)', minHeight: '100vh' }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
         <div style={{ display: "flex", alignItems: "center" }}>
         <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
         <Breadcrumb
-          style={{ fontSize: 16, fontWeight: 500}}
+          style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-primary)' }}
           items={[
             { title: "Create A Report" },
             { title: "Report A Leak"}
@@ -267,10 +268,10 @@ const ReportALeak: React.FC = () => {
       </div>
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-primary)',
           padding: 24,
           borderRadius: 8,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+          boxShadow: 'var(--card-shadow)',
         }}
       >
 
@@ -288,7 +289,7 @@ const ReportALeak: React.FC = () => {
           <Row gutter={24}>
             <Col span={10}>
               <Divider orientation="left">
-                <Text style={{ fontSize: 18 }} strong>
+                <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
                   Contact Information
                 </Text>
               </Divider>

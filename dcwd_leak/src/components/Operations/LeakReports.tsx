@@ -22,6 +22,8 @@ const tabLabels: Record<string, string> = {
   turnover: "Repair Turn-over",
   after: "Leak After the Meter",
   notfound: "Leak Not Found",
+  all: "All Reports",
+
 };
 
 const LeakReports: React.FC = observer(() => {
@@ -147,6 +149,56 @@ const LeakReports: React.FC = observer(() => {
   };
 
   const generateColumns = (tab: string) => {
+  if (tab === "all") {
+    const allReportsColumns: ColumnsType<LeakData> = [
+      { title: "ID", dataIndex: "id", key: "id" },
+      { title: "Date Reported", dataIndex: "dateReported", key: "dateReported" },
+      { title: "Leak Type", dataIndex: "leakType", key: "leakType" },
+      { title: "Reference Meter", dataIndex: "referenceMeter", key: "referenceMeter" },
+      { title: "Address", dataIndex: "location", key: "location" },
+      { 
+        title: "Status", 
+        dataIndex: "status", 
+        key: "status",
+        render: (status: string) => {
+          const statusStyles: Record<string, { bg: string; text: string; border: string }> = {
+            "Undispatched": { bg: "#fde68a", text: "#92400e", border: "#f59e0b" },
+            "Dispatched": { bg: "#22aa52ff", text: "#ebf7efff", border: "#14bb51ff" },
+            "Repaired": { bg: "#3b82f6", text: "#e0f2fe", border: "#2563eb" },
+            "For Schedule": { bg: "#f59e0b", text: "#fff7ed", border: "#d97706" },
+            "For Turnover": { bg: "#8b5cf6", text: "#f3e8ff", border: "#7c3aed" },
+            "After the meter link": { bg: "#ef4444", text: "#fee2e2", border: "#dc2626" },
+            "Unknown": { bg: "#9ca3af", text: "#f9fafb", border: "#6b7280" },
+          };
+          
+          const statusLabel = status || 'Unknown';
+          const style = statusStyles[statusLabel] || statusStyles["Unknown"];
+
+          return (
+            <span
+              style={{
+                backgroundColor: style.bg,
+                color: style.text,
+                border: `1px solid ${style.border}`,
+                padding: "4px 8px",
+                borderRadius: "9999px",
+                fontSize: "12px",
+                fontWeight: "500",
+                display: "inline-block",
+                minWidth: "80px",
+                textAlign: "center"
+              }}
+            >
+              {statusLabel}
+            </span>
+          );
+        }
+      },
+    ];
+
+    return allReportsColumns;
+  }
+
   const baseColumns: ColumnsType<LeakData> = [
     { title: "ID", dataIndex: "id", key: "id" },
     { title: "Leak Type", dataIndex: "leakType", key: "leakType" },

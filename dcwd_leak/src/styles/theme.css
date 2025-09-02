@@ -250,8 +250,8 @@
 }
 
 .expanded-logo {
-  max-width: 120px;
-  height: 32px;           
+  max-width: 220px;
+  height: 60px;           
   border-radius: 8px;
   margin: 0;  
   object-fit: contain;  
