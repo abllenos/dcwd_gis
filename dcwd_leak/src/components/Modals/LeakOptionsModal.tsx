@@ -28,9 +28,11 @@ const LeakOptionsModal: React.FC<LeakOptionsModalProps> = ({
       footer={null}
       centered
       width={600}
+
       closeIcon={false}
       title={null}
       style={{ padding: 0 }}
+
     >
       <div style={{ padding: 16 }}>
         <div className="leak-options-modal-header">

@@ -25,7 +25,7 @@ const Home: React.FC = observer(() => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    dashboardStore.fetchInitial(); 
+    dashboardStore.fetchInitial();
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -40,7 +40,7 @@ const Home: React.FC = observer(() => {
         <>
           <Row gutter={[24, 24]}>
             <Col xs={24} md={8}>
-              <Card bordered={false} style={{ ...statCardStyle(), position: "relative" }}>
+              <Card variant="borderless" style={{ ...statCardStyle(), position: "relative" }}>
                 <div>
                   <div style={labelStyle}>Dispatched</div>
                   <div style={numberStyle}>{dashboardStore.summary.dispatched}</div>
@@ -50,7 +50,7 @@ const Home: React.FC = observer(() => {
             </Col>
 
             <Col xs={24} md={8}>
-              <Card bordered={false} style={{ ...statCardStyle(), position: "relative" }}>
+              <Card variant="borderless" style={{ ...statCardStyle(), position: "relative" }}>
                 <div>
                   <div style={labelStyle}>Total Reports</div>
                   <div style={numberStyle}>{dashboardStore.summary.total}</div>
@@ -60,7 +60,7 @@ const Home: React.FC = observer(() => {
             </Col>
 
             <Col xs={24} md={8}>
-              <Card bordered={false} style={{ ...statCardStyle(), position: "relative" }}>
+              <Card variant="borderless" style={{ ...statCardStyle(), position: "relative" }}>
                 <div>
                   <div style={labelStyle}>Pending (Un-Dispatch)</div>
                   <div style={numberStyle}>{dashboardStore.summary.pending}</div>
@@ -72,7 +72,7 @@ const Home: React.FC = observer(() => {
 
           <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
             <Col xs={24}>
-              <Card title="Monthly Leak Reports" bordered={false} style={{ height: 350 }}>
+              <Card title="Monthly Leak Reports" variant="borderless" style={{ height: 350 }}>
                 <MonthlyLeakChart data={dashboardStore.monthlyReports} />
               </Card>
             </Col>
@@ -80,7 +80,7 @@ const Home: React.FC = observer(() => {
 
           <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
             <Col xs={24}>
-              <Card bordered={false}>
+              <Card variant="borderless">
                 <Title level={5}>Leak Reports</Title>
                 <Row
                   style={{

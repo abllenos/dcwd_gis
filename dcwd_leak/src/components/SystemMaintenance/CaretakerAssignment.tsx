@@ -161,10 +161,14 @@ const CaretakerAssignment: React.FC = () => {
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}
             shape="circle"
           />
-          <Breadcrumb style={{fontSize: 16, fontWeight: 500 }}>
-            <Breadcrumb.Item>Maintenance</Breadcrumb.Item>
-            <Breadcrumb.Item>Caretaker Assignment</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            style={{fontSize: 16, fontWeight: 500}}
+            items={[
+              { title: "Maintenance"},
+              { title: "Caretaker Assignment"}
+            ]}
+          />
+      
           </div>
         <Input.Search
           placeholder="Search"

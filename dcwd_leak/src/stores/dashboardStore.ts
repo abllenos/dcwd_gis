@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import axios from "axios";
+import { devApi } from "../components/Endpoints/Interceptor"; 
 
 export interface Report {
   id: number;
@@ -86,14 +86,13 @@ class DashboardStore {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.get(
-        "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports",
+      const res = await devApi.get(
+        "/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports",
         {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            PageIndex: this.page,
-            PageSize: this.pageSize,
-          },
+            params: {
+                PageIndex: this.page,
+                PageSize: this.pageSize,
+            },
         }
       );
 
@@ -123,14 +122,13 @@ class DashboardStore {
     this.loading = true;
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports",
+      const res = await devApi.get(
+        "/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports",
         {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            PageIndex: this.page,
-            PageSize: this.pageSize,
-          },
+            params: {
+                PageIndex: this.page,
+                PageSize: this.pageSize,
+            },
         }
       );
 
@@ -153,59 +151,59 @@ class DashboardStore {
 
   async fetchAllReports(recomputeAfter = false) {
     if (this.allReportsLoaded) {
-      if (recomputeAfter) {
-        runInAction(() => {
-          this.summary = this.computeSummary(this.allReports);
-          this.total = this.allReports.length;
-        });
-      }
-      return;
+        if (recomputeAfter) {
+            runInAction(() => {
+                this.summary = this.computeSummary(this.allReports);
+                this.total = this.allReports.length;
+            });
+        }
+        return;
     }
 
     this.loading = true;
 
     try {
-      const token = localStorage.getItem("token");
-      let page = 1;
-      let all: Report[] = [];
-      let totalCountFromApi = 0;
+        let page = 1;
+        let all: Report[] = [];
+        let totalCountFromApi = 0;
 
-      while (true) {
-        const res = await axios.get(
-          "https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params: {
-              PageIndex: page,
-              PageSize: this.pageSize, 
-            },
-          }
-        );
+        while(true) {
+            const res = await devApi.get(
+                "/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports",
+                {
+                    params: {
+                        PageIndex: page,
+                        PageSize: this.pageSize,
+                    },
+                }
+            );
 
-        const raw = res?.data?.data?.data || [];
-        totalCountFromApi = res?.data?.data?.totalCount ?? res?.data?.data?.count ?? totalCountFromApi;
+            const raw = res?.data?.data?.data || [];
+            totalCountFromApi = res?.data?.data?.totalCount ??
+            res?.data?.data?.count ??
+            totalCountFromApi;
 
-        all = all.concat(this.mapRawReports(raw));
+            all = all.concat(this.mapRawReports(raw));
 
-        if (page * this.pageSize >= totalCountFromApi) break;
-        page++;
-      }
-
-      runInAction(() => {
-        this.allReports = all;
-        this.allReportsLoaded = true;
-
-        if (recomputeAfter) {
-          this.summary = this.computeSummary(this.allReports);
-          this.total = this.allReports.length; 
+            if (page * this.pageSize >= totalCountFromApi) break;
+            page++;
         }
-      });
+
+        runInAction(() => {
+            this.allReports = all;
+            this.allReportsLoaded = true;
+
+            if (recomputeAfter) {
+                this.summary = this.computeSummary(this.allReports);
+                this.total = this.allReports.length;
+            }
+        });
     } catch (err) {
-      console.error("Failed to fetch all reports:", err);
+        console.error("Failed to fetch all reports:", err);
     } finally {
-      runInAction(() => {
-        this.loading = false;
-      });
+        runInAction(() => {
+            this.loading = false;
+        });
     }
   }
 

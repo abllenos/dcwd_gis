@@ -1,3 +1,4 @@
+let isScriptLoading = false;
 let isScriptLoaded = false;
 
 export function loadGoogleMapsScript(): Promise<void> {
@@ -7,23 +8,33 @@ export function loadGoogleMapsScript(): Promise<void> {
       return;
     }
 
-    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-    console.log("Google Maps API Key from .env:", apiKey); // 🔍 debug log
-
-    if (!apiKey) {
-      reject(new Error("Google Maps API key is not defined in environment variables"));
+    if (isScriptLoading) {
+      const check = setInterval(() => {
+        if (isScriptLoaded) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 50);
       return;
     }
 
+    isScriptLoading = true;
+
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyADLvGv3WeY3YCsDjWFackLgAOl7gxzGEA`;
     script.async = true;
     script.defer = true;
+
     script.onload = () => {
       isScriptLoaded = true;
+      isScriptLoading = false;
       resolve();
     };
-    script.onerror = () => reject(new Error("Failed to load Google Maps script"));
+
+    script.onerror = () => {
+      isScriptLoading = false;
+      reject(new Error("Failed to load Google Maps script"));
+    };
 
     document.head.appendChild(script);
   });

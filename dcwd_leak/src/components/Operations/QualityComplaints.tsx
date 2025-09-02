@@ -178,10 +178,14 @@ const QualityComplaints: React.FC = () => {
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}
             shape="circle"
           />
-        <Breadcrumb style={{fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Operation</Breadcrumb.Item>
-          <Breadcrumb.Item>Water Quality Complaints</Breadcrumb.Item>
-        </Breadcrumb>
+          <Breadcrumb
+            style={{ fontSize: 16, fontWeight: 500}}
+            items={[
+              { title: "Operation" },
+              { title: "Water Quality Complaints"}
+            ]}
+          />
+        
         </div>
         <Input.Search
           placeholder="Search"
@@ -231,6 +235,74 @@ const QualityComplaints: React.FC = () => {
         onCancel={handleCancel}
         selectedRecord={selectedRecord}
       />
+
+        footer={null}
+        width={720}
+        styles={{ body: {padding: '24px' }}}
+      >
+        {selectedRecord && (
+          <div style={{ marginTop: 12 }}>
+            <div
+              style={{
+                backgroundColor: '#3B82F6',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '10px 10px 0 0',
+                display: 'inline-block',
+                fontWeight: 600,
+                fontSize: 16,
+              }}
+            >
+              <FileSearchOutlined style={{ marginRight: 8 }} />
+              Report Details
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#f8fbfe',
+                border: '1px solid #bcdfff',
+                borderRadius: '0 0 10px 10px',
+                padding: '20px 24px',
+                marginBottom: 24,
+                fontSize: 15,
+                lineHeight: '1.8',
+              }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
+              <div><strong>ID:</strong> </div> <div> {selectedRecord.id}</div>
+              <div><strong>Account Number:</strong> </div> <div>{selectedRecord.accountNumber}</div>
+              <div><strong>Location:</strong></div> <div> {selectedRecord.location}</div>
+              <div><strong>Remarks:</strong> </div> <div>{selectedRecord.remarks}</div>
+              <div><strong>Reference Meter:</strong> </div> <div>{selectedRecord.referenceMeter}</div>
+              <div><strong>Contact No.:</strong> </div> <div>{selectedRecord.contactNo}</div>
+              <div><strong>Date/Time Reported:</strong> </div>  <div>{selectedRecord.dateTimeReported}</div>
+          </div>
+        </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>
+                Remarks:
+              </label>
+              <Input.TextArea
+                placeholder="Enter your remarks here..."
+                rows={4}
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <Button
+              type="primary"
+              style={{
+                backgroundColor: '#00B4D8',
+                borderColor: '#00B4D8',
+                fontWeight: 500,
+              }}
+            >
+              Submit Remarks
+            </Button>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

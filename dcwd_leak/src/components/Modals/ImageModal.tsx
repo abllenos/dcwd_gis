@@ -15,6 +15,10 @@ const RepairPhotoModal: React.FC<RepairPhotoModalProps> = ({ visible, onCancel, 
   return (
     <Modal
       open={visible}
+
+      title="Report Images"
+      footer={null}
+
       onCancel={onCancel}
       footer={[
         <Button
@@ -28,9 +32,11 @@ const RepairPhotoModal: React.FC<RepairPhotoModalProps> = ({ visible, onCancel, 
       ]}
       width={MODAL_SIZES.large}
       centered
+
       closeIcon={false}
       title={null}
-      style={{ padding: 0 }}
+      styles={{ body: { padding: 0 }}}
+
     >
       <div style={{ padding: 16 }}>
         <div style={{ 
@@ -122,7 +128,8 @@ const RepairPhotoModal: React.FC<RepairPhotoModalProps> = ({ visible, onCancel, 
         footer={null}
         onCancel={() => setPreviewImage(null)}
         centered
-        style={{ padding: 0 }}
+        styles={{ body: {padding: 0 }}}
+
       >
         {previewImage && (
           <img

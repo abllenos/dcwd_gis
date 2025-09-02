@@ -46,6 +46,7 @@ const UpdateReport: React.FC<UpdateReportProps> = ({
           type="primary"
           style={BUTTON_STYLES.primary}
           onClick={onSubmit}
+
         >
           Update Report
         </Button>,

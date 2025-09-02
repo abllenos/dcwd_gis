@@ -178,10 +178,14 @@ const SupplyComplaints: React.FC = () => {
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}
             shape="circle"
         />
-        <Breadcrumb style={{ fontSize: 16, fontWeight: 500 }}>
-          <Breadcrumb.Item>Operation</Breadcrumb.Item>
-          <Breadcrumb.Item>Water Supply Complaints</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb
+          style={{fontSize: 16, fontWeight: 500}}
+          items={[
+            { title: "Operations"},
+            { title: "Water Supply Complaints"}
+          ]}
+        />
+        
         </div>
         <Input.Search
           placeholder="Search..."
@@ -228,9 +232,72 @@ const SupplyComplaints: React.FC = () => {
       <SupplyComplaintDetailsModal
         visible={modalVisible}
         onCancel={handleCancel}
+
         selectedRecord={selectedRecord}
         onSubmitRemarks={handleSubmitRemarks}
       />
+
+        footer={null}
+        width={720}
+        styles={{ body: {padding: '24px' }}}      
+        >
+        {selectedRecord && (
+          <div style={{ marginTop: 12 }}>
+
+            <div
+              style={{
+                backgroundColor: '#3B82F6',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '10px 10px 0 0',
+                display: 'inline-block',
+                fontWeight: 600,
+                fontSize: 16,
+              }}
+            >
+              <FileSearchOutlined style={{ marginRight: 8 }} />
+              Report Details
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#f8fbfe',
+                border: '1px solid #bcdfff',
+                borderRadius: '0 0 10px 10px',
+                padding: '20px 24px',
+                marginBottom: 24,
+                fontSize: 15,
+                lineHeight: '1.8',
+              }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', rowGap: 7 }}>
+                <div><strong>COMPLAINT ID</strong>      :</div>       <div>{selectedRecord.id}</div>
+                <div><strong>LOCATION</strong>          :</div>           <div>{selectedRecord.location}</div>
+                <div><strong>REMARKS</strong>           :</div>            <div>{selectedRecord.remarks}</div>
+                <div><strong>REFERENCE METER</strong>   :</div>    <div>{selectedRecord.referenceMeter}</div>
+                <div><strong>CONTACT</strong>           :</div>            <div>{selectedRecord.contactNo}</div>
+                <div><strong>DATE/TIME REPORTED</strong>:</div> <div>{selectedRecord.dateTimeReported}</div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}>
+                Remarks:
+              </label>
+              <Input.TextArea
+                placeholder="Enter your remarks here..."
+                rows={4}
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <Button type="primary" style={{ backgroundColor: '#00B4D8', borderColor: '#00B4D8', fontWeight: 500, }}>
+              Submit Remarks
+            </Button>
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 };
