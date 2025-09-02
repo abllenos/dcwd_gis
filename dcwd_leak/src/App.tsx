@@ -10,6 +10,7 @@ import {
   SettingOutlined,
   BellOutlined,
   SunOutlined,
+  MoonOutlined,
   AppstoreOutlined,
   LogoutOutlined,
   SearchOutlined,
@@ -85,7 +86,7 @@ const getSidebarWidth = () => {
   return 280;
 };
 
-const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+const Dashboard: React.FC<{ onLogout: () => void; isDarkMode: boolean; setIsDarkMode: (value: boolean) => void }> = ({ onLogout, isDarkMode: appIsDarkMode, setIsDarkMode: setAppIsDarkMode }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
@@ -100,6 +101,12 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
       
   const navigate = useNavigate();
   const location = useLocation();
+
+  const toggleDarkMode = () => {
+    const newTheme = !appIsDarkMode;
+    setAppIsDarkMode(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  };
 
 
    useEffect(() => {
@@ -189,8 +196,8 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
           width={280}
           className="modern-sidebar"
           style={{
-            background: '#fff',
-            boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
+            background: 'var(--bg-sidebar)',
+            boxShadow: '2px 0 8px var(--shadow-color)',
           }}
         >
 
@@ -213,7 +220,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
           {!collapsed && (
             <div style={{
               padding: '20px',
-              borderBottom: '1px solid #f0f0f0',
+              borderBottom: '1px solid var(--border-color)',
               textAlign: 'center'
             }}>
               <Avatar 
@@ -225,13 +232,15 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 }}
               />
               <div>
-                <Text strong style={{ display: 'block', fontSize: '18px', color: '#262626' }}>
+
+                <Text strong style={{ display: 'block', fontSize: '14px', color: 'var(--text-primary)' }}>
                   {`${userProfile.firstName} ${userProfile.middleName} ${userProfile.lastName}`.trim() || 'Loading...'}
                 </Text>
-                <Text style={{ display: 'block', fontSize: '13px', color: '#8c8c8c', marginTop: '4px' }}>
+                <Text style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   {userProfile.department || 'Loading department...'}
                 </Text>
-                <Text style={{ display: 'block', fontSize: '12px', color: '#bfbfbf', marginTop: '2px' }}>
+                <Text style={{ display: 'block', fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
+
                   {userProfile.empId || 'Loading ID...'}
                 </Text>
               </div>
@@ -265,14 +274,14 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               left: collapsed ? 80 : 280,
               height: '64px',
               padding: '0 20px',
-              background: '#fff',
-              borderBottom: '1px solid #f0f0f0',
+              background: 'var(--bg-header)',
+              borderBottom: '1px solid var(--border-color)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               zIndex: 1000,
               transition: 'left 0.2s ease',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+              boxShadow: '0 2px 8px var(--shadow-color)'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginLeft: '-4px' }}>  
@@ -282,7 +291,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 onClick={() => setCollapsed(!collapsed)}
                 className="header-btn header-btn-menu"
               />
-              <Text strong style={{ fontSize: '16px', color: '#262626' }}>
+              <Text strong style={{ fontSize: '16px', color: 'var(--text-primary)' }}>
                 Leak Reporting System
               </Text>
             </div>
@@ -291,13 +300,10 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
               <Button
                 type="text"
-                icon={<SunOutlined />}
+                icon={appIsDarkMode ? <SunOutlined /> : <MoonOutlined />}
                 className="header-btn header-btn-icon"
-              />
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                className="header-btn header-btn-icon"
+                onClick={toggleDarkMode}
+                title={appIsDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               />
               <Button
                 type="text"
@@ -320,7 +326,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
             style={{
               marginTop: 64,
               padding: 24,
-              backgroundColor: '#f5f6fa',
+              backgroundColor: 'var(--bg-secondary)',
               minHeight: 'calc(100vh - 64px)',
             }}
           >
@@ -364,19 +370,26 @@ const WaterSupplyConcernsWrapper: React.FC = () => {
   return <WaterSupplyConcern formType={formType} />;
 };
 
-const theme = {
+const getTheme = (isDarkMode: boolean) => ({
+  algorithm: isDarkMode ? undefined : undefined, // Ant Design's built-in algorithms
   token: {
-    colorPrimary: '#1890ff',
+    colorPrimary: '#6782f5',
     colorSuccess: '#52c41a',
     colorWarning: '#faad14',
     colorError: '#ff4d4f',
     fontFamily: 'Noto Sans, -apple-system, BlinkMacSystemFont, sans-serif',
     borderRadius: 8,
+    colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
+    colorBgElevated: isDarkMode ? '#1f1f1f' : '#ffffff',
+    colorBgLayout: isDarkMode ? '#141414' : '#f5f6fa',
+    colorText: isDarkMode ? '#ffffff' : '#262626',
+    colorTextSecondary: isDarkMode ? '#d9d9d9' : '#595959',
+    colorBorder: isDarkMode ? '#303030' : '#f0f0f0',
   },
   components: {
     Form: {
       labelFontSize: 12,
-      labelColor: '#262626',
+      labelColor: isDarkMode ? '#ffffff' : '#262626',
     },
     Button: {
       borderRadius: 8,
@@ -384,13 +397,33 @@ const theme = {
     Card: {
       borderRadius: 12,
     },
+    Layout: {
+      siderBg: isDarkMode ? '#1f1f1f' : '#ffffff',
+      headerBg: isDarkMode ? '#1f1f1f' : '#ffffff',
+    },
+    Menu: {
+      itemBg: 'transparent',
+      subMenuItemBg: 'transparent',
+      itemColor: isDarkMode ? '#d9d9d9' : '#595959',
+      itemHoverColor: '#6782f5',
+      itemSelectedColor: '#ffffff',
+      itemSelectedBg: '#6782f5',
+    },
   },
-};
+});
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return !!localStorage.getItem("token");
   });
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  // Apply theme to document on app load
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -426,6 +459,11 @@ function App() {
     setupAutoLogout(expiry);
   };
 
+  const updateDarkMode = (value: boolean) => {
+    setIsDarkMode(value);
+    document.documentElement.setAttribute('data-theme', value ? 'dark' : 'light');
+  };
+
   const setupAutoLogout = (expiry:number) => {
     const timeout = expiry - new Date ().getTime();
     if (timeout > 0) {
@@ -445,7 +483,7 @@ function App() {
   };
 
   return (
-    <ConfigProvider theme={theme}>
+    <ConfigProvider theme={getTheme(isDarkMode)}>
     <Router>
       <Routes>
 
@@ -456,7 +494,7 @@ function App() {
   <Route
     path="/*"
     element={
-      isLoggedIn ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />
+      isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} setIsDarkMode={updateDarkMode} /> : <Navigate to="/login" />
     }
   />
 </Routes>

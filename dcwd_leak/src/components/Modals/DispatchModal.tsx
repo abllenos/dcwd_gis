@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Select, Button, message, Tooltip } from 'antd';
-import { ExclamationOutlined, UserOutlined, CloseOutlined, QuestionCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import '../../styles/modals.css';
+import { ExclamationOutlined, UserOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import '../../styles/modal.css';
 
 const { Option } = Select;
 
@@ -100,7 +100,7 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
         open={visible}
         onCancel={handleCancel}
         footer={null}
-        width={600}
+        width={480}
         closeIcon={true}
         centered
         className="dispatch-modal"
@@ -108,7 +108,7 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
         title={null}
       >
       <div className="dispatch-modal-header">
-        <span className="dispatch-modal-title">Dispatch Leak</span>
+        <span className="dispatch-modal-title">CONTROL - DISPATCH LEAK</span>
       </div>
 
       <div className="dispatch-modal-body">
@@ -117,17 +117,18 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
         </div>
 
         <div className="dispatch-modal-main-text">
-          Dispatch to Repair Crew
+          DISPATCH TO REPAIR CREW
         </div>
 
         <div className="dispatch-modal-form-section">
           <div className="dispatch-modal-label-text">
-            Dispatched to
+            <UserOutlined style={{ marginRight: 8, color: '#ff4d4f', fontSize: 16 }} />
+            DISPATCH TO :
           </div>
           
           <Select
             showSearch
-            placeholder="- Select CARETAKER -"
+            placeholder="-- Select Dispatcher --"
             value={selectedDispatcher}
             onChange={setSelectedDispatcher}
             className="dispatch-modal-select"
@@ -164,16 +165,6 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
         </div>
 
         <div className="dispatch-modal-button-container">
-          <Tooltip title="Cancel dispatch operation">
-            <Button
-              onClick={handleCancel}
-              className="dispatch-modal-cancel-btn"
-              icon={<CloseOutlined />}
-            >
-              Cancel
-            </Button>
-          </Tooltip>
-
           <Tooltip title={!selectedDispatcher ? "Please select a caretaker first" : "Send dispatch to selected caretaker"}>
             <Button
               type="primary"
@@ -182,7 +173,7 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
               className="dispatch-modal-dispatch-btn"
               disabled={!selectedDispatcher}
             >
-              {loading ? 'Dispatching...' : 'Dispatch Leak'}
+              {loading ? 'DISPATCHING...' : 'DISPATCH LEAK'}
             </Button>
           </Tooltip>
         </div>

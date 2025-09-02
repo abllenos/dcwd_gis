@@ -5,13 +5,13 @@ import {
   Breadcrumb,
   Card,
   Input,
-  Modal,
   Select,
   Badge,
 } from 'antd';
 import { FileSearchOutlined, HomeFilled, DownOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
+import SupplyComplaintDetailsModal from '../Modals/SupplyComplaintDetailsModal';
 
 const { Option } = Select;
 
@@ -93,6 +93,11 @@ const SupplyComplaints: React.FC = () => {
 
   const handleCancel = () => setModalVisible(false);
 
+  const handleSubmitRemarks = (remarks: string) => {
+    console.log('Submitted remarks:', remarks);
+    // Add your logic here to handle the submitted remarks
+  };
+
   const filteredData = (): ComplaintData[] => {
     let tabData: ComplaintData[] = [];
 
@@ -141,18 +146,21 @@ const SupplyComplaints: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button
             icon={<FileSearchOutlined />}
-            style={{
-              backgroundColor: '#00008B',
-              border: 'none',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 32,
-              height: 32,
-              padding: 0,
-            }}
             onClick={() => showDetails(record)}
+            style={{ 
+              borderColor: "#27cc3f", 
+              color: "#27cc3f",
+              backgroundColor: "transparent",
+              transition: "all 0.3s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#27cc3f";
+              e.currentTarget.style.color = "white";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#27cc3f";
+            }}
           />
         </div>
       ),
@@ -221,10 +229,14 @@ const SupplyComplaints: React.FC = () => {
         />
       </Card>
 
-      <Modal
-        title="Complaint Details"
-        open={modalVisible}
+      <SupplyComplaintDetailsModal
+        visible={modalVisible}
         onCancel={handleCancel}
+
+        selectedRecord={selectedRecord}
+        onSubmitRemarks={handleSubmitRemarks}
+      />
+
         footer={null}
         width={720}
         styles={{ body: {padding: '24px' }}}      
@@ -285,6 +297,7 @@ const SupplyComplaints: React.FC = () => {
           </div>
         )}
       </Modal>
+
     </div>
   );
 };
