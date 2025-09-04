@@ -311,10 +311,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
                 type="primary"
                 icon={<LogoutOutlined />}
                 className="header-btn header-btn-primary"
-                onClick={() => {
-                  onLogout();
-                  navigate('/login');
-                }}
+                onClick={() => setLogoutModalVisible(true)}
               >
                 Log out
               </Button>

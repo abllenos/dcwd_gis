@@ -61,7 +61,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div style={styles.pageWrapper}>
-      <div style={styles.leftPanel} />
+  <div style={styles.leftPanel} />
       <div style={styles.rightPanel}>
         {loading ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
