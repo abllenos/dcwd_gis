@@ -44,9 +44,9 @@ const formTypeToJMSCodeMap: Record<
   WaterSupplyConcernsProps['formType'],
   { value: string; label: string }
 > = {
-  no_water: { value: '1', label: 'No Water' },
-  low_pressure: { value: '2', label: 'Low Pressure' },
-  no_water_supply: { value: '3', label: 'Water Quality Complaints' },
+  no_water: { value: '57', label: 'No Water' },
+  low_pressure: { value: '58', label: 'Low Pressure' },
+  no_water_supply: { value: '59', label: 'Water Quality Complaints' },
   leak_report: { value: '4', label: 'Leak Report' },
 };
 

@@ -32,7 +32,7 @@ const labelStyle: React.CSSProperties = {
   fontWeight: 500,
   textTransform: 'uppercase' as const,
   fontSize: 12,
-  fontFamily: 'Noto Sans, sans-serif',
+  fontFamily: 'Montserrat, sans-serif',
   color: 'var(--text-primary)',
 };
 
@@ -123,23 +123,25 @@ const ReportALeak: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append('Name', values.Name || '');
-    formData.append('Number', values.Number || '');
-    formData.append('NearestMeter', values.NearestMeter || '');
-    formData.append('Address', values.address || '');
-    formData.append('Landmark', values.Landmark || '');
+    formData.append('ReporterName', values.Name || '');
+    formData.append('ReportedNumber', values.Number || '');
+    formData.append('ReferenceMtr', values.NearestMeter || '');
+    formData.append('ReferenceRecaddrs', values.address || '');
+    formData.append('ReportedLandmark', values.Landmark || '');
     formData.append('LeakPressure', values.leakPressure || '');
-    formData.append('LeakLocation', values.visibility || '');
-    formData.append('TypeId', values.typeId || '');
+    formData.append('LeakIndicator', values.visibility || '');
+    formData.append('ReportType', values.typeId || '');
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
-    formData.append('remarks', values.Remarks || '');
-    formData.append('ct_code', CT_ID || '');
-    formData.append('wscode', wscode || '');
-    formData.append('DT_Reported', new Date().toISOString());
-    formData.append('refAccNo', values.refAccNo || '');
-    formData.append('dispatchStat', '1');
+    formData.append('Geom', `${lng}, ${lat}`);
+    formData.append('Remarks', values.Remarks || '');
+    formData.append('ReporterType', values.reportertype || '');
+    formData.append('CtCode', CT_ID || '');
+    formData.append('WsCode', wscode || '');
+    formData.append('DtReported', new Date().toISOString());
+    formData.append('refAccNo', (values.refAccNo || '').substring(0, 6));
+    formData.append('DispatchStat', '1');
     formData.append('flgLeakDetection', '0')
 
     if (fileList.length) {
@@ -151,7 +153,7 @@ const ReportALeak: React.FC = () => {
     try {
       setLoading(true);
       await devApi.post(
-        'dcwd-gis/api/v1/admin/LeakDetection/saveLeakReport',
+        "dcwd-gis/api/v1/admin/LeakReport/SaveReport",
         formData,
         {
           headers: {
@@ -206,11 +208,12 @@ const ReportALeak: React.FC = () => {
 
         const accountNumber = customer.accountNumber || '';
         const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
+        const trimmedRefAccNo = RefAccAddress.substring(0, 6);
 
         form.setFieldsValue({
           address: customer.address || '',
           NearestMeter: customer.meterNumber || '',
-          refAccNo: RefAccAddress,
+          refAccNo: trimmedRefAccNo,
         });
 
         const newLat = parseFloat(customer.latitude);
@@ -343,9 +346,9 @@ const ReportALeak: React.FC = () => {
               <Row gutter={16}> 
                 <Col span={12}>  
                   <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>} rules={[{required: true, message: 'Enter Leak Type'}]}>
-                    <Select placeholder="-SELECT-">
-                      <Option value="1">Service Line</Option>
-                      <Option value="2">Main Line</Option>
+                    <Select placeholder="-SELECT-">   f
+                      <Option value="54">Service Line</Option>
+                      <Option value="55">Main Line</Option>
                     </Select>
                   </Form.Item>
                 </Col> 
@@ -389,7 +392,15 @@ const ReportALeak: React.FC = () => {
                   <Form.Item name="refAccNo" hidden>
                     <Input type='hidden' />
                   </Form.Item>
-                <Col span={24}>
+                <Col span={12}>
+                  <Form.Item name="reportertype" label={<span style={labelStyle}>Reporter Type</span>} rules={[{required: true, message: 'Select Reporter Type'}]}>
+                    <Select placeholder="-SELECT-">
+                      <Option value="1">Account Holder</Option>
+                      <Option value="2">Non Account Holder</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>} rules={[{required: true, message: 'Enter Remarks'}]}>
                     <Input.TextArea rows={3} />
                   </Form.Item>
