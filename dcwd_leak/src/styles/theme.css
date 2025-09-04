@@ -72,7 +72,44 @@
   --shadow-color: rgba(0,0,0,0.3);
 }
 
+[data-theme="dark"] .ant-table-thead > tr > th,
+[data-theme="dark"] .ant-table-thead .ant-table-cell,
+[data-theme="dark"] .ant-table-cell {
+  color: #fff !important;
+  background: #222 !important;
+}
+
+[data-theme="dark"] .ant-input {
+  color: #fff !important;
+}
+
+[data-theme="dark"] .ant-card-head-title,
+[data-theme="dark"] .ant-card-head {
+  color: #111 !important;
+}
+[data-theme="dark"] .ant-table-thead > tr > th {
+  background: #222 !important;
+}
+
 /* Form styles that you can reuse */
+.dashboard-header-row {
+  background-color: #f9fafb;
+  color: #504f4fff;
+}
+
+[data-theme="dark"] .dashboard-header-row {
+  background-color: #222 !important;
+  color: #fff !important;
+}
+
+.dashboard-card {
+  background-color: #fff;
+}
+
+[data-theme="dark"] .dashboard-card {
+  background-color: #222 !important;
+  color: #fff !important;
+}
 .form-card {
   background: white;
   padding: var(--card-padding);

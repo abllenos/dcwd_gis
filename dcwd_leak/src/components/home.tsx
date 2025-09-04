@@ -42,7 +42,7 @@ const Home: React.FC = observer(() => {
             <Col xs={24} md={8}>
               <Card variant="borderless" style={{ ...statCardStyle(), position: "relative" }}>
                 <div>
-                  <div style={labelStyle}>Dispatched</div>
+                  <div className="dashboard-label" style={labelStyle}>Dispatched</div>
                   <div style={numberStyle}>{dashboardStore.summary.dispatched}</div>
                 </div>
                 <CheckCircleOutlined style={iconStyle} />
@@ -52,7 +52,7 @@ const Home: React.FC = observer(() => {
             <Col xs={24} md={8}>
               <Card variant="borderless" style={{ ...statCardStyle(), position: "relative" }}>
                 <div>
-                  <div style={labelStyle}>Total Reports</div>
+                  <div className="dashboard-label" style={labelStyle}>Total Reports</div>
                   <div style={numberStyle}>{dashboardStore.summary.total}</div>
                 </div>
                 <FileTextOutlined style={iconStyle} />
@@ -62,7 +62,7 @@ const Home: React.FC = observer(() => {
             <Col xs={24} md={8}>
               <Card variant="borderless" style={{ ...statCardStyle(), position: "relative" }}>
                 <div>
-                  <div style={labelStyle}>Pending (Un-Dispatch)</div>
+                  <div className="dashboard-label" style={labelStyle}>Pending (Un-Dispatch)</div>
                   <div style={numberStyle}>{dashboardStore.summary.pending}</div>
                 </div>
                 <ClockCircleOutlined style={iconStyle} />
@@ -83,9 +83,9 @@ const Home: React.FC = observer(() => {
               <Card variant="borderless">
                 <Title level={5}>Leak Reports</Title>
                 <Row
+                  className="dashboard-header-row"
                   style={{
                     fontWeight: 600,
-                    backgroundColor: "#f9fafb",
                     borderBottom: "2px solid #e5e7eb",
                     padding: "8px 0",
                     marginBottom: 8,
