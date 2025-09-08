@@ -1,13 +1,16 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 
 export interface WaterSupplyConcernForm {
-  name?: string;
+  Name?: string;
   nearestMeter?: string;
   location?: string;
-  contactNumber?: string;
+  Number?: string;
   jmsCode?: string;
   remarks?: string;
   searchValue?: string;
+  reportertype?: string;
+  refAccNo?: string;
+  landmark?: string;
 }
 
 class WaterSupplyConcernsStore {
@@ -144,9 +147,14 @@ class WaterSupplyConcernsStore {
       if (data?.statusCode === 200 && data.data?.length > 0) {
         const customer = data.data[0];
         
+        const accountNumber = customer.accountNumber || '';
+        const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
+        const trimmedRefAccNo = RefAccAddress.substring(0, 6);
+        
         const customerData = {
           location: customer.address || '',
           nearestMeter: customer.meterNumber || '',
+          refAccNo: trimmedRefAccNo,
         };
 
         const newLat = parseFloat(customer.latitude);
@@ -167,6 +175,7 @@ class WaterSupplyConcernsStore {
           this.setFormValues({
             location: '',
             nearestMeter: '',
+            refAccNo: '',
           });
           this.setLocation(7.0722, 125.6131);
         });
@@ -186,33 +195,34 @@ class WaterSupplyConcernsStore {
   async submitConcern(values: WaterSupplyConcernForm) {
     const token = localStorage.getItem('debug_token');
     if (!token) {
-      this.showModal('Session Expired', 'Your session has expired. Please log in again.');
+      this.showModal('Session Expired', 'Your session has expired. Please log in again.', 'error');
       return false;
     }
 
-    const dateReported = new Date()
-      .toISOString()
-      .replace('T', ' ')
-      .replace('Z', '+00:00');
-
     const formData = new FormData();
-    formData.append('Name', values.name || '');
-    formData.append('NearestMeter', values.nearestMeter || '');
-    formData.append('Location', values.location || '');
-    formData.append('ContactNumber', values.contactNumber || '');
-    formData.append('JMSCode', values.jmsCode || '');
-    formData.append('Remarks', values.remarks || '');
+    formData.append('ReporterName', values.Name || '');
+    formData.append('ReportedNumber', values.Number || '');
+    formData.append('ReferenceMtr', values.nearestMeter || '');
+    formData.append('ReferenceRecaddrs', values.refAccNo || '');
+    formData.append('ReportedLandmark', values.landmark || '');
+    formData.append('JmsCode', values.jmsCode || '');
+    formData.append('SpoolID', '0');
     formData.append('Latitude', this.lat.toString());
     formData.append('Longitude', this.lng.toString());
-    formData.append('CT_ID', this.CT_ID || '');
-    formData.append('WSCode', this.wscode || '');
-    formData.append('DateReported', dateReported);
-    formData.append('Status', 'Pending');
+    formData.append('Geom', `${this.lng}, ${this.lat}`);
+    formData.append('Remarks', values.remarks || '');
+    formData.append('ReporterType', values.reportertype || '');
+    formData.append('CtCode', this.CT_ID || '');
+    formData.append('WsCode', this.wscode || '');
+    formData.append('DtReported', new Date().toISOString());
+    formData.append('refAccNo', (values.refAccNo || '').substring(0, 6));
+    formData.append('DispatchStat', '1');
+    formData.append('flgLeakDetection', '0')
 
     try {
       this.setLoading(true);
       const response = await fetch(
-        'https://api-gis.davao-water.gov.ph/dcwd-gis/api/v1/admin/water-supply-concerns',
+        'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/LeakReport/WaterComplaints',
         {
           method: 'POST',
           headers: {
@@ -227,7 +237,7 @@ class WaterSupplyConcernsStore {
       }
 
       runInAction(() => {
-        this.showModal('Success', 'Water supply concern submitted successfully', 'success');
+        this.showModal('Success', 'Water complaint submitted successfully', 'success');
         this.resetForm();
       });
 
@@ -236,7 +246,7 @@ class WaterSupplyConcernsStore {
       if (error.response?.status === 401) {
         this.showModal('Unauthorized', 'Unauthorized. Please log in again.', 'error');
       } else {
-        this.showModal('Submission Failed', 'Failed to submit water supply concern.', 'error');
+        this.showModal('Submission Failed', 'Failed to submit water complaint.', 'error');
       }
       console.error(error);
       return false;

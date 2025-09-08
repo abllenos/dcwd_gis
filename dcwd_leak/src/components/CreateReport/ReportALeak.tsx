@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import CustomModal from '../Modals/CustomModal';
 
 
-const { Text } = Typography;
+const { Text } = Typography
 const { Option } = Select;
 
 message.config({
@@ -126,7 +126,7 @@ const ReportALeak: React.FC = () => {
     formData.append('ReporterName', values.Name || '');
     formData.append('ReportedNumber', values.Number || '');
     formData.append('ReferenceMtr', values.NearestMeter || '');
-    formData.append('ReferenceRecaddrs', values.address || '');
+    formData.append('ReferenceRecaddrs', values.refAccNo || '');
     formData.append('ReportedLandmark', values.Landmark || '');
     formData.append('LeakPressure', values.leakPressure || '');
     formData.append('LeakIndicator', values.visibility || '');
@@ -134,7 +134,7 @@ const ReportALeak: React.FC = () => {
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
-    formData.append('Geom', `${lng}, ${lat}`);
+    formData.append('Geom',  `${lng}, ${lat}`);
     formData.append('Remarks', values.Remarks || '');
     formData.append('ReporterType', values.reportertype || '');
     formData.append('CtCode', CT_ID || '');

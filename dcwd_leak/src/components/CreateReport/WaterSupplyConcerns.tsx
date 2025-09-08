@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import MapComponent from '../Endpoints/MapView';
 import {
   Form,
   Input,
   Button,
+  Select,
   Divider,
   Typography,
   Row,
@@ -21,6 +22,7 @@ import '../../styles/theme.css';
 
 
 const { Text } = Typography;
+const { Option } = Select;
 
 message.config({
   top: 0,     
@@ -32,21 +34,21 @@ const labelStyle: React.CSSProperties = {
   fontWeight: 500,
   textTransform: 'uppercase' as const,
   fontSize: 12,
-  fontFamily: 'Noto Sans, sans-serif',
+  fontFamily: 'Montserrat, sans-serif',
   color: 'var(--text-primary)',
 };
 
 interface WaterSupplyConcernsProps {
-  formType: 'no_water' | 'low_pressure' | 'no_water_supply' | 'leak_report';
+  formType: 'water_quality' | 'low_pressure' | 'no_water_supply' | 'leak_report';
 }
 
 const formTypeToJMSCodeMap: Record<
   WaterSupplyConcernsProps['formType'],
   { value: string; label: string }
 > = {
-  no_water: { value: '57', label: 'No Water' },
+  water_quality: { value: '59', label: 'Water Quality' },
   low_pressure: { value: '58', label: 'Low Pressure' },
-  no_water_supply: { value: '59', label: 'Water Quality Complaints' },
+  no_water_supply: { value: '57', label: 'Water Supply' },
   leak_report: { value: '4', label: 'Leak Report' },
 };
 
@@ -55,6 +57,10 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
 
   const navigate = useNavigate();
   const handleHomeClick = () => navigate('/home');
+
+  const showModal = (title: string, content: string, type: 'success' | 'error' | 'warning' = 'success') => {
+    waterSupplyConcernsStore.showModal(title, content, type);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('debug_token');
@@ -174,7 +180,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
               </Form.Item>
 
               <Form.Item 
-                name="name"
+                name="Name"
                 label={<span style={labelStyle}>Name</span>}
                 rules={[{required: true, message: 'Enter Name'}]}
               >
@@ -198,7 +204,14 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
               </Form.Item>
 
               <Form.Item 
-                name="contactNumber"
+                name="landmark"
+                label={<span style={labelStyle}>Landmark</span>}
+              >
+                <Input placeholder="Enter landmark (optional)" />
+              </Form.Item>
+
+              <Form.Item 
+                name="Number"
                 label={<span style={labelStyle}>Contact No.</span>}
                 rules={[
                   {required: true, message: 'Enter Contact No.'}, 
@@ -206,6 +219,17 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
                 ]}
               >
                 <Input placeholder="Enter contact number" />
+              </Form.Item>
+
+              <Form.Item 
+                name="reportertype"
+                label={<span style={labelStyle}>Reporter Type</span>}
+                rules={[{required: true, message: 'Select Reporter Type'}]}
+              >
+                <Select placeholder="-SELECT-">
+                  <Option value="1">Account Holder</Option>
+                  <Option value="2">Non Account Holder</Option>
+                </Select>
               </Form.Item>
 
               <Divider orientation="left">
@@ -277,7 +301,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
         </Row>
       </div>
 
-      {/* Success/Error Modal (same as ReportALeak) */}
+      {/* Success/Error Modal */}
       <CustomModal
         visible={waterSupplyConcernsStore.modalData.visible}
         title={waterSupplyConcernsStore.modalData.title}

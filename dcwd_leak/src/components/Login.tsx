@@ -14,15 +14,35 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [activeInput, setActiveInput] = useState<string | null>(null);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [activeInput, setActiveInput] = useState<string | null>(null);
+  // const [username, setUsername] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [showPassword, setShowPassword] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState("");
   const navigate = useNavigate();
-  const styles = getStyles();
+  // const styles = getStyles();
 
+  // Bypass login - automatically navigate to home
+  React.useEffect(() => {
+    // Set dummy token and user data
+    localStorage.setItem("debug_token", "bypass_token");
+    localStorage.setItem("debug_user_data", JSON.stringify({ 
+      token: "bypass_token", 
+      user: "bypass_user" 
+    }));
+    
+    // Call onLogin if provided
+    onLogin?.("bypass_token");
+    
+    // Navigate to home after a short delay
+    setTimeout(() => {
+      navigate("/home");
+    }, 1000);
+  }, [navigate, onLogin]);
+
+  /* 
+  // Original login logic commented out
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -58,7 +78,37 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setLoading(false);
     }
   };
+  */
 
+  return (
+    <div style={{ 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center", 
+      height: "100vh",
+      backgroundColor: "#f5f5f5",
+      flexDirection: "column"
+    }}>
+      <img src="/logo-dcwd.webp" alt="Logo" style={{ width: 120, height: 120, marginBottom: 20 }} />
+      <div style={{ 
+        fontSize: 24, 
+        fontWeight: "bold", 
+        color: "#113983", 
+        marginBottom: 10 
+      }}>
+        LEAK REPORTING SYSTEM
+      </div>
+      <div style={{ 
+        fontSize: 16, 
+        color: "#666" 
+      }}>
+        Automatically logging in...
+      </div>
+    </div>
+  );
+
+  /* 
+  // Original JSX commented out
   return (
     <div style={styles.pageWrapper}>
   <div style={styles.leftPanel} />
@@ -137,6 +187,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       </div>
     </div>
   );
+  */
 };
 
 function getStyles(): { [key: string]: React.CSSProperties } {
