@@ -14,14 +14,14 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  // const [activeInput, setActiveInput] = useState<string | null>(null);
-  // const [username, setUsername] = useState("");
-  // const [password, setPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState("");
+  const [activeInput, setActiveInput] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  // const styles = getStyles();
+  const styles = getStyles();
 
   // Bypass login - automatically navigate to home
   React.useEffect(() => {
@@ -41,7 +41,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }, 1000);
   }, [navigate, onLogin]);
 
-  /* 
+  
   // Original login logic commented out
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,7 +78,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setLoading(false);
     }
   };
-  */
+  
 
   return (
     <div style={{ 
@@ -107,7 +107,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     </div>
   );
 
-  /* 
+  
   // Original JSX commented out
   return (
     <div style={styles.pageWrapper}>
@@ -187,7 +187,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       </div>
     </div>
   );
-  */
+ 
 };
 
 function getStyles(): { [key: string]: React.CSSProperties } {

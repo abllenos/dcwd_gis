@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import MapComponent from '../Endpoints/MapView';
 import {
   Form,
   Input,
@@ -8,18 +7,14 @@ import {
   Select,
   Divider,
   Typography,
-  Row,
-  Col,
-  Breadcrumb,
   message,
+  Space,
 } from 'antd';
-import { SearchOutlined, HomeFilled } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import CustomModal from '../Modals/CustomModal';
 import { waterSupplyConcernsStore } from '../../stores/waterSupplyConcernsStore';
 import { useNavigate } from 'react-router-dom';
-import { Space } from 'antd';
 import '../../styles/theme.css';
-
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -40,6 +35,10 @@ const labelStyle: React.CSSProperties = {
 
 interface WaterSupplyConcernsProps {
   formType: 'water_quality' | 'low_pressure' | 'no_water_supply' | 'leak_report';
+  lat?: number;
+  lng?: number;
+  onMapClick?: (lat: number, lng: number) => void;
+  formRef?: React.RefObject<any>;
 }
 
 const formTypeToJMSCodeMap: Record<
@@ -48,15 +47,19 @@ const formTypeToJMSCodeMap: Record<
 > = {
   water_quality: { value: '59', label: 'Water Quality' },
   low_pressure: { value: '58', label: 'Low Pressure' },
-  no_water_supply: { value: '57', label: 'Water Supply' },
-  leak_report: { value: '4', label: 'Leak Report' },
+  no_water_supply: { value: '60', label: 'No Water Supply' },
+  leak_report: { value: '57', label: 'Leak Report' },
 };
 
-const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ formType }) => {
+const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ 
+  formType, 
+  lat: propLat = 7.0722, 
+  lng: propLng = 125.6131, 
+  onMapClick: propOnMapClick,
+  formRef
+}) => {
   const [form] = Form.useForm();
-
   const navigate = useNavigate();
-  const handleHomeClick = () => navigate('/home');
 
   const showModal = (title: string, content: string, type: 'success' | 'error' | 'warning' = 'success') => {
     waterSupplyConcernsStore.showModal(title, content, type);
@@ -71,20 +74,25 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
   }, []);
 
   useEffect(() => {
-    if (waterSupplyConcernsStore.lat !== null && waterSupplyConcernsStore.lng !== null) {
-      waterSupplyConcernsStore.fetchWscode(waterSupplyConcernsStore.lat, waterSupplyConcernsStore.lng);
-      waterSupplyConcernsStore.fetchCaretaker(waterSupplyConcernsStore.lat, waterSupplyConcernsStore.lng);
+    const jmsCode = formTypeToJMSCodeMap[formType]?.value;
+    if (jmsCode) {
+      waterSupplyConcernsStore.setFormValues({ jmsCode });
     }
-  }, [waterSupplyConcernsStore.lat, waterSupplyConcernsStore.lng]);
+  }, [formType]);
 
   useEffect(() => {
-    const jmsCode = formTypeToJMSCodeMap[formType]?.value;
-    form.setFieldsValue({ jmsCode });
-    waterSupplyConcernsStore.setFormValues({ jmsCode });
-  }, [formType, form]);
+    if (propLat && propLng) {
+      waterSupplyConcernsStore.setLocation(propLat, propLng);
+      waterSupplyConcernsStore.fetchWscode(propLat, propLng);
+      waterSupplyConcernsStore.fetchCaretaker(propLat, propLng);
+    }
+  }, [propLat, propLng]);
 
   const handleMapClick = (clickedLat: number, clickedLng: number) => {
     waterSupplyConcernsStore.setLocation(clickedLat, clickedLng);
+    if (propOnMapClick) {
+      propOnMapClick(clickedLat, clickedLng);
+    }
   };
 
   const handleSubmit = async (values: any) => {
@@ -102,206 +110,124 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
   };
 
   return (
-    <div style={{ padding: "4px 24px 24px 24px", backgroundColor: 'var(--bg-secondary)', minHeight: '100vh' }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-        <Button 
-          icon={<HomeFilled />} 
-          onClick={handleHomeClick} 
-          type="text" 
-          style={{ 
-            fontSize: 16, 
-            color: "var(--btn-primary-color)",
-            backgroundColor: 'transparent'
-          }} 
-          shape="circle" 
-        />
-        <Breadcrumb
-          style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-primary)' }}
-          items={[
-            { title: "Create A Report"},
-            { title: "Water Supply Concerns"}
-          ]}
-        />
-
-        </div>
-      </div>
-      <div
-        style={{
-          backgroundColor: 'var(--bg-primary)',
-          padding: 24,
-          borderRadius: 8,
-          boxShadow: 'var(--card-shadow)',
+    <>
+      <Form 
+        ref={formRef}
+        layout="vertical" 
+        form={form}
+        onFinish={handleSubmit}
+        onFinishFailed={() => {
+          message.error('Please complete all required fields before submitting.')
+        }}
+        onValuesChange={(changedValues, allValues) => {
+          waterSupplyConcernsStore.setFormValues(allValues);
         }}
       >
-        <Row gutter={24}>
-          <Col span={10}>
-            <Form 
-              layout="vertical" 
-              form={form}
-              onFinish={handleSubmit}
-              onFinishFailed={() => {
-                message.error('Please complete all required fields before submitting.')
-              }}
-              onValuesChange={(changedValues, allValues) => {
-                waterSupplyConcernsStore.setFormValues(allValues);
-              }}
+        {/* Search Section */}
+        <Form.Item
+          label={
+            <span style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
+              <SearchOutlined style={{ fontSize: 15 }} />
+              Search Account No or Meter No
+            </span>
+          }
+        >
+          <Space.Compact style={{ width: '100%' }}>
+            <Input 
+              style={{ flex: 1 }} 
+              placeholder="Enter Account or Meter Number"
+              value={waterSupplyConcernsStore.formValues.searchValue || ''}
+              onChange={(e) => waterSupplyConcernsStore.setFormValues({ searchValue: e.target.value })}
+              onPressEnter={handleSearchCustomer}
+            />
+            <Button 
+              type="primary" 
+              onClick={handleSearchCustomer}
+              loading={waterSupplyConcernsStore.searchLoading}
             >
-              <Divider orientation="left">
-                <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-                  Contact Information
-                </Text>
-              </Divider>
+              Search
+            </Button>
+          </Space.Compact>
+        </Form.Item>
 
-              <Form.Item
-                label={
-                  <span style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
-                    <SearchOutlined style={{ fontSize: 15 }} />
-                    Search Account No or Meter No
-                  </span>
-                }
-              >
-                <Space.Compact style={{ width: '100%' }}>
-                  <Input 
-                    style={{ flex: 1 }} 
-                    placeholder="Enter Account or Meter Number"
-                    value={waterSupplyConcernsStore.formValues.searchValue || ''}
-                    onChange={(e) => waterSupplyConcernsStore.setFormValues({ searchValue: e.target.value })}
-                    onPressEnter={handleSearchCustomer}
-                  />
-                  <Button 
-                    type="primary" 
-                    onClick={handleSearchCustomer}
-                    loading={waterSupplyConcernsStore.searchLoading}
-                  >
-                    Search
-                  </Button>
-                </Space.Compact>
-              </Form.Item>
+        {/* Reporter Details Section */}
+        <Divider orientation="left">
+          <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
+            Reporter Details
+          </Text>
+        </Divider>
 
-              <Form.Item 
-                name="Name"
-                label={<span style={labelStyle}>Name</span>}
-                rules={[{required: true, message: 'Enter Name'}]}
-              >
-                <Input placeholder="Enter customer name" />
-              </Form.Item>
+        <Form.Item 
+          name="reporterType" 
+          label={<span style={labelStyle}>Reporter Type</span>}
+          rules={[{required: true, message: 'Select Reporter Type'}]}
+        >
+          <Select placeholder="-SELECT-">
+            <Option value="1">Account Holder</Option>
+            <Option value="2">Non Account Holder</Option>
+          </Select>
+        </Form.Item>
 
-              <Form.Item 
-                name="nearestMeter"
-                label={<span style={labelStyle}>Nearest Meter</span>}
-                rules={[{required: true, message: 'Enter Nearest Meter'}]}
-              >
-                <Input placeholder="Enter nearest meter" />
-              </Form.Item>
+        <Form.Item 
+          name="Name"
+          label={<span style={labelStyle}>Name</span>}
+          rules={[{required: true, message: 'Enter Name'}]}
+        >
+          <Input placeholder="Enter customer name" />
+        </Form.Item>
 
-              <Form.Item 
-                name="location"
-                label={<span style={labelStyle}>Location</span>}
-                rules={[{required: true, message: 'Enter Location'}]}
-              >
-                <Input placeholder="Enter location" />
-              </Form.Item>
+        <Form.Item 
+          name="Number" 
+          label={<span style={labelStyle}>Contact No.</span>}
+          rules={[
+            {required: true, message: 'Enter Contact No.'}, 
+            { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
+          ]}
+        >
+          <Input placeholder="Enter contact number" />
+        </Form.Item>
 
-              <Form.Item 
-                name="landmark"
-                label={<span style={labelStyle}>Landmark</span>}
-              >
-                <Input placeholder="Enter landmark (optional)" />
-              </Form.Item>
+        {/* Report Details Section */}
+        <Divider orientation="left">
+          <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
+            Report Details
+          </Text>
+        </Divider>
 
-              <Form.Item 
-                name="Number"
-                label={<span style={labelStyle}>Contact No.</span>}
-                rules={[
-                  {required: true, message: 'Enter Contact No.'}, 
-                  { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
-                ]}
-              >
-                <Input placeholder="Enter contact number" />
-              </Form.Item>
+        <Form.Item 
+          name="nearestMeter"
+          label={<span style={labelStyle}>Nearest Meter No.</span>}
+          rules={[{required: true, message: 'Enter Nearest Meter No.'}]}
+        >
+          <Input placeholder="Enter nearest meter number" />
+        </Form.Item>
 
-              <Form.Item 
-                name="reportertype"
-                label={<span style={labelStyle}>Reporter Type</span>}
-                rules={[{required: true, message: 'Select Reporter Type'}]}
-              >
-                <Select placeholder="-SELECT-">
-                  <Option value="1">Account Holder</Option>
-                  <Option value="2">Non Account Holder</Option>
-                </Select>
-              </Form.Item>
+        <Form.Item 
+          name="location"
+          label={<span style={labelStyle}>Location</span>}
+          rules={[{required: true, message: 'Enter Location'}]}
+        >
+          <Input placeholder="Enter location" />
+        </Form.Item>
 
-              <Divider orientation="left">
-                <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-                  Complaint Details
-                </Text>
-              </Divider>
+        <Form.Item 
+          name="remarks" 
+          label={<span style={labelStyle}>Remarks</span>}
+          rules={[{required: true, message: 'Enter Remarks'}]}
+        >
+          <Input.TextArea rows={3} placeholder="Enter additional remarks" />
+        </Form.Item>
 
-              <Form.Item name="jmsCode" hidden>
-                <Input type='hidden' />
-              </Form.Item>
+        {/* Hidden fields */}
+        <Form.Item 
+          name="complaintType" 
+          hidden
+          initialValue={formTypeToJMSCodeMap[formType]?.label}
+        >
+          <Input type="hidden" />
+        </Form.Item>
+      </Form>
 
-              <Form.Item 
-                name="remarks" 
-                label={<span style={labelStyle}>Remarks</span>}
-                rules={[{required: true, message: 'Enter Remarks'}]}
-              >
-                <Input.TextArea rows={3} placeholder="Enter additional remarks" />
-              </Form.Item>
-            </Form>
-          </Col>
-
-          <Col span={14}>
-            <Divider orientation="left">
-              <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-                Search Address
-              </Text>
-            </Divider>
-
-            <Form.Item>
-              <Input 
-                placeholder="e.g., Matina, Davao City, Davao del Sur"
-                style={{ 
-                  backgroundColor: 'var(--bg-primary)',
-                  borderColor: 'var(--border-color)',
-                  color: 'var(--text-primary)'
-                }}
-              />
-            </Form.Item>
-
-            <div style={{ height: 613, border: "1px solid var(--border-color)", borderRadius: 6 }}>
-              <MapComponent 
-                lat={waterSupplyConcernsStore.lat} 
-                lng={waterSupplyConcernsStore.lng} 
-                onMapClick={handleMapClick} 
-              />
-            </div>
-
-            <div style={{width: '100%', display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-              <Button 
-                danger
-                onClick={() => { 
-                  form.resetFields();
-                  waterSupplyConcernsStore.resetForm();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="primary" 
-                htmlType="submit"
-                loading={waterSupplyConcernsStore.loading}
-                onClick={() => form.submit()}
-              >
-                Submit
-              </Button>
-            </div>
-          </Col>
-        </Row>
-      </div>
-
-      {/* Success/Error Modal */}
       <CustomModal
         visible={waterSupplyConcernsStore.modalData.visible}
         title={waterSupplyConcernsStore.modalData.title}
@@ -309,7 +235,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({ form
         type={waterSupplyConcernsStore.modalData.type}
         onClose={() => waterSupplyConcernsStore.closeModal()}
       />
-    </div>
+    </>
   );
 });
 

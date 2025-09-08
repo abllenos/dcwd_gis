@@ -35,9 +35,7 @@ import DispatchOveride from './components/SystemMaintenance/DispatchOveride';
 import CaretakerAssignment from './components/SystemMaintenance/CaretakerAssignment';
 import AccessLevel from './components/SystemMaintenance/AccessLevel';
 import Reports from './components/Report/Reports';
-import LeakOptionsModal from './components/Modals/LeakOptionsModal';
-import WaterSupplyConcern from './components/CreateReport/WaterSupplyConcerns';
-import ReportALeak from './components/CreateReport/ReportALeak';
+import CreateReport from './components/CreateReport/CreateReport';
 import { devApi } from './components/Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 import LogoutModal from './components/Modals/LogoutModal'; 
@@ -86,7 +84,6 @@ const getSidebarWidth = () => {
 
 const Dashboard: React.FC<{ onLogout: () => void; isDarkMode: boolean; setIsDarkMode: (value: boolean) => void }> = ({ onLogout, isDarkMode: appIsDarkMode, setIsDarkMode: setAppIsDarkMode }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
   const [userProfile, setUserProfile] = useState({
     firstName: '',
@@ -149,30 +146,9 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
     if (e.key === 'logout') {
       setLogoutModalVisible(true); 
     } else if (e.key === 'create-report') {
-      setModalVisible(true);
+      navigate('/create-report');
     } else {
       navigate(`/${e.key}`);
-    }
-  };
-
-  const handleModalSelect = (option: string) => {
-    setModalVisible(false);
-
-    switch(option) {
-      case 'no_water':
-        navigate('/water-supply-concerns', { state: { formType: 'no_water' } });
-        break;
-      case 'low_pressure':
-        navigate('/water-supply-concerns', { state: { formType: 'low_pressure' } });
-        break;
-      case 'no_water_supply':
-        navigate('/water-supply-concerns', { state: { formType: 'no_water_supply' } });
-        break;
-      case 'report_leak':
-        navigate('/report-a-leak', { state: { formType: 'report_leak' } });
-        break;
-      default:
-        break;
     }
   };
 
@@ -336,19 +312,12 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               <Route path="access-level" element={<AccessLevel />} />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
-              <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
-              <Route path="report-a-leak" element={<ReportALeak />} />
+              <Route path="create-report" element={<CreateReport />} />
               <Route path="*" element={<Navigate to="home" />} />
             </Routes>
           </Content>
         </Layout>
       </Layout>
-
-      <LeakOptionsModal
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onSelect={handleModalSelect}
-      />
 
       <LogoutModal
         visible={logoutModalVisible}
@@ -357,12 +326,6 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
       />
     </>
   );
-};
-
-const WaterSupplyConcernsWrapper: React.FC = () => {
-  const location = useLocation();
-  const formType = (location.state as any)?.formType ?? 'no_water';
-  return <WaterSupplyConcern formType={formType} />;
 };
 
 const getTheme = (isDarkMode: boolean) => ({
