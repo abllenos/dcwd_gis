@@ -128,7 +128,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               Log In
             </button>
             {error && (
-              <div style={{ color: '#ff0000ff', marginTop: 10, fontSize: 14, textAlign: 'center' }}>
+              <div style={{ color: '#ff0707ff', marginTop: 10, fontSize: 14, textAlign: 'center' }}>
                 {error}
               </div>
             )}

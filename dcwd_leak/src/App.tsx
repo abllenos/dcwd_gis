@@ -84,7 +84,14 @@ const getSidebarWidth = () => {
   return 280;
 };
 
-const Dashboard: React.FC<{ onLogout: () => void; isDarkMode: boolean; setIsDarkMode: (value: boolean) => void }> = ({ onLogout, isDarkMode: appIsDarkMode, setIsDarkMode: setAppIsDarkMode }) => {
+interface DashboardProps {
+  onLogout: () => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (value: boolean) => void;
+  themeMode?: 'dark' | 'light';
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ onLogout, isDarkMode: appIsDarkMode, setIsDarkMode: setAppIsDarkMode, themeMode }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
@@ -327,7 +334,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
             }}
           >
             <Routes>
-              <Route path="home" element={<Home />} />
+              <Route path="home" element={<Home themeMode={themeMode} />} />
               <Route path="leak-reports" element={<LeakReports />} />
               <Route path="supply-complaints" element={<SupplyComplaints />} />
               <Route path="quality-complaints" element={<QualityComplaints />} />
@@ -335,7 +342,7 @@ const [logoutModalVisible, setLogoutModalVisible] = useState(false);
               <Route path="caretaker-assignment" element={<CaretakerAssignment />} />
               <Route path="access-level" element={<AccessLevel />} />
               <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
+              <Route path="settings" element={<Settings themeMode={themeMode} />} />
               <Route path="water-supply-concerns" element={<WaterSupplyConcernsWrapper />} />
               <Route path="report-a-leak" element={<ReportALeak />} />
               <Route path="*" element={<Navigate to="home" />} />
@@ -480,22 +487,29 @@ function App() {
 
   return (
     <ConfigProvider theme={getTheme(isDarkMode)}>
-    <Router>
-      <Routes>
-
-  <Route
-    path="/login"
-    element={<Login onLogin={handleLogin} />} 
-  />
-  <Route
-    path="/*"
-    element={
-      isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} setIsDarkMode={updateDarkMode} /> : <Navigate to="/login" />
-    }
-  />
-</Routes>
-
-    </Router>
+      <Router>
+        <Routes>
+          <Route
+            path="/login"
+            element={<Login onLogin={handleLogin} />}
+          />
+          <Route
+            path="/*"
+            element={
+              isLoggedIn ? (
+                <Dashboard
+                  onLogout={handleLogout}
+                  isDarkMode={isDarkMode}
+                  setIsDarkMode={updateDarkMode}
+                  themeMode={isDarkMode ? 'dark' : 'light'}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+        </Routes>
+      </Router>
     </ConfigProvider>
   );
 };

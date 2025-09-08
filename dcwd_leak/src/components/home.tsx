@@ -21,7 +21,11 @@ const statusColors: Record<string, { bg: string; text: string; border: string }>
   Unknown: { bg: "#9ca3af", text: "#f9fafb", border: "#6b7280" },
 };
 
-const Home: React.FC = observer(() => {
+interface HomeProps {
+  themeMode?: 'dark' | 'light';
+}
+
+const Home: React.FC<HomeProps> = observer(({ themeMode }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -30,6 +34,8 @@ const Home: React.FC = observer(() => {
     return () => clearInterval(timer);
   }, []);
 
+  // Accept themeMode prop
+  // ...existing code...
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen pt-20 sm:pt-24 md:pt-28">
       {dashboardStore.loading && dashboardStore.reports.length === 0 ? (
@@ -72,8 +78,18 @@ const Home: React.FC = observer(() => {
 
           <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
             <Col xs={24}>
-              <Card title="Monthly Leak Reports" variant="borderless" style={{ height: 350 }}>
-                <MonthlyLeakChart data={dashboardStore.monthlyReports} />
+              <Card
+                title={
+                  <span style={{
+                    color: (typeof themeMode !== 'undefined' && themeMode === 'dark') ? '#fff' : '#000',
+                  }}>
+                    Monthly Leak Reports
+                  </span>
+                }
+                variant="borderless"
+                style={{ height: 350 }}
+              >
+                <MonthlyLeakChart data={dashboardStore.monthlyReports} themeMode={themeMode} />
               </Card>
             </Col>
           </Row>
@@ -166,6 +182,10 @@ const labelStyle: React.CSSProperties = {
 const numberStyle: React.CSSProperties = {
   fontSize: "1.40rem",
   fontWeight: 600,
+  color: typeof window !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark'
+    ? '#fff'
+    : '#232323',
+  textShadow: 'none',
 };
 
 const iconStyle: React.CSSProperties = {

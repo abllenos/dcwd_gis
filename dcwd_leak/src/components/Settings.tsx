@@ -135,27 +135,33 @@ function EditProfileForm({
 }
 
 
-const Settings: React.FC = observer(() => {
+interface SettingsProps {
+  themeMode?: 'dark' | 'light';
+}
+
+const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
   useEffect(() => {
     profileStore.fetchProfile();
   }, []);
 
+  const isDark = themeMode === 'dark';
   return (
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#f0f4f8',
+        backgroundColor: isDark ? '#181818' : '#f0f4f8',
         padding: '40px 24px',
         display: 'flex',
         flexDirection: 'column',
         gap: 24,
+        color: isDark ? '#fff' : undefined,
       }}
     >
 
       <div
         style={{
           width: '100%',
-          background: 'linear-gradient(90deg, #174ea6, #4c85d4)',
+          background: isDark ? 'linear-gradient(90deg, #232a3a, #174ea6)' : 'linear-gradient(90deg, #174ea6, #4c85d4)',
           padding: '40px 24px',
           display: 'flex',
           justifyContent: 'center',
@@ -165,43 +171,44 @@ const Settings: React.FC = observer(() => {
       >
         <div
           style={{
-            backgroundColor: '#fff',
+            backgroundColor: isDark ? '#232a3a' : '#fff',
             borderRadius: 16,
             padding: 24,
-            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.06)',
+            boxShadow: isDark ? '0 4px 18px rgba(0,0,0,0.18)' : '0 4px 18px rgba(0, 0, 0, 0.06)',
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             width: '100%',
             maxWidth: 1000,
             gap: 32,
+            color: isDark ? '#fff' : undefined,
           }}
         >
 
           <div
             className="animated-avatar"
             style={{
-              backgroundColor: '#dbeafe',
+              backgroundColor: isDark ? '#232a3a' : '#dbeafe',
               borderRadius: '50%',
               padding: 14,
-              border: '3px solid #174ea6',
+              border: isDark ? '3px solid #fff' : '3px solid #174ea6',
             }}
           >
             <Avatar
               size={100}
               icon={<UserOutlined />}
-              style={{ backgroundColor: '#fff', color: '#174ea6', fontSize: 36 }}
+              style={{ backgroundColor: isDark ? '#181818' : '#fff', color: isDark ? '#fff' : '#174ea6', fontSize: 36 }}
             />
           </div>
 
 
           <div style={{ flex: 1 }}>
             <div
-              style={{ fontWeight: 700, fontSize: 20, color: '#174ea6', textTransform: 'uppercase' }}
+              style={{ fontWeight: 700, fontSize: 20, color: isDark ? '#fff' : '#174ea6', textTransform: 'uppercase' }}
             >
               {`${profileStore.firstName} ${profileStore.middlename} ${profileStore.lastName}`}
             </div>
-            <div style={{ fontSize: 14, color: '#333', marginTop: 4 }}>{`${profileStore.department}`}</div>
+            <div style={{ fontSize: 14, color: isDark ? '#dbeafe' : '#333', marginTop: 4 }}>{`${profileStore.department}`}</div>
           </div>
 
     
@@ -209,11 +216,12 @@ const Settings: React.FC = observer(() => {
             <div
               style={{
                 flex: 1,
-                background: '#f9f9f9',
+                background: isDark ? '#232a3a' : '#f9f9f9',
                 padding: 16,
                 borderRadius: 12,
                 transition: 'all 0.3s ease',
-                boxShadow: '0 0 0 3px #d6e4ff',
+                boxShadow: isDark ? '0 0 0 3px #174ea6' : '0 0 0 3px #d6e4ff',
+                color: isDark ? '#fff' : undefined,
               }}
             >
               <div style={{ fontWeight: 500, marginBottom: 8 }}>Preview:</div>
@@ -239,7 +247,7 @@ const Settings: React.FC = observer(() => {
   
       <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap' }}>
     
-        <Card title="Contact Details" style={{ flex: 1, minWidth: 280 }}>
+  <Card title="Contact Details" style={{ flex: 1, minWidth: 280, background: isDark ? '#232a3a' : '#fff', color: isDark ? '#fff' : undefined }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
               <span style={{ fontWeight: 500 }}>Email Address:</span>
@@ -266,7 +274,7 @@ const Settings: React.FC = observer(() => {
           </div>
         </Card>
 
-        <Card title="Edit Profile" style={{ flex: 1, minWidth: 280 }}>
+  <Card title="Edit Profile" style={{ flex: 1, minWidth: 280, background: isDark ? '#232a3a' : '#fff', color: isDark ? '#fff' : undefined }}>
           <EditProfileForm
             employeeId={profileStore.employeeId}
             setEmployeeId={(val) => (profileStore.employeeId = val)}
