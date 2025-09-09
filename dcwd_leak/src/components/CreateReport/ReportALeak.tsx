@@ -11,8 +11,9 @@ import {
   Col,
   message,
   Space,
+  Card,
 } from 'antd';
-import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import { DiffOutlined, ExceptionOutlined } from '@ant-design/icons';
 import { devApi } from '../Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 import CustomModal from '../Modals/CustomModal';
@@ -40,13 +41,22 @@ interface ReportALeakProps {
   lng?: number;
   onMapClick?: (lat: number, lng: number) => void;
   formRef?: React.RefObject<any>;
+  customerDetails?: {
+    accountNumber?: string;
+    meterNumber?: string;
+    customerName?: string;
+    address?: string;
+    connectionType?: string;
+    districtMeteringArea?: string;
+  };
 }
 
 const ReportALeak: React.FC<ReportALeakProps> = ({ 
   lat: propLat = 7.0722, 
   lng: propLng = 125.6131, 
   onMapClick: propOnMapClick,
-  formRef
+  formRef,
+  customerDetails = {}
 }) => {
   const [form] = Form.useForm();
   const [lat, setLat] = useState(propLat);
@@ -55,9 +65,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
   const [CT_ID, setCaretaker] = useState<string>('');
   const [fileList, setFileList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string }>({});
+  const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string; refAccNo?: string }>({});
   
   const navigate = useNavigate();
 
@@ -75,6 +83,27 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
       fetchCaretaker(lat, lng);
     }
   }, [lat, lng]);
+
+  // Update form fields when customer details change
+  useEffect(() => {
+    if (customerDetails && Object.keys(customerDetails).length > 0) {
+      const accountNumber = customerDetails.accountNumber || '';
+      const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
+      const trimmedRefAccNo = RefAccAddress.substring(0, 6);
+
+      form.setFieldsValue({
+        address: customerDetails.address || '',
+        NearestMeter: customerDetails.meterNumber || '',
+        refAccNo: trimmedRefAccNo,
+      });
+
+      setFormValues({
+        address: customerDetails.address || '',
+        NearestMeter: customerDetails.meterNumber || '',
+        refAccNo: trimmedRefAccNo,
+      });
+    }
+  }, [customerDetails, form]);
 
   const fetchWscode = async (lat: number, lng: number) => {
     try {
@@ -192,80 +221,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
     }
   };
 
-  const handleSearchCustomer = async () => {
-    if (!searchValue.trim()) {
-      showModal('Warning', 'Please enter an account number or meter number','warning');
-      return;
-    }
 
-    const token = localStorage.getItem('debug_token');
-    if (!token) {
-      showModal('Session Expired', 'Your session has expired. Please log in again.', 'error');
-      navigate('/login');
-      return;
-    }
-
-    try {
-      setSearchLoading(true);
-      const response = await devApi.get(
-        `dcwd-gis/api/v1/admin/customer/SearchAccountOrMeterNumber`,
-        {
-          params: { searchValue },
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.data?.statusCode === 200 && response.data.data?.length > 0) {
-        const customer = response.data.data[0];
-
-        const accountNumber = customer.accountNumber || '';
-        const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
-        const trimmedRefAccNo = RefAccAddress.substring(0, 6);
-
-        form.setFieldsValue({
-          address: customer.address || '',
-          NearestMeter: customer.meterNumber || '',
-          refAccNo: trimmedRefAccNo,
-        });
-
-        const newLat = parseFloat(customer.latitude);
-        const newLng = parseFloat(customer.longitude);
-
-        if (!isNaN(newLat) && !isNaN(newLng)) {
-          setLat(newLat);
-          setLng(newLng);
-        }
-      } else if (response.data?.statusCode === 404) {
-        showModal('Not Found', response.data.message || 'Account or Meter Number not found in the database.');
-
-        form.setFieldsValue({
-          address: '',
-          NearestMeter: '',
-          refAccNo: '',
-        });
-        setLat(7.0722);
-        setLng(125.6131);
-      } else {
-        showModal('Error', 'Unexpected response from the server');
-      }
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        showModal('Not Found', error.response.data?.message || 'Account or Meter Number not found in the database.');
-
-        form.setFieldsValue({
-          address: '',
-          NearestMeter: '',
-          refAccNo: '',
-        });
-        setLat(7.0722);
-        setLng(125.6131);
-      } else {
-        showModal('Error', 'Failed to search customer');
-      }
-    } finally {
-      setSearchLoading(false);
-    }
-  };
 
   return (
     <>
@@ -282,76 +238,115 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
         }}
       >
         {/* Search Section */}
-        <Form.Item
-          label={
-            <span
-              style={{
-                ...labelStyle,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              <SearchOutlined style={{ fontSize: 15 }} /> Search Account No or Meter No
-            </span>
-          }
-        >
-          <Space.Compact style={{ display: 'flex' }}>
-            <Input
-              style={{ flex: 1 }}
-              placeholder="Enter Account or Meter Number"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onPressEnter={handleSearchCustomer}
-            />
-            <Button
-              type="primary"
-              icon={<SearchOutlined />}
-              onClick={handleSearchCustomer}
-              loading={searchLoading}
-            >
-              Search
-            </Button>
-          </Space.Compact>
-        </Form.Item>
-
         {/* Reporter Details Section */}
-        <Divider orientation="left">
-          <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-            Reporter Details
-          </Text>
-        </Divider>
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{
+            position: 'absolute',
+            top: -14,
+            left: 20,
+            zIndex: 10,
+            backgroundColor: '#6782f5',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <DiffOutlined /> Reporter Details
+          </div>
+          <Card 
+            style={{ 
+              backgroundColor: '#fff',
+              borderColor: '#d9d9d9',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              paddingTop: 12
+            }}
+          >
+          <Form.Item 
+            name="reportertype" 
+            label={<span style={labelStyle}>Reporter Type</span>} 
+            rules={[{required: true, message: 'Select Reporter Type'}]}
+            style={{ marginBottom: 8 }}
+          >
+            <Select placeholder="-SELECT-">
+              <Option value="1">Account Holder</Option>
+              <Option value="2">Non Account Holder</Option>
+            </Select>
+          </Form.Item>
 
-        <Form.Item name="reportertype" label={<span style={labelStyle}>Reporter Type</span>} rules={[{required: true, message: 'Select Reporter Type'}]}>
-          <Select placeholder="-SELECT-">
-            <Option value="1">Account Holder</Option>
-            <Option value="2">Non Account Holder</Option>
-          </Select>
-        </Form.Item>
+          <Form.Item 
+            name="Name" 
+            label={<span style={labelStyle}>Name</span>} 
+            rules={[{required: true, message: 'Enter Name'}]}
+            style={{ marginBottom: 8 }}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item name="Name" label={<span style={labelStyle}>Name</span>} rules={[{required: true, message: 'Enter Name'}]}>
-          <Input />
-        </Form.Item>
-
-        <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>} rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}>
-          <Input />
-        </Form.Item>
+          <Form.Item 
+            name="Number" 
+            label={<span style={labelStyle}>Contact No.</span>} 
+            rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}
+            style={{ marginBottom: 8 }}
+          >
+            <Input />
+          </Form.Item>
+        </Card>
+        </div>
 
         {/* Report Details Section */}
-        <Divider orientation="left">
-          <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-            Report Details
-          </Text>
-        </Divider>
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            position: 'absolute',
+            top: -14,
+            left: 20,
+            zIndex: 10,
+            backgroundColor: '#6782f5',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 5,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <ExceptionOutlined /> Report Details
+          </div>
+          <Card 
+            style={{ 
+              backgroundColor: '#fff',
+              borderColor: '#d9d9d9',
+              borderRadius: 5,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              paddingTop: 12
+            }}
+          >
 
-        <Row gutter={16}>
+        <Row gutter={14}>
           <Col span={12}>
-            <Form.Item name="address" label={<span style={labelStyle}>Address</span>} rules={[{required: true, message: 'Enter Address'}]}>
+            <Form.Item 
+              name="address" 
+              label={<span style={labelStyle}>Address</span>} 
+              rules={[{required: true, message: 'Enter Address'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Input />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="Landmark" label={<span style={labelStyle}>Landmark</span>} rules={[{required: true, message: 'Enter Landmark'}]}>
+            <Form.Item 
+              name="Landmark" 
+              label={<span style={labelStyle}>Landmark</span>} 
+              rules={[{required: true, message: 'Enter Landmark'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Input />
             </Form.Item>
           </Col>
@@ -359,7 +354,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>} rules={[{required: true, message: 'Enter Leak Type'}]}>
+            <Form.Item 
+              name="typeId" 
+              label={<span style={labelStyle}>Leak Type</span>} 
+              rules={[{required: true, message: 'Enter Leak Type'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Select placeholder="-SELECT-">
                 <Option value="54">Service Line</Option>
                 <Option value="55">Main Line</Option>
@@ -367,7 +367,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="leakPressure" label={<span style={labelStyle}>Leak Pressure</span>} rules={[{required: true, message: 'Enter Leak Pressure'}]}>
+            <Form.Item 
+              name="leakPressure" 
+              label={<span style={labelStyle}>Leak Pressure</span>} 
+              rules={[{required: true, message: 'Enter Leak Pressure'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Select placeholder="-SELECT-">
                 <Option value="1">High</Option>
                 <Option value="2">Low</Option>
@@ -378,7 +383,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name="visibility" label={<span style={labelStyle}>Visibility</span>} rules={[{required: true, message: 'Enter Visibility'}]}>
+            <Form.Item 
+              name="visibility" 
+              label={<span style={labelStyle}>Visibility</span>} 
+              rules={[{required: true, message: 'Enter Visibility'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Select placeholder="-SELECT-">
                 <Option value="1">Exposed Leak</Option>
                 <Option value="2">Underground Leak</Option>
@@ -386,7 +396,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="coverings" label={<span style={labelStyle}>Coverings</span>} rules={[{required: true, message: 'Enter Coverings'}]}>
+            <Form.Item 
+              name="coverings" 
+              label={<span style={labelStyle}>Coverings</span>} 
+              rules={[{required: true, message: 'Enter Coverings'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Select placeholder="-SELECT-">
                 <Option value="1">Concrete</Option>
                 <Option value="2">Asphalt</Option>
@@ -399,7 +414,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name="leakIndicator" label={<span style={labelStyle}>Leak Indicator</span>} rules={[{required: true, message: 'Enter Leak Indicator'}]}>
+            <Form.Item 
+              name="leakIndicator" 
+              label={<span style={labelStyle}>Leak Indicator</span>} 
+              rules={[{required: true, message: 'Enter Leak Indicator'}]}
+              style={{ marginBottom: 8 }}
+            >
               <Select placeholder="-SELECT-">
                 <Option value="1">Water Pooling</Option>
                 <Option value="2">Wet Ground</Option>
@@ -409,20 +429,33 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>} rules={[{required: true, message: 'Enter Remarks'}]}>
-              <Input.TextArea rows={3} />
+            <Form.Item 
+              name="NearestMeter" 
+              label={<span style={labelStyle}>Nearest Meter</span>} 
+              rules={[{required: true, message: 'Enter Nearest Meter'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Input placeholder="Enter nearest meter number" />
             </Form.Item>
           </Col>
         </Row>
 
-        {/* Hidden fields */}
-        <Form.Item name="refAccNo" hidden>
-          <Input type='hidden' />
+        {/* Remarks - Full width at bottom */}
+        <Form.Item 
+          name="Remarks" 
+          label={<span style={labelStyle}>Remarks</span>} 
+          rules={[{required: true, message: 'Enter Remarks'}]}
+          style={{ marginBottom: 8 }}
+        >
+          <Input.TextArea rows={3} placeholder="Enter additional remarks" />
         </Form.Item>
 
-        <Form.Item name="NearestMeter" hidden>
-          <Input type='hidden' />
-        </Form.Item>
+          {/* Hidden fields */}
+          <Form.Item name="refAccNo" hidden>
+            <Input type='hidden' />
+          </Form.Item>
+        </Card>
+        </div>
       </Form>
 
       <CustomModal

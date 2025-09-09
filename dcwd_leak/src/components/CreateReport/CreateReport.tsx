@@ -14,6 +14,7 @@ import { HomeFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import ReportALeak from './ReportALeak';
 import WaterSupplyConcerns from './WaterSupplyConcerns';
+import CustomerAccountDetails from './CustomerAccountDetails';
 import MapComponent from '../Endpoints/MapView';
 import '../../styles/theme.css';
 
@@ -34,8 +35,30 @@ const CreateReport: React.FC = () => {
   const [selectedReportType, setSelectedReportType] = useState<ReportType>(undefined);
   const [lat, setLat] = useState(7.0722);
   const [lng, setLng] = useState(125.6131);
+  const [customerDetails, setCustomerDetails] = useState<{
+    accountNumber?: string;
+    meterNumber?: string;
+    customerName?: string;
+    address?: string;
+    connectionType?: string;
+    districtMeteringArea?: string;
+  }>({});
   const formRef = React.useRef<any>(null);
   const navigate = useNavigate();
+
+  const handleCustomerFound = (details: typeof customerDetails, lat?: number, lng?: number) => {
+    setCustomerDetails(details);
+    if (lat !== undefined && lng !== undefined) {
+      setLat(lat);
+      setLng(lng);
+    }
+  };
+
+  const handleCustomerNotFound = () => {
+    setCustomerDetails({});
+    setLat(7.0722);
+    setLng(125.6131);
+  };
 
   const handleHomeClick = () => {
     navigate('/home');
@@ -69,11 +92,23 @@ const CreateReport: React.FC = () => {
     }
 
     if (selectedReportType === 'leak_report') {
-      return <ReportALeak lat={lat} lng={lng} onMapClick={handleMapClick} formRef={formRef} />;
+      return <ReportALeak 
+        lat={lat} 
+        lng={lng} 
+        onMapClick={handleMapClick} 
+        formRef={formRef}
+        customerDetails={customerDetails}
+      />;
     }
 
-    // For water supply concerns (no_water_supply, low_pressure, water_quality)
-    return <WaterSupplyConcerns formType={selectedReportType} lat={lat} lng={lng} onMapClick={handleMapClick} formRef={formRef} />;
+    return <WaterSupplyConcerns 
+      formType={selectedReportType} 
+      lat={lat} 
+      lng={lng} 
+      onMapClick={handleMapClick} 
+      formRef={formRef}
+      customerDetails={customerDetails}
+    />;
   };
 
   const getBreadcrumbTitle = () => {
@@ -118,7 +153,6 @@ const CreateReport: React.FC = () => {
       >
         <Row gutter={24}>
           <Col span={10}>
-            {/* Report Type Selection */}
             <Divider orientation="left">
               <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
                 Report Type
@@ -143,12 +177,18 @@ const CreateReport: React.FC = () => {
               </Select>
             </Form.Item>
 
-            {/* Form Content */}
+            {selectedReportType && (
+              <CustomerAccountDetails
+                customerDetails={customerDetails}
+                onCustomerFound={handleCustomerFound}
+                onCustomerNotFound={handleCustomerNotFound}
+              />
+            )}
+
             {renderFormContent()}
           </Col>
 
           <Col span={14}>
-            {/* Map Component - only show when a report type is selected */}
             {selectedReportType && (
               <>
                 <Divider orientation="left">
@@ -211,6 +251,7 @@ const CreateReport: React.FC = () => {
           </Col>
         </Row>
       </div>
+
     </div>
   );
 };

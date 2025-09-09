@@ -9,8 +9,9 @@ import {
   Typography,
   message,
   Space,
+  Card,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, DiffOutlined, ExceptionOutlined } from '@ant-design/icons';
 import CustomModal from '../Modals/CustomModal';
 import { waterSupplyConcernsStore } from '../../stores/waterSupplyConcernsStore';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +40,14 @@ interface WaterSupplyConcernsProps {
   lng?: number;
   onMapClick?: (lat: number, lng: number) => void;
   formRef?: React.RefObject<any>;
+  customerDetails?: {
+    accountNumber?: string;
+    meterNumber?: string;
+    customerName?: string;
+    address?: string;
+    connectionType?: string;
+    districtMeteringArea?: string;
+  };
 }
 
 const formTypeToJMSCodeMap: Record<
@@ -56,7 +65,8 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
   lat: propLat = 7.0722, 
   lng: propLng = 125.6131, 
   onMapClick: propOnMapClick,
-  formRef
+  formRef,
+  customerDetails = {}
 }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -151,53 +161,108 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
         </Form.Item>
 
         {/* Reporter Details Section */}
-        <Divider orientation="left">
-          <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-            Reporter Details
-          </Text>
-        </Divider>
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{
+            position: 'absolute',
+            top: -12,
+            left: 20,
+            zIndex: 10,
+            backgroundColor: '#6782f5',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 20,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <DiffOutlined /> Reporter Details
+          </div>
+          <Card 
+            style={{ 
+              backgroundColor: '#fff',
+              borderColor: '#d9d9d9',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              paddingTop: 12,
+              padding: '32px 20px 20px 20px',
+            }}
 
-        <Form.Item 
-          name="reporterType" 
-          label={<span style={labelStyle}>Reporter Type</span>}
-          rules={[{required: true, message: 'Select Reporter Type'}]}
-        >
-          <Select placeholder="-SELECT-">
-            <Option value="1">Account Holder</Option>
-            <Option value="2">Non Account Holder</Option>
-          </Select>
-        </Form.Item>
+          >
+          <Form.Item 
+            name="reporterType" 
+            label={<span style={labelStyle}>Reporter Type</span>}
+            rules={[{required: true, message: 'Select Reporter Type'}]}
+            style={{ marginBottom: 8 }}
+          >
+            <Select placeholder="-SELECT-">
+              <Option value="1">Account Holder</Option>
+              <Option value="2">Non Account Holder</Option>
+            </Select>
+          </Form.Item>
 
-        <Form.Item 
-          name="Name"
-          label={<span style={labelStyle}>Name</span>}
-          rules={[{required: true, message: 'Enter Name'}]}
-        >
-          <Input placeholder="Enter customer name" />
-        </Form.Item>
+          <Form.Item 
+            name="Name"
+            label={<span style={labelStyle}>Name</span>}
+            rules={[{required: true, message: 'Enter Name'}]}
+            style={{ marginBottom: 8 }}
+          >
+            <Input placeholder="Enter customer name" />
+          </Form.Item>
 
-        <Form.Item 
-          name="Number" 
-          label={<span style={labelStyle}>Contact No.</span>}
-          rules={[
-            {required: true, message: 'Enter Contact No.'}, 
-            { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
-          ]}
-        >
-          <Input placeholder="Enter contact number" />
-        </Form.Item>
+          <Form.Item 
+            name="Number" 
+            label={<span style={labelStyle}>Contact No.</span>}
+            rules={[
+              {required: true, message: 'Enter Contact No.'}, 
+              { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
+            ]}
+            style={{ marginBottom: 8 }}
+          >
+            <Input placeholder="Enter contact number" />
+          </Form.Item>
+        </Card>
+        </div>
 
         {/* Report Details Section */}
-        <Divider orientation="left">
-          <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-            Report Details
-          </Text>
-        </Divider>
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{
+            position: 'absolute',
+            top: -12,
+            left: 20,
+            zIndex: 10,
+            backgroundColor: '#6782f5',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 20,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <ExceptionOutlined /> Report Details
+          </div>
+          <Card 
+            style={{ 
+              backgroundColor: '#fff',
+              borderColor: '#d9d9d9',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              paddingTop: 12,
+              padding: '32px 20px 20px 20px',
+            }}
+            
+          >
 
         <Form.Item 
           name="nearestMeter"
           label={<span style={labelStyle}>Nearest Meter No.</span>}
           rules={[{required: true, message: 'Enter Nearest Meter No.'}]}
+          style={{ marginBottom: 8 }}
         >
           <Input placeholder="Enter nearest meter number" />
         </Form.Item>
@@ -206,6 +271,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
           name="location"
           label={<span style={labelStyle}>Location</span>}
           rules={[{required: true, message: 'Enter Location'}]}
+          style={{ marginBottom: 8 }}
         >
           <Input placeholder="Enter location" />
         </Form.Item>
@@ -214,18 +280,21 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
           name="remarks" 
           label={<span style={labelStyle}>Remarks</span>}
           rules={[{required: true, message: 'Enter Remarks'}]}
+          style={{ marginBottom: 8 }}
         >
           <Input.TextArea rows={3} placeholder="Enter additional remarks" />
         </Form.Item>
 
-        {/* Hidden fields */}
-        <Form.Item 
-          name="complaintType" 
-          hidden
-          initialValue={formTypeToJMSCodeMap[formType]?.label}
-        >
-          <Input type="hidden" />
-        </Form.Item>
+          {/* Hidden fields */}
+          <Form.Item 
+            name="complaintType" 
+            hidden
+            initialValue={formTypeToJMSCodeMap[formType]?.label}
+          >
+            <Input type="hidden" />
+          </Form.Item>
+        </Card>
+        </div>
       </Form>
 
       <CustomModal
