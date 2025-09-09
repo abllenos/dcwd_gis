@@ -161,7 +161,7 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
       <div
         style={{
           width: '100%',
-          background: isDark ? 'linear-gradient(90deg, #232a3a, #174ea6)' : 'linear-gradient(90deg, #174ea6, #4c85d4)',
+          background: isDark ? 'linear-gradient(90deg, #3a64c5ff, #336cc7ff)' : 'linear-gradient(90deg, #3b70c7ff, #4c85d4)',
           padding: '40px 24px',
           display: 'flex',
           justifyContent: 'center',
