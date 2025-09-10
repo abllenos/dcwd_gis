@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import MapComponent from '../Endpoints/MapView';
 import {
   Form,
   Input,
-  Button,
   Select,
   Divider,
   Typography,
@@ -36,6 +34,8 @@ const labelStyle: React.CSSProperties = {
   color: 'var(--text-primary)',
 };
 
+type ReportType = 'leak_report' | 'no_water_supply' | 'low_pressure' | 'water_quality';
+
 interface ReportALeakProps {
   lat?: number;
   lng?: number;
@@ -49,6 +49,8 @@ interface ReportALeakProps {
     connectionType?: string;
     districtMeteringArea?: string;
   };
+  onReportTypeChange?: (value: ReportType) => void;
+  selectedReportType?: ReportType;
 }
 
 const ReportALeak: React.FC<ReportALeakProps> = ({ 
@@ -56,7 +58,9 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
   lng: propLng = 125.6131, 
   onMapClick: propOnMapClick,
   formRef,
-  customerDetails = {}
+  customerDetails = {},
+  onReportTypeChange,
+  selectedReportType = 'leak_report'
 }) => {
   const [form] = Form.useForm();
   const [lat, setLat] = useState(propLat);
@@ -267,35 +271,69 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
               paddingTop: 12
             }}
           >
-          <Form.Item 
-            name="reportertype" 
-            label={<span style={labelStyle}>Reporter Type</span>} 
-            rules={[{required: true, message: 'Select Reporter Type'}]}
-            style={{ marginBottom: 8 }}
-          >
-            <Select placeholder="-SELECT-">
-              <Option value="1">Account Holder</Option>
-              <Option value="2">Non Account Holder</Option>
-            </Select>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="reportType" 
+                label={<span style={labelStyle}>Report Type:</span>} 
+                rules={[{required: true, message: 'Select Report Type'}]}
+                style={{ marginBottom: 8 }}
+                initialValue={selectedReportType}
+              >
+                <Select 
+                  placeholder="- - Select Report Type - -" 
+                  value={selectedReportType}
+                  onChange={onReportTypeChange}
+                  style={{ 
+                    borderColor: '#ff4d4f',
+                    boxShadow: '0 0 0 2px rgba(244, 9, 12, 0.61)',
+                    borderRadius: 8,
+                  }}
+                >
+                  <Option value="leak_report">Report A Leak</Option>
+                  <Option value="no_water_supply">No Water Supply</Option>
+                  <Option value="low_pressure">Low Pressure</Option>
+                  <Option value="water_quality">Water Quality</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="reportertype" 
+                label={<span style={labelStyle}>Reporter Type:</span>} 
+                rules={[{required: true, message: 'Select Reporter Type'}]}
+                style={{ marginBottom: 8 }}
+              >
+                <Select placeholder="-SELECT-">
+                  <Option value="1">Account Holder</Option>
+                  <Option value="2">Non Account Holder</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item 
-            name="Name" 
-            label={<span style={labelStyle}>Name</span>} 
-            rules={[{required: true, message: 'Enter Name'}]}
-            style={{ marginBottom: 8 }}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item 
-            name="Number" 
-            label={<span style={labelStyle}>Contact No.</span>} 
-            rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}
-            style={{ marginBottom: 8 }}
-          >
-            <Input />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="Name" 
+                label={<span style={labelStyle}>Name:</span>} 
+                rules={[{required: true, message: 'Enter Name'}]}
+                style={{ marginBottom: 8 }}
+              >
+                <Input placeholder="Enter customer name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="Number" 
+                label={<span style={labelStyle}>Contact No.:</span>} 
+                rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}
+                style={{ marginBottom: 8 }}
+              >
+                <Input placeholder="Enter contact number" />
+              </Form.Item>
+            </Col>
+          </Row>
         </Card>
         </div>
 
@@ -333,21 +371,21 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="address" 
-              label={<span style={labelStyle}>Address</span>} 
+              label={<span style={labelStyle}>Address:</span>} 
               rules={[{required: true, message: 'Enter Address'}]}
               style={{ marginBottom: 8 }}
             >
-              <Input />
+              <Input placeholder="Enter address" />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item 
               name="Landmark" 
-              label={<span style={labelStyle}>Landmark</span>} 
+              label={<span style={labelStyle}>Landmark:</span>} 
               rules={[{required: true, message: 'Enter Landmark'}]}
               style={{ marginBottom: 8 }}
             >
-              <Input />
+              <Input placeholder="Enter landmark" />
             </Form.Item>
           </Col>
         </Row>
@@ -356,7 +394,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="typeId" 
-              label={<span style={labelStyle}>Leak Type</span>} 
+              label={<span style={labelStyle}>Leak Type:</span>} 
               rules={[{required: true, message: 'Enter Leak Type'}]}
               style={{ marginBottom: 8 }}
             >
@@ -369,7 +407,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="leakPressure" 
-              label={<span style={labelStyle}>Leak Pressure</span>} 
+              label={<span style={labelStyle}>Leak Pressure:</span>} 
               rules={[{required: true, message: 'Enter Leak Pressure'}]}
               style={{ marginBottom: 8 }}
             >
@@ -385,7 +423,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="visibility" 
-              label={<span style={labelStyle}>Visibility</span>} 
+              label={<span style={labelStyle}>Visibility:</span>} 
               rules={[{required: true, message: 'Enter Visibility'}]}
               style={{ marginBottom: 8 }}
             >
@@ -398,7 +436,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="coverings" 
-              label={<span style={labelStyle}>Coverings</span>} 
+              label={<span style={labelStyle}>Coverings:</span>} 
               rules={[{required: true, message: 'Enter Coverings'}]}
               style={{ marginBottom: 8 }}
             >
@@ -416,7 +454,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="leakIndicator" 
-              label={<span style={labelStyle}>Leak Indicator</span>} 
+              label={<span style={labelStyle}>Leak Indicator:</span>} 
               rules={[{required: true, message: 'Enter Leak Indicator'}]}
               style={{ marginBottom: 8 }}
             >
@@ -431,7 +469,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           <Col span={12}>
             <Form.Item 
               name="NearestMeter" 
-              label={<span style={labelStyle}>Nearest Meter</span>} 
+              label={<span style={labelStyle}>Nearest Meter:</span>} 
               rules={[{required: true, message: 'Enter Nearest Meter'}]}
               style={{ marginBottom: 8 }}
             >
@@ -443,7 +481,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
         {/* Remarks - Full width at bottom */}
         <Form.Item 
           name="Remarks" 
-          label={<span style={labelStyle}>Remarks</span>} 
+          label={<span style={labelStyle}>Remarks:</span>} 
           rules={[{required: true, message: 'Enter Remarks'}]}
           style={{ marginBottom: 8 }}
         >
