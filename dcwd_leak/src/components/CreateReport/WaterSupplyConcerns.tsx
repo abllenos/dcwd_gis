@@ -5,13 +5,13 @@ import {
   Input,
   Button,
   Select,
-  Divider,
   Typography,
   message,
-  Space,
   Card,
+  Row,
+  Col,
 } from 'antd';
-import { SearchOutlined, DiffOutlined, ExceptionOutlined } from '@ant-design/icons';
+import { DiffOutlined, ExceptionOutlined } from '@ant-design/icons';
 import CustomModal from '../Modals/CustomModal';
 import { waterSupplyConcernsStore } from '../../stores/waterSupplyConcernsStore';
 import { useNavigate } from 'react-router-dom';
@@ -34,6 +34,8 @@ const labelStyle: React.CSSProperties = {
   color: 'var(--text-primary)',
 };
 
+type ReportType = 'leak_report' | 'no_water_supply' | 'low_pressure' | 'water_quality';
+
 interface WaterSupplyConcernsProps {
   formType: 'water_quality' | 'low_pressure' | 'no_water_supply' | 'leak_report';
   lat?: number;
@@ -48,6 +50,8 @@ interface WaterSupplyConcernsProps {
     connectionType?: string;
     districtMeteringArea?: string;
   };
+  onReportTypeChange?: (value: ReportType) => void;
+  selectedReportType?: ReportType;
 }
 
 const formTypeToJMSCodeMap: Record<
@@ -66,7 +70,9 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
   lng: propLng = 125.6131, 
   onMapClick: propOnMapClick,
   formRef,
-  customerDetails = {}
+  customerDetails = {},
+  onReportTypeChange,
+  selectedReportType
 }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -112,13 +118,6 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
     }
   };
 
-  const handleSearchCustomer = async () => {
-    const customerData = await waterSupplyConcernsStore.searchCustomer();
-    if (customerData) {
-      form.setFieldsValue(customerData);
-    }
-  };
-
   return (
     <>
       <Form 
@@ -133,44 +132,17 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
           waterSupplyConcernsStore.setFormValues(allValues);
         }}
       >
-        {/* Search Section */}
-        <Form.Item
-          label={
-            <span style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
-              <SearchOutlined style={{ fontSize: 15 }} />
-              Search Account No or Meter No
-            </span>
-          }
-        >
-          <Space.Compact style={{ width: '100%' }}>
-            <Input 
-              style={{ flex: 1 }} 
-              placeholder="Enter Account or Meter Number"
-              value={waterSupplyConcernsStore.formValues.searchValue || ''}
-              onChange={(e) => waterSupplyConcernsStore.setFormValues({ searchValue: e.target.value })}
-              onPressEnter={handleSearchCustomer}
-            />
-            <Button 
-              type="primary" 
-              onClick={handleSearchCustomer}
-              loading={waterSupplyConcernsStore.searchLoading}
-            >
-              Search
-            </Button>
-          </Space.Compact>
-        </Form.Item>
-
         {/* Reporter Details Section */}
         <div style={{ position: 'relative', marginBottom: 24 }}>
           <div style={{
             position: 'absolute',
-            top: -12,
+            top: -14,
             left: 20,
             zIndex: 10,
             backgroundColor: '#6782f5',
             color: '#fff',
             padding: '8px 16px',
-            borderRadius: 20,
+            borderRadius: 8,
             fontSize: 14,
             fontWeight: 600,
             display: 'flex',
@@ -186,57 +158,89 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
               borderColor: '#d9d9d9',
               borderRadius: 8,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              paddingTop: 12,
-              padding: '32px 20px 20px 20px',
+              paddingTop: 12
             }}
+          >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="reportType" 
+                label={<span style={labelStyle}>Report Type:</span>} 
+                rules={[{required: true, message: 'Select Report Type'}]}
+                style={{ marginBottom: 8 }}
+                initialValue={selectedReportType}
+              >
+                <Select 
+                  placeholder="- - Select Report Type - -" 
+                  value={selectedReportType}
+                  onChange={onReportTypeChange}
+                  style={{ 
+                    borderColor: '#ff4d4f',
+                    boxShadow: '0 0 0 2px rgba(244, 9, 12, 0.61)',
+                    borderRadius: 8,
+                  }}
+                >
+                  <Option value="leak_report">Report A Leak</Option>
+                  <Option value="no_water_supply">No Water Supply</Option>
+                  <Option value="low_pressure">Low Pressure</Option>
+                  <Option value="water_quality">Water Quality</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="reporterType" 
+                label={<span style={labelStyle}>Reporter Type:</span>}
+                rules={[{required: true, message: 'Select Reporter Type'}]}
+                style={{ marginBottom: 8 }}
+              >
+                <Select placeholder="-SELECT-">
+                  <Option value="1">Account Holder</Option>
+                  <Option value="2">Non Account Holder</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
-          >
-          <Form.Item 
-            name="reporterType" 
-            label={<span style={labelStyle}>Reporter Type</span>}
-            rules={[{required: true, message: 'Select Reporter Type'}]}
-            style={{ marginBottom: 8 }}
-          >
-            <Select placeholder="-SELECT-">
-              <Option value="1">Account Holder</Option>
-              <Option value="2">Non Account Holder</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item 
-            name="Name"
-            label={<span style={labelStyle}>Name</span>}
-            rules={[{required: true, message: 'Enter Name'}]}
-            style={{ marginBottom: 8 }}
-          >
-            <Input placeholder="Enter customer name" />
-          </Form.Item>
-
-          <Form.Item 
-            name="Number" 
-            label={<span style={labelStyle}>Contact No.</span>}
-            rules={[
-              {required: true, message: 'Enter Contact No.'}, 
-              { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
-            ]}
-            style={{ marginBottom: 8 }}
-          >
-            <Input placeholder="Enter contact number" />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item 
+                name="Name"
+                label={<span style={labelStyle}>Name:</span>}
+                rules={[{required: true, message: 'Enter Name'}]}
+                style={{ marginBottom: 8 }}
+              >
+                <Input placeholder="Enter customer name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item 
+                name="Number" 
+                label={<span style={labelStyle}>Contact No.:</span>}
+                rules={[
+                  {required: true, message: 'Enter Contact No.'}, 
+                  { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
+                ]}
+                style={{ marginBottom: 8 }}
+              >
+                <Input placeholder="Enter contact number" />
+              </Form.Item>
+            </Col>
+          </Row>
         </Card>
         </div>
 
         {/* Report Details Section */}
-        <div style={{ position: 'relative', marginBottom: 24 }}>
+        <div style={{ position: 'relative' }}>
           <div style={{
             position: 'absolute',
-            top: -12,
+            top: -14,
             left: 20,
             zIndex: 10,
             backgroundColor: '#6782f5',
             color: '#fff',
             padding: '8px 16px',
-            borderRadius: 20,
+            borderRadius: 5,
             fontSize: 14,
             fontWeight: 600,
             display: 'flex',
@@ -250,17 +254,15 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
             style={{ 
               backgroundColor: '#fff',
               borderColor: '#d9d9d9',
-              borderRadius: 8,
+              borderRadius: 5,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              paddingTop: 12,
-              padding: '32px 20px 20px 20px',
+              paddingTop: 12
             }}
-            
           >
 
         <Form.Item 
           name="nearestMeter"
-          label={<span style={labelStyle}>Nearest Meter No.</span>}
+          label={<span style={labelStyle}>Nearest Meter No.:</span>}
           rules={[{required: true, message: 'Enter Nearest Meter No.'}]}
           style={{ marginBottom: 8 }}
         >
@@ -269,7 +271,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
 
         <Form.Item 
           name="location"
-          label={<span style={labelStyle}>Location</span>}
+          label={<span style={labelStyle}>Location:</span>}
           rules={[{required: true, message: 'Enter Location'}]}
           style={{ marginBottom: 8 }}
         >
@@ -278,7 +280,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
 
         <Form.Item 
           name="remarks" 
-          label={<span style={labelStyle}>Remarks</span>}
+          label={<span style={labelStyle}>Remarks:</span>}
           rules={[{required: true, message: 'Enter Remarks'}]}
           style={{ marginBottom: 8 }}
         >

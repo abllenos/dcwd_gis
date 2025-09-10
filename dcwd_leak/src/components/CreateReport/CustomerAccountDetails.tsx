@@ -119,8 +119,8 @@ const CustomerAccountDetails: React.FC<CustomerAccountDetailsProps> = ({
   return (
     <>
       {/* Customer Search Section */}
-      <Form.Item style={{ marginBottom: 16 }}>
-        <Space.Compact style={{ width: '100%' }}>
+      <Form.Item style={{ marginBottom: 24 }}>
+        <Space.Compact style={{ width: '50%' }}>
           <Input
             placeholder="Account No. / Meter No."
             value={searchValue}
@@ -143,13 +143,13 @@ const CustomerAccountDetails: React.FC<CustomerAccountDetailsProps> = ({
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <div style={{
           position: 'absolute',
-          top: -12,
+          top: -14,
           left: 20,
           zIndex: 10,
           backgroundColor: '#6782f5',
           color: '#fff',
           padding: '8px 16px',
-          borderRadius: 20,
+          borderRadius: 8,
           fontSize: 14,
           fontWeight: 600,
           display: 'flex',
@@ -165,68 +165,67 @@ const CustomerAccountDetails: React.FC<CustomerAccountDetailsProps> = ({
             borderColor: '#d9d9d9',
             borderRadius: 8,
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            paddingTop: 12,
-            padding: '32px 20px 20px 20px',
+            paddingTop: 12
           }}
           
         >
-          <Row gutter={16}>
-            <Col span={12}>
-              <div style={{ marginBottom: 16 }}>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Account No. / Meter No.</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  {customerDetails.accountNumber && customerDetails.meterNumber 
-                    ? `${customerDetails.accountNumber} / ${customerDetails.meterNumber}`
-                    : '01-000001-0 / A1234567783'
-                  }
-                </Text>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Name</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  {customerDetails.customerName || 'AJ VIRAY'}
-                </Text>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Address</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  {customerDetails.address || 'Davao City'}
-                </Text>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Connection Type</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  {customerDetails.connectionType || 'Residential'}
-                </Text>
-              </div>
-            </Col>
-            <Col span={12}>
-              <div>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Caretaker</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  CT-01
-                </Text>
-              </div>
-              <div>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Address</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  {customerDetails.address || 'Davao City'}
-                </Text>
-              </div>
-              <div>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>Water Supply System</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  Dumoy
-                </Text>
-              </div>
-              <div>
-                <Text style={{ ...labelStyle, display: 'block', marginBottom: 4 }}>District Metering Area</Text>
-                <Text style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                  {customerDetails.districtMeteringArea || 'DM-01'}
-                </Text>
-              </div>
-            </Col>
-          </Row>
+          {/* Clean 2-column grid layout with aligned colons */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr', 
+            gap: '8px 32px',
+            fontSize: 12,
+            lineHeight: '20px'
+          }}>
+            {/* Left Column */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>ACCOUNT/METER NO</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.accountNumber && customerDetails.meterNumber 
+                  ? `${customerDetails.accountNumber} / ${customerDetails.meterNumber}`
+                  : '01-000001-0 / A1234567783'
+                }
+              </Text>
+            </div>
+            {/* Right Column */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '145px', textAlign: 'left' }}>CARETAKER</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>: CT-01</Text>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>NAME</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.customerName || 'AJ VIRAY'}
+              </Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '145px', textAlign: 'left' }}>WATER SUPPLY SYSTEM</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>: Dumoy</Text>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>ADDRESS</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.address || 'Davao City'}
+              </Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '145px', textAlign: 'left' }}>DISTRICT METERING AREA</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.districtMeteringArea || 'DM-01'}
+              </Text>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>CONNECTION TYPE</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.connectionType || 'Residential'}
+              </Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+            </div>
+          </div>
         </Card>
       </div>
 
