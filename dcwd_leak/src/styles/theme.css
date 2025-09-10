@@ -260,7 +260,6 @@
   color: var(--text-tertiary);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .modern-sidebar {
     width: 80px !important;
@@ -440,15 +439,3 @@
 .custom-sider.collapsed ~ .custom-layout {
   margin-left: 80px;
 }
-
-/* @media (max-width: 768px) {
-.custom-tabs .ant-tabs-nav-list {
-  display: inline-flex;
-  width: auto;
-  min-width: max-content;
-}
-
-.custom-tabs .ant-tabs-tab {
-  flex: none;
-}
-} */
