@@ -9,17 +9,17 @@ import {
   Typography,
   Row,
   Col,
-  Breadcrumb,
   message,
   Space,
+  Card,
 } from 'antd';
-import { EnvironmentOutlined, HomeFilled, SearchOutlined } from '@ant-design/icons';
+import { DiffOutlined, ExceptionOutlined } from '@ant-design/icons';
 import { devApi } from '../Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
 import CustomModal from '../Modals/CustomModal';
 
 
-const { Text } = Typography;
+const { Text } = Typography
 const { Option } = Select;
 
 message.config({
@@ -36,21 +36,38 @@ const labelStyle: React.CSSProperties = {
   color: 'var(--text-primary)',
 };
 
-const ReportALeak: React.FC = () => {
+interface ReportALeakProps {
+  lat?: number;
+  lng?: number;
+  onMapClick?: (lat: number, lng: number) => void;
+  formRef?: React.RefObject<any>;
+  customerDetails?: {
+    accountNumber?: string;
+    meterNumber?: string;
+    customerName?: string;
+    address?: string;
+    connectionType?: string;
+    districtMeteringArea?: string;
+  };
+}
+
+const ReportALeak: React.FC<ReportALeakProps> = ({ 
+  lat: propLat = 7.0722, 
+  lng: propLng = 125.6131, 
+  onMapClick: propOnMapClick,
+  formRef,
+  customerDetails = {}
+}) => {
   const [form] = Form.useForm();
-  const [lat, setLat] = useState(7.0722);
-  const [lng, setLng] = useState(125.6131);
+  const [lat, setLat] = useState(propLat);
+  const [lng, setLng] = useState(propLng);
   const [wscode, setWscode] = useState<string>('');
   const [CT_ID, setCaretaker] = useState<string>('');
   const [fileList, setFileList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string }>({});
+  const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string; refAccNo?: string }>({});
   
   const navigate = useNavigate();
-
-  const handleHomeClick = () => navigate("/home");
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -66,6 +83,27 @@ const ReportALeak: React.FC = () => {
       fetchCaretaker(lat, lng);
     }
   }, [lat, lng]);
+
+  // Update form fields when customer details change
+  useEffect(() => {
+    if (customerDetails && Object.keys(customerDetails).length > 0) {
+      const accountNumber = customerDetails.accountNumber || '';
+      const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
+      const trimmedRefAccNo = RefAccAddress.substring(0, 6);
+
+      form.setFieldsValue({
+        address: customerDetails.address || '',
+        NearestMeter: customerDetails.meterNumber || '',
+        refAccNo: trimmedRefAccNo,
+      });
+
+      setFormValues({
+        address: customerDetails.address || '',
+        NearestMeter: customerDetails.meterNumber || '',
+        refAccNo: trimmedRefAccNo,
+      });
+    }
+  }, [customerDetails, form]);
 
   const fetchWscode = async (lat: number, lng: number) => {
     try {
@@ -100,7 +138,10 @@ const ReportALeak: React.FC = () => {
   const handleMapClick = React.useCallback((clickedLat: number, clickedLng: number) => {
     setLat(clickedLat);
     setLng(clickedLng);
-  }, []);
+    if (propOnMapClick) {
+      propOnMapClick(clickedLat, clickedLng);
+    }
+  }, [propOnMapClick]);
 
   const [modalData, setModalData] = useState({
     visible: false,
@@ -126,7 +167,7 @@ const ReportALeak: React.FC = () => {
     formData.append('ReporterName', values.Name || '');
     formData.append('ReportedNumber', values.Number || '');
     formData.append('ReferenceMtr', values.NearestMeter || '');
-    formData.append('ReferenceRecaddrs', values.address || '');
+    formData.append('ReferenceRecaddrs', values.refAccNo || '');
     formData.append('ReportedLandmark', values.Landmark || '');
     formData.append('LeakPressure', values.leakPressure || '');
     formData.append('LeakIndicator', values.visibility || '');
@@ -134,7 +175,7 @@ const ReportALeak: React.FC = () => {
     formData.append('SpoolID', '0');
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
-    formData.append('Geom', `${lng}, ${lat}`);
+    formData.append('Geom',  `${lng}, ${lat}`);
     formData.append('Remarks', values.Remarks || '');
     formData.append('ReporterType', values.reportertype || '');
     formData.append('CtCode', CT_ID || '');
@@ -180,262 +221,242 @@ const ReportALeak: React.FC = () => {
     }
   };
 
-  const handleSearchCustomer = async () => {
-    if (!searchValue.trim()) {
-      showModal('Warning', 'Please enter an account number or meter number','warning');
-      return;
-    }
 
-    const token = localStorage.getItem('debug_token');
-    if (!token) {
-      showModal('Session Expired', 'Your session has expired. Please log in again.', 'error');
-      navigate('/login');
-      return;
-    }
-
-    try {
-      setSearchLoading(true);
-      const response = await devApi.get(
-        `dcwd-gis/api/v1/admin/customer/SearchAccountOrMeterNumber`,
-        {
-          params: { searchValue },
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.data?.statusCode === 200 && response.data.data?.length > 0) {
-        const customer = response.data.data[0];
-
-        const accountNumber = customer.accountNumber || '';
-        const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
-        const trimmedRefAccNo = RefAccAddress.substring(0, 6);
-
-        form.setFieldsValue({
-          address: customer.address || '',
-          NearestMeter: customer.meterNumber || '',
-          refAccNo: trimmedRefAccNo,
-        });
-
-        const newLat = parseFloat(customer.latitude);
-        const newLng = parseFloat(customer.longitude);
-
-        if (!isNaN(newLat) && !isNaN(newLng)) {
-          setLat(newLat);
-          setLng(newLng);
-        }
-      } else if (response.data?.statusCode === 404) {
-        showModal('Not Found', response.data.message || 'Account or Meter Number not found in the database.');
-
-        form.setFieldsValue({
-          address: '',
-          NearestMeter: '',
-          refAccNo: '',
-        });
-        setLat(7.0722);
-        setLng(125.6131);
-      } else {
-        showModal('Error', 'Unexpected response from the server');
-      }
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        showModal('Not Found', error.response.data?.message || 'Account or Meter Number not found in the database.');
-
-        form.setFieldsValue({
-          address: '',
-          NearestMeter: '',
-          refAccNo: '',
-        });
-        setLat(7.0722);
-        setLng(125.6131);
-      } else {
-        showModal('Error', 'Failed to search customer');
-      }
-    } finally {
-      setSearchLoading(false);
-    }
-  };
 
   return (
-    <div style={{ padding: '4px 24px 24px 24px', backgroundColor: 'var(--bg-secondary)', minHeight: '100vh' }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-        <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
-        <Breadcrumb
-          style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-primary)' }}
-          items={[
-            { title: "Create A Report" },
-            { title: "Report A Leak"}
-          ]}
-        />
-        </div>
-      </div>
-      <div
-        style={{
-          backgroundColor: 'var(--bg-primary)',
-          padding: 24,
-          borderRadius: 8,
-          boxShadow: 'var(--card-shadow)',
+    <>
+      <Form
+        ref={formRef}
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        onFinishFailed={() => {
+          message.error('Please complete all required fields before submitting.')
+        }}  
+        onValuesChange={(changedValues, allValues) => {
+          setFormValues(allValues);
         }}
       >
+        {/* Search Section */}
+        {/* Reporter Details Section */}
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{
+            position: 'absolute',
+            top: -14,
+            left: 20,
+            zIndex: 10,
+            backgroundColor: '#6782f5',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <DiffOutlined /> Reporter Details
+          </div>
+          <Card 
+            style={{ 
+              backgroundColor: '#fff',
+              borderColor: '#d9d9d9',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              paddingTop: 12
+            }}
+          >
+          <Form.Item 
+            name="reportertype" 
+            label={<span style={labelStyle}>Reporter Type</span>} 
+            rules={[{required: true, message: 'Select Reporter Type'}]}
+            style={{ marginBottom: 8 }}
+          >
+            <Select placeholder="-SELECT-">
+              <Option value="1">Account Holder</Option>
+              <Option value="2">Non Account Holder</Option>
+            </Select>
+          </Form.Item>
 
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          onFinishFailed={() => {
-            message.error('Please complete all required fields before submitting.')
-          }}  
-          onValuesChange={(changedValues, allValues) => {
-            setFormValues(allValues);
-          }}
+          <Form.Item 
+            name="Name" 
+            label={<span style={labelStyle}>Name</span>} 
+            rules={[{required: true, message: 'Enter Name'}]}
+            style={{ marginBottom: 8 }}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item 
+            name="Number" 
+            label={<span style={labelStyle}>Contact No.</span>} 
+            rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}
+            style={{ marginBottom: 8 }}
+          >
+            <Input />
+          </Form.Item>
+        </Card>
+        </div>
+
+        {/* Report Details Section */}
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            position: 'absolute',
+            top: -14,
+            left: 20,
+            zIndex: 10,
+            backgroundColor: '#6782f5',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 5,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <ExceptionOutlined /> Report Details
+          </div>
+          <Card 
+            style={{ 
+              backgroundColor: '#fff',
+              borderColor: '#d9d9d9',
+              borderRadius: 5,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              paddingTop: 12
+            }}
+          >
+
+        <Row gutter={14}>
+          <Col span={12}>
+            <Form.Item 
+              name="address" 
+              label={<span style={labelStyle}>Address</span>} 
+              rules={[{required: true, message: 'Enter Address'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item 
+              name="Landmark" 
+              label={<span style={labelStyle}>Landmark</span>} 
+              rules={[{required: true, message: 'Enter Landmark'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item 
+              name="typeId" 
+              label={<span style={labelStyle}>Leak Type</span>} 
+              rules={[{required: true, message: 'Enter Leak Type'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Select placeholder="-SELECT-">
+                <Option value="54">Service Line</Option>
+                <Option value="55">Main Line</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item 
+              name="leakPressure" 
+              label={<span style={labelStyle}>Leak Pressure</span>} 
+              rules={[{required: true, message: 'Enter Leak Pressure'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Select placeholder="-SELECT-">
+                <Option value="1">High</Option>
+                <Option value="2">Low</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item 
+              name="visibility" 
+              label={<span style={labelStyle}>Visibility</span>} 
+              rules={[{required: true, message: 'Enter Visibility'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Select placeholder="-SELECT-">
+                <Option value="1">Exposed Leak</Option>
+                <Option value="2">Underground Leak</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item 
+              name="coverings" 
+              label={<span style={labelStyle}>Coverings</span>} 
+              rules={[{required: true, message: 'Enter Coverings'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Select placeholder="-SELECT-">
+                <Option value="1">Concrete</Option>
+                <Option value="2">Asphalt</Option>
+                <Option value="3">Soil</Option>
+                <Option value="4">Gravel</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item 
+              name="leakIndicator" 
+              label={<span style={labelStyle}>Leak Indicator</span>} 
+              rules={[{required: true, message: 'Enter Leak Indicator'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Select placeholder="-SELECT-">
+                <Option value="1">Water Pooling</Option>
+                <Option value="2">Wet Ground</Option>
+                <Option value="3">Sound</Option>
+                <Option value="4">Visual</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item 
+              name="NearestMeter" 
+              label={<span style={labelStyle}>Nearest Meter</span>} 
+              rules={[{required: true, message: 'Enter Nearest Meter'}]}
+              style={{ marginBottom: 8 }}
+            >
+              <Input placeholder="Enter nearest meter number" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        {/* Remarks - Full width at bottom */}
+        <Form.Item 
+          name="Remarks" 
+          label={<span style={labelStyle}>Remarks</span>} 
+          rules={[{required: true, message: 'Enter Remarks'}]}
+          style={{ marginBottom: 8 }}
         >
-          <Row gutter={24}>
-            <Col span={10}>
-              <Divider orientation="left">
-                <Text style={{ fontSize: 18, color: 'var(--text-primary)' }} strong>
-                  Contact Information
-                </Text>
-              </Divider>
+          <Input.TextArea rows={3} placeholder="Enter additional remarks" />
+        </Form.Item>
 
-              <Form.Item
-                label={
-                  <span
-                    style={{
-                      ...labelStyle,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <SearchOutlined style={{ fontSize: 15 }} /> Search Account No or Meter No
-                  </span>
-                }
-              >
-                <Space.Compact style={{ display: 'flex' }}>
-                  <Input
-                    style={{ flex: 1 }}
-                    placeholder="Enter Account or Meter Number"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    onPressEnter={handleSearchCustomer}
-                  />
-                  <Button
-                    type="primary"
-                    icon={<SearchOutlined />}
-                    onClick={handleSearchCustomer}
-                    loading={searchLoading}
-                  >
-                    Search
-                  </Button>
-                </Space.Compact>
-              </Form.Item>
-
-              <Form.Item name="Name" label={<span style={labelStyle}>Name</span>} rules={[{required: true, message: 'Enter Name'}]}>
-                <Input />
-              </Form.Item>
-
-              <Form.Item name="Number" label={<span style={labelStyle}>Contact No.</span>} rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}>
-                <Input />
-              </Form.Item>
-
-              <Divider orientation="left">
-                <Text style={{ fontSize: 18 }} strong>
-                  Leak Information
-                </Text>
-              </Divider>
-              <Row gutter={16}> 
-                <Col span={12}>  
-                  <Form.Item name="typeId" label={<span style={labelStyle}>Leak Type</span>} rules={[{required: true, message: 'Enter Leak Type'}]}>
-                    <Select placeholder="-SELECT-">   f
-                      <Option value="54">Service Line</Option>
-                      <Option value="55">Main Line</Option>
-                    </Select>
-                  </Form.Item>
-                </Col> 
-                <Col span={12}>
-                  <Form.Item name="leakPressure" label={<span style={labelStyle}>Leak Pressure</span>} rules={[{required: true, message: 'Enter Leak Pressure'}]}>
-                    <Select placeholder="-SELECT-">
-                      <Option value="1">High</Option>
-                      <Option value="2">Low</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}>  
-                  <Form.Item name="visibility" label={<span style={labelStyle}>Visibility</span>} rules={[{required: true, message: 'Enter Visibility'}]}>
-                    <Select placeholder="-SELECT-">
-                      <Option value="1">Exposed Leak</Option>
-                      <Option value="2">Underground Leak</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="address" label={<span style={labelStyle}>Address</span>} rules={[{required: true, message: 'Enter Address '}]}>
-                    <Input />
-                  </Form.Item>
-                </Col>   
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}> 
-                  <Form.Item name="Landmark" label={<span style={labelStyle}>Landmark</span>} rules={[{required: true, message: 'Enter Landmark '}]}>
-                    <Input />
-                  </Form.Item>
-                </Col>   
-                <Col span={12}> 
-                  <Form.Item name="NearestMeter" label={<span style={labelStyle}>Nearest Meter</span>} rules={[{required: true, message: 'Enter Nearest Meter '} , { pattern: /^[a-zA-Z0-9]+$/}]}>
-                    <Input />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                  <Form.Item name="refAccNo" hidden>
-                    <Input type='hidden' />
-                  </Form.Item>
-                <Col span={12}>
-                  <Form.Item name="reportertype" label={<span style={labelStyle}>Reporter Type</span>} rules={[{required: true, message: 'Select Reporter Type'}]}>
-                    <Select placeholder="-SELECT-">
-                      <Option value="1">Account Holder</Option>
-                      <Option value="2">Non Account Holder</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="Remarks" label={<span style={labelStyle}>Remarks</span>} rules={[{required: true, message: 'Enter Remarks'}]}>
-                    <Input.TextArea rows={3} />
-                  </Form.Item>
-                </Col> 
-              </Row>    
-            </Col>
-
-            <Col span={14}>
-              <Divider orientation="left">
-                <Text style={{ fontSize: 18 }} strong>
-                  Search Address
-                </Text>
-              </Divider>
-
-              <Form.Item>
-                <Input
-                  placeholder="e.g., Matina, Davao City, Davao del Sur"
-                  addonAfter={<EnvironmentOutlined />}
-                />
-              </Form.Item>
-
-              <div style={{ height: 625, border: '1px solid #ccc', marginBottom: 24 }}>
-                <MapComponent lat={lat} lng={lng} onMapClick={handleMapClick} />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                <Button danger  onClick={() => { form.resetFields();}}>Cancel</Button>
-                <Button type="primary" htmlType="submit" loading={loading}>
-                  Submit
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Form>
-      </div>
+          {/* Hidden fields */}
+          <Form.Item name="refAccNo" hidden>
+            <Input type='hidden' />
+          </Form.Item>
+        </Card>
+        </div>
+      </Form>
 
       <CustomModal
         visible={modalData.visible}
@@ -444,8 +465,7 @@ const ReportALeak: React.FC = () => {
         type={modalData.type}
         onClose={() => setModalData(prev => ({ ...prev, visible: false }))}
       />
-
-    </div>
+    </>
   );
 };
 

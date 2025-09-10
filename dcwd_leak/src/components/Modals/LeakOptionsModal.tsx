@@ -1,11 +1,10 @@
 import React from "react";
 import { Modal, Button, Row, Col } from "antd";
 import {
-  StopOutlined,
+  ExperimentOutlined,
   FallOutlined,
   ExclamationCircleOutlined,
   AlertOutlined,
-  WarningOutlined,
 } from "@ant-design/icons";
 import '../../styles/modal.css';
 
@@ -36,7 +35,6 @@ const LeakOptionsModal: React.FC<LeakOptionsModalProps> = ({
     >
       <div style={{ padding: 16 }}>
         <div className="leak-options-modal-header">
-          <WarningOutlined className="leak-options-modal-header-icon" />
           <span className="leak-options-modal-header-title">
             SELECT ISSUE TYPE
           </span>
@@ -48,11 +46,11 @@ const LeakOptionsModal: React.FC<LeakOptionsModalProps> = ({
               type="primary"
               block
               className="leak-options-modal-button"
-              onClick={() => onSelect("no_water")}
-              aria-label="Select No Water"
+              onClick={() => onSelect("no_water_supply")}
+              aria-label="Select No Water Supply"
             >
-              <StopOutlined style={{ fontSize: 28, marginBottom: 8 }} />
-              NO WATER
+              <ExclamationCircleOutlined style={{ fontSize: 28, marginBottom: 8 }} />
+              NO WATER SUPPLY
             </Button>
           </Col>
 
@@ -74,11 +72,11 @@ const LeakOptionsModal: React.FC<LeakOptionsModalProps> = ({
               type="primary"
               block
               className="leak-options-modal-button"
-              onClick={() => onSelect("no_water_supply")}
-              aria-label="Select No Water Supply"
+              onClick={() => onSelect("water_quality")}
+              aria-label="Select Water Quality"
             >
-              <ExclamationCircleOutlined style={{ fontSize: 28, marginBottom: 8 }} />
-              NO WATER SUPPLY
+              <ExperimentOutlined style={{ fontSize: 28, marginBottom: 8 }} />
+              WATER QUALITY
             </Button>
           </Col>
 
