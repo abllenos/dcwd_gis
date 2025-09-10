@@ -15,6 +15,7 @@ import { getTheme } from './layout/getTheme';
 import './styles/theme.css';
 import 'antd/dist/reset.css';
 
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return !!localStorage.getItem("token");
@@ -88,22 +89,29 @@ function App() {
 
   return (
     <ConfigProvider theme={getTheme(isDarkMode)}>
-    <Router>
-      <Routes>
-
-  <Route
-    path="/login"
-    element={<Login onLogin={handleLogin} />} 
-  />
-  <Route
-    path="/*"
-    element={
-      isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} setIsDarkMode={updateDarkMode} /> : <Navigate to="/login" />
-    }
-  />
-</Routes>
-
-    </Router>
+      <Router>
+        <Routes>
+          <Route
+            path="/login"
+            element={<Login onLogin={handleLogin} />}
+          />
+          <Route
+            path="/*"
+            element={
+              isLoggedIn ? (
+                <Dashboard
+                  onLogout={handleLogout}
+                  isDarkMode={isDarkMode}
+                  setIsDarkMode={updateDarkMode}
+                  themeMode={isDarkMode ? 'dark' : 'light'}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+        </Routes>
+      </Router>
     </ConfigProvider>
   );
 };
