@@ -103,7 +103,6 @@ function App() {
                   onLogout={handleLogout}
                   isDarkMode={isDarkMode}
                   setIsDarkMode={updateDarkMode}
-                  themeMode={isDarkMode ? 'dark' : 'light'}
                 />
               ) : (
                 <Navigate to="/login" />
