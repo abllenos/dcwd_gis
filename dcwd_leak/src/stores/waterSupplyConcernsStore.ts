@@ -2,7 +2,6 @@ import { makeAutoObservable, runInAction } from 'mobx';
 
 export interface WaterSupplyConcernForm {
   Name?: string;
-  nearestMeter?: string;
   location?: string;
   Number?: string;
   jmsCode?: string;
@@ -153,7 +152,6 @@ class WaterSupplyConcernsStore {
         
         const customerData = {
           location: customer.address || '',
-          nearestMeter: customer.meterNumber || '',
           refAccNo: trimmedRefAccNo,
         };
 
@@ -174,7 +172,6 @@ class WaterSupplyConcernsStore {
         runInAction(() => {
           this.setFormValues({
             location: '',
-            nearestMeter: '',
             refAccNo: '',
           });
           this.setLocation(7.0722, 125.6131);
@@ -202,7 +199,6 @@ class WaterSupplyConcernsStore {
     const formData = new FormData();
     formData.append('ReporterName', values.Name || '');
     formData.append('ReportedNumber', values.Number || '');
-    formData.append('ReferenceMtr', values.nearestMeter || '');
     formData.append('ReferenceRecaddrs', values.refAccNo || '');
     formData.append('ReportedLandmark', values.landmark || '');
     formData.append('JmsCode', values.jmsCode || '');

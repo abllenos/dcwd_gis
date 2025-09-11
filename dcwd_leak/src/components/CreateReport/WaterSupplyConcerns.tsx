@@ -5,7 +5,6 @@ import {
   Input,
   Button,
   Select,
-  Typography,
   message,
   Card,
   Row,
@@ -17,7 +16,6 @@ import { waterSupplyConcernsStore } from '../../stores/waterSupplyConcernsStore'
 import { useNavigate } from 'react-router-dom';
 import '../../styles/theme.css';
 
-const { Text } = Typography;
 const { Option } = Select;
 
 message.config({
@@ -77,10 +75,6 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const showModal = (title: string, content: string, type: 'success' | 'error' | 'warning' = 'success') => {
-    waterSupplyConcernsStore.showModal(title, content, type);
-  };
-
   useEffect(() => {
     const token = localStorage.getItem('debug_token');
     if (!token) {
@@ -88,6 +82,12 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
       return;
     }
   }, []);
+
+  // Reset form when report type changes
+  useEffect(() => {
+    form.resetFields();
+    waterSupplyConcernsStore.resetForm();
+  }, [selectedReportType, form]);
 
   useEffect(() => {
     const jmsCode = formTypeToJMSCodeMap[formType]?.value;
@@ -103,13 +103,6 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
       waterSupplyConcernsStore.fetchCaretaker(propLat, propLng);
     }
   }, [propLat, propLng]);
-
-  const handleMapClick = (clickedLat: number, clickedLng: number) => {
-    waterSupplyConcernsStore.setLocation(clickedLat, clickedLng);
-    if (propOnMapClick) {
-      propOnMapClick(clickedLat, clickedLng);
-    }
-  };
 
   const handleSubmit = async (values: any) => {
     const success = await waterSupplyConcernsStore.submitConcern(values);
@@ -178,6 +171,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
                     borderColor: '#ff4d4f',
                     boxShadow: '0 0 0 2px rgba(244, 9, 12, 0.61)',
                     borderRadius: 8,
+                    
                   }}
                 >
                   <Option value="leak_report">Report A Leak</Option>
@@ -259,15 +253,6 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
               paddingTop: 12
             }}
           >
-
-        <Form.Item 
-          name="nearestMeter"
-          label={<span style={labelStyle}>Nearest Meter No.:</span>}
-          rules={[{required: true, message: 'Enter Nearest Meter No.'}]}
-          style={{ marginBottom: 8 }}
-        >
-          <Input placeholder="Enter nearest meter number" />
-        </Form.Item>
 
         <Form.Item 
           name="location"

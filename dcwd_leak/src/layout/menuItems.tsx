@@ -14,16 +14,7 @@ const iconSize = { fontSize: '18px' };
 export const menuItems: MenuItem[] = [
   { key: 'home', label: 'Dashboard', icon: <HomeOutlined style={iconSize} /> },
   { key: 'create-report', label: 'Create a Report', icon: <FileTextOutlined style={iconSize} />},
-  { 
-    key: 'operations', 
-    label: 'Operations', 
-    icon: <AppstoreOutlined style={iconSize} />,
-    children: [
-      { key: 'leak-reports', label: 'Leak Reports' },
-      { key: 'supply-complaints', label: 'Water Supply Complaints' },
-      { key: 'quality-complaints', label: 'Water Quality Complaints' },
-    ],
-  },
+  { key: 'operations', label: 'Operations', icon: <AppstoreOutlined style={iconSize} /> },
   { 
     key: 'system-maintenance', 
     label: 'System Maintenance', 
