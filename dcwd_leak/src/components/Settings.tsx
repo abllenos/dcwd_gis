@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import '../styles/Settings.css';
-import { Card, Avatar, Input, Button, message } from 'antd';
+import { Card, Avatar, Input, Button, message, Spin } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { devApi } from '../components/Endpoints/Interceptor';
 
@@ -19,7 +19,6 @@ interface EditProfileFormProps {
   saving: boolean;
 }
 
-
 class ProfileStore {
   employeeId = 'EMP-00123';
   profileEmail = '';
@@ -33,6 +32,8 @@ class ProfileStore {
   contactSaving = false;
   showContactPreview = false;
   showProfilePreview = false;
+  loading = false;          // 👈 added
+  blurIntensity = 6;        // 👈 added
 
   constructor() {
     makeAutoObservable(this);
@@ -41,6 +42,10 @@ class ProfileStore {
   async fetchProfile() {
     const empId = localStorage.getItem('username');
     if (!empId) return;
+
+    runInAction(() => {
+      this.loading = true;
+    });
 
     try {
       const res = await devApi.get(
@@ -64,6 +69,10 @@ class ProfileStore {
       }
     } catch (err) {
       console.error('Failed to fetch profile:', err);
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
     }
   }
 
@@ -91,7 +100,6 @@ class ProfileStore {
 }
 
 const profileStore = new ProfileStore();
-
 
 function EditProfileForm({
   employeeId,
@@ -134,7 +142,6 @@ function EditProfileForm({
   );
 }
 
-
 interface SettingsProps {
   themeMode?: 'dark' | 'light';
 }
@@ -145,6 +152,7 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
   }, []);
 
   const isDark = themeMode === 'dark';
+
   return (
     <div
       style={{
@@ -155,13 +163,35 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
         flexDirection: 'column',
         gap: 24,
         color: isDark ? '#fff' : undefined,
+        position: 'relative', // 👈 for overlay
       }}
     >
+      {/* ===== Loading Overlay with Blur ===== */}
+      {profileStore.loading && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: isDark ? 'rgba(24,24,24,0.4)' : 'rgba(240,244,248,0.4)',
+            backdropFilter: `blur(${profileStore.blurIntensity}px)`,
+            WebkitBackdropFilter: `blur(${profileStore.blurIntensity}px)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999,
+          }}
+        >
+          <Spin size="large" tip="Loading profile..." />
+        </div>
+      )}
 
+      {/* ===== Your existing Settings content remains untouched ===== */}
       <div
         style={{
           width: '100%',
-          background: isDark ? 'linear-gradient(90deg, #2f5ac0ff, #336cc7ff)' : 'linear-gradient(90deg, #3b70c7ff, #4c85d4)',
+          background: isDark
+            ? 'linear-gradient(90deg, #2f5ac0ff, #336cc7ff)'
+            : 'linear-gradient(90deg, #3b70c7ff, #4c85d4)',
           padding: '40px 24px',
           display: 'flex',
           justifyContent: 'center',
@@ -184,7 +214,6 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
             color: isDark ? '#fff' : undefined,
           }}
         >
-
           <div
             className="animated-avatar"
             style={{
@@ -197,21 +226,36 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
             <Avatar
               size={100}
               icon={<UserOutlined />}
-              style={{ backgroundColor: isDark ? '#181818' : '#fff', color: isDark ? '#fff' : '#174ea6', fontSize: 36 }}
+              style={{
+                backgroundColor: isDark ? '#181818' : '#fff',
+                color: isDark ? '#fff' : '#174ea6',
+                fontSize: 36,
+              }}
             />
           </div>
 
-
           <div style={{ flex: 1 }}>
             <div
-              style={{ fontWeight: 700, fontSize: 20, color: isDark ? '#fff' : '#174ea6', textTransform: 'uppercase' }}
+              style={{
+                fontWeight: 700,
+                fontSize: 20,
+                color: isDark ? '#fff' : '#174ea6',
+                textTransform: 'uppercase',
+              }}
             >
               {`${profileStore.firstName} ${profileStore.middlename} ${profileStore.lastName}`}
             </div>
-            <div style={{ fontSize: 14, color: isDark ? '#dbeafe' : '#333', marginTop: 4 }}>{`${profileStore.department}`}</div>
+            <div
+              style={{
+                fontSize: 14,
+                color: isDark ? '#dbeafe' : '#333',
+                marginTop: 4,
+              }}
+            >
+              {`${profileStore.department}`}
+            </div>
           </div>
 
-    
           {(profileStore.showContactPreview || profileStore.showProfilePreview) && (
             <div
               style={{
@@ -244,24 +288,24 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
         </div>
       </div>
 
-  
       <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap' }}>
-    
-  <Card title="Contact Details" style={{ flex: 1, minWidth: 280, background: isDark ? '#232a3a' : '#fff', color: isDark ? '#fff' : undefined }}>
+        <Card
+          title="Contact Details"
+          style={{
+            flex: 1,
+            minWidth: 280,
+            background: isDark ? '#232a3a' : '#fff',
+            color: isDark ? '#fff' : undefined,
+          }}
+        >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
               <span style={{ fontWeight: 500 }}>Email Address:</span>
-              <Input
-                value={profileStore.email}
-                onChange={(e) => (profileStore.email = e.target.value)}
-              />
+              <Input value={profileStore.email} onChange={(e) => (profileStore.email = e.target.value)} />
             </div>
             <div>
               <span style={{ fontWeight: 500 }}>Mobile No.:</span>
-              <Input
-                value={profileStore.mobile}
-                onChange={(e) => (profileStore.mobile = e.target.value)}
-              />
+              <Input value={profileStore.mobile} onChange={(e) => (profileStore.mobile = e.target.value)} />
             </div>
             <Button
               type="primary"
@@ -274,7 +318,15 @@ const Settings: React.FC<SettingsProps> = observer(({ themeMode }) => {
           </div>
         </Card>
 
-  <Card title="Edit Profile" style={{ flex: 1, minWidth: 280, background: isDark ? '#232a3a' : '#fff', color: isDark ? '#fff' : undefined }}>
+        <Card
+          title="Edit Profile"
+          style={{
+            flex: 1,
+            minWidth: 280,
+            background: isDark ? '#232a3a' : '#fff',
+            color: isDark ? '#fff' : undefined,
+          }}
+        >
           <EditProfileForm
             employeeId={profileStore.employeeId}
             setEmployeeId={(val) => (profileStore.employeeId = val)}

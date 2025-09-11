@@ -8,7 +8,7 @@ import { Dropdown, Menu } from 'antd';
 
 const { Title } = Typography; 
 const Reports: React.FC = () => {
-  // Handler for dropdown icon click
+
   const handleHeaderDropdown = (reportType: string) => {
     openModal(reportType);
   };
@@ -20,7 +20,6 @@ const Reports: React.FC = () => {
     setModalVisible(true);
   };
 
-  // Dropdown menus for each card
   const dailyMenu = (
     <Menu onClick={({ key }) => openModal(key)}>
       <Menu.Item key="dailyrepairs">Daily Accomplishment Report (Per Caretaker)</Menu.Item>

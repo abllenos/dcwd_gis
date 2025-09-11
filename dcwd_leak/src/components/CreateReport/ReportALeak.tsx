@@ -198,7 +198,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
     try {
       setLoading(true);
       await devApi.post(
-        "dcwd-gis/api/v1/admin/LeakReport/SaveReport",
+        "dcwd-gis/api/v1/admin/LeakReport/ReportLeak",
         formData,
         {
           headers: {
