@@ -5,8 +5,6 @@ import {
   Button,
   Space,
   Card,
-  Row,
-  Col,
   Typography,
 } from 'antd';
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
@@ -23,6 +21,8 @@ interface CustomerDetails {
   address?: string;
   connectionType?: string;
   districtMeteringArea?: string;
+  caretaker?: string;
+  waterSupplySystem?: string;
 }
 
 interface CustomerAccountDetailsProps {
@@ -83,14 +83,19 @@ const CustomerAccountDetails: React.FC<CustomerAccountDetailsProps> = ({
 
       if (response.data?.statusCode === 200 && response.data.data?.length > 0) {
         const customer = response.data.data[0];
+        
+        // Log the customer data to see what fields are available
+        console.log('Customer API Response:', customer);
 
         const customerDetails: CustomerDetails = {
-          accountNumber: customer.accountNumber || '',
-          meterNumber: customer.meterNumber || '',
-          customerName: customer.customerName || customer.name || 'AJ VIRAY',
-          address: customer.address || '',
-          connectionType: customer.connectionType || 'Residential',
-          districtMeteringArea: customer.districtMeteringArea || 'DM-01',
+          accountNumber: customer.accountNumber || customer.account_number || '',
+          meterNumber: customer.meterNumber || customer.meter_number || '',
+          customerName: customer.customerName || customer.name || customer.customer_name || '',
+          address: customer.address || customer.full_address || '',
+          connectionType: customer.connectionType || customer.connection_type || '',
+          districtMeteringArea: customer.districtMeteringArea || customer.district_metering_area || customer.dma || '',
+          caretaker: customer.caretaker || customer.caretaker_id || customer.ct_id || '',
+          waterSupplySystem: customer.waterSupplySystem || customer.water_supply_system || customer.wss || '',
         };
 
         const newLat = parseFloat(customer.latitude);
@@ -183,44 +188,48 @@ const CustomerAccountDetails: React.FC<CustomerAccountDetailsProps> = ({
               <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
                 : {customerDetails.accountNumber && customerDetails.meterNumber 
                   ? `${customerDetails.accountNumber} / ${customerDetails.meterNumber}`
-                  : '01-000001-0 / A1234567783'
+                  : ''
                 }
               </Text>
             </div>
             {/* Right Column */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ ...labelStyle, fontSize: 10, width: '145px', textAlign: 'left' }}>CARETAKER</Text>
-              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>: CT-01</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.caretaker || ''}
+              </Text>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>NAME</Text>
               <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
-                : {customerDetails.customerName || 'AJ VIRAY'}
+                : {customerDetails.customerName || ''}
               </Text>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ ...labelStyle, fontSize: 10, width: '145px', textAlign: 'left' }}>WATER SUPPLY SYSTEM</Text>
-              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>: Dumoy</Text>
+              <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
+                : {customerDetails.waterSupplySystem || ''}
+              </Text>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>ADDRESS</Text>
               <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
-                : {customerDetails.address || 'Davao City'}
+                : {customerDetails.address || ''}
               </Text>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ ...labelStyle, fontSize: 10, width: '145px', textAlign: 'left' }}>DISTRICT METERING AREA</Text>
               <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
-                : {customerDetails.districtMeteringArea || 'DM-01'}
+                : {customerDetails.districtMeteringArea || ''}
               </Text>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ ...labelStyle, fontSize: 10, width: '130px', textAlign: 'left' }}>CONNECTION TYPE</Text>
               <Text style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600 }}>
-                : {customerDetails.connectionType || 'Residential'}
+                : {customerDetails.connectionType || ''}
               </Text>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>

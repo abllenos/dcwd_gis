@@ -11,6 +11,7 @@ import Settings from '../components/Settings';
 import LeakReports from '../components/Operations/LeakReports';
 import SupplyComplaints from '../components/Operations/SupplyComplaints';
 import QualityComplaints from '../components/Operations/QualityComplaints';
+import UnifiedOperations from '../components/Operations/UnifiedOperations';
 import DispatchOveride from '../components/SystemMaintenance/DispatchOveride';
 import CaretakerAssignment from '../components/SystemMaintenance/CaretakerAssignment';
 import AccessLevel from '../components/SystemMaintenance/AccessLevel';
@@ -96,6 +97,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           >
             <Routes>
               <Route path="home" element={<Home />} />
+              <Route path="operations" element={<UnifiedOperations />} />
               <Route path="leak-reports" element={<LeakReports />} />
               <Route path="supply-complaints" element={<SupplyComplaints />} />
               <Route path="quality-complaints" element={<QualityComplaints />} />

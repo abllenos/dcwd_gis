@@ -24,7 +24,7 @@ const { Option } = Select;
 type ReportType = 'leak_report' | 'no_water_supply' | 'low_pressure' | 'water_quality' | undefined;
 
 const CreateReport: React.FC = () => {
-  const [selectedReportType, setSelectedReportType] = useState<ReportType>('leak_report');
+  const [selectedReportType, setSelectedReportType] = useState<ReportType>(undefined);
   const [lat, setLat] = useState(7.0722);
   const [lng, setLng] = useState(125.6131);
   const [customerDetails, setCustomerDetails] = useState<{
@@ -58,6 +58,14 @@ const CreateReport: React.FC = () => {
 
   const handleReportTypeChange = (value: ReportType) => {
     setSelectedReportType(value);
+    // Reset form and clear customer details when switching report types
+    if (formRef.current) {
+      formRef.current.resetFields();
+    }
+    setCustomerDetails({});
+    // Reset to default coordinates
+    setLat(7.0722);
+    setLng(125.6131);
   };
 
   const handleMapClick = React.useCallback((clickedLat: number, clickedLng: number) => {
@@ -121,8 +129,56 @@ const CreateReport: React.FC = () => {
               onCustomerNotFound={handleCustomerNotFound}
             />
 
-            {selectedReportType === 'leak_report' ? (
+            {selectedReportType === undefined ? (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '60px 20px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: 8,
+                border: '2px dashed #d9d9d9',
+                minHeight: '300px'
+              }}>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: 500,
+                  color: '#8c8c8c',
+                  marginBottom: 24,
+                  textAlign: 'center'
+                }}>
+                  Select MO Type to Get Started
+                </Text>
+                
+                <div style={{ width: '300px' }}>
+                  <Text style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    color: '#8c8c8c',
+                    marginBottom: 8,
+                    display: 'block'
+                  }}>
+                    MO Type:
+                  </Text>
+                  <Select
+                    placeholder="- - Select MO Type - -"
+                    size="large"
+                    style={{ width: '100%' }}
+                    onChange={(value) => handleReportTypeChange(value)}
+                    options={[
+                      { value: 'leak_report', label: 'Report A Leak' },
+                      { value: 'no_water_supply', label: 'No Water Supply' },
+                      { value: 'low_pressure', label: 'Low Pressure' },
+                      { value: 'water_quality', label: 'Water Quality' }
+                    ]}
+                  />
+                </div>
+              </div>
+            ) : selectedReportType === 'leak_report' ? (
               <ReportALeak 
+                key={`leak-report-${selectedReportType}`}
                 lat={lat} 
                 lng={lng} 
                 onMapClick={handleMapClick} 
@@ -133,6 +189,7 @@ const CreateReport: React.FC = () => {
               />
             ) : (
               <WaterSupplyConcerns 
+                key={`water-supply-${selectedReportType}`}
                 formType={selectedReportType || 'no_water_supply'} 
                 lat={lat} 
                 lng={lng} 
@@ -197,7 +254,7 @@ const CreateReport: React.FC = () => {
               if (formRef.current) {
                 formRef.current.resetFields();
               }
-              setSelectedReportType('leak_report');
+              setSelectedReportType(undefined);
               setCustomerDetails({});
               setLat(7.0722);
               setLng(125.6131);
@@ -209,6 +266,7 @@ const CreateReport: React.FC = () => {
           <Button 
             type="primary" 
             size="large"
+            disabled={!selectedReportType}
             onClick={() => {
               // Trigger form submission
               if (formRef.current) {

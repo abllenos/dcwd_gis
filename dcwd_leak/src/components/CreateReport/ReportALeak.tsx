@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Form,
   Input,
   Select,
-  Divider,
-  Typography,
   Row,
   Col,
   message,
-  Space,
   Card,
 } from 'antd';
 import { DiffOutlined, ExceptionOutlined } from '@ant-design/icons';
-import { devApi } from '../Endpoints/Interceptor';
 import { useNavigate } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 import CustomModal from '../Modals/CustomModal';
+import { reportALeakStore, type ReportType, type CustomerDetails } from '../../stores/reportALeakStore';
 
-
-const { Text } = Typography
 const { Option } = Select;
 
 message.config({
@@ -34,26 +30,17 @@ const labelStyle: React.CSSProperties = {
   color: 'var(--text-primary)',
 };
 
-type ReportType = 'leak_report' | 'no_water_supply' | 'low_pressure' | 'water_quality';
-
 interface ReportALeakProps {
   lat?: number;
   lng?: number;
   onMapClick?: (lat: number, lng: number) => void;
   formRef?: React.RefObject<any>;
-  customerDetails?: {
-    accountNumber?: string;
-    meterNumber?: string;
-    customerName?: string;
-    address?: string;
-    connectionType?: string;
-    districtMeteringArea?: string;
-  };
+  customerDetails?: CustomerDetails;
   onReportTypeChange?: (value: ReportType) => void;
   selectedReportType?: ReportType;
 }
 
-const ReportALeak: React.FC<ReportALeakProps> = ({ 
+const ReportALeak: React.FC<ReportALeakProps> = observer(({ 
   lat: propLat = 7.0722, 
   lng: propLng = 125.6131, 
   onMapClick: propOnMapClick,
@@ -63,15 +50,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
   selectedReportType = 'leak_report'
 }) => {
   const [form] = Form.useForm();
-  const [lat, setLat] = useState(propLat);
-  const [lng, setLng] = useState(propLng);
-  const [wscode, setWscode] = useState<string>('');
-  const [CT_ID, setCaretaker] = useState<string>('');
-  const [fileList, setFileList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [formValues, setFormValues] = useState<{ address?: string; NearestMeter?: string; refAccNo?: string }>({});
-  
   const navigate = useNavigate();
+
+  // Initialize store location with props
+  useEffect(() => {
+    reportALeakStore.setLocation(propLat, propLng);
+  }, [propLat, propLng]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -81,147 +65,37 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
     }
   }, [navigate]);
 
+  // Reset form when report type changes
   useEffect(() => {
-    if (lat !== null && lng !== null) {
-      fetchWscode(lat, lng);
-      fetchCaretaker(lat, lng);
-    }
-  }, [lat, lng]);
+    form.resetFields();
+    reportALeakStore.resetForm();
+  }, [selectedReportType, form]);
 
   // Update form fields when customer details change
   useEffect(() => {
     if (customerDetails && Object.keys(customerDetails).length > 0) {
-      const accountNumber = customerDetails.accountNumber || '';
-      const RefAccAddress = accountNumber.match(/-(.*?)-/)?.[1] || '';
-      const trimmedRefAccNo = RefAccAddress.substring(0, 6);
-
+      reportALeakStore.setCustomerDetails(customerDetails);
+      
       form.setFieldsValue({
-        address: customerDetails.address || '',
-        NearestMeter: customerDetails.meterNumber || '',
-        refAccNo: trimmedRefAccNo,
-      });
-
-      setFormValues({
-        address: customerDetails.address || '',
-        NearestMeter: customerDetails.meterNumber || '',
-        refAccNo: trimmedRefAccNo,
+        address: reportALeakStore.formValues.address || '',
+        ReferenceMeter: reportALeakStore.formValues.ReferenceMeter || '',
+        refAccNo: reportALeakStore.formValues.refAccNo || '',
       });
     }
   }, [customerDetails, form]);
 
-  const fetchWscode = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(
-        `https://api-gis.davao-water.gov.ph/helpers/leaksys/getWSS.php?lat=${lat}&lng=${lng}`
-      );
-      const data = await response.json();
-      if (data.success && data.data && data.data.length > 0) {
-        setWscode(data.data[0].wscode);
-      }
-    } catch (error) {
-      console.error('Error fetching wscode: ', error);
-    }
-  };
-
-  const fetchCaretaker = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(
-        `https://api-gis.davao-water.gov.ph/helpers/leaksys/getCaretaker.php?lat=${lat}&lng=${lng}`
-      );
-      const data = await response.json();
-      if (data?.CT_ID) {
-        setCaretaker(data.CT_ID);
-      } else if (Array.isArray(data.data) && data.data[0]?.CT_ID) {
-        setCaretaker(data.data[0].CT_ID);
-      }
-    } catch (error) {
-      console.error('Error fetching caretaker: ', error);
-    }
-  };
-
   const handleMapClick = React.useCallback((clickedLat: number, clickedLng: number) => {
-    setLat(clickedLat);
-    setLng(clickedLng);
+    reportALeakStore.setLocation(clickedLat, clickedLng);
     if (propOnMapClick) {
       propOnMapClick(clickedLat, clickedLng);
     }
   }, [propOnMapClick]);
 
-  const [modalData, setModalData] = useState({
-    visible: false,
-    title: '',
-    content: '',
-    type: 'success' as 'success' | 'error' | 'warning'
-  });
-  
-  const showModal = (title: string, content: string, type: 'success' | 'error' | 'warning' = 'success') => {
-    setModalData({visible:true, title, content, type});
-  };
-
 
   const handleSubmit = async (values: any) => {
-    const token = localStorage.getItem('debug_token');
-    if (!token) {
-      showModal('Session Expired', 'Your session has expired. Please log in again.');
-      navigate('/login');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('ReporterName', values.Name || '');
-    formData.append('ReportedNumber', values.Number || '');
-    formData.append('ReferenceMtr', values.NearestMeter || '');
-    formData.append('ReferenceRecaddrs', values.refAccNo || '');
-    formData.append('ReportedLandmark', values.Landmark || '');
-    formData.append('LeakPressure', values.leakPressure || '');
-    formData.append('LeakIndicator', values.visibility || '');
-    formData.append('ReportType', values.typeId || '');
-    formData.append('SpoolID', '0');
-    formData.append('Latitude', lat.toString());
-    formData.append('Longitude', lng.toString());
-    formData.append('Geom',  `${lng}, ${lat}`);
-    formData.append('Remarks', values.Remarks || '');
-    formData.append('ReporterType', values.reportertype || '');
-    formData.append('CtCode', CT_ID || '');
-    formData.append('WsCode', wscode || '');
-    formData.append('DtReported', new Date().toISOString());
-    formData.append('refAccNo', (values.refAccNo || '').substring(0, 6));
-    formData.append('DispatchStat', '1');
-    formData.append('flgLeakDetection', '0')
-
-    if (fileList.length) {
-      fileList.forEach((file) => {
-        formData.append('Images', file.originFileObj);
-      });
-    }
-
-    try {
-      setLoading(true);
-      await devApi.post(
-        "dcwd-gis/api/v1/admin/LeakReport/SaveReport",
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      showModal('Success','Leak report submitted successfully', 'success');
+    await reportALeakStore.submitReport(values, navigate);
+    if (reportALeakStore.modalData.type === 'success') {
       form.resetFields();
-      setFileList([]);
-      
-    } catch (error: any) {
-      if (error.response?.status === 401) {
-        showModal('Unauthorized', 'Unauthorized. Please log in again.', 'error');
-        navigate('/login');
-      } else {
-        showModal('Submission Failed', 'Failed to submit leak report.', 'error');
-      }
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -238,10 +112,9 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
           message.error('Please complete all required fields before submitting.')
         }}  
         onValuesChange={(changedValues, allValues) => {
-          setFormValues(allValues);
+          reportALeakStore.setFormValues(allValues);
         }}
       >
-        {/* Search Section */}
         {/* Reporter Details Section */}
         <div style={{ position: 'relative', marginBottom: 24 }}>
           <div style={{
@@ -275,15 +148,18 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             <Col span={12}>
               <Form.Item 
                 name="reportType" 
-                label={<span style={labelStyle}>Report Type:</span>} 
-                rules={[{required: true, message: 'Select Report Type'}]}
+                label={<span style={labelStyle}>MO Type:</span>} 
+                rules={[{ required: true, message: 'Select MO Type' }]}
                 style={{ marginBottom: 8 }}
                 initialValue={selectedReportType}
               >
                 <Select 
-                  placeholder="- - Select Report Type - -" 
+                  placeholder="- - Select MO Type - -" 
                   value={selectedReportType}
-                  onChange={onReportTypeChange}
+                  onChange={(value) => {
+                    reportALeakStore.setReportType(value);
+                    onReportTypeChange?.(value);
+                  }}
                   style={{ 
                     borderColor: '#ff4d4f',
                     boxShadow: '0 0 0 2px rgba(244, 9, 12, 0.61)',
@@ -300,11 +176,11 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             <Col span={12}>
               <Form.Item 
                 name="reportertype" 
-                label={<span style={labelStyle}>Reporter Type:</span>} 
-                rules={[{required: true, message: 'Select Reporter Type'}]}
+                label={<span style={labelStyle}>Account Type:</span>} 
+                rules={[{ required: true, message: 'Select Acccount Type' }]}
                 style={{ marginBottom: 8 }}
               >
-                <Select placeholder="-SELECT-">
+                <Select placeholder="- SELECT -">
                   <Option value="1">Account Holder</Option>
                   <Option value="2">Non Account Holder</Option>
                 </Select>
@@ -317,7 +193,7 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
               <Form.Item 
                 name="Name" 
                 label={<span style={labelStyle}>Name:</span>} 
-                rules={[{required: true, message: 'Enter Name'}]}
+                rules={[{ required: true, message: 'Enter Name' }]}
                 style={{ marginBottom: 8 }}
               >
                 <Input placeholder="Enter customer name" />
@@ -327,7 +203,10 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
               <Form.Item 
                 name="Number" 
                 label={<span style={labelStyle}>Contact No.:</span>} 
-                rules={[{required: true, message: 'Enter Contact No.'}, { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }]}
+                rules={[
+                  { required: true, message: 'Enter Contact No.' }, 
+                  { pattern: /^\d{11}$/, message: 'Requires 11-digit number' }
+                ]}
                 style={{ marginBottom: 8 }}
               >
                 <Input placeholder="Enter contact number" />
@@ -367,22 +246,22 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             }}
           >
 
-        <Row gutter={14}>
+        <Row gutter={16}>
           <Col span={12}>
             <Form.Item 
-              name="address" 
-              label={<span style={labelStyle}>Address:</span>} 
-              rules={[{required: true, message: 'Enter Address'}]}
+              name="ReferenceMeter" 
+              label={<span style={labelStyle}>Reference Meter:</span>} 
+              rules={[{ required: true, message: 'Enter Reference Meter' }]}
               style={{ marginBottom: 8 }}
             >
-              <Input placeholder="Enter address" />
+              <Input placeholder="Enter reference meter number" />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item 
               name="Landmark" 
               label={<span style={labelStyle}>Landmark:</span>} 
-              rules={[{required: true, message: 'Enter Landmark'}]}
+              rules={[{ required: true, message: 'Enter Landmark' }]}
               style={{ marginBottom: 8 }}
             >
               <Input placeholder="Enter landmark" />
@@ -395,12 +274,14 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             <Form.Item 
               name="typeId" 
               label={<span style={labelStyle}>Leak Type:</span>} 
-              rules={[{required: true, message: 'Enter Leak Type'}]}
+              rules={[{ required: true, message: 'Select Leak Type' }]}
               style={{ marginBottom: 8 }}
             >
-              <Select placeholder="-SELECT-">
-                <Option value="54">Service Line</Option>
-                <Option value="55">Main Line</Option>
+              <Select placeholder="- SELECT -">
+                <Option value="37">Unidentified</Option>
+                <Option value="38">Serviceline</Option>
+                <Option value="39">Mainline</Option>
+                <Option value="40">Others</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -408,10 +289,10 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             <Form.Item 
               name="leakPressure" 
               label={<span style={labelStyle}>Leak Pressure:</span>} 
-              rules={[{required: true, message: 'Enter Leak Pressure'}]}
+              rules={[{ required: true, message: 'Select Leak Pressure' }]}
               style={{ marginBottom: 8 }}
             >
-              <Select placeholder="-SELECT-">
+              <Select placeholder="- SELECT -">
                 <Option value="1">High</Option>
                 <Option value="2">Low</Option>
               </Select>
@@ -424,12 +305,12 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             <Form.Item 
               name="visibility" 
               label={<span style={labelStyle}>Visibility:</span>} 
-              rules={[{required: true, message: 'Enter Visibility'}]}
+              rules={[{ required: true, message: 'Select Visibility' }]}
               style={{ marginBottom: 8 }}
             >
-              <Select placeholder="-SELECT-">
-                <Option value="1">Exposed Leak</Option>
-                <Option value="2">Underground Leak</Option>
+              <Select placeholder="- SELECT -">
+                <Option value="1">Surface</Option>
+                <Option value="2">Non-Surface</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -437,10 +318,10 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
             <Form.Item 
               name="coverings" 
               label={<span style={labelStyle}>Coverings:</span>} 
-              rules={[{required: true, message: 'Enter Coverings'}]}
+              rules={[{ required: true, message: 'Select Coverings' }]}
               style={{ marginBottom: 8 }}
             >
-              <Select placeholder="-SELECT-">
+              <Select placeholder="- SELECT -">
                 <Option value="1">Concrete</Option>
                 <Option value="2">Asphalt</Option>
                 <Option value="3">Soil</Option>
@@ -451,60 +332,47 @@ const ReportALeak: React.FC<ReportALeakProps> = ({
         </Row>
 
         <Row gutter={16}>
-          <Col span={12}>
+          {!reportALeakStore.isCustomerSearched && (
+            <Col span={12}>
+              <Form.Item 
+                name="address" 
+                label={<span style={labelStyle}>Address:</span>} 
+                rules={[{ required: !reportALeakStore.isCustomerSearched, message: 'Enter Address' }]}
+                style={{ marginBottom: 8 }}
+              >
+                <Input placeholder="Enter address" />
+              </Form.Item>
+            </Col>
+          )}
+          <Col span={reportALeakStore.isCustomerSearched ? 24 : 12}>
             <Form.Item 
-              name="leakIndicator" 
-              label={<span style={labelStyle}>Leak Indicator:</span>} 
-              rules={[{required: true, message: 'Enter Leak Indicator'}]}
+              name="Remarks" 
+              label={<span style={labelStyle}>Remarks:</span>} 
+              rules={[{ required: true, message: 'Enter Remarks' }]}
               style={{ marginBottom: 8 }}
             >
-              <Select placeholder="-SELECT-">
-                <Option value="1">Water Pooling</Option>
-                <Option value="2">Wet Ground</Option>
-                <Option value="3">Sound</Option>
-                <Option value="4">Visual</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item 
-              name="NearestMeter" 
-              label={<span style={labelStyle}>Nearest Meter:</span>} 
-              rules={[{required: true, message: 'Enter Nearest Meter'}]}
-              style={{ marginBottom: 8 }}
-            >
-              <Input placeholder="Enter nearest meter number" />
+              <Input.TextArea rows={3} placeholder="Enter additional remarks" />
             </Form.Item>
           </Col>
         </Row>
 
-        {/* Remarks - Full width at bottom */}
-        <Form.Item 
-          name="Remarks" 
-          label={<span style={labelStyle}>Remarks:</span>} 
-          rules={[{required: true, message: 'Enter Remarks'}]}
-          style={{ marginBottom: 8 }}
-        >
-          <Input.TextArea rows={3} placeholder="Enter additional remarks" />
+        {/* Hidden fields */}
+        <Form.Item name="refAccNo" hidden>
+          <Input type="hidden" />
         </Form.Item>
-
-          {/* Hidden fields */}
-          <Form.Item name="refAccNo" hidden>
-            <Input type='hidden' />
-          </Form.Item>
         </Card>
         </div>
       </Form>
 
       <CustomModal
-        visible={modalData.visible}
-        title={modalData.title}
-        content={modalData.content}
-        type={modalData.type}
-        onClose={() => setModalData(prev => ({ ...prev, visible: false }))}
+        visible={reportALeakStore.modalData.visible}
+        title={reportALeakStore.modalData.title}
+        content={reportALeakStore.modalData.content}
+        type={reportALeakStore.modalData.type}
+        onClose={() => reportALeakStore.hideModal()}
       />
     </>
   );
-};
+});
 
 export default ReportALeak;
