@@ -1,28 +1,32 @@
 export interface LeakData {
-  key: string;
+  key?: string; // React key for table rows
   id: string;
-  leakType: string;
-  location: string;
-  landmark: string;
-  referenceMeter: string;
-  contactNo: string;
-  dateTimeReported: string;
+  leakType?: string;
+  referenceNo: string;
+  location?: string;
+  landmark?: string;
+  referenceMeter?: string;
+  contactNo?: string;
   dateReported?: string;
-  referenceNo: number;
-  dmaId: string;
-  covering: string;
-  nrwLevel?: string;
-  repairedLeaks?: string;
+  dateTimeReported?: string; // For backward compatibility
+  dispatchStat?: number;
+  flgLeakDetection?: number;
+  status?: string;
+  reportType?: string;
+  remarks?: string;
+
+  // Additional fields that are still used in components
+  teamLeader?: string;
   jmsControlNo?: string;
   dateRepaired?: string;
-  teamLeader?: string;
-  dateTurnedOver?: string;
-  turnoverReason?: string;
+  dateTurnOvered?: string;
+  reason?: string;
+
+  dmaId?: string;
+  covering?: string;
+  nrwLevel?: string;
   leakPressure?: string;
   latitude?: number;
   longitude?: number;
   images?: string[];
-  dispatchStat: number;
-  flgLeakDetection: number;
-  status?: string; // Added for the "all" tab
 }

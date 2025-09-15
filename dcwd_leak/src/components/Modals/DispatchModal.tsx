@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Select, Button, message, Tooltip } from 'antd';
-import { ExclamationOutlined, UserOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Modal, Select, Button, message, Tooltip, Spin, Alert } from 'antd';
+import { ExclamationOutlined, UserOutlined, QuestionCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import { observer } from 'mobx-react-lite';
+import { caretakersStore } from '../../stores/caretakersStore';
+import type { MappedCaretaker } from '../../types/caretaker';
 import '../../styles/modal.css';
 
 const { Option } = Select;
@@ -13,7 +16,7 @@ interface DispatchModalProps {
   fields: { label: string; value?: string }[];
 }
 
-const DispatchModal: React.FC<DispatchModalProps> = ({
+const DispatchModal: React.FC<DispatchModalProps> = observer(({
   visible,
   onCancel,
   onDispatch,
@@ -25,6 +28,17 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [dispatchedCaretaker, setDispatchedCaretaker] = useState<string>('');
+
+  // Fetch caretakers when modal opens
+  useEffect(() => {
+    if (visible) {
+      caretakersStore.fetchCaretakers();
+    }
+  }, [visible]);
+
+  const handleRefresh = () => {
+    caretakersStore.refresh();
+  };
 
   const handleDispatchClick = () => {
     if (!selectedDispatcher) {
@@ -42,24 +56,77 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
     setShowConfirmation(false);
     setLoading(true);
     try {
-      // Simulate API call with more realistic timing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Debug logging to understand the record structure
+      console.log('DispatchModal record:', record);
+      console.log('Record keys:', record ? Object.keys(record) : 'null');
+      console.log('Full record object:', JSON.stringify(record, null, 2));
+      
+      // Validate required data
+      // Use referenceNo first (now properly mapped), then fallback to id
+      let refNo: string | null = null;
+      
+      if (record?.referenceNo && record.referenceNo !== '' && record.referenceNo !== 'null') {
+        refNo = String(record.referenceNo);
+        console.log('Using record.referenceNo as refNo for dispatch:', refNo);
+      } else if (record?.id) {
+        refNo = String(record.id);
+        console.log('Using record.id (spool_ID) as refNo fallback for dispatch:', refNo);
+      } else {
+        throw new Error('Missing leak report reference number and ID for dispatch. This leak report may not be properly saved yet.');
+      }
+      
+      console.log('Record dispatchStat:', record.dispatchStat);
+      console.log('Record flgLeakDetection:', record.flgLeakDetection);
+      console.log('Record status:', record.status);
+      
+      // Validate that record is in dispatchable state
+      if (record.dispatchStat === 2) {
+        console.warn('Record is already dispatched (dispatchStat=2)');
+      } else if (record.dispatchStat !== 1) {
+        console.warn('Record may not be dispatchable. Expected dispatchStat=1, got:', record.dispatchStat);
+      }
+      
+      // Check if it's a test/dummy record that might not exist in backend
+      if (refNo === "1" || parseInt(refNo) < 100) {
+        console.warn('This appears to be test data that may not exist in the backend database');
+      }
+      
+      if (!selectedDispatcher) {
+        throw new Error('No caretaker selected for dispatch');
+      }
+
+      console.log('Dispatching with refNo:', refNo, 'to:', selectedDispatcher);
+
+      // Call the actual dispatch API
+      const response = await caretakersStore.dispatchToCrew(
+        refNo,
+        selectedDispatcher
+      );
+
+      console.log('Dispatch successful:', response);
       
       if (onDispatch) {
         onDispatch(selectedDispatcher);
       }
       
       // Store the dispatched caretaker name for success modal
-      const caretakerName = dispatchers.find(d => d.value === selectedDispatcher)?.label || '';
+      const caretaker = caretakersStore.mappedCaretakers.find(c => c.value === selectedDispatcher);
+      const caretakerName = caretaker?.label || 'Unknown Caretaker';
       setDispatchedCaretaker(caretakerName);
       
-      // Show success modal instead of message
+      // Show success modal
       setShowSuccess(true);
       
     } catch (error) {
+      console.error('Dispatch error:', error);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to dispatch leak report. Please try again.';
+        
       message.error({
-        content: 'Failed to dispatch leak report. Please try again.',
-        duration: 4,
+        content: errorMessage,
+        duration: 6,
         style: { fontFamily: 'Noto Sans' }
       });
     } finally {
@@ -86,13 +153,8 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
     onCancel();
   };
 
-  const dispatchers = [
-    { value: 'caretaker1', label: 'John Smith - District A', status: 'available', experience: '5 years' },
-    { value: 'caretaker2', label: 'Maria Garcia - District B', status: 'busy', experience: '3 years' },
-    { value: 'caretaker3', label: 'Robert Johnson - District C', status: 'available', experience: '7 years' },
-    { value: 'caretaker4', label: 'Sarah Wilson - District D', status: 'available', experience: '4 years' },
-    { value: 'caretaker5', label: 'Michael Brown - District E', status: 'offline', experience: '6 years' },
-  ];
+  // Get available caretakers from store
+  const availableCaretakers = caretakersStore.mappedCaretakers;
 
   return (
     <>
@@ -121,42 +183,71 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
         </div>
 
         <div className="dispatch-modal-form-section">
-          <div className="dispatch-modal-label-text">
-            <UserOutlined style={{ marginRight: 8, color: '#ff4d4f', fontSize: 16 }} />
-            DISPATCH TO :
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <div className="dispatch-modal-label-text">
+                <UserOutlined style={{ marginRight: 8, color: '#ff4d4f', fontSize: 16 }} />
+                DISPATCH TO :
+              </div>
+              <Tooltip title="Refresh caretakers list">
+                <Button 
+                  icon={<ReloadOutlined />} 
+                  onClick={handleRefresh}
+                  loading={caretakersStore.loading}
+                  size="small"
+                  type="text"
+                />
+              </Tooltip>
+            </div>
+            
+            {caretakersStore.error && (
+              <Alert
+                message="Error loading caretakers"
+                description={caretakersStore.error}
+                type="error"
+                showIcon
+                style={{ marginBottom: 12 }}
+                action={
+                  <Button size="small" onClick={handleRefresh}>
+                    Retry
+                  </Button>
+                }
+              />
+            )}
           </div>
           
           <Select
             showSearch
-            placeholder="-- Select Dispatcher --"
+            placeholder={caretakersStore.loading ? "Loading caretakers..." : "-- Select Dispatcher --"}
             value={selectedDispatcher}
             onChange={setSelectedDispatcher}
             className="dispatch-modal-select"
             optionFilterProp="children"
             size="large"
+            loading={caretakersStore.loading}
+            notFoundContent={caretakersStore.loading ? <Spin size="small" /> : "No caretakers available"}
             filterOption={(input, option) =>
               typeof option?.children === 'string' &&
               (option.children as string).toLowerCase().includes(input.toLowerCase())
             }
           >
-            {dispatchers.map(dispatcher => (
+            {availableCaretakers.map((caretaker: MappedCaretaker) => (
               <Option 
-                key={dispatcher.value} 
-                value={dispatcher.value}
-                disabled={dispatcher.status === 'offline' || dispatcher.status === 'busy'}
+                key={caretaker.value} 
+                value={caretaker.value}
+                disabled={caretaker.status === 'inactive'}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>
                     <UserOutlined style={{ marginRight: 8, color: '#6782f5' }} />
-                    {dispatcher.label}
+                    {caretaker.label}
                   </span>
                   <span style={{ 
                     fontSize: '12px', 
-                    color: dispatcher.status === 'available' ? '#28a745' : 
-                          dispatcher.status === 'busy' ? '#ffc107' : '#dc3545',
+                    color: caretaker.status === 'active' ? '#28a745' : '#dc3545',
                     fontWeight: 500
                   }}>
-                    {dispatcher.status} • {dispatcher.experience}
+                    {caretaker.status}
                   </span>
                 </div>
               </Option>
@@ -218,7 +309,7 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
             color: '#1890ff', 
             marginBottom: 24 
           }}>
-            {dispatchers.find(d => d.value === selectedDispatcher)?.label}
+            {availableCaretakers.find(c => c.value === selectedDispatcher)?.label || 'Unknown Caretaker'}
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <Button
@@ -304,6 +395,6 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
     </Modal>
     </>
   );
-};
+});
 
 export default DispatchModal;

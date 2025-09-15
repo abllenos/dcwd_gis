@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Table, Button, Input, Badge, Card, Breadcrumb, Select, Tooltip } from "antd";
-import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled, DownOutlined } from "@ant-design/icons";
+import { Table, Button, Input, Badge, Card, Breadcrumb, Select, Tooltip, Switch, Divider } from "antd";
+import { EditOutlined, TruckOutlined, FileSearchOutlined, FileImageOutlined, HomeFilled, DownOutlined, ReloadOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import DispatchModal from "../Modals/DispatchModal";
 import UpdateReport from "../Modals/UpdateModal";
@@ -32,6 +32,28 @@ const LeakReports: React.FC = observer(() => {
   useEffect(() => {
     leakReportsStore.fetchCounts();
     leakReportsStore.fetchData();
+    
+    // Cleanup auto-refresh on component unmount
+    return () => {
+      leakReportsStore.cleanup();
+    };
+  }, []);
+
+  // Handle visibility change to pause/resume auto-refresh when tab is not visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && leakReportsStore.autoRefreshEnabled) {
+        leakReportsStore.stopAutoRefresh();
+      } else if (!document.hidden && leakReportsStore.autoRefreshEnabled) {
+        leakReportsStore.startAutoRefresh();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const handleHomeClick = () => navigate("/home");
@@ -224,7 +246,17 @@ const LeakReports: React.FC = observer(() => {
 };
 
   return (
-    <div style={{ padding: "4px 24px 24px 24px" }}>
+    <>
+      <style>
+        {`
+          @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
+      <div style={{ padding: "4px 24px 24px 24px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Button icon={<HomeFilled />} onClick={handleHomeClick} type="text" style={{ fontSize: 16, color: "#00008B" }} shape="circle" />
@@ -236,7 +268,58 @@ const LeakReports: React.FC = observer(() => {
             ]}
           />
         </div>
-        <Input.Search placeholder="Search..." allowClear style={{ width: 300 }} onChange={(e) => leakReportsStore.setSearchText(e.target.value)} />
+        
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* Auto-refresh controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", backgroundColor: "#f5f5f5", borderRadius: 6 }}>
+            <ClockCircleOutlined style={{ color: "#1890ff" }} />
+            <span style={{ fontSize: 12, color: "#666", minWidth: 70 }}>Auto-refresh:</span>
+            <Switch
+              size="small"
+              checked={leakReportsStore.autoRefreshEnabled}
+              onChange={(checked) => leakReportsStore.setAutoRefreshEnabled(checked)}
+            />
+            <Select
+              size="small"
+              value={leakReportsStore.autoRefreshInterval}
+              onChange={(value) => leakReportsStore.setAutoRefreshInterval(value)}
+              style={{ width: 80 }}
+              disabled={!leakReportsStore.autoRefreshEnabled}
+            >
+              <Select.Option value={10000}>10s</Select.Option>
+              <Select.Option value={30000}>30s</Select.Option>
+              <Select.Option value={60000}>1m</Select.Option>
+              <Select.Option value={120000}>2m</Select.Option>
+              <Select.Option value={300000}>5m</Select.Option>
+            </Select>
+            {leakReportsStore.autoRefreshEnabled && (
+              <span style={{ fontSize: 11, color: "#1890ff", minWidth: 25 }}>
+                {leakReportsStore.nextRefreshCountdown}s
+              </span>
+            )}
+          </div>
+          
+          <Divider type="vertical" style={{ height: 20 }} />
+          
+          {/* Manual refresh button */}
+          <Tooltip title="Refresh now">
+            <Button 
+              icon={<ReloadOutlined />} 
+              onClick={() => leakReportsStore.manualRefresh()}
+              loading={leakReportsStore.loading}
+              size="small"
+            >
+              Refresh
+            </Button>
+          </Tooltip>
+          
+          <Input.Search 
+            placeholder="Search..." 
+            allowClear 
+            style={{ width: 300 }} 
+            onChange={(e) => leakReportsStore.setSearchText(e.target.value)} 
+          />
+        </div>
       </div>
 
       <Card className="custom-card">
@@ -265,6 +348,51 @@ const LeakReports: React.FC = observer(() => {
           </Select>
         </div>
 
+        {/* Auto-refresh status indicator */}
+        {(leakReportsStore.autoRefreshEnabled || leakReportsStore.lastRefreshTime) && (
+          <div style={{ 
+            marginBottom: 16, 
+            padding: "8px 12px", 
+            backgroundColor: "#f8f9fa", 
+            borderRadius: 4, 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between",
+            fontSize: 12,
+            color: "#666"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {leakReportsStore.autoRefreshEnabled ? (
+                <>
+                  <div style={{ 
+                    width: 8, 
+                    height: 8, 
+                    backgroundColor: "#52c41a", 
+                    borderRadius: "50%",
+                    animation: "pulse 2s infinite"
+                  }} />
+                  <span>Auto-refresh enabled</span>
+                </>
+              ) : (
+                <>
+                  <div style={{ 
+                    width: 8, 
+                    height: 8, 
+                    backgroundColor: "#d9d9d9", 
+                    borderRadius: "50%"
+                  }} />
+                  <span>Auto-refresh disabled</span>
+                </>
+              )}
+            </div>
+            {leakReportsStore.lastRefreshTime && (
+              <span>
+                Last updated: {leakReportsStore.lastRefreshTime.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
+        )}
+
         <Table
           columns={generateColumns(leakReportsStore.activeTab)}
           dataSource={leakReportsStore.data}
@@ -275,7 +403,7 @@ const LeakReports: React.FC = observer(() => {
             total: leakReportsStore.total,
             onChange: (page, size) => leakReportsStore.setPagination(page, size),
           }}
-          rowKey="id"
+          rowKey={(record) => record.key || record.id}
         />
       </Card>
 
@@ -310,6 +438,7 @@ const LeakReports: React.FC = observer(() => {
 
       <ImageModal visible={leakReportsStore.imageModalVisible} onCancel={() => leakReportsStore.setImageModal(false)} images={leakReportsStore.imageUrls} />
     </div>
+    </>
   );
 });
 
