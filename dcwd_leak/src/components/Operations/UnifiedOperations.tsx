@@ -8,7 +8,6 @@ import {
   FileImageOutlined, 
   HomeFilled, 
   DownOutlined,
-  AppstoreOutlined 
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import DispatchModal from "../Modals/DispatchModal";
@@ -317,16 +316,13 @@ const UnifiedOperations: React.FC = observer(() => {
       </div>
 
       <Card className="custom-card">
-        {/* Operation Type and Status Filters */}
         <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 24 }}>
-          {/* Operation Type Filter */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <AppstoreOutlined style={{ color: "#1890ff" }} />
             <span style={{ fontSize: 14, fontWeight: 500, color: "#595959" }}>Operation Type:</span>
             <Select
               value={unifiedOperationsStore.activeOperation}
               onChange={unifiedOperationsStore.setActiveOperation}
-              style={{ width: 200 }}
+              style={{ width: 175 }}
               suffixIcon={<DownOutlined />}
             >
               {Object.entries(operationConfigs).map(([key, config]) => (
@@ -343,7 +339,7 @@ const UnifiedOperations: React.FC = observer(() => {
             <Select
               value={unifiedOperationsStore.activeStatus}
               onChange={unifiedOperationsStore.setActiveStatus}
-              style={{ width: 300 }}
+              style={{ width: 235 }}
               suffixIcon={<DownOutlined />}
               placeholder="Select status"
             >
@@ -364,7 +360,6 @@ const UnifiedOperations: React.FC = observer(() => {
           </div>
         </div>
 
-        {/* Data Table */}
         <Table
           columns={generateColumns() as any}
           dataSource={unifiedOperationsStore.data as any}
