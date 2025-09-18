@@ -32,19 +32,18 @@ class DispatchStore {
           },
         }
       );
-      runInAction(() => {
-        this.caretakers = Array.isArray(res.data?.data)
-          ? res.data.data.map((c: any) => ({
-              id: c.id,
-              empId: c.empId,
-              name: c.name ?? c.description ?? '',
-              ctCode: c.ctCode,
-              mobileNo: c.mobileNo,
-              status: c.status ?? 'active',
-            }))
-          : [];
-        this.loading = false;
-      });
+        runInAction(() => {
+          this.caretakers = Array.isArray(res.data?.data?.data)
+            ? res.data.data.data.map((c: any) => ({
+                id: c.id,
+                empId: c.assignedCrewId, // Use assignedCrewId as empId
+                name: c.description ?? '', // Use description as name
+                ctCode: c.description ?? '', // Use description as ctCode
+                status: c.isActive === 1 ? 'active' : 'inactive',
+              }))
+            : [];
+          this.loading = false;
+        });
     } catch (err: any) {
       runInAction(() => {
         this.error = err?.message || 'Failed to fetch caretakers';
@@ -64,10 +63,13 @@ class DispatchStore {
   async dispatchToCrew(refNo: string, caretakerEmpId: string) {
     try {
       const token = localStorage.getItem('token');
-      const payload = {
-        refNo,
-        dispatchTo: caretakerEmpId,
-      };
+          // Find the caretaker object by empId
+          const caretaker = this.caretakers.find(c => c.empId === caretakerEmpId);
+          const payload = {
+            refNo,
+            dispatchedBy: caretaker ? caretaker.empId : '', 
+            dispatchTo: caretakerEmpId,
+          };
       const res = await axios.post(
         'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1/admin/Dispatch/DispatchToCrew',
         payload,

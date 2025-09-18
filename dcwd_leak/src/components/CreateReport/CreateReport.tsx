@@ -19,7 +19,6 @@ import MapComponent from '../Endpoints/MapView';
 import '../../styles/theme.css';
 
 const { Text } = Typography;
-const { Option } = Select;
 
 type ReportType = 'leak_report' | 'no_water_supply' | 'low_pressure' | 'water_quality' | undefined;
 

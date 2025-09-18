@@ -236,7 +236,7 @@ const DispatchModal: React.FC<DispatchModalProps> = observer(({
             </Select>
           </div>
           <div className="dispatch-modal-button-container">
-            <Tooltip title={!uiStore.selectedDispatcher ? "Please select a caretaker first" : "Send dispatch to selected caretaker"}>
+            <Tooltip>
               <Button
                 type="primary"
                 onClick={handleDispatchClick}

@@ -346,15 +346,6 @@ export class LeakReportsStore {
     }
   }
 
-  // Method to refresh data manually (preserves current state)
-  async manualRefresh() {
-    await this.refreshData();
-  }
-
-  // Cleanup method for component unmount
-  cleanup() {
-    this.stopAutoRefresh();
-  }
 }
 
 export const leakReportsStore = new LeakReportsStore();

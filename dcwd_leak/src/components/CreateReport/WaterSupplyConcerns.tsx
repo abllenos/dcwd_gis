@@ -92,7 +92,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
   useEffect(() => {
     const jmsCode = formTypeToJMSCodeMap[formType]?.value;
     if (jmsCode) {
-      waterSupplyConcernsStore.setFormValues({ jmsCode });
+      waterSupplyConcernsStore.setFormValues({ JmsCode: jmsCode });
     }
   }, [formType]);
 
@@ -105,7 +105,22 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
   }, [propLat, propLng]);
 
   const handleSubmit = async (values: any) => {
-    const success = await waterSupplyConcernsStore.submitConcern(values);
+    // Map form values to NoWaterSupplyForm
+    const mappedValues = {
+      ReferenceMtr: values.ReferenceMtr ?? null,
+      DtReported: values.DtReported ?? new Date().toISOString(),
+      ReportedLocation: values.ReportedLocation ?? values.location ?? null,
+      WsCode: values.WsCode ?? waterSupplyConcernsStore.wscode ?? '0',
+      ReportedLandmark: values.ReportedLandmark ?? values.landmark ?? null,
+      ReporterName: values.ReporterName ?? values.Name ?? null,
+      Remarks: values.Remarks ?? values.remarks ?? null,
+      ReportedNumber: values.ReportedNumber ?? values.Number ?? null,
+      Geom: values.Geom ?? `${waterSupplyConcernsStore.lng}, ${waterSupplyConcernsStore.lat}`,
+      ReferenceRecaddrs: values.ReferenceRecaddrs ?? null,
+      JmsCode: values.JmsCode ?? waterSupplyConcernsStore.formValues.JmsCode ?? null,
+      CtCode: values.CtCode ?? waterSupplyConcernsStore.CT_ID ?? '0',
+    };
+    const success = await waterSupplyConcernsStore.submitNoWaterSupply(mappedValues);
     if (success) {
       form.resetFields();
     }
@@ -199,7 +214,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item 
-                name="Name"
+                name="ReporterName"
                 label={<span style={labelStyle}>Name:</span>}
                 rules={[{required: true, message: 'Enter Name'}]}
                 style={{ marginBottom: 8 }}
@@ -209,7 +224,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
             </Col>
             <Col span={12}>
               <Form.Item 
-                name="Number" 
+                name="ReportedNumber" 
                 label={<span style={labelStyle}>Contact No.:</span>}
                 rules={[
                   {required: true, message: 'Enter Contact No.'}, 
@@ -255,7 +270,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
           >
 
         <Form.Item 
-          name="location"
+          name="ReportedLocation"
           label={<span style={labelStyle}>Location:</span>}
           rules={[{required: true, message: 'Enter Location'}]}
           style={{ marginBottom: 8 }}
@@ -264,7 +279,7 @@ const WaterSupplyConcerns: React.FC<WaterSupplyConcernsProps> = observer(({
         </Form.Item>
 
         <Form.Item 
-          name="remarks" 
+          name="Remarks" 
           label={<span style={labelStyle}>Remarks:</span>}
           rules={[{required: true, message: 'Enter Remarks'}]}
           style={{ marginBottom: 8 }}
