@@ -30,6 +30,14 @@ export class LeakReportsStore {
   imageModalVisible = false;
   imageUrls: string[] = [];
 
+  // Auto-refresh properties
+  autoRefreshEnabled = false;
+  autoRefreshInterval = 30000; // Default 30 seconds
+  autoRefreshIntervalId: number | null = null;
+  lastRefreshTime: Date | null = null;
+  nextRefreshCountdown = 0;
+  countdownIntervalId: number | null = null;
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -79,7 +87,7 @@ export class LeakReportsStore {
       Object.entries(tabFilters).map(async ([key, filter]) => {
         try {
           if (key === "all") {
-            const res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", { 
+            const res = await devApi.get("/dcwd-gis/api/v1/admin/GetLeakReports/GetAllLeakReports", {
               params: { PageIndex: 1, PageSize: 1 }
             });
             counts[key] = res.data.data.totalCount || res.data.data.count || 0;
@@ -94,11 +102,11 @@ export class LeakReportsStore {
             }
             
             try {
-              const res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered", { params });
+              const res = await devApi.get("/dcwd-gis/api/v1/admin/GetLeakReports/GetLeakReportsFiltered", { params });
               counts[key] = res.data.data.totalCount || res.data.data.count || 0;
               
               if (key === "leakdetection" && counts[key] === 0) {
-                const fallbackRes = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", { 
+                const fallbackRes = await devApi.get("/dcwd-gis/api/v1/admin/GetLeakReports/GetAllLeakReports", { 
                   params: { PageIndex: 1, PageSize: 100 }
                 });
                 
@@ -136,7 +144,7 @@ export class LeakReportsStore {
       let res;
       
       if (this.activeTab === "all") {
-        res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", {
+        res = await devApi.get("/dcwd-gis/api/v1/admin/GetLeakReports/GetAllLeakReports", {
           params: {
             PageIndex: this.pageIndex,
             PageSize: this.pageSize,
@@ -155,12 +163,12 @@ export class LeakReportsStore {
           }
           
           
-          res = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReportsFiltered", {params});
+          res = await devApi.get("/dcwd-gis/api/v1/admin/GetLeakReports/GetLeakReportsFiltered", {params});
           
           
           if (this.activeTab === "leakdetection" && (!res?.data?.data?.data || res.data.data.data.length === 0)) {
             
-            const fallbackRes = await devApi.get("/dcwd-gis/api/v1/admin/LeakReports/GetLeakReports", {
+            const fallbackRes = await devApi.get("/dcwd-gis/api/v1/admin/GetLeakReports/GetAllLeakReports", {
               params: { PageIndex: 1, PageSize: 100 }
             });
             
@@ -210,19 +218,41 @@ export class LeakReportsStore {
       if (apiData) {
         runInAction(() => {
           this.total = apiData.totalCount || apiData.count;
-          this.data = apiData.data.map((item: any) => ({
-            id: String(item.spool_ID),
-            leakType: item.typeid,
-            location: item.address,
-            landmark: item.landmark,
-            referenceMeter: item.nearestMtrAccNo || item.nearestMeter,
-            contactNo: item.mobileNo,
-            dateReported: item.dT_Reported,
-            referenceNo: item.refAccNo,
-            dispatchStat: item.dispatchStat,
-            flgLeakDetection: item.flgLeakDetection,
-            status: this.getStatusFromDispatchStat(item.dispatchStat, item.flgLeakDetection),
-          }));
+          
+          this.data = apiData.data.map((item: any, index: number) => {
+            return {
+              key: String(item.id || `temp-${index}-${Date.now()}`), 
+              id: String(index + 1), 
+              uuid: item.id, 
+              leakType: item.leakTypeId,
+              referenceNo: String(item.refNo || ''), 
+              location: item.reportedLocation,
+              landmark: item.reportedLandmark,
+              referenceMeter: item.referenceMtr,
+              contactNo: item.reportedNumber,
+              dateReported: item.dtReported,
+              dateTimeReported: item.dtReported, 
+              dispatchStat: item.dispatchStat,
+              flgLeakDetection: item.flgLeakDetection,
+              status: this.getStatusFromDispatchStat(item.dispatchStat, item.flgLeakDetection),
+              reportType: item.reportType || item.typeid,
+              remarks: item.remarks,
+              
+              teamLeader: item.teamLeader,
+              jmsControlNo: item.jmsControlNo,
+              dateRepaired: item.dateRepaired,
+              dateTurnOvered: item.dateTurnOvered,
+              reason: item.reason,
+              
+              dmaId: item.dmaId,
+              coverings: item.coverings,
+              nrwLevel: item.nrwLevel,
+              leakPressure: item.leakPressure,
+              latitude: item.latitude,
+              longitude: item.longitude,
+              images: item.images || [],
+            };
+          });
         });
       }
     } catch (error) {
@@ -242,6 +272,88 @@ export class LeakReportsStore {
       case 6: return "After the meter link";
       default: return "Unknown";
     }
+  }
+
+  // Auto-refresh methods
+  setAutoRefreshEnabled(enabled: boolean) {
+    this.autoRefreshEnabled = enabled;
+    if (enabled) {
+      this.startAutoRefresh();
+    } else {
+      this.stopAutoRefresh();
+    }
+  }
+
+  setAutoRefreshInterval(interval: number) {
+    this.autoRefreshInterval = interval;
+    if (this.autoRefreshEnabled) {
+      this.stopAutoRefresh();
+      this.startAutoRefresh();
+    }
+  }
+
+  startAutoRefresh() {
+    this.stopAutoRefresh(); // Clear any existing intervals
+    
+    if (this.autoRefreshInterval > 0) {
+      // Start countdown
+      this.nextRefreshCountdown = this.autoRefreshInterval / 1000;
+      this.startCountdown();
+      
+      // Start auto-refresh interval
+      this.autoRefreshIntervalId = window.setInterval(() => {
+        this.refreshData();
+      }, this.autoRefreshInterval);
+      
+      this.lastRefreshTime = new Date();
+    }
+  }
+
+  stopAutoRefresh() {
+    if (this.autoRefreshIntervalId) {
+      clearInterval(this.autoRefreshIntervalId);
+      this.autoRefreshIntervalId = null;
+    }
+    if (this.countdownIntervalId) {
+      clearInterval(this.countdownIntervalId);
+      this.countdownIntervalId = null;
+    }
+    this.nextRefreshCountdown = 0;
+  }
+
+  private startCountdown() {
+    this.countdownIntervalId = window.setInterval(() => {
+      if (this.nextRefreshCountdown > 0) {
+        this.nextRefreshCountdown--;
+      } else {
+        this.nextRefreshCountdown = this.autoRefreshInterval / 1000;
+      }
+    }, 1000);
+  }
+
+  private async refreshData() {
+    try {
+      // Only refresh if no modal is open to avoid disrupting user interactions
+      if (!this.modalVisible && !this.imageModalVisible) {
+        await Promise.all([
+          this.fetchData(),
+          this.fetchCounts()
+        ]);
+        this.lastRefreshTime = new Date();
+      }
+    } catch (error) {
+      console.error('Auto-refresh failed:', error);
+    }
+  }
+
+  // Method to refresh data manually (preserves current state)
+  async manualRefresh() {
+    await this.refreshData();
+  }
+
+  // Cleanup method for component unmount
+  cleanup() {
+    this.stopAutoRefresh();
   }
 }
 

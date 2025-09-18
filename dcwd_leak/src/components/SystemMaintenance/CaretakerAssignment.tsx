@@ -1,78 +1,66 @@
-import React, { useState } from 'react';
-import {
-  Table,
-  Button,
-  Breadcrumb,
-  Card,
-  Input,
-  Modal,
-  Select,
-} from 'antd';
-import { FileSearchOutlined, PlusOutlined, DeleteOutlined, HomeFilled } from '@ant-design/icons';
+import React, { useEffect } from 'react';
+import { Table, Button, Breadcrumb, Card, Input } from 'antd';
+import { FileSearchOutlined, DeleteOutlined, HomeFilled } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
+import { makeAutoObservable } from 'mobx';
+import { caretakerStore } from '../../stores/caretakerStore';
+import CaretakerModal from '../Modals/CaretakerModal';
 
-interface CaretakerData {
-  key: string;
-  id: string;
-  ctCode: string;
-  description: string;
-  mobileNo: string;
-}
+class CaretakerAssignmentUIStore {
+  searchText: string = '';
+  modalVisible: boolean = false;
+  selectedRecord: any = null;
+  crewList: any[] = [];
+  addMode: boolean = false;
+  selectedCrewKey: string | undefined = undefined;
 
-const caretakerData: CaretakerData[] = [
-  {
-    key: '1',
-    id: '50124',
-    ctCode: 'CT-001',
-    description: 'Caretaker for Zone 8',
-    mobileNo: '09190002222',
-  },
-];
+  constructor() {
+    makeAutoObservable(this);
+  }
 
-interface CrewData {
-  key: string;
-  employeeId: string;
-  name: string;
-}
-
-const initialCrewList: CrewData[] = [
-  { key: '1', employeeId: 'EMP-101', name: 'Pedro Cruz' },
-  { key: '2', employeeId: 'EMP-102', name: 'Juan Luna' },
-];
-
-const availableCrews: CrewData[] = [
-  { key: '3', employeeId: 'EMP-103', name: 'Carlos Reyes' },
-  { key: '4', employeeId: 'EMP-104', name: 'Ana Flores' },
-  { key: '5', employeeId: 'EMP-105', name: 'Liza Gomez' },
-];
-
-const CaretakerAssignment: React.FC = () => {
-  const [searchText, setSearchText] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<CaretakerData | null>(null);
-  const [crewList, setCrewList] = useState<CrewData[]>(initialCrewList);
-  const [crewModalVisible, setCrewModalVisible] = useState(false);
-  const [addMode, setAddMode] = useState(false);
-  const [selectedCrewKey, setSelectedCrewKey] = useState<string | undefined>(undefined);
-
-  const navigate = useNavigate();
-
-  const handleHomeClick = () => {
-    navigate('/home');
-  };
-
-  const showDetails = (record: CaretakerData) => {
-    setSelectedRecord(record);
-    setModalVisible(true);
-  };
-
-  const handleCancel = () => setModalVisible(false);
-
-  const filteredData = (): CaretakerData[] => {
-    let data = caretakerData;
-    if (searchText.trim()) {
-      const keyword = searchText.toLowerCase();
+  setSearchText(val: string) {
+    this.searchText = val;
+  }
+  setModalVisible(val: boolean) {
+    this.modalVisible = val;
+  }
+  setSelectedRecord(val: any) {
+    this.selectedRecord = val;
+    this.crewList = [];
+  }
+  setAddMode(val: boolean) {
+    this.addMode = val;
+  }
+  setSelectedCrewKey(val: string | undefined) {
+    this.selectedCrewKey = val;
+  }
+  addCrewToList(key: string) {
+    const crew = caretakerStore.crews.find(c => c.key === key);
+    if (crew && !this.crewList.some(c => c.key === crew.key)) {
+      this.crewList.push(crew);
+    }
+    this.addMode = false;
+    this.selectedCrewKey = undefined;
+  }
+  deleteCrewFromList(key: string) {
+    this.crewList = this.crewList.filter(c => c.key !== key);
+  }
+  showDetails(record: any) {
+    this.setSelectedRecord(record);
+    this.setModalVisible(true);
+  }
+  handleCancel() {
+    this.setModalVisible(false);
+    this.setAddMode(false);
+    this.setSelectedCrewKey(undefined);
+    this.crewList = [];
+  }
+  get filteredCaretakers() {
+    let data = caretakerStore.caretakers;
+    if (this.searchText.trim()) {
+      const keyword = this.searchText.toLowerCase();
       data = data.filter(record =>
         Object.values(record)
           .filter(val => typeof val === 'string')
@@ -80,30 +68,25 @@ const CaretakerAssignment: React.FC = () => {
       );
     }
     return data;
-  };
+  }
+  get availableCrews() {
+    return caretakerStore.crews.filter(c => !this.crewList.some(enrolled => enrolled.key === c.key));
+  }
+}
 
-  const handleDeleteCrew = (key: string) => {
-    setCrewList(prev => prev.filter(c => c.key !== key));
-  };
+const uiStore = new CaretakerAssignmentUIStore();
 
-  const handleAddCrewClick = () => {
-    setAddMode(true);
-  };
+const CaretakerAssignment: React.FC = observer(() => {
+  const navigate = useNavigate();
 
-  const handleSelectCrew = (key: string) => {
-    const crew = availableCrews.find(c => c.key === key);
-    if (crew && !crewList.some(c => c.key === crew.key)) {
-      setCrewList(prev => [...prev, crew]);
-    }
-    setAddMode(false);
-    setSelectedCrewKey(undefined);
-  };
+  useEffect(() => {
+    caretakerStore.fetchCaretakers();
+    caretakerStore.fetchCrews();
+  }, []);
 
-  const columns: ColumnsType<CaretakerData> = [
-    { title: 'ID', dataIndex: 'id' },
+  const columns: ColumnsType<any> = [
     { title: 'CT Code', dataIndex: 'ctCode' },
-    { title: 'Description', dataIndex: 'description' },
-    { title: 'Mobile No.', dataIndex: 'mobileNo' },
+    { title: 'Description', dataIndex: 'empId' },
     {
       title: 'Action',
       key: 'action',
@@ -122,14 +105,14 @@ const CaretakerAssignment: React.FC = () => {
               height: 32,
               padding: 0,
             }}
-            onClick={() => showDetails(record)}
+            onClick={() => uiStore.showDetails(record)}
           />
         </div>
       ),
     },
   ];
 
-  const crewColumns: ColumnsType<CrewData> = [
+  const crewColumns: ColumnsType<any> = [
     { title: 'Employee ID No.', dataIndex: 'employeeId' },
     { title: 'Name', dataIndex: 'name' },
     {
@@ -143,10 +126,10 @@ const CaretakerAssignment: React.FC = () => {
             style={{
               backgroundColor: '#FF4D4F',
               color: '#FFFFFF'}}
-            onClick={() => handleDeleteCrew(record.key)}
+            onClick={() => uiStore.deleteCrewFromList(record.key)}
           />
         </div>
-      ),
+      ),  
     },
   ];
 
@@ -156,7 +139,7 @@ const CaretakerAssignment: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Button
             icon={<HomeFilled />}
-            onClick={handleHomeClick}
+            onClick={() => navigate('/home')}
             type="text"
             style={{ fontSize: 16, color: '#00008B', margin: 0 }}
             shape="circle"
@@ -168,79 +151,58 @@ const CaretakerAssignment: React.FC = () => {
               { title: "Caretaker Assignment"}
             ]}
           />
-      
-          </div>
+        </div>
         <Input.Search
           placeholder="Search"
           allowClear
           style={{ width: 300 }}
-          onChange={e => setSearchText(e.target.value.toLowerCase())}
+          onChange={e => uiStore.setSearchText(e.target.value.toLowerCase())}
         />
       </div>
 
       <Card className='custom-card'>
         <Table
           columns={columns}
-          dataSource={filteredData()}
+          dataSource={uiStore.filteredCaretakers}
           pagination={{ pageSize: 8 }}
           scroll={{ x: 'max-content' }}
           bordered
+          loading={caretakerStore.loading}
         />
       </Card>
 
-      <Modal
-        title="Crew List"
-        open={modalVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Table
-          columns={crewColumns}
-          dataSource={crewList}
-          pagination={false}
-          bordered
-          size="small"
-        />
-        <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 16 }}>
-          {!addMode ? (
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCrewClick}>
-              Add Crew
-            </Button>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 475 }}>
-              <Select
-                showSearch
-                placeholder="Select crew to enroll"
-                style={{ minWidth: 375 }}
-                optionFilterProp="children"
-                onChange={setSelectedCrewKey}
-                value={selectedCrewKey}
-                filterOption={(input, option) =>
-                  typeof option?.children === 'string' &&
-                  (option.children as string).toLowerCase().includes(input.toLowerCase())
-                }
-              >
-                {availableCrews
-                  .filter(c => !crewList.some(enrolled => enrolled.key === c.key))
-                  .map(c => (
-                    <Select.Option key={c.key} value={c.key}>
-                      {`${c.employeeId} - ${c.name}`}
-                    </Select.Option>
-                  ))}
-              </Select>
-              <Button
-                type="primary"
-                disabled={!selectedCrewKey}
-                onClick={() => selectedCrewKey && handleSelectCrew(selectedCrewKey)}
-              >
-                Enroll
-              </Button>
-            </div>
-          )}
-        </div>
-      </Modal>
+      <CaretakerModal
+        visible={uiStore.modalVisible}
+        crewList={uiStore.crewList}
+        addMode={uiStore.addMode}
+        selectedCrewKey={uiStore.selectedCrewKey}
+        availableCrews={uiStore.availableCrews}
+        onCancel={() => uiStore.handleCancel()}
+        onAddMode={val => uiStore.setAddMode(val)}
+        onSelectCrew={val => uiStore.setSelectedCrewKey(val)}
+        onAddCrew={async() => {
+          if (uiStore.selectedCrewKey && uiStore.selectedRecord) {
+            await caretakerStore.assignCrew({
+              crewId: uiStore.selectedCrewKey,
+              caretakerId: uiStore.selectedRecord.key,
+              action: 'assign'
+            });
+            uiStore.addCrewToList(uiStore.selectedCrewKey);
+          }
+        }}
+        onDeleteCrew={async key => {
+          if (uiStore.selectedRecord) {
+            await caretakerStore.assignCrew({
+              crewId: key,
+              caretakerId: uiStore.selectedRecord.key,
+              action: 'unassign'
+            });
+            uiStore.deleteCrewFromList(key);
+          }
+        }}
+      />
     </div>
   );
-};
+});
 
 export default CaretakerAssignment;

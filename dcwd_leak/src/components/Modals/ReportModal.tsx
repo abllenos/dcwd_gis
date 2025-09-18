@@ -98,7 +98,7 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({
                           
                           <div><strong>DATE REPORTED</strong></div>
                           <div>:</div>
-                          <div>{record.dateTimeReported || 'N/A'}</div>
+                          <div>{record.dateReported || 'N/A'}</div>
                         </div>
                         
                         {/* Right Column */}

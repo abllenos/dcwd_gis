@@ -176,6 +176,7 @@ export class ReportALeakStore {
     formData.append('ReportedLocation', values.address || '');
     formData.append('LeakPressure', values.leakPressure || '');
     formData.append('LeakIndicator', values.visibility || '');
+    formData.append('LeakCovering', values.coverings || '');
     formData.append('ReportType', values.typeId || '');
     formData.append('SpoolID', '0');
     formData.append('Latitude', this.lat.toString());

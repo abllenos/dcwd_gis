@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Table, Button, Input, Badge, Card, Breadcrumb, Select, Tooltip, Tabs } from "antd";
+import { Table, Button, Input, Badge, Card, Breadcrumb, Select, Tooltip } from "antd";
 import { 
   EditOutlined, 
   TruckOutlined, 
@@ -8,7 +8,6 @@ import {
   FileImageOutlined, 
   HomeFilled, 
   DownOutlined,
-  AppstoreOutlined 
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import DispatchModal from "../Modals/DispatchModal";
@@ -17,106 +16,27 @@ import ReportDetails from "../Modals/ReportModal";
 import ImageModal from "../Modals/ImageModal";
 import SupplyComplaintDetailsModal from "../Modals/SupplyComplaintDetailsModal";
 import { leakReportsStore } from "../../stores/leakReportsStore";
-import { supplyComplaintsStore, type ComplaintData as SupplyComplaintData } from "../../stores/supplyComplaintsStore";
-import { qualityComplaintsStore, type QualityComplaintData } from "../../stores/qualityComplaintsStore";
+import { 
+  unifiedOperationsStore, 
+  OperationType, 
+  operationConfigs,
+  type UnifiedData 
+} from "../../stores/unifiedOperationsStore";
 import type { ColumnsType } from "antd/es/table";
 import type { LeakData } from "../../types/Leakdata";
+import type { ComplaintData as SupplyComplaintData } from "../../stores/supplyComplaintsStore";
+import type { QualityComplaintData } from "../../stores/qualityComplaintsStore";
 
 const { Option } = Select;
-const { TabPane } = Tabs;
-
-// Operation Types
-enum OperationType {
-  LEAK_REPORTS = "leak-reports",
-  SUPPLY_COMPLAINTS = "supply-complaints", 
-  QUALITY_COMPLAINTS = "quality-complaints"
-}
-
-// Status configurations for each operation type
-const operationConfigs = {
-  [OperationType.LEAK_REPORTS]: {
-    title: "Leak Reports",
-    statuses: {
-      customer: "Customer Reports",
-      leakdetection: "Leak Detection", 
-      dispatched: "Dispatched",
-      repaired: "Repaired Leaks",
-      scheduled: "Repair Scheduled",
-      turnover: "Repair Turn-over",
-      after: "Leak After the Meter",
-      notfound: "Leak Not Found",
-      all: "All Reports"
-    }
-  },
-  [OperationType.SUPPLY_COMPLAINTS]: {
-    title: "Supply Complaints",
-    statuses: {
-      reports: "New Reports",
-      onprocess: "On-Process", 
-      completed: "Completed"
-    }
-  },
-  [OperationType.QUALITY_COMPLAINTS]: {
-    title: "Quality Complaints",
-    statuses: {
-      reports: "New Reports",
-      onprocess: "On-Process",
-      completed: "Completed"
-    }
-  }
-};
-
-// Union type for all data types
-type UnifiedData = LeakData | SupplyComplaintData | QualityComplaintData;
 
 const UnifiedOperations: React.FC = observer(() => {
   const navigate = useNavigate();
-  const [activeOperation, setActiveOperation] = useState<OperationType>(OperationType.LEAK_REPORTS);
-  const [activeStatus, setActiveStatus] = useState<string>("customer");
-  const [searchText, setSearchText] = useState("");
-  const [complaintModalVisible, setComplaintModalVisible] = useState(false);
-  const [selectedComplaint, setSelectedComplaint] = useState<SupplyComplaintData | QualityComplaintData | null>(null);
 
   useEffect(() => {
-    if (activeOperation === OperationType.LEAK_REPORTS) {
-      leakReportsStore.fetchCounts();
-      leakReportsStore.fetchData();
-    } else if (activeOperation === OperationType.SUPPLY_COMPLAINTS) {
-      supplyComplaintsStore.fetchCounts();
-      supplyComplaintsStore.fetchData();
-    } else if (activeOperation === OperationType.QUALITY_COMPLAINTS) {
-      qualityComplaintsStore.fetchCounts();
-      qualityComplaintsStore.fetchData();
-    }
-  }, [activeOperation]);
+    unifiedOperationsStore.initialize();
+  }, []);
 
   const handleHomeClick = () => navigate("/home");
-
-  const handleOperationChange = (operation: OperationType) => {
-    setActiveOperation(operation);
-    // Reset to first status when changing operations
-    const firstStatus = Object.keys(operationConfigs[operation].statuses)[0];
-    setActiveStatus(firstStatus);
-    
-    if (operation === OperationType.LEAK_REPORTS) {
-      leakReportsStore.setActiveTab(firstStatus);
-    } else if (operation === OperationType.SUPPLY_COMPLAINTS) {
-      supplyComplaintsStore.setActiveTab(firstStatus);
-    } else if (operation === OperationType.QUALITY_COMPLAINTS) {
-      qualityComplaintsStore.setActiveTab(firstStatus);
-    }
-  };
-
-  const handleStatusChange = (status: string) => {
-    setActiveStatus(status);
-    if (activeOperation === OperationType.LEAK_REPORTS) {
-      leakReportsStore.setActiveTab(status);
-    } else if (activeOperation === OperationType.SUPPLY_COMPLAINTS) {
-      supplyComplaintsStore.setActiveTab(status);
-    } else if (activeOperation === OperationType.QUALITY_COMPLAINTS) {
-      qualityComplaintsStore.setActiveTab(status);
-    }
-  };
 
   // Render action buttons for leak reports
   const renderLeakActionButtons = (record: LeakData) => {
@@ -222,7 +142,7 @@ const UnifiedOperations: React.FC = observer(() => {
       notfound: ["details"]
     };
 
-    const actions = tabActions[activeStatus] || ["dispatch", "update", "image", "details"];
+    const actions = tabActions[unifiedOperationsStore.activeStatus] || ["dispatch", "update", "image", "details"];
     
     return (
       <div style={{ display: "flex", justifyContent: "center", gap: 4 }}>
@@ -238,10 +158,7 @@ const UnifiedOperations: React.FC = observer(() => {
         <Tooltip title="View Details">
           <Button 
             icon={<FileSearchOutlined />} 
-            onClick={() => {
-              setSelectedComplaint(record);
-              setComplaintModalVisible(true);
-            }}
+            onClick={() => unifiedOperationsStore.setComplaintModal(true, record)}
             style={{ 
               borderColor: "#27cc3f", 
               color: "#27cc3f",
@@ -264,7 +181,7 @@ const UnifiedOperations: React.FC = observer(() => {
 
   // Generate columns based on operation type
   const generateColumns = () => {
-    if (activeOperation === OperationType.LEAK_REPORTS) {
+    if (unifiedOperationsStore.activeOperation === OperationType.LEAK_REPORTS) {
       return generateLeakReportColumns();
     } else {
       return generateComplaintColumns();
@@ -272,9 +189,8 @@ const UnifiedOperations: React.FC = observer(() => {
   };
 
   const generateLeakReportColumns = (): ColumnsType<LeakData> => {
-    if (activeStatus === "all") {
+    if (unifiedOperationsStore.activeStatus === "all") {
       return [
-        { title: "ID", dataIndex: "id", key: "id" },
         { title: "Date Reported", dataIndex: "dateReported", key: "dateReported" },
         { title: "Leak Type", dataIndex: "leakType", key: "leakType" },
         { title: "Reference Meter", dataIndex: "referenceMeter", key: "referenceMeter" },
@@ -326,18 +242,17 @@ const UnifiedOperations: React.FC = observer(() => {
     }
 
     const baseColumns: ColumnsType<LeakData> = [
-      { title: "ID", dataIndex: "id", key: "id" },
       { title: "Leak Type", dataIndex: "leakType", key: "leakType" },
       { title: "Reference Meter", dataIndex: "referenceMeter", key: "referenceMeter" },
       { title: "Location", dataIndex: "location", key: "location" },
       { title: "Landmark", dataIndex: "landmark", key: "landmark" },
       { title: "Date Reported", dataIndex: "dateReported", key: "dateReported" },
-      { title: "Team Leader", dataIndex: "teamLeader", key: "teamLeader", hidden: activeStatus === "customer" || activeStatus === "leakdetection" || activeStatus === "dispatched" },
+      { title: "Team Leader", dataIndex: "teamLeader", key: "teamLeader", hidden: unifiedOperationsStore.activeStatus === "customer" || unifiedOperationsStore.activeStatus === "leakdetection" || unifiedOperationsStore.activeStatus === "dispatched" },
       { title: "Reference No.", dataIndex: "referenceNo", key: "referenceNo" },
-      { title: "JMS Control No.", dataIndex: "jmsControlNo", key: "jmsControlNo", hidden: activeStatus === "customer" || activeStatus === "leakdetection" || activeStatus === "scheduled" || activeStatus === "dispatched" },
-      { title: "Date Repaired", dataIndex: "dateRepaired", key: "dateRepaired", hidden: activeStatus !== "repaired" },
-      { title: "Date Turn-overed", dataIndex: "dateTurnOvered", key: "dateTurnOvered", hidden: activeStatus !== "scheduled" && activeStatus !== "turnover" },
-      { title: "Reason", dataIndex: "reason", key: "reason", hidden: activeStatus !== "scheduled" && activeStatus !== "turnover" },
+      { title: "JMS Control No.", dataIndex: "jmsControlNo", key: "jmsControlNo", hidden: unifiedOperationsStore.activeStatus === "customer" || unifiedOperationsStore.activeStatus === "leakdetection" || unifiedOperationsStore.activeStatus === "scheduled" || unifiedOperationsStore.activeStatus === "dispatched" },
+      { title: "Date Repaired", dataIndex: "dateRepaired", key: "dateRepaired", hidden: unifiedOperationsStore.activeStatus !== "repaired" },
+      { title: "Date Turn-overed", dataIndex: "dateTurnOvered", key: "dateTurnOvered", hidden: unifiedOperationsStore.activeStatus !== "scheduled" && unifiedOperationsStore.activeStatus !== "turnover" },
+      { title: "Reason", dataIndex: "reason", key: "reason", hidden: unifiedOperationsStore.activeStatus !== "scheduled" && unifiedOperationsStore.activeStatus !== "turnover" },
       {
         title: "Actions",
         key: "action",
@@ -350,12 +265,11 @@ const UnifiedOperations: React.FC = observer(() => {
 
   const generateComplaintColumns = (): ColumnsType<SupplyComplaintData | QualityComplaintData> => {
     const baseColumns: ColumnsType<SupplyComplaintData | QualityComplaintData> = [
-      { title: "ID", dataIndex: "id", key: "id" },
       { 
         title: "Account Number", 
         dataIndex: "accountNumber", 
         key: "accountNumber",
-        hidden: activeOperation !== OperationType.QUALITY_COMPLAINTS
+        hidden: unifiedOperationsStore.activeOperation !== OperationType.QUALITY_COMPLAINTS
       },
       { title: "Location", dataIndex: "location", key: "location" },
       { title: "Remarks", dataIndex: "remarks", key: "remarks" },
@@ -371,31 +285,6 @@ const UnifiedOperations: React.FC = observer(() => {
 
     return baseColumns.filter((c) => !c.hidden);
   };
-
-  // Get data based on operation type
-  const getData = (): UnifiedData[] => {
-    if (activeOperation === OperationType.LEAK_REPORTS) {
-      return leakReportsStore.data;
-    } else if (activeOperation === OperationType.SUPPLY_COMPLAINTS) {
-      return supplyComplaintsStore.data;
-    } else {
-      return qualityComplaintsStore.data;
-    }
-  };
-
-  // Get counts for status badges
-  const getStatusCounts = () => {
-    if (activeOperation === OperationType.LEAK_REPORTS) {
-      return leakReportsStore.tabCounts;
-    } else if (activeOperation === OperationType.SUPPLY_COMPLAINTS) {
-      return supplyComplaintsStore.tabCounts;
-    } else {
-      return qualityComplaintsStore.tabCounts;
-    }
-  };
-
-  const currentConfig = operationConfigs[activeOperation];
-  const statusCounts = getStatusCounts();
 
   return (
     <div style={{ padding: "4px 24px 24px 24px" }}>
@@ -413,7 +302,7 @@ const UnifiedOperations: React.FC = observer(() => {
             style={{ fontSize: 16, fontWeight: 500 }}
             items={[
               { title: "Operations" },
-              { title: currentConfig.title }
+              { title: unifiedOperationsStore.currentConfig.title }
             ]}
           />
         </div>
@@ -421,22 +310,19 @@ const UnifiedOperations: React.FC = observer(() => {
           placeholder="Search..." 
           allowClear 
           style={{ width: 300 }} 
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          value={unifiedOperationsStore.searchText}
+          onChange={(e) => unifiedOperationsStore.setSearchText(e.target.value)}
         />
       </div>
 
       <Card className="custom-card">
-        {/* Operation Type and Status Filters */}
         <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 24 }}>
-          {/* Operation Type Filter */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <AppstoreOutlined style={{ color: "#1890ff" }} />
             <span style={{ fontSize: 14, fontWeight: 500, color: "#595959" }}>Operation Type:</span>
             <Select
-              value={activeOperation}
-              onChange={handleOperationChange}
-              style={{ width: 200 }}
+              value={unifiedOperationsStore.activeOperation}
+              onChange={unifiedOperationsStore.setActiveOperation}
+              style={{ width: 175 }}
               suffixIcon={<DownOutlined />}
             >
               {Object.entries(operationConfigs).map(([key, config]) => (
@@ -451,18 +337,18 @@ const UnifiedOperations: React.FC = observer(() => {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 14, fontWeight: 500, color: "#595959" }}>Status:</span>
             <Select
-              value={activeStatus}
-              onChange={handleStatusChange}
-              style={{ width: 300 }}
+              value={unifiedOperationsStore.activeStatus}
+              onChange={unifiedOperationsStore.setActiveStatus}
+              style={{ width: 235 }}
               suffixIcon={<DownOutlined />}
               placeholder="Select status"
             >
-              {Object.entries(currentConfig.statuses).map(([key, label]) => (
+              {Object.entries(unifiedOperationsStore.currentConfig.statuses).map(([key, label]) => (
                 <Option key={key} value={key}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                     <span>{label}</span>
                     <Badge 
-                      count={statusCounts[key] ?? 0} 
+                      count={unifiedOperationsStore.statusCounts[key] ?? 0} 
                       size="small" 
                       color="blue" 
                       style={{ marginLeft: 8 }}
@@ -474,44 +360,22 @@ const UnifiedOperations: React.FC = observer(() => {
           </div>
         </div>
 
-        {/* Data Table */}
         <Table
           columns={generateColumns() as any}
-          dataSource={getData() as any}
-          loading={
-            activeOperation === OperationType.LEAK_REPORTS ? leakReportsStore.loading : 
-            activeOperation === OperationType.SUPPLY_COMPLAINTS ? supplyComplaintsStore.loading :
-            qualityComplaintsStore.loading
-          }
+          dataSource={unifiedOperationsStore.data as any}
+          loading={unifiedOperationsStore.loading}
           pagination={{
-            current: 
-              activeOperation === OperationType.LEAK_REPORTS ? leakReportsStore.pageIndex : 
-              activeOperation === OperationType.SUPPLY_COMPLAINTS ? supplyComplaintsStore.pageIndex :
-              qualityComplaintsStore.pageIndex,
-            pageSize: 
-              activeOperation === OperationType.LEAK_REPORTS ? leakReportsStore.pageSize : 
-              activeOperation === OperationType.SUPPLY_COMPLAINTS ? supplyComplaintsStore.pageSize :
-              qualityComplaintsStore.pageSize,
-            total: 
-              activeOperation === OperationType.LEAK_REPORTS ? leakReportsStore.total : 
-              activeOperation === OperationType.SUPPLY_COMPLAINTS ? supplyComplaintsStore.total :
-              qualityComplaintsStore.total,
-            onChange: (page, size) => {
-              if (activeOperation === OperationType.LEAK_REPORTS) {
-                leakReportsStore.setPagination(page, size);
-              } else if (activeOperation === OperationType.SUPPLY_COMPLAINTS) {
-                supplyComplaintsStore.setPagination(page, size);
-              } else {
-                qualityComplaintsStore.setPagination(page, size);
-              }
-            },
+            current: unifiedOperationsStore.pagination.current,
+            pageSize: unifiedOperationsStore.pagination.pageSize,
+            total: unifiedOperationsStore.pagination.total,
+            onChange: unifiedOperationsStore.setPagination,
           }}
-          rowKey={activeOperation === OperationType.LEAK_REPORTS ? "id" : "key"}
+          rowKey={(record) => record.key || record.id || `row-${Math.random()}`}
         />
       </Card>
 
       {/* Modals for Leak Reports */}
-      {activeOperation === OperationType.LEAK_REPORTS && (
+      {unifiedOperationsStore.activeOperation === OperationType.LEAK_REPORTS && (
         <>
           <DispatchModal 
             visible={leakReportsStore.modalVisible && leakReportsStore.modalTitle === "Dispatch"} 
@@ -541,7 +405,7 @@ const UnifiedOperations: React.FC = observer(() => {
           <ReportDetails
             visible={leakReportsStore.modalVisible && leakReportsStore.modalTitle === "Report Details"}
             record={leakReportsStore.selectedRecord ? { ...leakReportsStore.selectedRecord, id: String(leakReportsStore.selectedRecord.id) } : null}
-            activeTab={activeStatus}
+            activeTab={unifiedOperationsStore.activeStatus}
             columnMap={{}}
             columnPresets={{}}
             onCancel={() => leakReportsStore.hideModal()}
@@ -556,17 +420,14 @@ const UnifiedOperations: React.FC = observer(() => {
       )}
 
       {/* Modal for Complaints */}
-      {(activeOperation === OperationType.SUPPLY_COMPLAINTS || activeOperation === OperationType.QUALITY_COMPLAINTS) && (
+      {(unifiedOperationsStore.activeOperation === OperationType.SUPPLY_COMPLAINTS || unifiedOperationsStore.activeOperation === OperationType.QUALITY_COMPLAINTS) && (
         <SupplyComplaintDetailsModal
-          visible={complaintModalVisible}
-          selectedRecord={selectedComplaint as any}
-          onCancel={() => {
-            setComplaintModalVisible(false);
-            setSelectedComplaint(null);
-          }}
+          visible={unifiedOperationsStore.complaintModalVisible}
+          selectedRecord={unifiedOperationsStore.selectedComplaint as any}
+          onCancel={() => unifiedOperationsStore.setComplaintModal(false)}
           onSubmitRemarks={(remarks: string) => {
             console.log('Submitted remarks:', remarks);
-            setComplaintModalVisible(false);
+            unifiedOperationsStore.setComplaintModal(false);
           }}
         />
       )}

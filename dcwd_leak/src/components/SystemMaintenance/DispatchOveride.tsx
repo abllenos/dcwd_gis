@@ -116,7 +116,7 @@ const DispatchOveride: React.FC = () => {
             style={{ fontSize:16, fontWeight: 500}}
             items={[
               { title: "Maintenance"},
-              { title: "Caretaker Assignment"}
+              { title: "Disptach Override"}
             ]}
           />
        
