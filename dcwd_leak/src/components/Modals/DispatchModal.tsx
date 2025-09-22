@@ -179,7 +179,6 @@ const DispatchModal: React.FC<DispatchModalProps> = ({
         </div>
       </div>
 
-      {/* Confirmation Modal */}
       <Modal
         open={showConfirmation}
         onCancel={handleCancelConfirmation}
