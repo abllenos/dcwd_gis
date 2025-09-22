@@ -1,0 +1,12 @@
+.custom-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  
+}
+
+.custom-card .ant-card-body {
+  padding: 25;
+}

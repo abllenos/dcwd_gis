@@ -10,11 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "antd": "^5.27.4",
+    "axios": "^1.12.2",
+    "lottie-react": "^2.4.1",
+    "mobx": "^6.13.7",
+    "mobx-react": "^9.2.0",
+    "mobx-react-lite": "^4.1.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.1",
+    "react-toastify": "^11.0.5",
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react-swc": "^4.0.1",
