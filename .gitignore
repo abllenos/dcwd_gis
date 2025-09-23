@@ -1,0 +1,18 @@
+# Root .gitignore for dcwd_gis
+
+# Ignore the .github folder (user requested)
+.github/
+
+# Node artifacts
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# Editor/temp
+.vscode/
+*.log
+.DS_Store
