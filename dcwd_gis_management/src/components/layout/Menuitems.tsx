@@ -1,9 +1,10 @@
 import {
-  HomeOutlined,
+  AppstoreOutlined,
+  BookOutlined,
+  BoxPlotOutlined,
   FileTextOutlined,
   ClusterOutlined,
-  SettingOutlined,
-  AppstoreOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
@@ -19,42 +20,73 @@ const iconSize = { fontSize: "18px" };
 
 export const menuItems: CustomMenuItem[] = [
   {
-    key: "home",
-    label: "Dashboard",
-    icon: <HomeOutlined style={iconSize} />,
-    access: ["A00001", "R00001", "A00002", "A00003", "M01"],
-  },
-  {
     key: "data-maintenance",
     label: "Data Maintenance",
     icon: <FileTextOutlined style={iconSize} />,
     access: ["A00001", "A00002", "R01"],
     children: [
-        { key: "dma", label: "District Metering Area" }
+      { key: "assets", label: "Assets", access: ["A00001", "A00002"] },
+      { key: "district-metering-area", label: "District Metering Area", access: ["A00001", "A00002"] },
+      { key: "map-viewer", label: "Map Viewer", access: ["A00001", "A00002"] },
+      { key: "valve", label: "Valve", access: ["A00001", "A00002"] },
+      { key: "air-valve", label: "Air Valve", access: ["A00001", "A00002"] },
+      { key: "fire-hydrant", label: "Fire Hydrant", access: ["A00001", "A00002"] },
+      { key: "isolation-valve", label: "Isolation Valve", access: ["A00001", "A00002"] },
+      { key: "pressure-setting-valve", label: "Pressure Setting Valve", access: ["A00001", "A00002"] },
+      { key: "pressure-release-valve", label: "Pressure Release Valve", access: ["A00001", "A00002"] },
+      { key: "blow-off-valve", label: "Blow Off Valve", access: ["A00001", "A00002"] },
+      { key: "pressure-monitoring-system", label: "Pressure Monitoring System", access: ["A00001", "A00002"] },
+      { key: "pipe-network", label: "Pipe Network", access: ["A00001", "A00002"] },
+      { key: "distribution-transmission", label: "Distribution & Transmission", access: ["A00001", "A00002"] },
+      { key: "district-metering-area-2", label: "District Metering Area", access: ["A00001", "A00002"] },
+      { key: "dma-inlet", label: "DMA Inlet", access: ["A00001", "A00002"] },
     ]
   },
   {
-    key: "operations",
-    label: "Operations",
-    icon: <AppstoreOutlined style={iconSize} />,
-    access: ["R00001", "A00003", "A00001"],
+    key: "gis-operation",
+    label: "GIS Operation",
+    icon: <BoxPlotOutlined style={iconSize} />,
+    access: ["A00001", "A00002", "R00001"],
+    children: [
+      { key: "mapinfo-users", label: "MapInfo Users", access: ["A00001", "A00002"] },
+      { key: "building-footprints", label: "Building Footprints", access: ["A00001", "A00002"] },
+    ]
   },
   {
-    key: "system-maintenance",
-    label: "System Maintenance",
-    icon: <SettingOutlined style={iconSize} />,
+    key: "inventory",
+    label: "Inventory",
+    icon: <AppstoreOutlined style={iconSize} />,
+    access: ["A00001", "A00002", "R00001"],
+    children: [
+      { key: "license", label: "License", access: ["A00001", "A00002"] },
+      { key: "device", label: "Device", access: ["A00001", "A00002"] },
+      { key: "gps", label: "GPS", access: ["A00001", "A00002"] },
+    ]
+  },
+  {
+    key: "report",
+    label: "Report",
+    icon: <ClusterOutlined style={iconSize} />,
+    access: ["R00001", "A00001", "A00002"],
+  },
+  {
+    key: "log",
+    label: "Log",
+    icon: <BookOutlined style={iconSize} />,
+    access: ["A00001", "S01"],
+  },
+  {
+    key: "maintenance",
+    label: "Maintenance",
+    icon: <ToolOutlined style={iconSize} />,
     access: ["A00001", "S01"],
     children: [
-      { key: "dispatch-overide", label: "Dispatch Override", access: ["A00001", "S01"] },
-      { key: "caretaker-assignment", label: "Caretaker Assignment", access: ["A00001", "S01"] },
-      { key: "employees", label: "Employees", access: ["A00001", "S01"] },
-    ],
-  },
-  {
-    key: "reports",
-    label: "Reports",
-    icon: <ClusterOutlined style={iconSize} />,
-    access: ["R00001", "A00001"],
+      { key: "classification", label: "Classification", access: ["A00001", "S01"] },
+      { key: "class", label: "Class", access: ["A00001", "S01"] },
+      { key: "layer", label: "Layer", access: ["A00001", "S01"] },
+      { key: "settings", label: "Settings", access: ["A00001", "S01"] },
+      { key: "user-accounts", label: "User Accounts", access: ["A00001", "S01"] },
+    ]
   },
 ];
 
