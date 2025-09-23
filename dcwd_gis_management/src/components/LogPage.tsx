@@ -4,22 +4,9 @@ import { Card, Row, Col, Select, Input, Table, Typography, Alert, Space, Tag, Bu
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import type { LogRecord } from '../stores/logTypes';
+import { formatAssetId, safeString } from '../utils/formatters';
 
 const { Title } = Typography;
-
-const safeString = (v?: string) => (v ?? '').toString();
-
-// Format asset IDs like "CUSTOMER-1000" to just "1000" when possible.
-const formatAssetId = (v?: string) => {
-  const s = safeString(v).trim();
-  if (!s) return '';
-  // Prefer extracting a trailing numeric sequence (e.g. CUSTOMER-1000 -> 1000)
-  const m = s.match(/(\d+)$/);
-  if (m) return m[1];
-  // Fallback: return part after last hyphen if present
-  const parts = s.split('-');
-  return parts.length > 1 ? parts[parts.length - 1] : s;
-};
 
 const columns: ColumnsType<LogRecord> = [
   { title: 'ID', dataIndex: 'id', sorter: (a, b) => (Number(a.id) || 0) - (Number(b.id) || 0), width: 90 },
