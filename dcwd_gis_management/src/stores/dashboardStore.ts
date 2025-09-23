@@ -1,5 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
-import { devApi } from "../components/endpoints/Interceptor"; 
+import { makeAutoObservable } from "mobx";
 
 export interface Report {
   id: number;
@@ -36,19 +35,7 @@ class DashboardStore {
 
 
 
-  private computeSummary(source: Report[], totalFromApi?: number) {
-    const byStatus = source.reduce<Record<string, number>>((acc, r) => {
-      acc[r.status] = (acc[r.status] || 0) + 1;
-      return acc;
-    }, {});
-
-    const dispatched = source.filter(r => r.dispatchStat === 2).length;
-    const pending = source.filter(r => r.dispatchStat === 1).length;
-
-    const total = totalFromApi ?? source.length;
-
-    return { total, dispatched, pending, byStatus };
-  }
+  // NOTE: computeSummary was unused; remove to satisfy lint
 
 
   get monthlyReports() {

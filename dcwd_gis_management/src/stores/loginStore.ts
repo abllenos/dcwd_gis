@@ -49,7 +49,25 @@ class LoginStore {
     this.darkMode = !this.darkMode;
   }
 
-  async login(onLogin: (token: string) => void, navigate: any) {
+  setDarkMode(value: boolean) {
+    this.darkMode = value;
+  }
+
+  setUserDataFromToken(token: string, expiration: number, username: string = '') {
+    this.userData = {
+      token,
+      refreshToken: '',
+      expiration,
+      roles: [],
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      deptId: 0,
+      empId: username,
+    };
+  }
+
+  async login(onLogin: (token: string) => void, navigate: (path: string, opts?: { replace?: boolean }) => void) {
     if (this.loading || this.pendingSubmit) return;
     this.pendingSubmit = true;
     this.loading = true;

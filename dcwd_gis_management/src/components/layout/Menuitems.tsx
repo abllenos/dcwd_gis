@@ -111,11 +111,11 @@ export const filterMenuByAccess = (
         ? filterMenuByAccess(item.children, userAccess)
         : undefined;
 
-        if (children && children.length === 0) return null;
+    if (children && children.length === 0) return null;
 
-        const { access, ...rest } = item;
-        
-        return { ...rest, children};
+  // Build item without 'access' key explicitly to satisfy linter
+  const { key, label, icon } = item;
+  return { key, label, icon, children } as const;
     })
     .filter(Boolean) as MenuProps["items"];
 };

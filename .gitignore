@@ -16,3 +16,7 @@ build/
 .vscode/
 *.log
 .DS_Store
+
+# Ignore API reference notes and similar docs
+API-References.md
+dcwd_gis_management/API-References.md

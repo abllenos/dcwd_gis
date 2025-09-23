@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Layout } from 'antd';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -7,6 +7,9 @@ import HeaderBar from './Headerbar';
 import LogoutModal from '../modal/LogoutModal';
 
 import Home from '../Home';
+import LogPage from '../LogPage';
+import { observer } from 'mobx-react-lite';
+import { dashboardUiStore } from '../../stores/dashboardUiStore';
 
 
 const { Content } = Layout;
@@ -17,13 +20,13 @@ interface DashboardProps {
   setIsDarkMode: (value: boolean) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ 
+const Dashboard: React.FC<DashboardProps> = observer(({ 
   onLogout, 
   isDarkMode: appIsDarkMode, 
   setIsDarkMode: setAppIsDarkMode 
 }) => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const collapsed = dashboardUiStore.collapsed;
+  const logoutModalVisible = dashboardUiStore.logoutModalVisible;
       
   const navigate = useNavigate();
 
@@ -35,7 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const onClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
-      setLogoutModalVisible(true); 
+      dashboardUiStore.showLogoutModal(); 
     } else if (e.key === 'create-report') {
       navigate('/create-report');
     } else {
@@ -44,17 +47,17 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const handleLogoutConfirmed = () => {
-    setLogoutModalVisible(false);
+    dashboardUiStore.hideLogoutModal();
     onLogout();
     navigate('/login');
   };
 
   const handleToggleCollapse = () => {
-    setCollapsed(!collapsed);
+    dashboardUiStore.toggleCollapsed();
   };
 
   const handleCollapseBreakpoint = (broken: boolean) => {
-    setCollapsed(broken);
+    dashboardUiStore.setCollapsed(broken);
   };
 
   return (
@@ -75,21 +78,24 @@ const Dashboard: React.FC<DashboardProps> = ({
             onToggleCollapse={handleToggleCollapse}
             isDarkMode={appIsDarkMode}
             onToggleDarkMode={toggleDarkMode}
-            onLogoutClick={() => setLogoutModalVisible(true)}
+            onLogoutClick={() => dashboardUiStore.showLogoutModal()}
           />
 
           <Content
             style={{
               marginTop: 64,
-              padding: 24,
+              padding: '24px',
               backgroundColor: 'var(--bg-secondary)',
               minHeight: 'calc(100vh - 64px)',
             }}
           >
-            <Routes>
-              <Route path="home" element={<Home />} />
-              <Route path="*" element={<Navigate to="home" />} />
-            </Routes>
+            <div style={{ maxWidth: 1510, margin: '0 auto' }}>
+              <Routes>
+                <Route path="home" element={<Home />} />
+                <Route path="log" element={<LogPage />} />
+                <Route path="*" element={<Navigate to="/home" replace />} />
+              </Routes>
+            </div>
           </Content>
         </Layout>
       </Layout>
@@ -97,10 +103,10 @@ const Dashboard: React.FC<DashboardProps> = ({
       <LogoutModal
         visible={logoutModalVisible}
         onConfirm={handleLogoutConfirmed}
-        onCancel={() => setLogoutModalVisible(false)}
+        onCancel={() => dashboardUiStore.hideLogoutModal()}
       />
     </>
   );
-};
+});
 
 export default Dashboard;

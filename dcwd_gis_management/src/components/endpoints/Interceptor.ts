@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
 export const apiGis = axios.create({
   baseURL: 'https://api-gis.davao-water.gov.ph/',
@@ -15,14 +16,15 @@ export const devApi = axios.create({
 });
 
 let isRefreshing = false;
-let failedQueue: any[] = [];
+type QueueEntry = { resolve: (token: string | null) => void; reject: (reason?: unknown) => void };
+let failedQueue: QueueEntry[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
-      prom.reject(error);
+      reject(error);
     } else {
-      prom.resolve(token);
+      resolve(token);
     }
   });
   failedQueue = [];
@@ -44,19 +46,22 @@ const processQueue = (error: any, token: string | null = null) => {
 
   instance.interceptors.response.use(
     (response) => response,
-    async (error) => {
-      const originalRequest = error.config;
+    async (error: AxiosError) => {
+      const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
 
       if (
         error.response?.status === 401 &&
-        error.response?.data?.message === 'Token Expired' &&
-        !originalRequest._retry
+        (error.response?.data as { message?: string } | undefined)?.message === 'Token Expired' &&
+        originalRequest && !originalRequest._retry
       ) {
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           }).then(token => {
-            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            originalRequest.headers = {
+              ...(originalRequest.headers || {}),
+              Authorization: `Bearer ${token}`,
+            } as AxiosRequestHeaders;
             return instance(originalRequest);
           });
         }
@@ -71,7 +76,10 @@ const processQueue = (error: any, token: string | null = null) => {
           localStorage.setItem('token', data.accessToken);
           processQueue(null, data.accessToken);
 
-          originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
+          originalRequest.headers = {
+            ...(originalRequest.headers || {}),
+            Authorization: `Bearer ${data.accessToken}`,
+          } as AxiosRequestHeaders;
           return instance(originalRequest);
         } catch (err) {
           processQueue(err, null);
