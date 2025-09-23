@@ -9,10 +9,22 @@ const { Title } = Typography;
 
 const safeString = (v?: string) => (v ?? '').toString();
 
+// Format asset IDs like "CUSTOMER-1000" to just "1000" when possible.
+const formatAssetId = (v?: string) => {
+  const s = safeString(v).trim();
+  if (!s) return '';
+  // Prefer extracting a trailing numeric sequence (e.g. CUSTOMER-1000 -> 1000)
+  const m = s.match(/(\d+)$/);
+  if (m) return m[1];
+  // Fallback: return part after last hyphen if present
+  const parts = s.split('-');
+  return parts.length > 1 ? parts[parts.length - 1] : s;
+};
+
 const columns: ColumnsType<LogRecord> = [
   { title: 'ID', dataIndex: 'id', sorter: (a, b) => (Number(a.id) || 0) - (Number(b.id) || 0), width: 90 },
   { title: 'Layer ID', dataIndex: 'layerId', width: 160, sorter: (a, b) => safeString(a.layerId).localeCompare(safeString(b.layerId)) },
-  { title: 'Asset ID', dataIndex: 'assetId', width: 180, sorter: (a, b) => safeString(a.assetId).localeCompare(safeString(b.assetId)) },
+  { title: 'Asset ID', dataIndex: 'assetId', width: 180, sorter: (a, b) => safeString(a.assetId).localeCompare(safeString(b.assetId)), render: (val: unknown) => formatAssetId(String(val ?? '')) },
   { title: 'Modified By', dataIndex: 'modifiedBy', width: 140, sorter: (a, b) => safeString(a.modifiedBy).localeCompare(safeString(b.modifiedBy)) },
   { title: 'Access Flag', dataIndex: 'accessFlag', width: 130, sorter: (a, b) => safeString(a.accessFlag).localeCompare(safeString(b.accessFlag)) },
   { title: 'Date & Time', dataIndex: 'dateTime', width: 200, sorter: (a, b) => safeString(a.dateTime).localeCompare(safeString(b.dateTime)) },
