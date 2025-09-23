@@ -45,6 +45,29 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, onMenuClick })
       const empId = localStorage.getItem('username');
       if (!empId) return;
 
+      // Check if using hardcoded dev account
+      if (process.env.NODE_ENV !== 'production' && empId === 'admin') {
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+          try {
+            const user = JSON.parse(userData);
+            setUserProfile({
+              firstName: user.firstName || 'Admin',
+              middleName: user.middleName || '',
+              lastName: user.lastName || 'User',
+              department: 'IT Department',
+              empId: user.empId || 'ADMIN001',
+              access: ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'] // Give admin access to all menu items
+            });
+
+            setAccessibleMenuItems(filterMenuByAccess(menuItems, ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01']));
+            return;
+          } catch (err) {
+            console.error('Failed to parse userData:', err);
+          }
+        }
+      }
+
       try {
         const res = await devApi.get(`/admin/useraccount/GetByEmployeeId`, { params: { empId } });
         const data = res.data;

@@ -1,0 +1,40 @@
+.home-loading {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.home-card-wrapper {
+  position: relative;
+}
+
+.home-stat-card {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  min-height: 115px;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.home-dashboard-label {
+  font-size: 1.10rem;
+  color: #504f4fff;
+}
+
+.home-dashboard-number {
+  font-size: 1.40rem;
+  font-weight: 600;
+  color: #232323;
+  text-shadow: none;
+}
+
+[data-theme='dark'] .home-dashboard-number {
+  color: #fff;
+}
+
+.home-dashboard-icon {
+  font-size: 34px;
+  color: #4169E1;
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+}
