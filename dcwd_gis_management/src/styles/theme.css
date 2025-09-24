@@ -52,6 +52,7 @@
   --bg-secondary: #f5f6fa;
   --bg-sidebar: #ffffff;
   --bg-header: #ffffff;
+  --bg-hover: #f0f5ff;
   --text-primary: #262626;
   --text-secondary: #595959;
   --text-tertiary: #8c8c8c;
@@ -65,6 +66,7 @@
   --bg-secondary: #141414;
   --bg-sidebar: #1f1f1f;
   --bg-header: #1f1f1f;
+  --bg-hover: #2a2a2a;
   --text-primary: #ffffff;
   --text-secondary: #d9d9d9;
   --text-tertiary: #8c8c8c;

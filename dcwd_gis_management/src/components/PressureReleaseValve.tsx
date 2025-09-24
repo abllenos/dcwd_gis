@@ -1,0 +1,147 @@
+import React, { useState, useMemo } from 'react';
+import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
+import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
+import type { ColumnsType } from 'antd/es/table';
+import { UnorderedListOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { apiGis } from './endpoints/Interceptor';
+
+const { Title, Text } = Typography;
+
+interface PressureReleaseValveRecord {
+  key: string;
+  id: number;
+  prvNumber: string;
+  location: string;
+  status: string;
+  // Add other fields as needed from API
+}
+
+// Fetch function for PRV data
+const fetchPRVData = async (): Promise<PressureReleaseValveRecord[]> => {
+  const res = await apiGis.get('helpers/gis/mgtsys/getLayers/getPrv.php');
+  // Map API data to PressureReleaseValveRecord shape
+  return (Array.isArray(res.data.data) ? res.data.data : []).map((item: any, idx: number) => ({
+    key: item.prv_number || String(idx),
+    id: idx + 1,
+    prvNumber: item.prv_number || '',
+    location: item.location || '',
+    status: item.status_remarks || '',
+    ...item,
+  }));
+};
+
+
+const PressureReleaseValve: React.FC = () => {
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [search, setSearch] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedRecord, setSelectedRecord] = useState<PressureReleaseValveRecord | null>(null);
+
+  // Fetch PRV data
+  const { data, isLoading, error } = useQuery<PressureReleaseValveRecord[]>({
+    queryKey: ['prvData'],
+    queryFn: fetchPRVData,
+  });
+
+  // Debug: log API response and error
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('PRV API data:', data);
+    if (error) console.error('PRV API error:', error);
+  }
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    const q = search.trim().toLowerCase();
+    return data.filter((r) =>
+      String(r.id).includes(q) ||
+      r.prvNumber.toLowerCase().includes(q) ||
+      r.location.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  }, [data, search]);
+
+  const columns: ColumnsType<PressureReleaseValveRecord> = [
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
+    { title: 'PRV Number', dataIndex: 'prvNumber', key: 'prvNumber' },
+    { title: 'Location', dataIndex: 'location', key: 'location', ellipsis: true },
+    { title: 'Status', dataIndex: 'status', key: 'status', width: 160 },
+    {
+      title: '',
+      key: 'actions',
+      width: 80,
+      render: (_: any, _record: PressureReleaseValveRecord) => (
+        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setSelectedRecord(_record); setModalVisible(true); }}>
+          <UnorderedListOutlined />
+        </button>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+      <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+        <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
+      </div>
+      <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+        <div style={{ marginBottom: 24 }}>
+          <Title level={5} style={{ color: '#666', marginBottom: 8 }}>Instructions:</Title>
+          <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <Space>
+            <Text>Display</Text>
+            <select value={String(pageSize)} onChange={(e) => setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <Text>records per page</Text>
+          </Space>
+
+          <Space>
+            <Text>Search:</Text>
+            <input
+              aria-label="Search"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: 260, padding: '6px 10px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+            />
+          </Space>
+        </div>
+
+        {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load data" /> : (
+          <Table
+            columns={columns as any}
+            dataSource={filteredData}
+            pagination={{ pageSize }}
+            rowKey={(r: PressureReleaseValveRecord) => r.key}
+            onRow={(record: PressureReleaseValveRecord) => ({
+              onDoubleClick: () => {
+                setSelectedRecord(record);
+                setModalVisible(true);
+              },
+            })}
+            bordered
+          />
+        )}
+
+        <PressureReleaseValveModal
+          visible={modalVisible}
+          record={selectedRecord}
+          onCancel={() => setModalVisible(false)}
+          onUpdate={() => {
+            console.log('Updated', selectedRecord);
+            setModalVisible(false);
+          }}
+        />
+      </Card>
+    </div>
+  );
+};
+
+export default PressureReleaseValve;

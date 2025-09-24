@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import 'antd/dist/reset.css';
 import { ConfigProvider } from 'antd';
 import {
@@ -90,6 +90,16 @@ const App = observer(() => {
           <Route
             path="/login"
             element={<Login onLogin={handleLogin} />}
+          />
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="/*"

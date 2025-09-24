@@ -1,8 +1,10 @@
+
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
+
 export const apiGis = axios.create({
-  baseURL: 'https://api-gis.davao-water.gov.ph/',
+  baseURL: 'http://192.100.140.198/', // Match legacy system for local dev
   headers: {
     'Content-Type': 'application/json',
   },
@@ -64,6 +66,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
   );
 
 
+
   instance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
@@ -113,3 +116,18 @@ const processQueue = (error: unknown, token: string | null = null) => {
     }
   );
 });
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
+// instance.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+//     // ... (rest of the logic)
+//   }
+// );
+

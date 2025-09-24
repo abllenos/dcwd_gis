@@ -1,4 +1,5 @@
 import {
+  HomeOutlined,
   AppstoreOutlined,
   BookOutlined,
   BoxPlotOutlined,
@@ -14,21 +15,29 @@ export interface CustomMenuItem {
   icon?: React.ReactNode;
   access?: string[];
   children?: CustomMenuItem[];
+  disabled?: boolean;
 }
 
 const iconSize = { fontSize: "18px" };
 
 export const menuItems: CustomMenuItem[] = [
   {
+    key: "home",
+    label: "Dashboard",
+    icon: <HomeOutlined style={iconSize} />,
+    access: ["A00001", "R00001", "A00002", "A00003", "M01"],
+  },
+  {
     key: "data-maintenance",
     label: "Data Maintenance",
     icon: <FileTextOutlined style={iconSize} />,
     access: ["A00001", "A00002", "R01"],
     children: [
-      { key: "assets", label: "Assets", access: ["A00001", "A00002"] },
-      { key: "district-metering-area", label: "District Metering Area", access: ["A00001", "A00002"] },
+      { key: "assets-header", label: "Assets", access: ["A00001", "A00002"], disabled: true },
+      { key: "assets-district-metering-area", label: "District Metering Area", access: ["A00001", "A00002"] },
       { key: "map-viewer", label: "Map Viewer", access: ["A00001", "A00002"] },
-      { key: "valve", label: "Valve", access: ["A00001", "A00002"] },
+      
+      { key: "valve-header", label: "Valve", access: ["A00001", "A00002"], disabled: true },
       { key: "air-valve", label: "Air Valve", access: ["A00001", "A00002"] },
       { key: "fire-hydrant", label: "Fire Hydrant", access: ["A00001", "A00002"] },
       { key: "isolation-valve", label: "Isolation Valve", access: ["A00001", "A00002"] },
@@ -36,9 +45,11 @@ export const menuItems: CustomMenuItem[] = [
       { key: "pressure-release-valve", label: "Pressure Release Valve", access: ["A00001", "A00002"] },
       { key: "blow-off-valve", label: "Blow Off Valve", access: ["A00001", "A00002"] },
       { key: "pressure-monitoring-system", label: "Pressure Monitoring System", access: ["A00001", "A00002"] },
-      { key: "pipe-network", label: "Pipe Network", access: ["A00001", "A00002"] },
+      
+      { key: "pipe-network-header", label: "Pipe Network", access: ["A00001", "A00002"], disabled: true },
       { key: "distribution-transmission", label: "Distribution & Transmission", access: ["A00001", "A00002"] },
-      { key: "district-metering-area-2", label: "District Metering Area", access: ["A00001", "A00002"] },
+      
+      { key: "district-metering-area-header", label: "District Metering Area", access: ["A00001", "A00002"], disabled: true },
       { key: "dma-inlet", label: "DMA Inlet", access: ["A00001", "A00002"] },
     ]
   },
@@ -59,8 +70,7 @@ export const menuItems: CustomMenuItem[] = [
     access: ["A00001", "A00002", "R00001"],
     children: [
       { key: "license", label: "License", access: ["A00001", "A00002"] },
-      { key: "device", label: "Device", access: ["A00001", "A00002"] },
-      { key: "gps", label: "GPS", access: ["A00001", "A00002"] },
+      { key: "vts", label: "VTS", access: ["A00001", "A00002"] },
     ]
   },
   {

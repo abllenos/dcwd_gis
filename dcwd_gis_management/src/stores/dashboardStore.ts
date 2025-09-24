@@ -35,9 +35,6 @@ class DashboardStore {
 
 
 
-  // NOTE: computeSummary was unused; remove to satisfy lint
-
-
   get monthlyReports() {
     const grouped: Record<string, number> = {};
     const source = this.allReportsLoaded ? this.allReports : this.reports;

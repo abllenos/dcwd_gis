@@ -11,6 +11,22 @@ import LogPage from '../LogPage';
 import { observer } from 'mobx-react-lite';
 import { dashboardUiStore } from '../../stores/dashboardUiStore';
 
+import DistrictMeteringAreaBoundaries from '../DistrictMeteringAreaBoundaries';
+import MapViewer from '../MapViewer';
+import AirValveMaintenance from '../AirValveMaintenance';
+import FireHydrant from '../FireHydrant';
+import IsolationValve from '../IsolationValve';
+import PressureSettingValve from '../PressureSettingValve';
+import License from '../License';
+import VTS from '../vts';
+import Reports from '../reports';
+
+
+
+import BlowOffValve from '../BlowOffValve';
+import DMAInlet from '../DMAInlet';
+import PressureReleaseValve from '../PressureReleaseValve';
+import PressureMonitoringSystem from '../PressureMonitoringSystem';
 
 const { Content } = Layout;
 
@@ -41,8 +57,10 @@ const Dashboard: React.FC<DashboardProps> = observer(({
       dashboardUiStore.showLogoutModal(); 
     } else if (e.key === 'create-report') {
       navigate('/create-report');
+    } else if (e.key === 'home') {
+      navigate('/home');
     } else {
-      navigate(`/${e.key}`);
+      navigate(`/${e.key}`, { replace: true });
     }
   };
 
@@ -89,13 +107,28 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               minHeight: 'calc(100vh - 64px)',
             }}
           >
-            <div style={{ maxWidth: 1510, margin: '0 auto' }}>
-              <Routes>
-                <Route path="home" element={<Home />} />
-                <Route path="log" element={<LogPage />} />
-                <Route path="*" element={<Navigate to="/home" replace />} />
-              </Routes>
-            </div>
+
+            <Routes>
+              <Route path="home" element={<Home />} />
+              <Route path="assets-district-metering-area" element={<DistrictMeteringAreaBoundaries />} />
+              <Route path="map-viewer" element={<MapViewer />} />
+              <Route path="air-valve" element={<AirValveMaintenance />} />
+              <Route path="fire-hydrant" element={<FireHydrant />} />
+              <Route path="isolation-valve" element={<IsolationValve />} />
+              <Route path="pressure-setting-valve" element={<PressureSettingValve />} />
+              <Route path="pressure-release-valve" element={<PressureReleaseValve />} />
+              <Route path="blow-off-valve" element={<BlowOffValve />} />
+              <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
+              <Route path="dma-inlet" element={<DMAInlet />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/license" element={<License />} />
+              <Route path="/vts" element={<VTS />} />
+              <Route path="/report" element={<Reports />} />
+              <Route path="log" element={<LogPage />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+
           </Content>
         </Layout>
       </Layout>
