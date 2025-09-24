@@ -7,6 +7,9 @@ import HeaderBar from './Headerbar';
 import LogoutModal from '../modal/LogoutModal';
 
 import Home from '../Home';
+import License from '../License';
+import VTS from '../vts';
+import Reports from '../reports';
 
 
 const { Content } = Layout;
@@ -39,7 +42,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     } else if (e.key === 'create-report') {
       navigate('/create-report');
     } else {
-      navigate(`/${e.key}`);
+      navigate(`/${e.key}`, { replace: true });
     }
   };
 
@@ -87,8 +90,12 @@ const Dashboard: React.FC<DashboardProps> = ({
             }}
           >
             <Routes>
-              <Route path="home" element={<Home />} />
-              <Route path="*" element={<Navigate to="home" />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/license" element={<License />} />
+              <Route path="/vts" element={<VTS />} />
+              <Route path="/report" element={<Reports />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
           </Content>
         </Layout>

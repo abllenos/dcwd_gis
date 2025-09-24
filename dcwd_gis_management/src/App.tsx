@@ -94,6 +94,16 @@ function App() {
             element={<Login onLogin={handleLogin} />}
           />
           <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
             path="/*"
             element={
               isLoggedIn ? (

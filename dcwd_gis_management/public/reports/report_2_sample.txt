@@ -1,0 +1,15 @@
+This is a sample System Performance Analysis Report.
+
+This file serves as a placeholder for your actual PDF report.
+
+To replace this with your actual report:
+1. Delete this file
+2. Copy your actual report_2.pdf file to this location  
+3. Make sure it's named exactly "report_2.pdf"
+
+Report Details:
+- Title: System Performance Analysis
+- Category: Performance
+- Description: Detailed performance metrics and system analysis
+- Format: PDF
+- Size: Will be determined by your actual file

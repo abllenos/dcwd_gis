@@ -1,0 +1,321 @@
+/* License Component Styles */
+
+.license-container {
+  padding: 24px;
+  max-width: 2000px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* Form Section */
+.license-form-header {
+  background-color: #e5eeffff;
+  padding: 12px 20px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  border-radius: 6px 6px 0px 0px;
+  border: 1px solid #d9d9d9;
+}
+
+.license-form-title {
+  margin: 0;
+  color: #1890ff;
+}
+
+.license-form-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 0px 0px 10px 10px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d9d9d9;
+  border-top: none;
+}
+
+.license-form-label {
+  font-weight: bold;
+}
+
+.license-required-asterisk {
+  color: red;
+}
+
+.license-form-input {
+  height: 40px;
+}
+
+.license-register-button {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  width: 100%;
+  height: 40px;
+  font-weight: bold;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.license-register-button:hover {
+  background-color: white !important;
+  border-color: #40a9ff !important;
+  color: #1890ff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.license-register-button:not(:hover) {
+  background-color: #6C86F5 !important;
+  border-color: #6C86F5 !important;
+  color: white !important;
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* List Section */
+.license-list-header {
+  background-color: #e5eeffff;
+  padding: 12px 20px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  border-radius: 6px 6px 0px 0px;
+  border: 1px solid #d9d9d9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.license-list-title {
+  margin: 0;
+  color: #1890ff;
+}
+
+.license-action-button {
+  color: #1890ff;
+  border: 1px solid #1890ff;
+}
+
+.license-list-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 0px 0px 10px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d9d9d9;
+  border-top: none;
+}
+
+/* Tab Style */
+.license-tab-container {
+  margin-bottom: 20px;
+}
+
+.license-tab-header {
+  display: inline-block;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 8px 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.license-tab-text {
+  color: #1890ff;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.license-tab-content {
+  border: 1px solid #d9d9d9;
+  border-radius: 0 6px 6px 6px;
+  background-color: #ffffff;
+  padding: 16px;
+  margin-top: -1px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Controls */
+.license-controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.license-display-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.license-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.license-control-text {
+  font-size: 14px;
+  color: #595959;
+}
+
+/* Table */
+.license-table {
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.license-table-action-button {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  font-size: 12px;
+  height: 28px;
+  padding: 0 8px;
+}
+
+/* Empty State */
+.license-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #8c8c8c;
+}
+
+.license-empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  color: #d9d9d9;
+  opacity: 0.6;
+}
+
+.license-empty-text {
+  color: #8c8c8c;
+  font-size: 16px;
+  text-align: center;
+}
+
+.license-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #8c8c8c;
+}
+
+.license-loading-text {
+  color: #8c8c8c;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Pagination */
+.license-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #595959;
+}
+
+.license-pagination-text {
+  font-size: 14px;
+  color: #595959;
+}
+
+.license-pagination-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 4px;
+  background-color: #ffffff;
+}
+
+.license-pagination-button {
+  border: none;
+  background-color: transparent;
+  font-weight: 500;
+}
+
+.license-pagination-button-prev-next {
+  border: none;
+  background-color: transparent;
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.license-pagination-button-active {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: #ffffff;
+  font-weight: 500;
+  min-width: 32px;
+  border: none;
+}
+
+.license-pagination-button-inactive {
+  background-color: transparent;
+  border-color: transparent;
+  color: #1890ff;
+  font-weight: 500;
+  min-width: 32px;
+  border: none;
+}
+
+.license-pagination-button-disabled {
+  background-color: #f5f5f5;
+  border-color: transparent;
+  color: #d9d9d9;
+  font-weight: 500;
+  min-width: 32px;
+  border: none;
+}
+
+.license-pagination-button-disabled-prev-next {
+  border: none;
+  background-color: transparent;
+  color: #d9d9d9;
+  font-weight: 500;
+}
+
+/* Modal Styles */
+.license-modal-section {
+  background-color: var(--bg-secondary, #f5f5f5);
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #d9d9d9);
+}
+
+.license-modal-section-title {
+  color: var(--text-secondary, #595959);
+}
+
+.license-modal-form-container {
+  padding: 20px 0;
+}
+
+.license-modal-form-button {
+  height: 36px;
+  padding: 0 20px;
+}
+
+.license-modal-form-button-primary {
+  background-color: var(--primary-color, #1890ff);
+  border-color: var(--primary-color, #1890ff);
+  height: 36px;
+  padding: 0 20px;
+}
+
+.license-modal-form-button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
