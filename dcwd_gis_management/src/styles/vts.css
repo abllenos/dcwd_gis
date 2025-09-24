@@ -1,0 +1,268 @@
+/* VTS (Vehicle Tracking System) Component Styles */
+
+/* Main container */
+.vts-container {
+  min-height: calc(100vh - 64px);
+  background-color: var(--bg-tertiary);
+  padding: 20px;
+  padding-bottom: 40px;
+}
+
+/* Page header */
+.vts-header {
+  background-color: var(--bg-primary);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.vts-header-title {
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.vts-header-description {
+  color: var(--text-secondary);
+}
+
+/* Main content row */
+.vts-main-content {
+  height: calc(100vh - 200px);
+}
+
+/* Map section */
+.vts-map-card {
+  height: 100%;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+}
+
+.vts-map-card .ant-card-body {
+  height: calc(100% - 57px);
+  padding: 0;
+}
+
+.vts-map-container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+/* User list section */
+.vts-user-card {
+  height: 100%;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+}
+
+.vts-user-search {
+  width: 200px;
+}
+
+.vts-user-table-container {
+  height: calc(100% - 57px);
+  overflow: auto;
+}
+
+.vts-user-table {
+  background-color: var(--bg-primary);
+}
+
+.vts-user-table .ant-table-row {
+  cursor: pointer;
+}
+
+.vts-user-table .ant-table-tbody .ant-table-row:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Table column specific styling */
+.vts-user-table .ant-table-thead > tr > th {
+  font-weight: 600;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.vts-user-table .ant-table-tbody > tr > td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+}
+
+/* Controls container */
+.vts-controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.vts-display-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vts-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vts-control-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Pagination */
+.vts-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.vts-pagination-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.vts-pagination-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.vts-pagination-button {
+  min-width: 32px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.vts-pagination-button-active {
+  min-width: 32px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.vts-pagination-button-disabled {
+  min-width: 32px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+/* Empty state */
+.vts-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+
+.vts-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.vts-empty-state-text {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Footer spacing */
+.vts-footer-spacing {
+  height: 30px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .vts-container {
+    padding: 15px;
+    padding-bottom: 30px;
+  }
+  
+  .vts-header {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .vts-container {
+    padding: 10px;
+    padding-bottom: 25px;
+  }
+  
+  .vts-header {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .vts-main-content {
+    height: auto;
+  }
+  
+  .vts-map-container {
+    min-height: 300px;
+  }
+  
+  .vts-controls-container {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .vts-display-controls,
+  .vts-search-controls {
+    justify-content: center;
+  }
+  
+  .vts-pagination-container {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .vts-pagination-buttons {
+    justify-content: center;
+  }
+  
+  .vts-footer-spacing {
+    height: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .vts-map-container {
+    min-height: 250px;
+  }
+  
+  .vts-pagination-buttons {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  
+  .vts-pagination-button,
+  .vts-pagination-button-active,
+  .vts-pagination-button-disabled {
+    min-width: 28px;
+    height: 22px;
+    font-size: 11px;
+  }
+  
+  .vts-footer-spacing {
+    height: 15px;
+  }
+}
