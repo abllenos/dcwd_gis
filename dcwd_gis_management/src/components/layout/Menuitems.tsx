@@ -70,8 +70,7 @@ export const menuItems: CustomMenuItem[] = [
     access: ["A00001", "A00002", "R00001"],
     children: [
       { key: "license", label: "License", access: ["A00001", "A00002"] },
-      { key: "device", label: "Device", access: ["A00001", "A00002"] },
-      { key: "gps", label: "GPS", access: ["A00001", "A00002"] },
+      { key: "vts", label: "VTS", access: ["A00001", "A00002"] },
     ]
   },
   {

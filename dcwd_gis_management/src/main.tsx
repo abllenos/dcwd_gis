@@ -6,6 +6,7 @@ import App from './App';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
+import './services/MapAPI'; // Initialize global MapAPI
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

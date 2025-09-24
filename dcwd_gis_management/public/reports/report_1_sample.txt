@@ -1,0 +1,15 @@
+This is a sample Water Infrastructure Report.
+
+This file serves as a placeholder for your actual PDF report.
+
+To replace this with your actual report:
+1. Delete this file
+2. Copy your actual report_1.pdf file to this location
+3. Make sure it's named exactly "report_1.pdf"
+
+Report Details:
+- Title: Water Infrastructure Report
+- Category: Infrastructure
+- Description: Comprehensive analysis of water infrastructure systems
+- Format: PDF
+- Size: Will be determined by your actual file

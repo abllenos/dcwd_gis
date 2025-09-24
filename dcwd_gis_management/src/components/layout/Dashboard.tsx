@@ -13,6 +13,9 @@ import AirValveMaintenance from '../AirValveMaintenance';
 import FireHydrant from '../FireHydrant';
 import IsolationValve from '../IsolationValve';
 import PressureSettingValve from '../PressureSettingValve';
+import License from '../License';
+import VTS from '../vts';
+import Reports from '../reports';
 
 
 import BlowOffValve from '../BlowOffValve';
@@ -52,7 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     } else if (e.key === 'home') {
       navigate('/home');
     } else {
-      navigate(`/${e.key}`);
+      navigate(`/${e.key}`, { replace: true });
     }
   };
 
@@ -111,6 +114,11 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Route path="blow-off-valve" element={<BlowOffValve />} />
               <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
               <Route path="dma-inlet" element={<DMAInlet />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/license" element={<License />} />
+              <Route path="/vts" element={<VTS />} />
+              <Route path="/report" element={<Reports />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
           </Content>
