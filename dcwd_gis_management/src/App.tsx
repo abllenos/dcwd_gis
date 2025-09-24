@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import 'antd/dist/reset.css';
 import { ConfigProvider } from 'antd';
 import {
