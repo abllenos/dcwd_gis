@@ -72,18 +72,18 @@ const MapView: React.FC<MapViewProps> = ({ geometry, center, height = 300 }) => 
           if (isPolygon) {
             const polygon = new window.google.maps.Polygon({
               paths: valid,
-              strokeColor: '#1677ff',
+              strokeColor: '#ff4d4f',
               strokeOpacity: 1,
               strokeWeight: 2,
-              fillColor: '#1677ff',
-              fillOpacity: 0.2,
+              fillColor: '#ff4d4f',
+              fillOpacity: 0.25,
             });
             polygon.setMap(mapInstance.current);
           } else {
             const polyline = new window.google.maps.Polyline({
               path: valid,
               geodesic: true,
-              strokeColor: '#1677ff',
+              strokeColor: '#ff4d4f',
               strokeOpacity: 1,
               strokeWeight: 2,
             });
