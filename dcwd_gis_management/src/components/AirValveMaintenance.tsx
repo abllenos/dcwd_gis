@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { observer } from 'mobx-react-lite';
+import { airValveStore } from '../stores/airValveStore';
 import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
 import AirValveModal from './modal/AirValveModal';
 import type { ColumnsType } from 'antd/es/table';
@@ -51,12 +53,9 @@ const fetchAirValves = async (): Promise<AirValveRecord[]> => {
   }));
 };
 
-const AirValveMaintenance: React.FC = () => {
 
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [search, setSearch] = useState<string>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedRecord, setSelectedRecord] = useState<AirValveRecord | null>(null);
+const AirValveMaintenance: React.FC = observer(() => {
+  const { pageSize, setPageSize, search, setSearch, modalVisible, setModalVisible, selectedRecord, setSelectedRecord } = airValveStore;
 
   const { data, isLoading, error } = useQuery<AirValveRecord[]>({
     queryKey: ['airValveData'],
@@ -158,6 +157,6 @@ const AirValveMaintenance: React.FC = () => {
       </Card>
     </div>
   );
-};
+});
 
 export default AirValveMaintenance;
