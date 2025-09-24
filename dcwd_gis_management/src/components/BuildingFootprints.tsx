@@ -73,7 +73,8 @@ const BuildingFootprints = observer(() => {
         </Row>
       </div>
     </Card>
+
   );
-};
+});
 
 export default BuildingFootprints;
