@@ -4,6 +4,7 @@ import { Table, Input, Select, Button, Typography, Card, Space, Spin, Alert } fr
 import { ToolOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import PmsMaintenanceModal from './modal/PmsMaintenanceModal';
 import { pressureMonitoringSystemStore } from '../stores/pressureMonitoringSystemStore';
+import Footer from './layout/Footer';
 import { useQuery } from '@tanstack/react-query';
 import { apiGis } from './endpoints/Interceptor';
 

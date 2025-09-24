@@ -3,6 +3,7 @@ import { Card, Typography, Space, Select, Input, Table, Button, Spin, Alert } fr
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
+import Footer from './layout/Footer';
 import { useQuery } from '@tanstack/react-query';
 import { apiGis } from './endpoints/Interceptor';
 

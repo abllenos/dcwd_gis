@@ -6,6 +6,7 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
+import Footer from './layout/Footer';
 import { dashboardStore } from "../stores/dashboardStore";
 import "../styles/Home.css";
 

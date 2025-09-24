@@ -1,6 +1,7 @@
 import { Card, Typography, Row, Col, Select, Button } from 'antd';
 import { FilterOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 

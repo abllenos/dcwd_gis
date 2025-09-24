@@ -1,6 +1,10 @@
 import React from 'react';
 
 const Footer: React.FC = () => {
+  const getCurrentYear = () => {
+    return new Date().getFullYear();
+  };
+
   return (
     <div style={{
       position: 'fixed',
@@ -15,7 +19,7 @@ const Footer: React.FC = () => {
       fontSize: '14px',
       zIndex: 500
     }}>
-      Copyright © DCWD GIS Management System 2025
+      Copyright © DCWD GIS Management System {getCurrentYear()}
     </div>
   );
 };

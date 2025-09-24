@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Input, Select, Card, Typography, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 const { Option } = Select;

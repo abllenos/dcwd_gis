@@ -6,6 +6,7 @@ import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 import { useQuery } from '@tanstack/react-query';
+import Footer from './layout/Footer';
 import axios from 'axios';
 
 const { Title } = Typography;

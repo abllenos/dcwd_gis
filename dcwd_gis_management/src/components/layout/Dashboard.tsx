@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import Sidebar from './Sidebar';
 import HeaderBar from './Headerbar';
+import Footer from './Footer';
 import LogoutModal from '../modal/LogoutModal';
 
 import Home from '../Home';
@@ -19,7 +20,8 @@ import IsolationValve from '../IsolationValve';
 import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
-import Reports from '../reports';
+import Reports from '../Reports';
+
 
 
 
@@ -130,6 +132,8 @@ const Dashboard: React.FC<DashboardProps> = observer(({
             </Routes>
 
           </Content>
+          
+          <Footer />
         </Layout>
       </Layout>
 

@@ -1,43 +1,49 @@
 import React from 'react';
-import { Card, Table, Typography, Row, Col, Input, Space, Button, Dropdown, Select } from 'antd';
-import { UserOutlined, EnvironmentOutlined, GlobalOutlined, DownOutlined } from '@ant-design/icons';
+import { Card, Table, Typography, Row, Col, Input, Space, Button, Dropdown, Select, Alert, Spin, message } from 'antd';
+import { UserOutlined, EnvironmentOutlined, GlobalOutlined, DownOutlined, ReloadOutlined, ApiOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
-import { licenseStore } from '../stores/licenseStore';
+import { vtsStore } from '../stores/vtsStore';
 import Footer from './layout/Footer';
 import '../styles/vts.css';
 
 const { Title, Text } = Typography;
 
 const VTS: React.FC = observer(() => {
-  const [filteredUsers, setFilteredUsers] = React.useState(licenseStore.registeredUsers);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [currentPage, setCurrentPage] = React.useState(1);
   const mapRef = React.useRef<HTMLDivElement>(null);
   const mapInitialized = React.useRef(false);
 
-  // Update filtered users when the license store data changes
+  // Fetch VTS data when component mounts
   React.useEffect(() => {
-    setFilteredUsers(licenseStore.registeredUsers);
-    setCurrentPage(1); // Reset to first page when data changes
-  }, [licenseStore.registeredUsers]);
-
-  // Fetch license data when component mounts
-  React.useEffect(() => {
-    if (licenseStore.registeredUsers.length === 0) {
-      licenseStore.fetchRegisteredUsers();
+    if (vtsStore.users.length === 0) {
+      vtsStore.fetchUsers();
     }
   }, []);
 
+  // Handle refresh from API
+  const handleRefreshFromAPI = async () => {
+    try {
+      await vtsStore.forceRefreshFromAPI();
+      if (!vtsStore.error) {
+        message.success(`VTS data refreshed! Loaded ${vtsStore.users.length} users from API`);
+      } else {
+        message.error(vtsStore.error);
+      }
+    } catch (error) {
+      message.error('Error refreshing VTS data');
+      console.error('Refresh error:', error);
+    }
+  };
+
   React.useEffect(() => {
     // Initialize the map when component mounts
-    if (mapRef.current && !mapInitialized.current && window.MapAPI) {
+    if (mapRef.current && !mapInitialized.current && window.MapAPI && !vtsStore.mapState.initialized) {
       const mapId = 'vts-map';
       mapRef.current.id = mapId;
 
-      // Create the map with Davao City coordinates
+      // Create the map with coordinates from store
       window.MapAPI.createMap(mapId, {
-        center: [7.0731, 125.6128], // Davao City center
-        zoom: 14,
+        center: vtsStore.mapState.center,
+        zoom: vtsStore.mapState.zoom,
         scrollWheelZoom: true,
         zoomControl: true,
       });
@@ -46,6 +52,7 @@ const VTS: React.FC = observer(() => {
       window.MapAPI.addDavaoWaterFacilities(mapId);
 
       mapInitialized.current = true;
+      vtsStore.setMapInitialized(true);
     }
 
     // Cleanup function
@@ -53,83 +60,58 @@ const VTS: React.FC = observer(() => {
       if (mapInitialized.current && window.MapAPI) {
         window.MapAPI.destroyMap('vts-map');
         mapInitialized.current = false;
+        vtsStore.setMapInitialized(false);
       }
     };
   }, []);
 
   const handleSearch = (value: string) => {
-    const filtered = licenseStore.registeredUsers.filter(user =>
-      user.deviceName.toLowerCase().includes(value.toLowerCase()) ||
-      user.department.toLowerCase().includes(value.toLowerCase()) ||
-      user.id.toString().toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredUsers(filtered);
-    setCurrentPage(1); // Reset to first page when searching
+    vtsStore.setSearchText(value);
   };
 
   // Pagination helpers
   const handlePageSizeChange = (value: string) => {
     const newPageSize = parseInt(value);
-    setPageSize(newPageSize);
-    
-    // Adjust current page if it would be out of bounds with the new page size
-    const newTotalPages = Math.ceil(filteredUsers.length / newPageSize);
-    if (currentPage > newTotalPages) {
-      setCurrentPage(Math.max(1, newTotalPages));
-    } else {
-      setCurrentPage(1); // Reset to first page for better UX
-    }
+    vtsStore.setPageSize(newPageSize);
   };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    vtsStore.setCurrentPage(page);
   };
 
-  // Simple pagination logic
-  const totalItems = filteredUsers.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalItems);
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 3; // Reduced for smaller right panel
-    
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      let startPage = Math.max(1, currentPage - 1);
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      
-      if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-      
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-    }
-    
-    return pages;
-  };
+  // Get computed values from store
+  const totalItems = vtsStore.totalItems;
+  const totalPages = vtsStore.totalPages;
+  const startIndex = vtsStore.startIndex;
+  const endIndex = vtsStore.endIndex;
+  const paginatedUsers = vtsStore.paginatedUsers;
+  const currentPage = vtsStore.currentPage;
+  const pageSize = vtsStore.pageSize;
+  const pageNumbers = vtsStore.pageNumbers;
 
   const handleUserClick = (userId: number) => {
+    // Focus on user location and select in store
+    vtsStore.focusOnUser(userId);
+    
     // Example of how to interact with the map when a user is clicked
     if (window.MapAPI) {
       const map = window.MapAPI.getMap('vts-map');
       if (map) {
-        // Focus on Davao city bounds when user is selected
-        window.MapAPI.focusOnDavaoCity('vts-map');
-        console.log(`User ${userId} selected, map focused on Davao area`);
+        // Focus on user location if coordinates are available
+        const user = vtsStore.users.find(u => u.id === userId);
+        if (user && user.coordinates) {
+          window.MapAPI.setView('vts-map', user.coordinates, 16);
+        } else {
+          // Fallback to Davao city bounds
+          window.MapAPI.focusOnDavaoCity('vts-map');
+        }
+        console.log(`User ${userId} selected, map focused on user location`);
       }
     }
   };
 
   const handleMapLayerChange = (layerType: 'googleMaps' | 'googleSatellite' | 'googleHybrid' | 'googleTerrain') => {
+    vtsStore.setMapLayer(layerType);
     if (window.MapAPI) {
       window.MapAPI.switchTileLayer('vts-map', layerType);
     }
@@ -235,8 +217,73 @@ const VTS: React.FC = observer(() => {
                 Registered Users ({totalItems})
               </Space>
             }
+            extra={
+              <Space>
+                {vtsStore.isUsingAPIData ? (
+                  <Space size="small">
+                    <ApiOutlined style={{ color: '#52c41a' }} />
+                    <Text type="secondary" style={{ fontSize: '12px' }}>Live API</Text>
+                  </Space>
+                ) : (
+                  <Text type="secondary" style={{ fontSize: '12px' }}>Sample Data</Text>
+                )}
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<ReloadOutlined />}
+                  onClick={handleRefreshFromAPI}
+                  loading={vtsStore.loading}
+                  title="Refresh from API"
+                  style={{ padding: '0 4px' }}
+                />
+              </Space>
+            }
             className="vts-user-card"
           >
+            {/* Data Source Alert */}
+            {!vtsStore.isUsingAPIData && !vtsStore.loading && (
+              <Alert
+                message="Using Sample Data"
+                description="Click refresh to load live data from License API"
+                type="info"
+                showIcon
+                style={{ marginBottom: '12px', fontSize: '12px' }}
+                action={
+                  <Button 
+                    size="small" 
+                    type="primary"
+                    onClick={handleRefreshFromAPI}
+                    loading={vtsStore.loading}
+                  >
+                    Load API Data
+                  </Button>
+                }
+              />
+            )}
+
+            {/* Error Alert */}
+            {vtsStore.error && (
+              <Alert
+                message="Error Loading Data"
+                description={vtsStore.error}
+                type="error"
+                showIcon
+                closable
+                onClose={() => vtsStore.setError(null)}
+                style={{ marginBottom: '12px', fontSize: '12px' }}
+              />
+            )}
+
+            {/* Loading Indicator */}
+            {vtsStore.loading && (
+              <div style={{ textAlign: 'center', margin: '12px 0' }}>
+                <Spin size="small" />
+                <Text type="secondary" style={{ marginLeft: '8px', fontSize: '12px' }}>
+                  Loading from License API...
+                </Text>
+              </div>
+            )}
+
             {/* Display and Search Controls */}
             <div className="vts-controls-container">
               <div className="vts-display-controls">
@@ -286,7 +333,7 @@ const VTS: React.FC = observer(() => {
                 <div className="vts-empty-state">
                   <UserOutlined className="vts-empty-state-icon" />
                   <Text className="vts-empty-state-text">
-                    {licenseStore.registeredUsers.length === 0 
+                    {vtsStore.users.length === 0 
                       ? 'No registered users yet' 
                       : 'No users found matching your search criteria'
                     }
@@ -312,7 +359,7 @@ const VTS: React.FC = observer(() => {
                   >
                     Previous
                   </Button>
-                  {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                  {totalItems > 0 ? pageNumbers.map((pageNum: number) => (
                     <Button 
                       key={pageNum}
                       size="small" 
