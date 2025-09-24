@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
+
 import { Layout, Menu, Avatar, Typography } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -6,7 +8,9 @@ import { useLocation } from 'react-router-dom';
 import { devApi } from '../endpoints/Interceptor';
 import dcwdIcon from '../../assets/image/dcwd.jpg';
 import dcwd from '../../assets/image/logo.png';
-import { menuItems, getSidebarWidth } from './Menuitems';
+import { observer } from 'mobx-react-lite';
+import { sidebarUiStore } from '../../stores/sidebarUiStore';
+import { filterMenuByAccess, menuItems, getSidebarWidth } from './Menuitems';
 import SideSubmenuPanel from './SideSubmenuPanel';
 import '../../styles/sidepanel.css';
 
@@ -28,9 +32,9 @@ interface UserProfile {
   access: string[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, onMenuClick }) => {
-  const [sidebarWidth, setSidebarWidth] = useState(getSidebarWidth());
-  const [userProfile, setUserProfile] = useState<UserProfile>({
+const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMenuClick }) => {
+  const sidebarWidth = sidebarUiStore.sidebarWidth;
+  const [userProfile, setUserProfile] = React.useState<UserProfile>({
     firstName: '',
     middleName: '',
     lastName: '',
@@ -38,10 +42,13 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, onMenuClick })
     empId: '',
     access: []
   });
+
+  const [accessibleMenuItems, setAccessibleMenuItems] = React.useState<MenuProps['items']>([]);
   const [topLevelMenuItems, setTopLevelMenuItems] = useState<MenuProps['items']>([]);
   const [sideOpen, setSideOpen] = useState(false);
   const [sideTitle, setSideTitle] = useState('');
   const [sideItems, setSideItems] = useState<{ key: string; label: string }[]>([]);
+
 
   const location = useLocation();
   const selectedTopKey = useMemo(() => {
@@ -132,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, onMenuClick })
   const leftOffset = useMemo(() => (collapsed ? 80 : sidebarWidth), [collapsed, sidebarWidth]);
 
   useEffect(() => {
-    const handleResize = () => setSidebarWidth(getSidebarWidth());
+    const handleResize = () => sidebarUiStore.recalcWidth();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -218,6 +225,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, onMenuClick })
       />
     </Sider>
   );
-};
+});
 
 export default Sidebar;

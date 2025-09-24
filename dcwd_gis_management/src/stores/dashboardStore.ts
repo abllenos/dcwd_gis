@@ -35,9 +35,6 @@ class DashboardStore {
 
 
 
-  // computeSummary removed (unused) to satisfy strict unused checks
-
-
   get monthlyReports() {
     const grouped: Record<string, number> = {};
     const source = this.allReportsLoaded ? this.allReports : this.reports;

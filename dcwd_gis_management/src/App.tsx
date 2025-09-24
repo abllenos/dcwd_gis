@@ -14,15 +14,13 @@ import { getTheme } from './components/layout/getTheme';
 
 import './styles/theme.css';
 import 'antd/dist/reset.css';
+import { observer } from 'mobx-react-lite';
+import { loginStore } from './stores/loginStore';
 
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return !!localStorage.getItem("token");
-  });
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
+const App = observer(() => {
+  const isLoggedIn = loginStore.isLoggedIn;
+  const isDarkMode = loginStore.darkMode;
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -39,7 +37,7 @@ function App() {
       if (now > expiryTime) {
         handleLogout();
       } else {
-        setIsLoggedIn(true);
+        loginStore.setUserDataFromToken(token, expiryTime, localStorage.getItem('username') || '');
 
         const timeout = expiryTime - now;
         const timer = setTimeout(() => {
@@ -49,7 +47,7 @@ function App() {
         return () => clearTimeout(timer);
       }
     } else {
-      setIsLoggedIn(false);
+      loginStore.clearUserData();
     }
   }, []);
 
@@ -57,13 +55,13 @@ function App() {
     const expiry = new Date().getTime() + 24 * 60 * 60 * 1000;
     localStorage.setItem("token", token);
     localStorage.setItem("token_expiry", expiry.toString());
-    setIsLoggedIn(true);
+    loginStore.setUserDataFromToken(token, expiry, localStorage.getItem('username') || '');
 
     setupAutoLogout(expiry);
   };
 
   const updateDarkMode = (value: boolean) => {
-    setIsDarkMode(value);
+    loginStore.setDarkMode(value);
     document.documentElement.setAttribute('data-theme', value ? 'dark' : 'light');
   };
 
@@ -82,11 +80,11 @@ function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("token_expiry"); 
     localStorage.removeItem("debug_user_data");
-    setIsLoggedIn(false);
+    loginStore.clearUserData();
   };
 
   return (
-    <ConfigProvider theme={getTheme(isDarkMode)}>
+    <ConfigProvider theme={getTheme(isDarkMode)} wave={{ disabled: true }}>
       <Router>
         <Routes>
           <Route
@@ -121,6 +119,6 @@ function App() {
       </Router>
     </ConfigProvider>
   );
-};
+});
 
 export default App;
