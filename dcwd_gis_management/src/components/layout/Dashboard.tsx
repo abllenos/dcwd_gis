@@ -7,10 +7,21 @@ import HeaderBar from './Headerbar';
 import LogoutModal from '../modal/LogoutModal';
 
 import Home from '../Home';
+import DistrictMeteringAreaBoundaries from '../DistrictMeteringAreaBoundaries';
+import MapViewer from '../MapViewer';
+import AirValveMaintenance from '../AirValveMaintenance';
+import FireHydrant from '../FireHydrant';
+import IsolationValve from '../IsolationValve';
+import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
 import Reports from '../reports';
 
+
+import BlowOffValve from '../BlowOffValve';
+import DMAInlet from '../DMAInlet';
+import PressureReleaseValve from '../PressureReleaseValve';
+import PressureMonitoringSystem from '../PressureMonitoringSystem';
 
 const { Content } = Layout;
 
@@ -41,6 +52,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       setLogoutModalVisible(true); 
     } else if (e.key === 'create-report') {
       navigate('/create-report');
+    } else if (e.key === 'home') {
+      navigate('/home');
     } else {
       navigate(`/${e.key}`, { replace: true });
     }
@@ -90,6 +103,17 @@ const Dashboard: React.FC<DashboardProps> = ({
             }}
           >
             <Routes>
+              <Route path="home" element={<Home />} />
+              <Route path="assets-district-metering-area" element={<DistrictMeteringAreaBoundaries />} />
+              <Route path="map-viewer" element={<MapViewer />} />
+              <Route path="air-valve" element={<AirValveMaintenance />} />
+              <Route path="fire-hydrant" element={<FireHydrant />} />
+              <Route path="isolation-valve" element={<IsolationValve />} />
+              <Route path="pressure-setting-valve" element={<PressureSettingValve />} />
+              <Route path="pressure-release-valve" element={<PressureReleaseValve />} />
+              <Route path="blow-off-valve" element={<BlowOffValve />} />
+              <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
+              <Route path="dma-inlet" element={<DMAInlet />} />
               <Route path="/home" element={<Home />} />
               <Route path="/license" element={<License />} />
               <Route path="/vts" element={<VTS />} />

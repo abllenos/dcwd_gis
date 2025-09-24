@@ -4,28 +4,22 @@
     "C:\\Users\\abllenos\\Desktop\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\abllenos\\Desktop\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj": {
+    "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\abllenos\\Desktop\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
+        "projectUniqueName": "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
         "projectName": "gisApi",
-        "projectPath": "C:\\Users\\abllenos\\Desktop\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
-        "packagesPath": "C:\\Users\\abllenos\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\abllenos\\Desktop\\dcwd_gis\\gisTest\\gisApi\\obj\\",
+        "projectPath": "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
+        "packagesPath": "C:\\Users\\lamig\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\abllenos\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\lamig\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -83,7 +77,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
