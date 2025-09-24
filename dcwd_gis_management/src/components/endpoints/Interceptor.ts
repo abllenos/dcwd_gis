@@ -15,6 +15,7 @@ export const devApi = axios.create({
    },
 });
 
+
 let isRefreshing = false;
 type QueueEntry = { resolve: (token: string | null) => void; reject: (reason?: unknown) => void };
 let failedQueue: QueueEntry[] = [];
@@ -33,12 +34,31 @@ const processQueue = (error: unknown, token: string | null = null) => {
 [apiGis, devApi].forEach((instance) => {
   instance.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem('token');
-      
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      // Support per-request opt-out of auth via custom flag
+      const cfg = config as (InternalAxiosRequestConfig & { skipAuth?: boolean });
+
+      // Remove Content-Type for GET to avoid unnecessary CORS preflight
+      if ((cfg.method || '').toLowerCase() === 'get' && cfg.headers) {
+        delete (cfg.headers as AxiosRequestHeaders)['Content-Type'];
       }
-      return config;
+
+      // Normalize URL to detect public geometry endpoint (no Authorization header allowed; CORS rejects it)
+      const combined = ((cfg.baseURL || '').replace(/\/$/, '') + '/' + (cfg.url || '')).replace(/(?<!:)\/+/g, '/');
+      const pathOnly = '/' + combined.replace(/^https?:\/\/[^/]+/, '').replace(/^\/*/, '').split('?')[0];
+      const isPublicGeometry = pathOnly.toLowerCase().endsWith('/helpers/gis/api/userlogs/getlogsgeometry.php');
+      if (!cfg.skipAuth && !isPublicGeometry) {
+        const token = localStorage.getItem('token');
+        if (token) {
+          cfg.headers = {
+            ...(cfg.headers as AxiosRequestHeaders),
+            Authorization: `Bearer ${token}`,
+          } as AxiosRequestHeaders;
+        }
+      } else if (isPublicGeometry && cfg.headers) {
+        // Ensure Authorization header *not* present if some earlier logic added it
+        delete (cfg.headers as AxiosRequestHeaders).Authorization;
+      }
+      return cfg;
     },
     (error) => Promise.reject(error)
   );

@@ -49,6 +49,16 @@ const FLAG_MAP: Record<string, LogRecord['accessFlag']> = {
 
 /** Normalize action/flag values to a canonical variant. */
 export const normalizeFlag = (v: unknown): LogRecord['accessFlag'] => {
+  // Map common numeric codes if the API sends numbers (e.g., 1=view)
+  if (typeof v === 'number') {
+    switch (v) {
+      case 1: return 'VIEW';
+      case 2: return 'CREATE';
+      case 3: return 'UPDATE';
+      case 4: return 'DELETE';
+      default: break;
+    }
+  }
   const s = String(v ?? '').trim().toUpperCase();
   return FLAG_MAP[s] ?? 'VIEW';
 };
@@ -140,11 +150,11 @@ const firstDefined = (obj: Record<string, unknown>, keys: readonly string[]): un
 
 const KEY_CANDIDATES = {
   id: ['id', 'logId', 'LogId', 'LogID', 'ID'] as const,
-  layerId: ['layerId', 'layer_id', 'LayerID', 'LayerId', 'layer'] as const,
-  assetId: ['assetId', 'asset_id', 'AssetID', 'AssetId', 'asset'] as const,
+  layerId: ['layerId', 'layer_id', 'LayerID', 'LayerId', 'layer', 'layerid'] as const,
+  assetId: ['assetId', 'asset_id', 'AssetID', 'AssetId', 'asset', 'assetid'] as const,
   modifiedBy: ['modifiedBy', 'modified_by', 'ModifiedBy', 'user', 'User', 'username', 'UserName', 'Username'] as const,
-  accessFlag: ['accessFlag', 'AccessFlag', 'action', 'Action', 'operation', 'Operation', 'type', 'Type'] as const,
-  dateTime: ['dateTime', 'DateTime', 'datetime', 'timestamp', 'Timestamp', 'date', 'Date', 'createdAt', 'CreatedAt', 'updatedAt', 'UpdatedAt'] as const,
+  accessFlag: ['accessFlag', 'AccessFlag', 'action', 'Action', 'operation', 'Operation', 'type', 'Type', 'access_flg'] as const,
+  dateTime: ['dateTime', 'DateTime', 'datetime', 'timestamp', 'Timestamp', 'date', 'Date', 'createdAt', 'CreatedAt', 'updatedAt', 'UpdatedAt', 'transaction_datetime'] as const,
   description: ['description', 'Description', 'message', 'Message', 'remarks', 'Remarks', 'note', 'Note', 'details', 'Details'] as const,
 } as const;
 
@@ -159,7 +169,9 @@ export const mapToLogRecord = (it: Record<string, unknown>, idx: number, layerLa
   const descriptionRaw = firstDefined(it, KEY_CANDIDATES.description);
 
   const idNum = typeof idRaw === 'number' ? idRaw : Number(String(idRaw ?? idx + 1));
-  const layerId = String(layerIdRaw ?? layerLabel);
+  // Clean up layer string: trim spaces but preserve prefixes like "DCWD_"
+  const rawLayerStr = String(layerIdRaw ?? layerLabel);
+  const layerId = rawLayerStr.trim();
   const assetId = String(assetIdRaw ?? `${layerLabel}-${1000 + idx}`);
   const modifiedBy = String(modifiedByRaw ?? '-');
   const accessFlag = normalizeFlag(accessFlagRaw);

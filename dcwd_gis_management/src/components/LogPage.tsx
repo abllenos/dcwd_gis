@@ -1,10 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Space, Tag, Button } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Space, Tag, Button, Modal, Descriptions, Divider } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import type { LogRecord } from '../stores/logTypes';
 import { formatAssetId, safeString } from '../utils/formatters';
+import { logUiStore } from '../stores/logUiStore';
+import MapView from './MapView';
 
 const { Title } = Typography;
 
@@ -93,6 +95,10 @@ const LogPage: React.FC = observer(() => {
             columns={columns}
             dataSource={filteredData}
             loading={loading}
+            onRow={(record) => ({
+              onClick: () => logUiStore.open(record),
+              style: { cursor: 'pointer' },
+            })}
             pagination={{
               pageSize: pageSize,
               current: currentPage,
@@ -105,6 +111,40 @@ const LogPage: React.FC = observer(() => {
             locale={{ emptyText: 'Empty' }}
           />
         </div>
+        <Modal
+          title="Log Details"
+          open={logUiStore.isModalOpen}
+          onCancel={() => logUiStore.close()}
+          footer={[
+            <Button key="close" onClick={() => logUiStore.close()}>Close</Button>,
+          ]}
+        >
+          {logUiStore.selected && (
+            <>
+              <Descriptions column={1} size="small" styles={{ label: { width: 200 } }}>
+                <Descriptions.Item label="ID">{logUiStore.selected.id}</Descriptions.Item>
+                <Descriptions.Item label="Layer ID">{logUiStore.selected.layerId}</Descriptions.Item>
+                <Descriptions.Item label="Asset ID">{formatAssetId(logUiStore.selected.assetId)}</Descriptions.Item>
+                <Descriptions.Item label="Modified By">{logUiStore.selected.modifiedBy}</Descriptions.Item>
+                <Descriptions.Item label="Transaction Type">{logUiStore.selected.accessFlag}</Descriptions.Item>
+                <Descriptions.Item label="Transaction Date & Time">{logUiStore.selected.dateTime}</Descriptions.Item>
+                <Descriptions.Item label="Description">{logUiStore.selected.description || '-'}</Descriptions.Item>
+              </Descriptions>
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontWeight: 600, marginBottom: 8 }}>Map</div>
+                {logUiStore.geometryLoading && <div style={{ padding: 8 }}>Loading geometry…</div>}
+                {!logUiStore.geometryLoading && logUiStore.geometry && (
+                  <MapView height={280} geometry={logUiStore.geometry} />
+                )}
+                {!logUiStore.geometryLoading && !logUiStore.geometry && (
+                  <div style={{ padding: 8, color: 'var(--text-muted)' }}>
+                    {logUiStore.geometryError || 'No geometry available.'}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </Modal>
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
           <Space size={8} wrap>
             {logStore.debugStatus === 'ok' && (
