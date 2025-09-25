@@ -20,6 +20,10 @@ import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
 import Reports from '../reports';
+import Classification from '../Classification';
+import ClassPage from '../Class';
+import Layer from '../Layer';
+import UserAccounts from '../UserAccounts';
 
 
 
@@ -129,6 +133,10 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="/license" element={<License />} />
               <Route path="/vts" element={<VTS />} />
               <Route path="/report" element={<Reports />} />
+              <Route path="/classification" element={<Classification />} />
+              <Route path="/class" element={<ClassPage />} />
+              <Route path="/layer" element={<Layer />} />
+              <Route path="/user-accounts" element={<UserAccounts />} />
               <Route path="log" element={<LogPage />} />
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="*" element={<Navigate to="/home" replace />} />

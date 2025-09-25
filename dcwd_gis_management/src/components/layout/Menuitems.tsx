@@ -91,11 +91,11 @@ export const menuItems: CustomMenuItem[] = [
     icon: <ToolOutlined style={iconSize} />,
     access: ["A00001", "S01"],
     children: [
-      { key: "classification", label: "Classification", access: ["A00001", "S01"] },
-      { key: "class", label: "Class", access: ["A00001", "S01"] },
-      { key: "layer", label: "Layer", access: ["A00001", "S01"] },
-      { key: "settings", label: "Settings", access: ["A00001", "S01"] },
-      { key: "user-accounts", label: "User Accounts", access: ["A00001", "S01"] },
+  { key: "classification", label: "Classification", access: ["A00001", "S01"] },
+  { key: "class", label: "Class", access: ["A00001", "S01"] },
+  { key: "layer", label: "Layer", access: ["A00001", "S01"] },
+  { key: "settings", label: "Settings", access: ["A00001", "S01"], disabled: true },
+  { key: "user-accounts", label: "User Accounts", access: ["A00001", "S01"] },
     ]
   },
 ];
