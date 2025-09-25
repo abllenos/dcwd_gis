@@ -79,7 +79,6 @@ const PressureSettingValve: React.FC = observer(() => {
       <div style={{ marginBottom: 16 }}>
         {psvStore.isLoading && <div style={{ color: '#2563eb', fontWeight: 600 }}>Loading...</div>}
         {psvStore.error && <div style={{ color: 'red', fontWeight: 600 }}>Error: {psvStore.error.message}</div>}
-        <pre style={{ background: '#f8f8f8', color: '#c00', fontSize: 12, maxHeight: 200, overflow: 'auto' }}>{JSON.stringify(psvStore.data, null, 2)}</pre>
       </div>
       <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
         <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Setting Valves</span>
