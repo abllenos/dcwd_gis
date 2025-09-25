@@ -13,9 +13,6 @@ const { Option } = Select;
 const License: React.FC = observer(() => {
   const [form] = Form.useForm();
 
-
-  const [renewForm] = Form.useForm();
-
   // Function to handle API fetch with UI feedback
   const handleFetchUsers = async () => {
     try {
