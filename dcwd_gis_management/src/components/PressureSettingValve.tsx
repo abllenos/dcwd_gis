@@ -4,6 +4,10 @@ import { Card, Typography, Space, Select, Input, Table, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
+
+import Footer from './layout/Footer';
+import { useQuery } from '@tanstack/react-query';
+
 import { observer } from 'mobx-react-lite';
 import { psvStore } from '../stores/psvStore';
 import { apiGis } from './endpoints/Interceptor';

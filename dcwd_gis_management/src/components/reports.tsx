@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Card, 
   Table, 
@@ -7,69 +7,61 @@ import {
   Col, 
   Select, 
   Button, 
-  Space
+  Space,
+  message,
+  Spin,
+  Alert
 } from 'antd';
 import { 
   FileTextOutlined, 
   PrinterOutlined,
-  DownloadOutlined
+  DownloadOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
+import { reportsStore } from '../stores/reportsStore';
+import type { ReportFile } from '../stores/reportsStore';
 import Footer from './layout/Footer';
 import '../styles/reports.css';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-interface ReportFile {
-  id: number;
-  fileName: string;
-  displayName: string;
-  description: string;
-  fileSize: string;
-  uploadDate: string;
-  category: string;
-  filePath: string; // Path to the actual file
-}
-
 const Reports: React.FC = observer(() => {
   const [selectedReportType, setSelectedReportType] = useState<string>('all');
-  const [availableReports] = useState<ReportFile[]>([
-    {
-      id: 1,
-      fileName: 'CPDPipelineCostAnalysis_2025-09-23.csv',
-      displayName: 'CPD Pipeline Cost Analysis',
-      description: 'Comprehensive cost analysis of pipeline infrastructure for September 2025',
-      fileSize: '6.5 MB',
-      uploadDate: '2025-09-23',
-      category: 'Infrastructure',
-      filePath: '/reports/CPDPipelineCostAnalysis_2025-09-23.csv'
-    },
-    {
-      id: 2,
-      fileName: 'CustomerListing_Zone01_2025-09-23.csv',
-      displayName: 'Customer Listing - Zone 01',
-      description: 'Complete customer database listing for Zone 01 as of September 2025',
-      fileSize: '2.4 MB',
-      uploadDate: '2025-09-23',
-      category: 'Customer',
-      filePath: '/reports/CustomerListing_Zone01_2025-09-23.csv'
+
+  // Function to refresh reports via store
+  const handleRefreshReports = async () => {
+    try {
+      await reportsStore.refreshReports();
+      if (!reportsStore.error) {
+        message.success(`Reports refreshed! Loaded ${reportsStore.reports.length} local files`);
+      } else {
+        message.error(reportsStore.error);
+      }
+    } catch (error) {
+      message.error('Error refreshing reports');
+      console.error('Refresh error:', error);
     }
-  ]);
+  };
+
+  // Load reports when component mounts
+  useEffect(() => {
+    reportsStore.fetchReports();
+  }, []);
+  
+  // Debug logging
+  console.log('Reports Debug:', {
+    totalReportsCount: reportsStore.reports.length,
+    localReportsCount: reportsStore.localReports.length,
+    isLoading: reportsStore.loading,
+    error: reportsStore.error
+  });
+
+
 
   const handleDownloadReport = (report: ReportFile) => {
-    // Create a temporary link element to trigger download
-    const link = document.createElement('a');
-    link.href = report.filePath;
-    link.download = report.fileName;
-    link.target = '_blank';
-    
-    // Append to body, click, and remove
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    console.log(`Downloading: ${report.displayName} (${report.fileName})`);
+    reportsStore.downloadReport(report);
   };
 
   const getFileIcon = (fileName: string) => {
@@ -191,9 +183,12 @@ const Reports: React.FC = observer(() => {
     },
   ];
 
+  // Get filtered reports from store
   const filteredReports = selectedReportType === 'all' 
-    ? availableReports 
-    : availableReports.filter(report => report.category.toLowerCase() === selectedReportType.toLowerCase());
+    ? reportsStore.reports 
+    : reportsStore.reports.filter(report => 
+        report.category.toLowerCase().includes(selectedReportType.toLowerCase())
+      );
 
   return (
     <div className="reports-container">
@@ -252,8 +247,64 @@ const Reports: React.FC = observer(() => {
               </Text>
             </div>
           </Col>
+          <Col xs={24} sm={12} lg={8}>
+            <div className="form-group">
+              <Text strong style={{ display: 'block', marginBottom: '8px', color: 'var(--text-primary)' }}>
+                Data Source:
+              </Text>
+              <Space>
+                <Text style={{ fontSize: '14px', color: 'var(--success-color)' }}>
+                  Local Files (/public/reports)
+                </Text>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<ReloadOutlined />}
+                  onClick={handleRefreshReports}
+                  loading={reportsStore.loading}
+                  style={{ padding: '0 8px' }}
+                >
+                  Refresh
+                </Button>
+              </Space>
+            </div>
+          </Col>
         </Row>
       </Card>
+
+      {/* Status Alert */}
+      {reportsStore.reports.length === 0 && !reportsStore.loading && (
+        <Alert
+          message="No Reports Found"
+          description="No reports found in the public/reports folder. Please ensure report files are available."
+          type="warning"
+          showIcon
+          style={{ marginBottom: '16px' }}
+        />
+      )}
+
+      {/* Error Alert */}
+      {reportsStore.error && (
+        <Alert
+          message="Error Loading Reports"
+          description={reportsStore.error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => reportsStore.setError(null)}
+          style={{ marginBottom: '16px' }}
+        />
+      )}
+
+      {/* Loading indicator */}
+      {reportsStore.loading && (
+        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <Spin size="large" />
+          <div style={{ marginTop: '8px' }}>
+            <Text>Loading local reports...</Text>
+          </div>
+        </div>
+      )}
 
       {/* Reports Table */}
       <Card 

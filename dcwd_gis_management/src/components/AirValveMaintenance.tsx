@@ -6,6 +6,7 @@ import AirValveModal from './modal/AirValveModal';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
+import Footer from './layout/Footer';
 import { devApi } from './endpoints/Interceptor';
 
 const { Title, Text } = Typography;

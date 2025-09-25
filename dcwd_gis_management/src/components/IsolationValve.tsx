@@ -5,6 +5,7 @@ import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
+import Footer from './layout/Footer';
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 
 const { Search } = Input;

@@ -10,6 +10,9 @@ import dcwdIcon from '../../assets/image/dcwd.jpg';
 import dcwd from '../../assets/image/logo.png';
 import { observer } from 'mobx-react-lite';
 import { sidebarUiStore } from '../../stores/sidebarUiStore';
+import { filterMenuByAccess, menuItems } from './Menuitems';
+
+
 import { menuItems } from './Menuitems';
 import SideSubmenuPanel from './SideSubmenuPanel';
 import '../../styles/sidepanel.css';
@@ -43,6 +46,10 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
     access: []
   });
 
+
+  const [accessibleMenuItems, setAccessibleMenuItems] = React.useState<MenuProps['items']>([]);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+
   // ...existing code...
   const [topLevelMenuItems, setTopLevelMenuItems] = useState<MenuProps['items']>([]);
   const [sideOpen, setSideOpen] = useState(false);
@@ -51,16 +58,7 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
 
 
   const location = useLocation();
-  const selectedTopKey = useMemo(() => {
-    const pathKey = location.pathname.replace('/', '') || 'home';
-    // If the path is a top-level item, use it
-    if (menuItems.some(mi => mi.key === pathKey)) return pathKey;
-    // Otherwise, find a parent that contains this child
-    for (const mi of menuItems) {
-      if (mi.children?.some(ch => ch.key === pathKey)) return mi.key;
-    }
-    return 'home';
-  }, [location.pathname]);
+
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -81,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
               empId: user.empId || 'ADMIN001',
               access: ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'] // Give admin access to all menu items
             });
-            setTopLevelMenuItems(buildTopLevelMenu(menuItems, ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01']));
+            setAccessibleMenuItems(filterMenuByAccess(menuItems, ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01']));
             return;
           } catch (err) {
             console.error('Failed to parse userData:', err);
@@ -104,7 +102,7 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
             empId: user.empId || '',
             access: accessArr
           });
-          setTopLevelMenuItems(buildTopLevelMenu(menuItems, accessArr));
+          setAccessibleMenuItems(filterMenuByAccess(menuItems, accessArr));
         }
       } catch (err) {
         console.error('Failed to fetch user profile:', err);
@@ -114,29 +112,60 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
     fetchUserProfile();
   }, []);
 
-  // Build a list of children for the side panel, including group headers (disabled items)
-  const getAccessibleChildren = (parentKey: string) => {
-    const parent = menuItems.find(mi => mi.key === parentKey);
-    if (!parent || !parent.children) return [];
-    const accessSet = new Set(userProfile.access);
-    return parent.children
-      .filter(c => !c.access || c.access.some(a => accessSet.has(a)))
-      .map(c =>
-        c.disabled
-          ? { key: c.key, label: String(c.label), type: 'header' as const }
-          : { key: c.key, label: String(c.label), type: 'item' as const }
-      );
+  // Memoized selected keys based on current location
+  const selectedKeys = useMemo(() => {
+    const pathKey = location.pathname.replace('/', '') || 'home';
+    
+    // If it's a top-level item
+    if (menuItems.some(mi => mi.key === pathKey)) {
+      return [pathKey];
+    }
+    
+    // If it's a child item, return the child key
+    for (const mi of menuItems) {
+      if (mi.children?.some(ch => ch.key === pathKey)) {
+        return [pathKey];
+      }
+    }
+    
+    return ['home'];
+  }, [location.pathname]);
+
+  // Set initial open keys based on current location
+  useEffect(() => {
+    const pathKey = location.pathname.replace('/', '') || 'home';
+    
+    // If current page is a child item, open its parent
+    for (const mi of menuItems) {
+      if (mi.children?.some(ch => ch.key === pathKey)) {
+        setOpenKeys([mi.key]);
+        return;
+      }
+    }
+    
+    // Reset open keys if on top-level page
+    setOpenKeys([]);
+  }, [location.pathname]);
+
+  // Handle exclusive dropdown behavior - only one submenu can be open at a time
+  const handleOpenChange = (keys: string[]) => {
+    const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
+    
+    // Get all parent menu keys that have children
+    const parentMenuKeys = menuItems
+      .filter(item => item.children && item.children.length > 0)
+      .map(item => item.key);
+    
+    if (latestOpenKey && parentMenuKeys.includes(latestOpenKey)) {
+      // If opening a new submenu, close all others and open only the new one
+      setOpenKeys([latestOpenKey]);
+    } else {
+      // If closing a submenu or no new submenu being opened
+      setOpenKeys(keys.filter(key => parentMenuKeys.includes(key)));
+    }
   };
 
-  // Create top-level items only, without rendering nested dropdowns
-  function buildTopLevelMenu(items: any[], access: string[]): MenuProps['items'] {
-    const accessSet = new Set(access);
-    return items
-      .filter(it => !it.access || it.access.some((a: string) => accessSet.has(a)))
-      .map(it => ({ key: it.key, label: it.label, icon: it.icon }));
-  }
 
-  const leftOffset = useMemo(() => (collapsed ? 80 : sidebarWidth), [collapsed, sidebarWidth]);
 
   useEffect(() => {
     const handleResize = () => sidebarUiStore.recalcWidth();
@@ -190,37 +219,16 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
 
       <Menu
         className="modern-menu"
-        onClick={(e) => {
-          const children = getAccessibleChildren(e.key);
-          if (children.length > 0) {
-            const parent = menuItems.find(mi => mi.key === e.key);
-            setSideTitle(String(parent?.label ?? 'Menu'));
-            setSideItems(children);
-            setSideOpen(true);
-            return;
-          }
-          onMenuClick?.(e);
-        }}
-  selectedKeys={[selectedTopKey]}
+        onClick={onMenuClick}
+        selectedKeys={selectedKeys}
+        openKeys={openKeys}
+        onOpenChange={handleOpenChange}
         mode="inline"
-        items={topLevelMenuItems} 
+        items={accessibleMenuItems}
         style={{
           border: 'none',
           background: 'transparent',
           fontSize: '14px'
-        }}
-      />
-
-      {/* Side submenu panel */}
-      <SideSubmenuPanel
-        open={sideOpen}
-        title={sideTitle}
-        items={sideItems}
-        leftOffset={leftOffset}
-        onClose={() => setSideOpen(false)}
-        onSelect={(key) => {
-          setSideOpen(false);
-          onMenuClick?.({ key } as any);
         }}
       />
     </Sider>

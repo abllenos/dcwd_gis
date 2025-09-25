@@ -7,7 +7,7 @@
    - The files should be accessible at `/reports/filename.pdf` from the web browser
 
 2. **Update the report configuration:**
-   - Open `src/components/reports.tsx`
+   - Open `src/components/Reports.tsx`
    - Modify the `availableReports` array to match your actual files
    - Update the file paths, names, and descriptions
 
@@ -30,7 +30,7 @@ public/
 
 ## Updating Report Information
 
-In `src/components/reports.tsx`, update the `availableReports` array:
+In `src/components/Reports.tsx`, update the `availableReports` array:
 
 ```typescript
 const [availableReports] = useState<ReportFile[]>([
