@@ -1,3 +1,4 @@
+import BuildingFootprints from '../BuildingFootprints';
 import React from 'react';
 import { Layout } from 'antd';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -21,7 +22,6 @@ import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
 
-import Reports from '../Reports';
 
 import Reports from '../reports';
 import Classification from '../Classification';
@@ -133,6 +133,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="dma-inlet" element={<DMAInlet />} />
               <Route path="distribution-transmission" element={<DistributionTransmission />} />
               <Route path="mapinfo-users" element={<MapInfoUsers />} />
+              <Route path="building-footprints" element={<BuildingFootprints />} />
               <Route path="/home" element={<Home />} />
               <Route path="/license" element={<License />} />
               <Route path="/vts" element={<VTS />} />
