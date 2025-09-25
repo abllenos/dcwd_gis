@@ -5,7 +5,7 @@ import { fireHydrantListStore } from '../stores/fireHydrantListStore';
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
-import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+import type { ColumnsType } from "antd/es/table";
 
 const { Search } = Input;
 
