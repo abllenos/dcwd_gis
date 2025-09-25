@@ -217,27 +217,7 @@ const VTS: React.FC = observer(() => {
                 Registered Users ({totalItems})
               </Space>
             }
-            extra={
-              <Space>
-                {vtsStore.isUsingAPIData ? (
-                  <Space size="small">
-                    <ApiOutlined style={{ color: '#52c41a' }} />
-                    <Text type="secondary" style={{ fontSize: '12px' }}>Live API</Text>
-                  </Space>
-                ) : (
-                  <Text type="secondary" style={{ fontSize: '12px' }}>Sample Data</Text>
-                )}
-                <Button
-                  type="link"
-                  size="small"
-                  icon={<ReloadOutlined />}
-                  onClick={handleRefreshFromAPI}
-                  loading={vtsStore.loading}
-                  title="Refresh from API"
-                  style={{ padding: '0 4px' }}
-                />
-              </Space>
-            }
+
             className="vts-user-card"
           >
             {/* Data Source Alert */}

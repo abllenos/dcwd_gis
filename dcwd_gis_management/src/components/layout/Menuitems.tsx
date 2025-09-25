@@ -69,7 +69,10 @@ export const menuItems: CustomMenuItem[] = [
     icon: <AppstoreOutlined style={iconSize} />,
     access: ["A00001", "A00002", "R00001"],
     children: [
+      { key: "software-header", label: "Software", access: ["A00001", "A00002"], disabled: true },
       { key: "license", label: "License", access: ["A00001", "A00002"] },
+      
+      { key: "device-header", label: "Device", access: ["A00001", "A00002"], disabled: true },
       { key: "vts", label: "VTS", access: ["A00001", "A00002"] },
     ]
   },
@@ -91,10 +94,12 @@ export const menuItems: CustomMenuItem[] = [
     icon: <ToolOutlined style={iconSize} />,
     access: ["A00001", "S01"],
     children: [
+      { key: "operation-header", label: "Operation", access: ["A00001", "S01"], disabled: true },
       { key: "classification", label: "Classification", access: ["A00001", "S01"] },
       { key: "class", label: "Class", access: ["A00001", "S01"] },
       { key: "layer", label: "Layer", access: ["A00001", "S01"] },
-      { key: "settings", label: "Settings", access: ["A00001", "S01"] },
+      
+      { key: "settings-header", label: "Settings", access: ["A00001", "S01"], disabled: true },
       { key: "user-accounts", label: "User Accounts", access: ["A00001", "S01"] },
     ]
   },
@@ -123,9 +128,20 @@ export const filterMenuByAccess = (
 
     if (children && children.length === 0) return null;
 
-  // Build item without 'access' key explicitly to satisfy linter
-  const { key, label, icon } = item;
-  return { key, label, icon, children } as const;
+    // Build item with proper handling for disabled header items
+    const { key, label, icon, disabled } = item;
+    
+    // If item is disabled, make it a group header (non-clickable title)
+    if (disabled) {
+      return { 
+        key, 
+        label, 
+        type: 'group' as const,
+        children: undefined 
+      };
+    }
+
+    return { key, label, icon, children, disabled } as const;
     })
     .filter(Boolean) as MenuProps["items"];
 };
