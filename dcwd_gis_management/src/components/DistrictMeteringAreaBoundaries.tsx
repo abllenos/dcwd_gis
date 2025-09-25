@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { observer } from 'mobx-react-lite';
+import { dmaBoundariesStore } from '../stores/dmaBoundariesStore';
 import { Table, Input, Select, Card, Typography, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import Footer from './layout/Footer';
@@ -15,8 +17,8 @@ interface DMABoundaryRecord {
   status: string;
 }
 
-const DistrictMeteringAreaBoundaries: React.FC = () => {
-  const [pageSize, setPageSize] = useState(10);
+const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
+  const { pageSize, setPageSize, search, setSearch } = dmaBoundariesStore;
 
   // Sample data - replace with actual data from your API
   const data: DMABoundaryRecord[] = [
@@ -59,8 +61,7 @@ const DistrictMeteringAreaBoundaries: React.FC = () => {
   };
 
   const handleSearch = (value: string) => {
-    // Handle search functionality here
-    console.log('Search:', value);
+    setSearch(value);
   };
 
   const locale = {
@@ -116,6 +117,8 @@ const DistrictMeteringAreaBoundaries: React.FC = () => {
               placeholder="Search..."
               allowClear
               style={{ width: 200 }}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               onSearch={handleSearch}
             />
           </Space>
@@ -150,6 +153,6 @@ const DistrictMeteringAreaBoundaries: React.FC = () => {
       </Card>
     </div>
   );
-};
+});
 
 export default DistrictMeteringAreaBoundaries;

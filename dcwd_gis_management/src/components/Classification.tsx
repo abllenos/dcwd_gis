@@ -1,0 +1,137 @@
+import React from 'react';
+import { observer } from 'mobx-react-lite';
+import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form, Alert, Empty } from 'antd';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { classificationStore } from '../stores/classificationStore';
+import type { ClassificationRecord } from '../stores/classificationStore';
+
+const { Title, Text } = Typography;
+
+const layerOptions = [
+  'DCWD_PMS', 'UNIVERSAL', 'DCWD_VALVE_AV'
+];
+const classOptions = [
+  'PMS BRAND', 'PIPE TYPE', 'VALVE TYPE', 'VALVE BRAND'
+];
+
+const Classification: React.FC = observer(() => {
+  const store = classificationStore;
+  const { pagedRecords, pageSize, currentPage, totalCount, loading } = store;
+
+  const columns = [
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 70, sorter: (a: any, b: any) => (Number(a.id) || 0) - (Number(b.id) || 0) },
+    { title: 'Description', dataIndex: 'description', key: 'description' },
+    { title: 'Layer Name', dataIndex: 'layerName', key: 'layerName', sorter: (a: any, b: any) => String(a.layerName || '').localeCompare(String(b.layerName || '')) },
+    { title: 'Class Name', dataIndex: 'className', key: 'className', sorter: (a: any, b: any) => String(a.className || '').localeCompare(String(b.className || '')) },
+    { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassificationRecord) => (
+      <Button
+        type="primary"
+        icon={<EditOutlined />}
+        size="small"
+        onClick={() => store.openEdit(record)}
+      />)
+    }
+  ];
+
+  return (
+    <div style={{ maxWidth: '100%', margin: '0 auto' }}>
+      <Card
+        style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }}
+        styles={{ body: { padding: 20 } }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Title level={5} style={{ margin: 0, color: 'var(--text-primary)' }}>Classification - Maintenance</Title>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAddModal()}>
+            Add Classification
+          </Button>
+        </div>
+
+        <div style={{ background: 'var(--bg-tertiary, #f5f7fb)', padding: '8px 12px', borderRadius: 8, marginBottom: 18 }}>
+          <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>Instructions:</Text>
+          <Text style={{ fontSize: 12 }}>Instruction: Double Click row to edit Class Details.</Text>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+          <Space size={8}>
+            <Text>Display</Text>
+            <Select
+              size="small"
+              value={pageSize}
+              style={{ width: 90 }}
+              onChange={(v) => store.setPageSize(v)}
+              options={[10,20,30,40,50].map(n => ({ label: n, value: n }))}
+            />
+            <Text>records per page</Text>
+          </Space>
+          <Space>
+            <Text>Search:</Text>
+            <Input size="small" allowClear placeholder="" value={store.search} onChange={e => store.setSearch(e.target.value)} />
+          </Space>
+        </div>
+
+        {store.diagnostics.lastError && !loading && (
+          <Alert type="error" showIcon style={{ marginBottom: 12 }} message="Failed to load classifications" description={store.diagnostics.lastError} />
+        )}
+        {!loading && !store.diagnostics.lastError && pagedRecords.length === 0 && (
+          <Empty description="No classifications" style={{ margin: '40px 0' }} />
+        )}
+        <Table
+          size="small"
+          rowKey="id"
+          dataSource={pagedRecords}
+          columns={columns as any}
+          pagination={false}
+          loading={loading}
+          onRow={(record) => ({ onDoubleClick: () => store.openEdit(record) })}
+          style={{ marginBottom: 16 }}
+        />
+
+        {/* Custom pagination footer to match screenshot style */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
+          <Text style={{ fontSize: 12 }}>Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries</Text>
+          <Space>
+            <Button size="small" disabled={currentPage === 1} onClick={() => store.setCurrentPage(currentPage - 1)}>Previous</Button>
+            {/* Simple numeric pages (cap to 5 for now) */}
+            {Array.from({ length: Math.ceil(totalCount / pageSize) }).slice(0,5).map((_, i) => {
+              const page = i + 1;
+              return <Button key={page} size="small" type={page === currentPage ? 'primary' : 'default'} onClick={() => store.setCurrentPage(page)}>{page}</Button>;
+            })}
+            {Math.ceil(totalCount / pageSize) > 5 && <Button size="small" disabled>...</Button>}
+            {Math.ceil(totalCount / pageSize) > 5 && <Button size="small" type={currentPage === Math.ceil(totalCount / pageSize) ? 'primary' : 'default'} onClick={() => store.setCurrentPage(Math.ceil(totalCount / pageSize))}>{Math.ceil(totalCount / pageSize)}</Button>}
+            <Button size="small" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => store.setCurrentPage(currentPage + 1)}>Next</Button>
+          </Space>
+        </div>
+
+        {import.meta.env.DEV && (
+          <div style={{ marginTop: 18, fontSize: 11, opacity: 0.7 }}>
+            <Text type="secondary">Diagnostics: url={store.diagnostics.lastUrl} status={store.diagnostics.lastStatus} fetched={store.diagnostics.lastFetchedAt}</Text>
+          </div>
+        )}
+      </Card>
+
+      <Modal
+        title={store.editingRecord ? 'Edit Classification' : 'Add Classification'}
+        open={store.addModalVisible}
+        onCancel={() => store.closeModal()}
+        onOk={() => store.saveDraft()}
+        okText="Save"
+        destroyOnHidden
+      >
+        <Form
+          layout="vertical"
+          initialValues={store.formDraft}
+          onValuesChange={(_, all) => {
+            (Object.keys(all) as (keyof typeof all)[]).forEach(k => store.updateDraft(k as any, (all as any)[k]));
+          }}
+        >
+          <Form.Item label="Description" name="description" required rules={[{ required: true }]}> <Input /> </Form.Item>
+          <Form.Item label="Layer Name" name="layerName" required rules={[{ required: true }]}> <Select options={layerOptions.map(o => ({ label: o, value: o }))} showSearch /> </Form.Item>
+          <Form.Item label="Class Name" name="className" required rules={[{ required: true }]}> <Select options={classOptions.map(o => ({ label: o, value: o }))} showSearch /> </Form.Item>
+          {/* Status field removed per design; store still keeps statusFlag if needed */}
+        </Form>
+      </Modal>
+    </div>
+  );
+});
+
+export default Classification;

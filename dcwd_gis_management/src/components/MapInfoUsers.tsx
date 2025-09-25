@@ -1,6 +1,6 @@
 
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Space } from 'antd';
+import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
 

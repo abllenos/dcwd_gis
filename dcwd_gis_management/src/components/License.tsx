@@ -12,8 +12,11 @@ const { Option } = Select;
 
 const License: React.FC = observer(() => {
   const [form] = Form.useForm();
+
   const [pageSize, setPageSize] = React.useState(10);
   const [currentPage, setCurrentPage] = React.useState(1);
+
+  const [renewForm] = Form.useForm();
 
   // Function to handle API fetch with UI feedback
   const handleFetchUsers = async () => {
@@ -94,59 +97,52 @@ const License: React.FC = observer(() => {
 
   const handleSearch = (value: string) => {
     licenseStore.setSearchText(value);
-    setCurrentPage(1); // Reset to first page when searching
+    licenseStore.setCurrentPage(1); // Reset to first page when searching
   };
 
   // Pagination helpers
   const handlePageSizeChange = (value: string) => {
     const newPageSize = parseInt(value);
-    setPageSize(newPageSize);
-    
+    licenseStore.setPageSize(newPageSize);
     // Adjust current page if it would be out of bounds with the new page size
     const newTotalPages = Math.ceil(licenseStore.filteredUsers.length / newPageSize);
-    if (currentPage > newTotalPages) {
-      setCurrentPage(Math.max(1, newTotalPages));
+    if (licenseStore.currentPage > newTotalPages) {
+      licenseStore.setCurrentPage(Math.max(1, newTotalPages));
     } else {
-      setCurrentPage(1); // Reset to first page for better UX
+      licenseStore.setCurrentPage(1); // Reset to first page for better UX
     }
   };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    licenseStore.setCurrentPage(page);
   };
 
   // Simple pagination logic
   const totalItems = licenseStore.filteredUsers.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const totalPages = Math.ceil(totalItems / licenseStore.pageSize);
+  const startIndex = (licenseStore.currentPage - 1) * licenseStore.pageSize;
+  const endIndex = Math.min(startIndex + licenseStore.pageSize, totalItems);
   const paginatedUsers = licenseStore.filteredUsers.slice(startIndex, endIndex);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+    const currentPage = licenseStore.currentPage;
     if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is less than max visible
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Show pages around current page
       let startPage = Math.max(1, currentPage - 2);
       let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      
-      // Adjust start if we're near the end
       if (endPage - startPage < maxVisiblePages - 1) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-      
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
     }
-    
     return pages;
   };
 
@@ -366,7 +362,7 @@ const License: React.FC = observer(() => {
               <div className="license-display-controls">
                 <Typography.Text className="license-control-text">Display</Typography.Text>
                 <Select 
-                  value={pageSize.toString()} 
+                  value={licenseStore.pageSize.toString()} 
                   size="small" 
                   style={{ width: 80 }}
                   onChange={handlePageSizeChange}
@@ -431,10 +427,10 @@ const License: React.FC = observer(() => {
               <div className="license-pagination-buttons">
                 <Button 
                   size="small" 
-                  disabled={currentPage === 1 || totalItems === 0}
-                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={licenseStore.currentPage === 1 || totalItems === 0}
+                  onClick={() => handlePageChange(licenseStore.currentPage - 1)}
                   className={
-                    (currentPage === 1 || totalItems === 0) 
+                    (licenseStore.currentPage === 1 || totalItems === 0) 
                       ? "license-pagination-button-disabled-prev-next" 
                       : "license-pagination-button-prev-next"
                   }
@@ -445,9 +441,9 @@ const License: React.FC = observer(() => {
                   <Button 
                     key={pageNum}
                     size="small" 
-                    type={pageNum === currentPage ? "primary" : "default"}
+                    type={pageNum === licenseStore.currentPage ? "primary" : "default"}
                     className={
-                      pageNum === currentPage 
+                      pageNum === licenseStore.currentPage 
                         ? "license-pagination-button-active" 
                         : "license-pagination-button-inactive"
                     }
@@ -466,10 +462,10 @@ const License: React.FC = observer(() => {
                 )}
                 <Button 
                   size="small" 
-                  disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0}
-                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0}
+                  onClick={() => handlePageChange(licenseStore.currentPage + 1)}
                   className={
-                    (currentPage === totalPages || totalPages === 0 || totalItems === 0)
+                    (licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0)
                       ? "license-pagination-button-disabled-prev-next" 
                       : "license-pagination-button-prev-next"
                   }
