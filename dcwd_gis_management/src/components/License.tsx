@@ -13,8 +13,6 @@ const { Option } = Select;
 const License: React.FC = observer(() => {
   const [form] = Form.useForm();
 
-  const [pageSize, setPageSize] = React.useState(10);
-  const [currentPage, setCurrentPage] = React.useState(1);
 
   const [renewForm] = Form.useForm();
 
@@ -393,6 +391,7 @@ const License: React.FC = observer(() => {
                 <Table
                   columns={columns}
                   dataSource={paginatedUsers}
+                  rowKey="key"
                   pagination={false}
                   size="small"
                   className="license-table"

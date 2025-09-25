@@ -32,15 +32,15 @@ export default defineConfig({
         target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/query',
         changeOrigin: true,
         secure: true,
-        rewrite: (path) => {
-          if (path.startsWith('/api/layers')) {
-            return path.replace(/^\/api\/layers/, '/getAllLayer.php');
-          }
-          if (path.startsWith('/api/license')) {
-            return path.replace(/^\/api\/license/, '');
-          }
-          return path;
-        }
+        rewrite: (path) => path.replace(/^\/api\/layers/, '/getAllLayer.php')
+      },
+
+      // Dedicated proxy for License API
+      '/api/license': {
+        target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/views',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/license/, ''),
       },
       '/helpers/gis/mgtsys/getLayers': {
         target: 'http://192.100.140.198',
