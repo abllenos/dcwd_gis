@@ -4,7 +4,7 @@ import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
 
 export const apiGis = axios.create({
-  baseURL: 'http://192.100.140.198/', // Match legacy system for local dev
+  baseURL: import.meta.env.DEV ? '' : 'http://192.100.140.198/',
   headers: {
     'Content-Type': 'application/json',
   },
