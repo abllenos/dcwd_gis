@@ -23,3 +23,87 @@
   margin-bottom: 20px;
 }
 
+/* ===== DARK MODE STYLES ===== */
+
+/* Loading overlay general styles */
+[data-theme='dark'] .loading-overlay {
+  background-color: rgba(31, 31, 31, 0.8);
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .loading-spinner {
+  border-color: #434343;
+  border-top-color: #60a5fa;
+}
+
+[data-theme='dark'] .loading-text {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .loading-content {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+/* Loading backdrop */
+[data-theme='dark'] .loading-backdrop {
+  background-color: rgba(20, 20, 20, 0.9);
+}
+
+/* Loading modal/dialog styles */
+[data-theme='dark'] .loading-modal {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .loading-modal .ant-modal-content {
+  background-color: #1f1f1f;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .loading-modal .ant-modal-header {
+  background-color: #262626;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .loading-modal .ant-modal-title {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .loading-modal .ant-modal-body {
+  background-color: #1f1f1f;
+  color: #f1f5f9;
+}
+
+/* Progress bar styles */
+[data-theme='dark'] .loading-progress {
+  background-color: #262626;
+}
+
+[data-theme='dark'] .loading-progress-bar {
+  background-color: #60a5fa;
+}
+
+[data-theme='dark'] .loading-progress-text {
+  color: #f1f5f9;
+}
+
+/* Status indicator styles */
+[data-theme='dark'] .loading-status {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .loading-status.success {
+  color: #10b981;
+}
+
+[data-theme='dark'] .loading-status.error {
+  color: #ef4444;
+}
+
+[data-theme='dark'] .loading-status.warning {
+  color: #f59e0b;
+}
+

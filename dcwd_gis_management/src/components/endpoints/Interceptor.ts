@@ -7,9 +7,6 @@ const GIS_BASE = import.meta.env.DEV
   : 'https://api-gis.davao-water.gov.ph/';
 
 export const apiGis = axios.create({
-
-  baseURL: GIS_BASE,
-
   baseURL: import.meta.env.DEV ? '' : 'http://192.100.140.198/',
   headers: {
     'Content-Type': 'application/json',
@@ -135,3 +132,4 @@ const PUBLIC_ENDPOINT_PATHS = [
     }
   );
 });
+

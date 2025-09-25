@@ -11,10 +11,6 @@ import dcwd from '../../assets/image/logo.png';
 import { observer } from 'mobx-react-lite';
 import { sidebarUiStore } from '../../stores/sidebarUiStore';
 import { filterMenuByAccess, menuItems } from './Menuitems';
-
-
-import { menuItems } from './Menuitems';
-import SideSubmenuPanel from './SideSubmenuPanel';
 import '../../styles/sidepanel.css';
 
 const { Sider } = Layout;

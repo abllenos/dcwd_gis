@@ -1,13 +1,9 @@
-
 import React, { useEffect } from "react";
 import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
 import { observer } from 'mobx-react-lite';
 import { fireHydrantListStore } from '../stores/fireHydrantListStore';
 import type { FireHydrant } from '../stores/fireHydrantListStore';
-import { HomeOutlined } from "@ant-design/icons";
-import Footer from './layout/Footer';
-import { useQuery } from "@tanstack/react-query";
-import { apiGis } from "./endpoints/Interceptor";
+import { HomeOutlined } from "@ant-design/icons";   
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 
 

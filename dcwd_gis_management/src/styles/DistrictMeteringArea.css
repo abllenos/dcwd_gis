@@ -1,0 +1,78 @@
+/* District Metering Area Boundaries Component Styles */
+
+.dma-boundaries-container {
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+.dma-boundaries-title {
+  color: #1890ff;
+  margin: 0;
+}
+
+.dma-boundaries-instructions-title {
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.dma-boundaries-instructions-text {
+  color: #999;
+}
+
+.dma-boundaries-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dma-boundaries-table {
+  margin-bottom: 16px;
+}
+
+.dma-boundaries-footer-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #999;
+}
+
+.dma-boundaries-footer-text {
+  color: #999;
+}
+
+.dma-boundaries-empty-text {
+  padding: 40px 0;
+  color: #999;
+}
+
+/* Dark mode styles */
+[data-theme='dark'] .dma-boundaries-container {
+  background: #141414;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dma-boundaries-title {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .dma-boundaries-instructions-title {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dma-boundaries-instructions-text {
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .dma-boundaries-footer-controls {
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .dma-boundaries-footer-text {
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .dma-boundaries-empty-text {
+  color: #9ca3af;
+}
