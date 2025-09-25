@@ -4,7 +4,6 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import Sidebar from './Sidebar';
 import HeaderBar from './Headerbar';
-import Footer from './Footer';
 import LogoutModal from '../modal/LogoutModal';
 
 import Home from '../Home';
@@ -20,9 +19,6 @@ import IsolationValve from '../IsolationValve';
 import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
-
-import Reports from '../Reports';
-
 import Reports from '../reports';
 import Classification from '../Classification';
 import ClassPage from '../Class';
@@ -30,14 +26,10 @@ import Layer from '../Layer';
 import UserAccounts from '../UserAccounts';
 
 
-
-
-import PressureReleaseValve from '../PressureReleaseValve';
 import BlowOffValve from '../BlowOffValve';
-import PressureMonitoringSystem from '../PressureMonitoringSystem';
 import DMAInlet from '../DMAInlet';
-import MapInfoUsers from '../MapInfoUsers';
-import DistributionTransmission from '../DistributionTransmission';
+import PressureReleaseValve from '../PressureReleaseValve';
+import PressureMonitoringSystem from '../PressureMonitoringSystem';
 
 const { Content } = Layout;
 
@@ -131,8 +123,6 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="blow-off-valve" element={<BlowOffValve />} />
               <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
               <Route path="dma-inlet" element={<DMAInlet />} />
-              <Route path="distribution-transmission" element={<DistributionTransmission />} />
-              <Route path="mapinfo-users" element={<MapInfoUsers />} />
               <Route path="/home" element={<Home />} />
               <Route path="/license" element={<License />} />
               <Route path="/vts" element={<VTS />} />
@@ -147,8 +137,6 @@ const Dashboard: React.FC<DashboardProps> = observer(({
             </Routes>
 
           </Content>
-          
-          <Footer />
         </Layout>
       </Layout>
 

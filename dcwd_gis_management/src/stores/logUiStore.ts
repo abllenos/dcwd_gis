@@ -86,7 +86,6 @@ class LogUiStore {
       this.geometryError = null;
       this.geometry = null;
     });
-    // Prepare request metadata outside try so catch & retry have access
     const LogID = record.id;
     const LayerID = record.layerId; // already trimmed; includes DCWD_ prefix
     const assetStr = formatAssetId(record.assetId);
@@ -97,7 +96,10 @@ class LogUiStore {
       const resp = await apiGis.get(path, {
         params,
         headers: { Accept: 'application/json,text/plain;q=0.9' },
-      });
+        // Ensure dev uses local proxy (blank baseURL) & treat as public (no auth header)
+        useLocalProxy: true,
+        skipAuth: true,
+      } as any);
       runInAction(() => {
         this.lastGeometryUrl = `${apiGis.defaults.baseURL?.replace(/\/$/, '')}/${path}?` + new URLSearchParams({ LogID: String(LogID), LayerID: String(LayerID), AssetID: String(AssetID) }).toString();
         this.lastGeometryStatus = resp.status ?? null;

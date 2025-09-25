@@ -15,6 +15,7 @@ export class LogStore {
   selectedLayer: number | undefined = 1;
   pageSize = 10;
   currentPage = 1;
+  // Server-side paging: currentPage will be sent as PageIndex; pageSize as PageSize
   search = '';
   data: LogRecord[] = [];
   loading = false;
@@ -36,6 +37,7 @@ export class LogStore {
   debugStatus: DebugStatus = null;
   lastErrorCode: string | null = null;
   lastErrorMessage: string | null = null;
+  totalCount: number | null = null; // server-side total rows for selected layer
 
   constructor() {
     makeAutoObservable(this);
@@ -58,10 +60,22 @@ export class LogStore {
   setPageSize(size: number) {
     this.pageSize = size;
     this.currentPage = 1;
+    // Fetch immediately for server-side paging
+    void this.fetchLogs();
   }
 
   setPage(page: number) {
     this.currentPage = page;
+    void this.fetchLogs();
+  }
+
+  // Combined update to avoid double fetch when both page & size change from Table pagination event
+  updatePagination(page: number, size: number) {
+    const sizeChanged = size !== this.pageSize;
+    this.pageSize = size;
+    this.currentPage = page;
+    void this.fetchLogs();
+    return { sizeChanged };
   }
 
   setSearch(q: string) {
@@ -94,10 +108,11 @@ export class LogStore {
       const layerId = this.selectedLayer ?? 1;
       const path = 'admin/logtrails/get';
       const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
-      const fullUrl = `${base}/${path}?LayerID=${layerId}`;
+      const pageIndex = this.currentPage;
+      const fullUrl = `${base}/${path}?LayerID=${layerId}&PageIndex=${pageIndex}&PageSize=${this.pageSize}`;
     // request start
       const resp = await devApi.get(path, {
-        params: { LayerID: layerId },
+        params: { LayerID: layerId, PageIndex: pageIndex, PageSize: this.pageSize },
         headers: { Accept: 'text/plain' },
       });
     const { status, headers } = resp;
@@ -107,7 +122,7 @@ export class LogStore {
       this.lastCurl = `curl -X 'GET' '${fullUrl}' -H 'accept: text/plain'`;
     const reqObj = (resp as unknown as { request?: { responseURL?: string } }).request;
       this.lastEffectiveUrl = reqObj?.responseURL || resp.config?.url || fullUrl;
-      this.lastRequestParams = { LayerID: layerId };
+      this.lastRequestParams = { LayerID: layerId, PageIndex: pageIndex, PageSize: this.pageSize };
 
     // Normalize response to LogRecord[]
     const payload: unknown = parseMaybeJson(data);
@@ -133,7 +148,20 @@ export class LogStore {
         return;
       }
 
-      // use helpers for preferred paths and deep search
+      // Extract paging meta if present (shape: { data: { pageIndex,pageSize,count,totalCount,data:[...] } })
+      let serverCount: number | null = null;
+      if (payload && typeof payload === 'object') {
+        const outer = payload as Record<string, unknown>;
+        const inner = outer.data as Record<string, unknown> | undefined;
+        if (inner && typeof inner === 'object') {
+          const c1 = Number((inner as { count?: unknown }).count);
+            if (!Number.isNaN(c1) && c1 > 0) serverCount = c1;
+          const c2 = Number((inner as { totalCount?: unknown }).totalCount);
+            if (serverCount === null && !Number.isNaN(c2) && c2 > 0) serverCount = c2;
+        }
+      }
+
+      // use helpers for preferred paths and deep search to find the list
 
       let list: unknown[] = [];
       let usedPath: string | null = null;
@@ -157,6 +185,7 @@ export class LogStore {
         this.lastFetchedAt = new Date().toISOString();
         this.lastUrl = fullUrl;
         this.lastCount = 0;
+        this.totalCount = serverCount ?? 0;
         this.lastCurl = `curl -X 'GET' '${fullUrl}' -H 'accept: text/plain'`;
         this.listKeyPath = usedPath;
         this.sampleItemKeys = null;
@@ -171,6 +200,7 @@ export class LogStore {
       this.lastFetchedAt = new Date().toISOString();
       this.lastUrl = fullUrl;
       this.lastCount = this.data.length;
+      this.totalCount = serverCount ?? this.totalCount ?? (this.currentPage === 1 ? this.data.length : null);
       this.listKeyPath = usedPath;
       // capture raw item keys for diagnostics if available
       try {
@@ -190,11 +220,12 @@ export class LogStore {
       this.data = [];
       const layerId = this.selectedLayer ?? 1;
       const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
-      const fullUrl = `${base}/admin/logtrails/get?LayerID=${layerId}`;
+  const fullUrl = `${base}/admin/logtrails/get?LayerID=${layerId}&PageIndex=${this.currentPage}&PageSize=${this.pageSize}`;
       this.lastSource = hasResponse ? 'api' : 'error';
       this.lastFetchedAt = new Date().toISOString();
       this.lastUrl = fullUrl;
       this.lastCount = 0;
+  this.totalCount = 0;
       this.lastCurl = `curl -X 'GET' '${fullUrl}' -H 'accept: text/plain'`;
       // Distinguish disconnected vs HTTP error
       this.debugStatus = hasResponse ? 'empty' : 'disconnected';

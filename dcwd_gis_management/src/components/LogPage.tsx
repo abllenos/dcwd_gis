@@ -21,7 +21,7 @@ const columns: ColumnsType<LogRecord> = [
 ];
 
 const LogPage: React.FC = observer(() => {
-  const { layerOptions, selectedLayer, pageSize, currentPage, search, filteredData, loading, error } = logStore;
+  const { layerOptions, selectedLayer, pageSize, currentPage, search, filteredData, loading, error, totalCount } = logStore;
 
   return (
     <Card className="card shadow mb-4" style={{ borderRadius: 8 }}>
@@ -102,8 +102,8 @@ const LogPage: React.FC = observer(() => {
             pagination={{
               pageSize: pageSize,
               current: currentPage,
-              total: filteredData.length,
-              onChange: (p, s) => { if (s !== pageSize) { logStore.setPageSize(s); } logStore.setPage(p); },
+              total: totalCount ?? filteredData.length,
+              onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); },
               showTotal: (total) => `${total} record${total === 1 ? '' : 's'}`
             }}
             scroll={{ x: 900 }}
