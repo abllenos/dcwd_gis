@@ -1,7 +1,5 @@
 import { Card, Typography, Row, Col, Select, Button } from 'antd';
 import { FilterOutlined, CalendarOutlined } from '@ant-design/icons';
-import { useState } from 'react';
-import Footer from './layout/Footer';
 
 import { observer } from 'mobx-react-lite';
 import { buildingFootprintsStore } from '../stores/buildingFootprintsStore';

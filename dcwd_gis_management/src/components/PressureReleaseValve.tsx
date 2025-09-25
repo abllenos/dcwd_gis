@@ -4,8 +4,6 @@ import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import Footer from './layout/Footer';
 
 import { observer } from 'mobx-react-lite';
 import { prvStore } from '../stores/prvStore';
