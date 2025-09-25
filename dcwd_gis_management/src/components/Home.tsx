@@ -24,7 +24,7 @@ const Home: React.FC = observer(() => {
       ) : (
         <>
           <Row gutter={[24, 24]}>
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <Card variant="borderless" className="home-stat-card home-card-wrapper">
                 <div>
                   <div className="dashboard-label home-dashboard-label">Customer</div>
@@ -34,7 +34,7 @@ const Home: React.FC = observer(() => {
               </Card>
             </Col>
 
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <Card variant="borderless" className="home-stat-card home-card-wrapper">
                 <div>
                   <div className="dashboard-label home-dashboard-label">Pipe Network Length</div>
@@ -44,13 +44,23 @@ const Home: React.FC = observer(() => {
               </Card>
             </Col>
 
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <Card variant="borderless" className="home-stat-card home-card-wrapper">
                 <div>
                   <div className="dashboard-label home-dashboard-label">Reassessed Pipe Network</div>
                   <div className="home-dashboard-number">{dashboardStore.summary.pending}</div>
                 </div>
                 <ClockCircleOutlined className="home-dashboard-icon" />
+              </Card>
+            </Col>
+
+            <Col xs={24} md={6}>
+              <Card variant="borderless" className="home-stat-card home-card-wrapper">
+                <div>
+                  <div className="dashboard-label home-dashboard-label">Road Network</div>
+                  <div className="home-dashboard-number">30017,8,556.41 km</div>
+                </div>
+                <FileTextOutlined className="home-dashboard-icon" />
               </Card>
             </Col>
           </Row>

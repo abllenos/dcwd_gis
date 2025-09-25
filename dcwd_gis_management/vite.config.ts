@@ -13,6 +13,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/license/, '')
+      },
+      '/helpers/gis/mgtsys/getLayers': {
+        target: 'http://192.100.140.198',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

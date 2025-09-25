@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useEffect } from 'react';
 import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
+import { observer } from 'mobx-react-lite';
+import { prvStore } from '../stores/prvStore';
 import { apiGis } from './endpoints/Interceptor';
 
 const { Title, Text } = Typography;
@@ -17,50 +19,33 @@ interface PressureReleaseValveRecord {
   // Add other fields as needed from API
 }
 
-// Fetch function for PRV data
-const fetchPRVData = async (): Promise<PressureReleaseValveRecord[]> => {
-  const res = await apiGis.get('helpers/gis/mgtsys/getLayers/getPrv.php');
-  // Map API data to PressureReleaseValveRecord shape
-  return (Array.isArray(res.data.data) ? res.data.data : []).map((item: any, idx: number) => ({
-    key: item.prv_number || String(idx),
-    id: idx + 1,
-    prvNumber: item.prv_number || '',
-    location: item.location || '',
-    status: item.status_remarks || '',
-    ...item,
-  }));
-};
 
 
-const PressureReleaseValve: React.FC = () => {
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [search, setSearch] = useState<string>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedRecord, setSelectedRecord] = useState<PressureReleaseValveRecord | null>(null);
 
-  // Fetch PRV data
-  const { data, isLoading, error } = useQuery<PressureReleaseValveRecord[]>({
-    queryKey: ['prvData'],
-    queryFn: fetchPRVData,
-  });
-
-  // Debug: log API response and error
-  if (typeof window !== 'undefined') {
-    // eslint-disable-next-line no-console
-    console.log('PRV API data:', data);
-    if (error) console.error('PRV API error:', error);
-  }
-
-  const filteredData = useMemo(() => {
-    if (!data) return [];
-    const q = search.trim().toLowerCase();
-    return data.filter((r) =>
-      String(r.id).includes(q) ||
-      r.prvNumber.toLowerCase().includes(q) ||
-      r.location.toLowerCase().includes(q) ||
-      r.status.toLowerCase().includes(q)
-    );
-  }, [data, search]);
+const PressureReleaseValve: React.FC = observer(() => {
+  useEffect(() => {
+    const fetchData = async () => {
+      prvStore.setLoading(true);
+      prvStore.setError(null);
+      try {
+        const res = await apiGis.get('helpers/gis/mgtsys/getLayers/getPrv.php');
+        const data = (Array.isArray(res.data.data) ? res.data.data : []).map((item: any, idx: number) => ({
+          key: item.prv_number || String(idx),
+          id: idx + 1,
+          prvNumber: item.prv_number || '',
+          location: item.location || '',
+          status: item.status_remarks || '',
+          ...item,
+        }));
+        prvStore.setData(data);
+      } catch (err) {
+        prvStore.setError(err);
+      } finally {
+        prvStore.setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const columns: ColumnsType<PressureReleaseValveRecord> = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
@@ -72,7 +57,7 @@ const PressureReleaseValve: React.FC = () => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PressureReleaseValveRecord) => (
-        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setSelectedRecord(_record); setModalVisible(true); }}>
+        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
           <UnorderedListOutlined />
         </button>
       ),
@@ -93,7 +78,7 @@ const PressureReleaseValve: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <Space>
             <Text>Display</Text>
-            <select value={String(pageSize)} onChange={(e) => setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
+            <select value={String(prvStore.pageSize)} onChange={(e) => prvStore.setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
@@ -107,23 +92,23 @@ const PressureReleaseValve: React.FC = () => {
             <input
               aria-label="Search"
               placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={prvStore.search}
+              onChange={(e) => prvStore.setSearch(e.target.value)}
               style={{ width: 260, padding: '6px 10px', borderRadius: 4, border: '1px solid #d9d9d9' }}
             />
           </Space>
         </div>
 
-        {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load data" /> : (
+        {prvStore.isLoading ? <Spin /> : prvStore.error ? <Alert type="error" message="Failed to load data" /> : (
           <Table
             columns={columns as any}
-            dataSource={filteredData}
-            pagination={{ pageSize }}
+            dataSource={prvStore.filteredData}
+            pagination={{ pageSize: prvStore.pageSize }}
             rowKey={(r: PressureReleaseValveRecord) => r.key}
             onRow={(record: PressureReleaseValveRecord) => ({
               onDoubleClick: () => {
-                setSelectedRecord(record);
-                setModalVisible(true);
+                prvStore.setSelectedRecord(record);
+                prvStore.setModalVisible(true);
               },
             })}
             bordered
@@ -131,17 +116,17 @@ const PressureReleaseValve: React.FC = () => {
         )}
 
         <PressureReleaseValveModal
-          visible={modalVisible}
-          record={selectedRecord}
-          onCancel={() => setModalVisible(false)}
+          visible={prvStore.modalVisible}
+          record={prvStore.selectedRecord}
+          onCancel={() => prvStore.setModalVisible(false)}
           onUpdate={() => {
-            console.log('Updated', selectedRecord);
-            setModalVisible(false);
+            console.log('Updated', prvStore.selectedRecord);
+            prvStore.setModalVisible(false);
           }}
         />
       </Card>
     </div>
   );
-};
+});
 
 export default PressureReleaseValve;
