@@ -1,5 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
+import { observer } from 'mobx-react-lite';
+import { fireHydrantListStore } from '../stores/fireHydrantListStore';
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
@@ -21,12 +23,9 @@ const fetchFireHydrant = async () => {
     return Array.isArray(res.data.data) ? res.data.data : [];
 };
 
-const FireHydrantList: React.FC = () => {
-    const [searchText, setSearchText] = useState("");
-    const [pagination, setPagination] = useState<TablePaginationConfig>({
-        current: 1,
-        pageSize: 10,
-    });
+
+const FireHydrantList: React.FC = observer(() => {
+    const { searchText, pagination, setSearchText, setPagination } = fireHydrantListStore;
 
     const { data, isLoading, error } = useQuery<FireHydrant[]>({
         queryKey: ["fireHydrantData"],
@@ -83,18 +82,18 @@ const FireHydrantList: React.FC = () => {
                 }}
                 style={{ width: 300, marginBottom: 20, marginTop: 20 }}
             />
-            <Table
-                    dataSource={filteredData}
-                    columns={columns}
-                    rowKey="assetid"
-                    pagination={{
-                      ...pagination,
-                      total: filteredData.length,
-                      onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
-                    }}
-                  />
+                        <Table
+                                dataSource={filteredData}
+                                columns={columns}
+                                rowKey="assetid"
+                                pagination={{
+                                    ...pagination,
+                                    total: filteredData.length,
+                                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                                }}
+                        />
         </div>
     );
-};
+});
 
 export default FireHydrantList;
