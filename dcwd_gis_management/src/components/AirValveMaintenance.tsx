@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { airValveStore } from '../stores/airValveStore';
 import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
 import AirValveModal from './modal/AirValveModal';
+import AirValveDetailsModal from './modal/AirValveDetailsModal';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
@@ -56,7 +57,11 @@ const fetchAirValves = async (): Promise<AirValveRecord[]> => {
 
 
 const AirValveMaintenance: React.FC = observer(() => {
+
   const { pageSize, setPageSize, search, setSearch, modalVisible, setModalVisible, selectedRecord, setSelectedRecord } = airValveStore;
+  // State for details modal
+  const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+  const [detailsRecord, setDetailsRecord] = useState<AirValveRecord | null>(null);
 
   const { data, isLoading, error } = useQuery<AirValveRecord[]>({
     queryKey: ['airValveData'],
@@ -75,7 +80,14 @@ const AirValveMaintenance: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: AirValveRecord) => (
-        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setSelectedRecord(_record); setModalVisible(true); }}>
+        <button
+          aria-label="actions"
+          style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => {
+            setDetailsRecord(_record);
+            setDetailsModalVisible(true);
+          }}
+        >
           <UnorderedListOutlined />
         </button>
       ),
@@ -154,6 +166,11 @@ const AirValveMaintenance: React.FC = observer(() => {
             console.log('Updated values', values);
             setModalVisible(false);
           }}
+        />
+        <AirValveDetailsModal
+          visible={detailsModalVisible}
+          record={detailsRecord}
+          onCancel={() => setDetailsModalVisible(false)}
         />
       </Card>
     </div>
