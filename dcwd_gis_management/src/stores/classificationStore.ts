@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
+import { apiGis } from '../components/endpoints/Interceptor';
 
 // Shape of a classification record
 export interface ClassificationRecord {
@@ -15,6 +16,8 @@ interface NetworkDiagnostics {
   lastStatus: number | null;
   lastFetchedAt: string | null; // ISO string
   lastError: string | null;
+  lastRawCount?: number | null;
+  lastParseNote?: string | null;
 }
 
 class ClassificationStore {
@@ -40,37 +43,113 @@ class ClassificationStore {
     lastStatus: null,
     lastFetchedAt: null,
     lastError: null,
+    lastRawCount: null,
+    lastParseNote: null,
   };
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
-    this.seedFakeData();
+    // Initial fetch
+    this.fetchAllClassifications();
   }
 
-  // Seed with 123 fake records to match screenshot density
-  private seedFakeData() {
-    const base: Omit<ClassificationRecord, 'id'>[] = [
-      { description: 'HWMONLINE', statusFlag: 1, layerName: 'DCWD_PMS', className: 'PMS BRAND' },
-      { description: 'RADCOM', statusFlag: 1, layerName: 'DCWD_PMS', className: 'PMS BRAND' },
-      { description: 'PRIMAYER', statusFlag: 1, layerName: 'DCWD_PMS', className: 'PMS BRAND' },
-      { description: 'PVC', statusFlag: 1, layerName: 'UNIVERSAL', className: 'PIPE TYPE' },
-      { description: 'CMLECSP', statusFlag: 1, layerName: 'UNIVERSAL', className: 'PIPE TYPE' },
-      { description: 'MLCSP', statusFlag: 1, layerName: 'UNIVERSAL', className: 'PIPE TYPE' },
-      { description: 'Air Release Valve', statusFlag: 1, layerName: 'DCWD_VALVE_AV', className: 'VALVE TYPE' },
-      { description: 'BERMAD', statusFlag: 1, layerName: 'DCWD_VALVE_AV', className: 'VALVE BRAND' },
-      { description: 'CLAVAL', statusFlag: 1, layerName: 'DCWD_VALVE_AV', className: 'VALVE BRAND' },
-      { description: 'AVK', statusFlag: 1, layerName: 'DCWD_VALVE_AV', className: 'VALVE BRAND' },
-    ];
-    const list: ClassificationRecord[] = [];
-    let id = 1;
-    // Repeat base list until we reach ~123 items (as screenshot shows 123 entries)
-    while (list.length < 123) {
-      for (const item of base) {
-        list.push({ id: id++, ...item });
-        if (list.length >= 123) break;
+  // Fetch real data from public endpoint
+  async fetchAllClassifications() {
+    this.loading = true;
+  // Path selection:
+  // DEV: use local Vite proxy (/api/classifications) as a TEMPORARY CORS workaround until backend adds headers or
+  // a server-side pass-through is implemented. PROD: call remote relative path directly.
+  const isDev = import.meta.env.DEV;
+  const urlPath = isDev ? '/api/classifications' : 'web/dcwdgis/ajax/query/getAllClassification.php';
+    runInAction(() => {
+      this.diagnostics.lastUrl = urlPath + '?mode=active';
+      this.diagnostics.lastStatus = null;
+      this.diagnostics.lastError = null;
+    });
+    try {
+      // TEMP DEBUG START (remove later)
+      const startTs = performance.now();
+      // Public endpoint: do not send Authorization header; mark skipAuth to be explicit
+      console.log('[ClassificationFetch] starting request', { urlPath, params: { mode: 'active' } });
+  const response = await apiGis.get(urlPath, { params: { mode: 'active' }, useLocalProxy: isDev, skipAuth: true, headers: { Accept: 'application/json, text/plain;q=0.9' } } as any);
+      console.log('[ClassificationFetch] response received', { status: response.status, tookMs: +(performance.now() - startTs).toFixed(1) });
+      const raw = response.data;
+      try { console.debug('[ClassificationFetch] raw type/preview', { type: typeof raw, preview: typeof raw === 'string' ? raw.slice(0, 300) : JSON.stringify(raw).slice(0, 300) }); } catch {}
+      // Some endpoints might respond as text; defensively parse if string
+      let data: unknown;
+      if (typeof raw === 'string') {
+        try { data = JSON.parse(raw); } catch { data = raw; }
+      } else { data = raw; }
+
+      let working = data;
+      let parseNote: string | null = null;
+      // If not an array, attempt to find array inside an object wrapper
+      if (!Array.isArray(working) && working && typeof working === 'object') {
+        const obj = working as Record<string, unknown>;
+        // Common keys to try first
+        const preferredKeys = ['data', 'rows', 'result', 'items', 'classifications'];
+        let candidate: unknown = null;
+        for (const k of preferredKeys) {
+          if (Array.isArray(obj[k])) { candidate = obj[k]; parseNote = `wrapped:${k}`; break; }
+        }
+        if (!candidate) {
+          // Fallback: first array property
+            for (const k of Object.keys(obj)) {
+              if (Array.isArray(obj[k])) { candidate = obj[k]; parseNote = `wrapped:firstArray:${k}`; break; }
+            }
+        }
+        if (!candidate) {
+          // Maybe it's an object keyed by id -> convert values
+          const values = Object.values(obj);
+          if (values.length && values.every(v => v && typeof v === 'object')) {
+            candidate = values;
+            parseNote = 'objectValues';
+          }
+        }
+        if (candidate) working = candidate;
       }
+
+      const arr: ClassificationRecord[] = Array.isArray(working) ? (working as any[]).map((item: any, idx: number) => {
+        // Two possible shapes:
+        // 1. Object form { id, description, statusFlag, layerName, className }
+        // 2. Tuple form [id, description, statusFlag, layerName, className]
+        if (Array.isArray(item)) {
+          const [idRaw, descRaw, statusRaw, layerRaw, classRaw] = item as unknown[];
+          const id = Number(idRaw) || idx + 1;
+          const description = String(descRaw ?? '').trim();
+          const statusFlag = Number(statusRaw) === 0 ? 0 : 1; // treat non-zero as 1
+          const layerName = String(layerRaw ?? '').trim();
+          const className = String(classRaw ?? '').trim();
+          return { id, description, statusFlag, layerName, className };
+        }
+        // Object normalization fallback
+        const description = String(item.description || item.desc || item.classification || '').trim();
+        const layerName = String(item.layerName || item.layer || item.layer_name || '').trim();
+        const className = String(item.className || item.class_name || item.class || '').trim();
+        const statusFlag = typeof item.statusFlag === 'number' ? item.statusFlag : (item.status_flag ? Number(item.status_flag) : 1);
+        const idVal = Number(item.id ?? item.classificationId ?? (idx + 1));
+        return { id: Number.isFinite(idVal) ? idVal : idx + 1, description, layerName, className, statusFlag };
+      }).filter(r => r.description || r.layerName || r.className) : [];
+
+      runInAction(() => {
+        this.records = arr;
+        this.diagnostics.lastStatus = 200;
+        this.diagnostics.lastFetchedAt = new Date().toISOString();
+        this.diagnostics.lastRawCount = Array.isArray(working) ? (working as any[]).length : null;
+        this.diagnostics.lastParseNote = parseNote;
+      });
+      console.log('[ClassificationFetch] normalization complete', { rawCount: this.diagnostics.lastRawCount, stored: arr.length, parseNote });
+    } catch (err: unknown) {
+      runInAction(() => {
+        this.diagnostics.lastStatus = (err as any)?.response?.status ?? 0;
+        this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
+        this.diagnostics.lastRawCount = null;
+        this.diagnostics.lastParseNote = null;
+      });
+      console.error('[ClassificationFetch] request failed', err);
+    } finally {
+      runInAction(() => { this.loading = false; });
     }
-    this.records = list;
   }
 
   // Computed filtered set
@@ -138,17 +217,8 @@ class ClassificationStore {
     return true;
   }
 
-  // Placeholder for future API fetch
-  async refreshFromServer(fakeDelayMs = 600) {
-    this.loading = true;
-    runInAction(() => {
-      this.diagnostics.lastUrl = '/maintenance/classification';
-      this.diagnostics.lastStatus = 200; // fake
-      this.diagnostics.lastError = null;
-    });
-    await new Promise(r => setTimeout(r, fakeDelayMs));
-    runInAction(() => { this.diagnostics.lastFetchedAt = new Date().toISOString(); this.loading = false; });
-  }
+  // Manual refresh
+  async refreshFromServer() { await this.fetchAllClassifications(); }
 }
 
 export const classificationStore = new ClassificationStore();

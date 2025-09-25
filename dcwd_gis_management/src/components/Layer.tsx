@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form } from 'antd';
+import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form, Alert, Empty } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { layerStore } from '../stores/layerStore';
 import type { LayerRecord } from '../stores/layerStore';
@@ -18,10 +18,10 @@ const Layer: React.FC = observer(() => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 70 },
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 70, sorter: (a: any, b: any) => (Number(a.id) || 0) - (Number(b.id) || 0) },
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Status Flag', dataIndex: 'statusFlag', key: 'statusFlag', width: 110, render: (v: number) => v === 1 ? <Tag color="green">1</Tag> : <Tag color="red">0</Tag> },
-    { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', render: (v: string) => new Date(v).toISOString() },
+    { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: LayerRecord) => (
       <Button
         type="primary"
@@ -34,7 +34,7 @@ const Layer: React.FC = observer(() => {
 
   return (
     <div style={{ maxWidth: '100%', margin: '0 auto' }}>
-      <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} bodyStyle={{ padding: 20 }}>
+  <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} styles={{ body: { padding: 20 } }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0 }}>Layer - Maintenance</Title>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAdd()}>
@@ -65,6 +65,12 @@ const Layer: React.FC = observer(() => {
           </Space>
         </div>
 
+        {store.diagnostics.lastError && !loading && (
+          <Alert type="error" showIcon style={{ marginBottom: 12 }} message="Failed to load layers" description={store.diagnostics.lastError} />
+        )}
+        {!loading && !store.diagnostics.lastError && paged.length === 0 && (
+          <Empty description="No layers" style={{ margin: '40px 0' }} />
+        )}
         <Table
           size="small"
           rowKey="id"
@@ -103,7 +109,7 @@ const Layer: React.FC = observer(() => {
         onCancel={() => store.closeModal()}
         onOk={() => store.saveDraft()}
         okText="Save"
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           layout="vertical"

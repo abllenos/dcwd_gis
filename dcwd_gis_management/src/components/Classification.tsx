@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form } from 'antd';
+import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form, Alert, Empty } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { classificationStore } from '../stores/classificationStore';
 import type { ClassificationRecord } from '../stores/classificationStore';
@@ -19,10 +19,10 @@ const Classification: React.FC = observer(() => {
   const { pagedRecords, pageSize, currentPage, totalCount, loading } = store;
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 70 },
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 70, sorter: (a: any, b: any) => (Number(a.id) || 0) - (Number(b.id) || 0) },
     { title: 'Description', dataIndex: 'description', key: 'description' },
-    { title: 'Layer Name', dataIndex: 'layerName', key: 'layerName' },
-    { title: 'Class Name', dataIndex: 'className', key: 'className' },
+    { title: 'Layer Name', dataIndex: 'layerName', key: 'layerName', sorter: (a: any, b: any) => String(a.layerName || '').localeCompare(String(b.layerName || '')) },
+    { title: 'Class Name', dataIndex: 'className', key: 'className', sorter: (a: any, b: any) => String(a.className || '').localeCompare(String(b.className || '')) },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassificationRecord) => (
       <Button
         type="primary"
@@ -37,7 +37,7 @@ const Classification: React.FC = observer(() => {
     <div style={{ maxWidth: '100%', margin: '0 auto' }}>
       <Card
         style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }}
-        bodyStyle={{ padding: 20 }}
+        styles={{ body: { padding: 20 } }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0, color: 'var(--text-primary)' }}>Classification - Maintenance</Title>
@@ -69,16 +69,20 @@ const Classification: React.FC = observer(() => {
           </Space>
         </div>
 
+        {store.diagnostics.lastError && !loading && (
+          <Alert type="error" showIcon style={{ marginBottom: 12 }} message="Failed to load classifications" description={store.diagnostics.lastError} />
+        )}
+        {!loading && !store.diagnostics.lastError && pagedRecords.length === 0 && (
+          <Empty description="No classifications" style={{ margin: '40px 0' }} />
+        )}
         <Table
           size="small"
-            rowKey="id"
+          rowKey="id"
           dataSource={pagedRecords}
           columns={columns as any}
           pagination={false}
           loading={loading}
-          onRow={(record) => ({
-            onDoubleClick: () => store.openEdit(record)
-          })}
+          onRow={(record) => ({ onDoubleClick: () => store.openEdit(record) })}
           style={{ marginBottom: 16 }}
         />
 
@@ -111,7 +115,7 @@ const Classification: React.FC = observer(() => {
         onCancel={() => store.closeModal()}
         onOk={() => store.saveDraft()}
         okText="Save"
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           layout="vertical"

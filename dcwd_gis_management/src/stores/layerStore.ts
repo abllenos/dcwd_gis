@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
+import { apiGis } from '../components/endpoints/Interceptor';
 
 export interface LayerRecord {
   id: number;
@@ -29,20 +30,65 @@ class LayerStore {
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
-    this.seed();
+    this.fetchAll();
   }
 
-  private seed() {
-    const base = [
-      'DCWD_PMS','UNIVERSAL','DCWD_VALVE_AV','FIREHYDRANT','ISOLATIONVALVE','BOV','PRV','PSV','REDUCER','CUSTOMER','TRANSMISSION','DISTRIBUTION','PRESSURE_ZONE','DMA_POLYGON','EASEMENT','SERVICE_CONNECTION','WATER_SOURCE','TREATMENT_PLANT','RESERVOIR','PUMP_STATION','PIPE_REHAB','METERING_POINT','SENSOR_LAYER'
-    ];
-    const now = Date.now();
-    this.records = base.map((d, i) => ({
-      id: i + 1,
-      description: d,
-      statusFlag: 1,
-      dateInserted: new Date(now - i * 7000).toISOString()
-    }));
+  async fetchAll() {
+    this.loading = true;
+    const isDev = import.meta.env.DEV;
+    const urlPath = isDev ? '/api/layers' : 'web/dcwdgis/ajax/query/getAllLayer.php';
+    runInAction(() => {
+      this.diagnostics.lastUrl = urlPath + '?mode=active';
+      this.diagnostics.lastStatus = null;
+      this.diagnostics.lastError = null;
+    });
+    try {
+      const start = performance.now();
+      const resp = await apiGis.get(urlPath, { params: { mode: 'active' }, useLocalProxy: isDev, skipAuth: true, headers: { Accept: 'application/json, text/plain;q=0.9' } } as any);
+      const raw = resp.data;
+      let parsed: unknown = raw;
+      if (typeof raw === 'string') { try { parsed = JSON.parse(raw); } catch { /* keep string */ } }
+      let working: unknown = parsed;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && (parsed as any).data) {
+        working = (parsed as any).data;
+      }
+      const list: LayerRecord[] = Array.isArray(working) ? (working as any[]).map((item: any, idx: number): LayerRecord | null => {
+        if (Array.isArray(item)) {
+          // Tuple guess: [id, description, statusFlag, ...]
+          const [idRaw, descRaw, statusRaw] = item;
+          return {
+            id: Number(idRaw) || idx + 1,
+            description: String(descRaw ?? '').trim(),
+            statusFlag: Number(statusRaw) === 0 ? 0 : 1,
+            dateInserted: new Date().toISOString(),
+          };
+        }
+        if (item && typeof item === 'object') {
+          const id = Number(item.id ?? idx + 1);
+          const description = String(item.description || item.desc || item.name || '').trim();
+          const statusFlag = Number((item.statusFlag ?? item.status_flag ?? 1)) === 0 ? 0 : 1;
+          const dateInserted = String(item.dateInserted || item.created_at || new Date().toISOString());
+          if (!description) return null;
+          return { id, description, statusFlag, dateInserted };
+        }
+        return null;
+      }).filter(Boolean) as LayerRecord[] : [];
+      runInAction(() => {
+        this.records = list;
+        this.diagnostics.lastStatus = 200;
+        this.diagnostics.lastFetchedAt = new Date().toISOString();
+      });
+      console.log('[LayerFetch] ok', { tookMs: +(performance.now() - start).toFixed(1), count: list.length });
+    } catch (err: unknown) {
+      runInAction(() => {
+        this.diagnostics.lastStatus = (err as any)?.response?.status ?? 0;
+        this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
+        this.records = [];
+      });
+      console.error('[LayerFetch] failed', err);
+    } finally {
+      runInAction(() => { this.loading = false; });
+    }
   }
 
   // Computed
@@ -79,12 +125,7 @@ class LayerStore {
     return true;
   }
 
-  async refresh(fakeDelay = 400) {
-    this.loading = true;
-    runInAction(() => { this.diagnostics.lastUrl = '/maintenance/layer'; this.diagnostics.lastStatus = 200; this.diagnostics.lastError = null; });
-    await new Promise(r => setTimeout(r, fakeDelay));
-    runInAction(() => { this.diagnostics.lastFetchedAt = new Date().toISOString(); this.loading = false; });
-  }
+  async refresh() { await this.fetchAll(); }
 }
 
 export const layerStore = new LayerStore();

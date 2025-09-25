@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
+import { apiGis } from '../components/endpoints/Interceptor';
 
 export interface ClassRecord {
   id: number;
@@ -33,20 +34,67 @@ class ClassStore {
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
-    this.seed();
+    this.fetchAll();
   }
 
-  private seed() {
-    const baseDescriptions = [
-      'VALVE BRAND','PIPE TYPE','STATUS','VALVE TYPE','PMS BRAND','HYDRANT CLASSIFICATION','VALVE STATUS','PSV BRAND','REDUCER TYPE','PIPE MATERIAL','PIPE COATING','GAUGE TYPE','HYDRANT TYPE','MATERIAL TYPE','METER TYPE','SERVICE TYPE','AREA CLASS','PRESSURE ZONE','DMA GROUP','LEAK CATEGORY','INSPECTION TYPE','MAINTENANCE TYPE'
-    ];
-    // Provide 22 entries like screenshot (1..22)
-    const now = new Date();
-    this.records = baseDescriptions.map((d, idx) => ({
-      id: idx + 1,
-      description: d,
-      dateInserted: new Date(now.getTime() - idx * 5000).toISOString()
-    }));
+  async fetchAll() {
+    this.loading = true;
+    const isDev = import.meta.env.DEV;
+    const urlPath = isDev ? '/api/classes' : 'web/dcwdgis/ajax/query/getAllClass.php';
+    runInAction(() => {
+      this.diagnostics.lastUrl = urlPath + '?mode=active';
+      this.diagnostics.lastStatus = null;
+      this.diagnostics.lastError = null;
+    });
+    try {
+      const start = performance.now();
+      // Public endpoint; skip auth
+      const response = await apiGis.get(urlPath, { params: { mode: 'active' }, useLocalProxy: isDev, skipAuth: true, headers: { Accept: 'application/json, text/plain;q=0.9' } } as any);
+      const raw = response.data;
+      let parsed: unknown = raw;
+      if (typeof raw === 'string') {
+        try { parsed = JSON.parse(raw); } catch { /* leave as string */ }
+      }
+      // Expect shape { data: [ [id, description, date?, ...] ] } similar to classification, but verify
+      let working: unknown = parsed;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && (parsed as any).data) {
+        working = (parsed as any).data;
+      }
+      const list: ClassRecord[] = Array.isArray(working) ? (working as any[]).map((item: any, idx: number): ClassRecord | null => {
+        if (Array.isArray(item)) {
+          // Tuple form: [id, description, maybeStatusFlag/unused, ...]
+            const [idRaw, descRaw] = item;
+          return {
+            id: Number(idRaw) || idx + 1,
+            description: String(descRaw ?? '').trim(),
+            dateInserted: new Date().toISOString(),
+          };
+        }
+        if (item && typeof item === 'object') {
+          const id = Number(item.id ?? idx + 1);
+          const description = String(item.description || item.desc || item.name || '').trim();
+          const dateInserted = String(item.dateInserted || item.created_at || new Date().toISOString());
+          if (!description) return null;
+          return { id, description, dateInserted };
+        }
+        return null;
+      }).filter(Boolean) as ClassRecord[] : [];
+      runInAction(() => {
+        this.records = list;
+        this.diagnostics.lastStatus = 200;
+        this.diagnostics.lastFetchedAt = new Date().toISOString();
+      });
+      console.log('[ClassFetch] ok', { tookMs: +(performance.now() - start).toFixed(1), count: list.length });
+    } catch (err: unknown) {
+      runInAction(() => {
+        this.diagnostics.lastStatus = (err as any)?.response?.status ?? 0;
+        this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
+        this.records = [];
+      });
+      console.error('[ClassFetch] failed', err);
+    } finally {
+      runInAction(() => { this.loading = false; });
+    }
   }
 
   // Computed
@@ -82,12 +130,7 @@ class ClassStore {
     return true;
   }
 
-  async refresh(fakeDelay = 400) {
-    this.loading = true;
-    runInAction(() => { this.diagnostics.lastUrl = '/maintenance/class'; this.diagnostics.lastStatus = 200; this.diagnostics.lastError = null; });
-    await new Promise(r => setTimeout(r, fakeDelay));
-    runInAction(() => { this.diagnostics.lastFetchedAt = new Date().toISOString(); this.loading = false; });
-  }
+  async refresh() { await this.fetchAll(); }
 }
 
 export const classStore = new ClassStore();

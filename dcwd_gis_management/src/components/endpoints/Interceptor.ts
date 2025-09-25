@@ -1,8 +1,13 @@
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
+// Dynamic base: use dev-gis host in development to satisfy CORS (prod host lacks ACAO for localhost) but retain production host in builds
+const GIS_BASE = import.meta.env.DEV
+  ? 'https://dev-gis.davao-water.gov.ph/'
+  : 'https://api-gis.davao-water.gov.ph/';
+
 export const apiGis = axios.create({
-  baseURL: 'https://api-gis.davao-water.gov.ph/',
+  baseURL: GIS_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,11 +36,23 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
+// Public endpoints (lowercase, path only, no domain) where Authorization must be stripped
+const PUBLIC_ENDPOINT_PATHS = [
+  '/web/dcwdgis/ajax/query/getallclassification.php',
+  '/helpers/gis/api/userlogs/getlogsgeometry.php',
+  '/api/classifications', // local dev proxy path
+];
+
 [apiGis, devApi].forEach((instance) => {
   instance.interceptors.request.use(
     (config) => {
       // Support per-request opt-out of auth via custom flag
-      const cfg = config as (InternalAxiosRequestConfig & { skipAuth?: boolean });
+      const cfg = config as (InternalAxiosRequestConfig & { skipAuth?: boolean; useLocalProxy?: boolean });
+
+      // If flagged to use local proxy in DEV, blank the baseURL so the request hits the Vite dev server and triggers proxy
+      if (import.meta.env.DEV && cfg.useLocalProxy) {
+        cfg.baseURL = '' as any; // ensure final URL is relative to current origin
+      }
 
       // Remove Content-Type for GET to avoid unnecessary CORS preflight
       if ((cfg.method || '').toLowerCase() === 'get' && cfg.headers) {
@@ -43,10 +60,12 @@ const processQueue = (error: unknown, token: string | null = null) => {
       }
 
       // Normalize URL to detect public geometry endpoint (no Authorization header allowed; CORS rejects it)
-      const combined = ((cfg.baseURL || '').replace(/\/$/, '') + '/' + (cfg.url || '')).replace(/(?<!:)\/+/g, '/');
+  const combined = ((cfg.baseURL || '').replace(/\/$/, '') + '/' + (cfg.url || '')).replace(/(?<!:)\/+/g, '/');
       const pathOnly = '/' + combined.replace(/^https?:\/\/[^/]+/, '').replace(/^\/*/, '').split('?')[0];
-      const isPublicGeometry = pathOnly.toLowerCase().endsWith('/helpers/gis/api/userlogs/getlogsgeometry.php');
-      if (!cfg.skipAuth && !isPublicGeometry) {
+      const lowerPath = pathOnly.toLowerCase();
+      const isPublic = PUBLIC_ENDPOINT_PATHS.includes(lowerPath);
+
+      if (!cfg.skipAuth && !isPublic) {
         const token = localStorage.getItem('token');
         if (token) {
           cfg.headers = {
@@ -54,7 +73,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
             Authorization: `Bearer ${token}`,
           } as AxiosRequestHeaders;
         }
-      } else if (isPublicGeometry && cfg.headers) {
+      } else if (isPublic && cfg.headers) {
         // Ensure Authorization header *not* present if some earlier logic added it
         delete (cfg.headers as AxiosRequestHeaders).Authorization;
       }
