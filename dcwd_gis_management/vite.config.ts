@@ -17,6 +17,7 @@ export default defineConfig({
         target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/query',
         changeOrigin: true,
         secure: true,
+
         rewrite: (path) => path.replace(/^\/api\/classifications/, '/getAllClassification.php')
       },
       // TEMPORARY WORKAROUND (CORS) for Class endpoint; mirror of classifications rationale above.
@@ -32,6 +33,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/layers/, '/getAllLayer.php')
+        rewrite: (path) => path.replace(/^\/api\/license/, '')
+      },
+      '/helpers/gis/mgtsys/getLayers': {
+        target: 'http://192.100.140.198',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

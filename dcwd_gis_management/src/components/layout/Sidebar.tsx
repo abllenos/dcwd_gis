@@ -10,7 +10,7 @@ import dcwdIcon from '../../assets/image/dcwd.jpg';
 import dcwd from '../../assets/image/logo.png';
 import { observer } from 'mobx-react-lite';
 import { sidebarUiStore } from '../../stores/sidebarUiStore';
-import { filterMenuByAccess, menuItems, getSidebarWidth } from './Menuitems';
+import { menuItems } from './Menuitems';
 import SideSubmenuPanel from './SideSubmenuPanel';
 import '../../styles/sidepanel.css';
 
@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
     access: []
   });
 
-  const [accessibleMenuItems, setAccessibleMenuItems] = React.useState<MenuProps['items']>([]);
+  // ...existing code...
   const [topLevelMenuItems, setTopLevelMenuItems] = useState<MenuProps['items']>([]);
   const [sideOpen, setSideOpen] = useState(false);
   const [sideTitle, setSideTitle] = useState('');

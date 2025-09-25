@@ -27,10 +27,13 @@ import UserAccounts from '../UserAccounts';
 
 
 
-import BlowOffValve from '../BlowOffValve';
-import DMAInlet from '../DMAInlet';
+
 import PressureReleaseValve from '../PressureReleaseValve';
+import BlowOffValve from '../BlowOffValve';
 import PressureMonitoringSystem from '../PressureMonitoringSystem';
+import DMAInlet from '../DMAInlet';
+import MapInfoUsers from '../MapInfoUsers';
+import DistributionTransmission from '../DistributionTransmission';
 
 const { Content } = Layout;
 
@@ -124,6 +127,8 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="blow-off-valve" element={<BlowOffValve />} />
               <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
               <Route path="dma-inlet" element={<DMAInlet />} />
+              <Route path="distribution-transmission" element={<DistributionTransmission />} />
+              <Route path="mapinfo-users" element={<MapInfoUsers />} />
               <Route path="/home" element={<Home />} />
               <Route path="/license" element={<License />} />
               <Route path="/vts" element={<VTS />} />

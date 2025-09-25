@@ -1,6 +1,7 @@
 import { Card, Typography, Row, Col, Select, Button } from 'antd';
 import { FilterOutlined, CalendarOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { buildingFootprintsStore } from '../stores/buildingFootprintsStore';
 
 const { Title } = Typography;
 
@@ -28,9 +29,9 @@ const years = [
   })
 ];
 
-const BuildingFootprints = () => {
-  const [month, setMonth] = useState('');
-  const [year, setYear] = useState('');
+
+const BuildingFootprints = observer(() => {
+  const { month, setMonth, year, setYear } = buildingFootprintsStore;
 
   return (
     <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
@@ -72,7 +73,8 @@ const BuildingFootprints = () => {
         </Row>
       </div>
     </Card>
+
   );
-};
+});
 
 export default BuildingFootprints;

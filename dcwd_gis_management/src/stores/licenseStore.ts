@@ -31,6 +31,10 @@ class LicenseStore {
   renewModalVisible = false;
   loading = false;
 
+  // MobX state for pagination
+  pageSize = 10;
+  currentPage = 1;
+
   // Mock installation logs data
   installationLogs: InstallationLog[] = [
     {
@@ -54,6 +58,14 @@ class LicenseStore {
   constructor() {
     makeAutoObservable(this);
   }
+
+  setPageSize = (size: number) => {
+    this.pageSize = size;
+  };
+
+  setCurrentPage = (page: number) => {
+    this.currentPage = page;
+  };
 
   // Actions
   addUser = (userData: Omit<RegisteredUser, 'key' | 'id'>) => {
