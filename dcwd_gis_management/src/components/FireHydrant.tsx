@@ -1,6 +1,10 @@
 
-import React, { useEffect } from "react";
-import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
+import React, { useEffect, useState } from "react";
+import { Table, Input, Spin, Alert, Breadcrumb, Card, Typography, Space } from "antd";
+const { Title, Text } = Typography;
+import { UnorderedListOutlined } from "@ant-design/icons";
+import FireHydrantDetailsModal from './modal/FireHydrantDetailsModal';
+import FireHydrantEditModal from './modal/FireHydrantEditModal';
 import { observer } from 'mobx-react-lite';
 import { fireHydrantListStore } from '../stores/fireHydrantListStore';
 import type { FireHydrant } from '../stores/fireHydrantListStore';
@@ -18,6 +22,11 @@ const FireHydrantList: React.FC = observer(() => {
         fireHydrantListStore.fetchData();
     }, []);
 
+    // State for modals
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState<FireHydrant | null>(null);
+
     const columns: ColumnsType<FireHydrant> = [
         {
             title: "#",
@@ -32,6 +41,23 @@ const FireHydrantList: React.FC = observer(() => {
         { title: "Size", dataIndex: "size", key: "size" },
         { title: "Type Description", dataIndex: "type_description", key: "type_description" },
         { title: "Remarks", dataIndex: "remarks", key: "remarks" },
+        {
+            title: '',
+            key: 'actions',
+            width: 80,
+            render: (_: any, record: FireHydrant) => (
+                <button
+                    aria-label="actions"
+                    style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    onClick={() => {
+                        setSelectedRecord(record);
+                        setDetailsModalVisible(true);
+                    }}
+                >
+                    <UnorderedListOutlined />
+                </button>
+            ),
+        },
     ];
 
 
@@ -40,32 +66,64 @@ const FireHydrantList: React.FC = observer(() => {
         return <Alert message="Error" description={error.message || String(error)} type="error" showIcon />;
 
     return (
-        <div>
-            <Breadcrumb>
-                <Breadcrumb.Item href="/">
-                    <HomeOutlined />
-                </Breadcrumb.Item>
-                <Breadcrumb.Item>Fire Hydrant</Breadcrumb.Item>
-            </Breadcrumb>
-            <Search
-                placeholder="Search Fire Hydrant"
-                value={searchText}
-                onChange={(e) => {
-                    setSearchText(e.target.value);
-                    setPagination({ ...pagination, current: 1});
-                }}
-                style={{ width: 300, marginBottom: 20, marginTop: 20 }}
-            />
-                        <Table
-                                dataSource={filteredData}
-                                columns={columns}
-                                rowKey="assetid"
-                                pagination={{
-                                    ...pagination,
-                                    total: filteredData.length,
-                                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
-                                }}
+        <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+            <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+                <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Fire Hydrant - Maintenance</span>
+            </div>
+            <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+                <div style={{ marginBottom: 24 }}>
+                    <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
+                        Instructions:
+                    </Title>
+                    <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <Space>
+                        <Text>Search:</Text>
+                        <Input.Search
+                            placeholder="Search Fire Hydrant"
+                            value={searchText}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setPagination({ ...pagination, current: 1 });
+                            }}
+                            style={{ width: 300 }}
                         />
+                    </Space>
+                </div>
+
+                <Table
+                    dataSource={filteredData}
+                    columns={columns}
+                    rowKey="assetid"
+                    pagination={{
+                        ...pagination,
+                        total: filteredData.length,
+                        onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                    }}
+                    onRow={(record) => ({
+                        onDoubleClick: () => {
+                            setSelectedRecord(record);
+                            setEditModalVisible(true);
+                        },
+                    })}
+                />
+                <FireHydrantDetailsModal
+                    visible={detailsModalVisible}
+                    record={selectedRecord}
+                    onCancel={() => setDetailsModalVisible(false)}
+                />
+                <FireHydrantEditModal
+                    visible={editModalVisible}
+                    record={selectedRecord}
+                    onCancel={() => setEditModalVisible(false)}
+                    onUpdate={(values) => {
+                        // handle update logic here
+                        setEditModalVisible(false);
+                    }}
+                />
+            </Card>
         </div>
     );
 });
