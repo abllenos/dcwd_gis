@@ -1,6 +1,7 @@
 
-import React, { useEffect, useState } from "react";
-import { Table, Input, Spin, Alert, Breadcrumb, Card, Typography, Space } from "antd";
+import React, { useEffect } from "react";
+
+import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
 const { Title, Text } = Typography;
 import { UnorderedListOutlined } from "@ant-design/icons";
 import FireHydrantDetailsModal from './modal/FireHydrantDetailsModal';
@@ -8,11 +9,7 @@ import FireHydrantEditModal from './modal/FireHydrantEditModal';
 import { observer } from 'mobx-react-lite';
 import { fireHydrantListStore } from '../stores/fireHydrantListStore';
 import type { FireHydrant } from '../stores/fireHydrantListStore';
-import { HomeOutlined } from "@ant-design/icons";   
 import type { ColumnsType } from "antd/es/table";
-
-
-const { Search } = Input;
 
 
 const FireHydrantList: React.FC = observer(() => {
@@ -22,10 +19,6 @@ const FireHydrantList: React.FC = observer(() => {
         fireHydrantListStore.fetchData();
     }, []);
 
-    // State for modals
-    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
-    const [editModalVisible, setEditModalVisible] = useState(false);
-    const [selectedRecord, setSelectedRecord] = useState<FireHydrant | null>(null);
 
     const columns: ColumnsType<FireHydrant> = [
         {
@@ -50,8 +43,8 @@ const FireHydrantList: React.FC = observer(() => {
                     aria-label="actions"
                     style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     onClick={() => {
-                        setSelectedRecord(record);
-                        setDetailsModalVisible(true);
+                        fireHydrantListStore.setSelectedRecord(record);
+                        fireHydrantListStore.setDetailsModalVisible(true);
                     }}
                 >
                     <UnorderedListOutlined />
@@ -104,23 +97,23 @@ const FireHydrantList: React.FC = observer(() => {
                     }}
                     onRow={(record) => ({
                         onDoubleClick: () => {
-                            setSelectedRecord(record);
-                            setEditModalVisible(true);
+                            fireHydrantListStore.setSelectedRecord(record);
+                            fireHydrantListStore.setEditModalVisible(true);
                         },
                     })}
                 />
                 <FireHydrantDetailsModal
-                    visible={detailsModalVisible}
-                    record={selectedRecord}
-                    onCancel={() => setDetailsModalVisible(false)}
+                    visible={fireHydrantListStore.detailsModalVisible}
+                    record={fireHydrantListStore.selectedRecord}
+                    onCancel={() => fireHydrantListStore.setDetailsModalVisible(false)}
                 />
                 <FireHydrantEditModal
-                    visible={editModalVisible}
-                    record={selectedRecord}
-                    onCancel={() => setEditModalVisible(false)}
-                    onUpdate={(values) => {
-                        // handle update logic here
-                        setEditModalVisible(false);
+                    visible={fireHydrantListStore.editModalVisible}
+                    record={fireHydrantListStore.selectedRecord}
+                    onCancel={() => fireHydrantListStore.setEditModalVisible(false)}
+                    onUpdate={(updated) => {
+                        fireHydrantListStore.updateRecord(updated);
+                        fireHydrantListStore.setEditModalVisible(false);
                     }}
                 />
             </Card>

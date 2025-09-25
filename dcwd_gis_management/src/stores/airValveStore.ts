@@ -26,11 +26,16 @@ export interface AirValveRecord {
   hotlink?: string;
 }
 
+
+
 class AirValveStore {
   pageSize = 10;
   search = '';
   modalVisible = false;
   selectedRecord: AirValveRecord | null = null;
+  detailsModalVisible = false;
+  detailsRecord: AirValveRecord | null = null;
+  data: AirValveRecord[] = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -40,6 +45,12 @@ class AirValveStore {
   setSearch = (val: string) => { this.search = val; };
   setModalVisible = (val: boolean) => { this.modalVisible = val; };
   setSelectedRecord = (val: AirValveRecord | null) => { this.selectedRecord = val; };
+  setDetailsModalVisible = (val: boolean) => { this.detailsModalVisible = val; };
+  setDetailsRecord = (val: AirValveRecord | null) => { this.detailsRecord = val; };
+  setData = (arr: AirValveRecord[]) => { this.data = arr; };
+  updateRecord = (updated: AirValveRecord) => {
+    this.data = this.data.map((item) => item.id === updated.id ? { ...item, ...updated } : item);
+  };
 }
 
 export const airValveStore = new AirValveStore();

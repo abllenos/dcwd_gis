@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const { Title } = Typography;
 

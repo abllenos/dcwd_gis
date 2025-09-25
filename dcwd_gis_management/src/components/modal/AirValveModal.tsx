@@ -61,7 +61,30 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
 
   const handleUpdate = () => {
     form.validateFields().then(values => {
-      onUpdate(values);
+      // Map form fields back to API fields
+      const updatePayload = {
+        ...record,
+        arv_number: values.assetTag,
+        status: values.status,
+        date_installed: values.dateInstalled,
+        location: values.location,
+        water_source: values.waterSource,
+        barangay: values.barangay,
+        arv_serial_no: values.avSerialNo,
+        type: values.avType,
+        size: values.avSize,
+        brand: values.avBrand,
+        gate_serial_no: values.gateSerialNo,
+        gate_valve_size: values.gateValveSize,
+        gate_valve_brand: values.gateValveBrand,
+        no_of_turns: values.noOfTurns,
+        depth: values.depth,
+        wonumber: values.workOrderNo,
+        remarks: values.remarks,
+        project_title: values.projectTitle,
+        hotlink: values.hotlink,
+      };
+      onUpdate(updatePayload);
     });
   };
 
