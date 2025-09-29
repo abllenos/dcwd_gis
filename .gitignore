@@ -20,3 +20,6 @@ build/
 # Ignore API reference notes and similar docs
 API-References.md
 dcwd_gis_management/API-References.md
+
+# Ignore user activity logs (local, not for version control)
+dcwd_gis_management/user_activity(NJ)/

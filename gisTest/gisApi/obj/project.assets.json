@@ -3042,24 +3042,31 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\lamig\\.nuget\\packages\\": {}
+    "C:\\Users\\jnetc\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
+      "projectUniqueName": "D:\\React Projects\\DCWD\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
       "projectName": "gisApi",
-      "projectPath": "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
-      "packagesPath": "C:\\Users\\lamig\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lamig\\dcwd_gis\\gisTest\\gisApi\\obj\\",
+      "projectPath": "D:\\React Projects\\DCWD\\dcwd_gis\\gisTest\\gisApi\\gisApi.csproj",
+      "packagesPath": "C:\\Users\\jnetc\\.nuget\\packages\\",
+      "outputPath": "D:\\React Projects\\DCWD\\dcwd_gis\\gisTest\\gisApi\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\lamig\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\jnetc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

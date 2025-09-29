@@ -34,11 +34,20 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/layers/, '/getAllLayer.php')
       },
 
-      '/api/license': {
-        target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/views',
+      // TEMPORARY WORKAROUND (CORS): Geometry (User Logs) endpoint
+      // The geometry endpoint is public (no Authorization) and currently lacks permissive CORS for localhost.
+      // This dev-only proxy maps the same local path to the production api-gis host so the UI can retrieve
+      // geometry for a selected log. Remove once backend provides appropriate CORS or a .NET pass-through.
+      '/helpers/gis/api/UserLogs/getLogsGeometry.php': {
+        target: 'https://api-gis.davao-water.gov.ph',
         changeOrigin: true,
         secure: true,
-        rewrite: (path) => path.replace(/^\/api\/license/, '')
+      },
+      // Lowercase variant (defensive); some refactors normalize to lowercase.
+      '/helpers/gis/api/userlogs/getlogsgeometry.php': {
+        target: 'https://api-gis.davao-water.gov.ph',
+        changeOrigin: true,
+        secure: true,
 
       },
       '/helpers/gis/mgtsys/getLayers': {
