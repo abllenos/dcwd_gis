@@ -61,16 +61,14 @@ const DMAInlet = observer(() => {
       render: (_: any, record: any) => (
         <Space>
           <Button
-            type="primary"
-            shape="circle"
+            className="btn-action-circle"
             icon={<SettingOutlined />}
-            style={{ background: '#16c784', border: 'none' }}
             onClick={() => {
               dmaInletStore.setSelectedAssetId(record.id);
               dmaInletStore.setModalOpen(true);
             }}
           />
-          <Button type="primary" shape="circle" icon={<InfoCircleOutlined />} style={{ background: '#3b82f6', border: 'none' }} />
+          <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
         </Space>
       ),
     },

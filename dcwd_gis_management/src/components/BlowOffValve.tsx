@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite';
 import BlowOffValveModal from './modal/BlowOffValveModal';
 import { Table, Input, Select, Button, Typography, Card } from 'antd';
 import { AppstoreOutlined } from '@ant-design/icons';
-import Footer from './layout/Footer';
 import { blowOffValveStore } from '../stores/blowOffValveStore';
 
 const { Title, Text } = Typography;
@@ -50,7 +49,7 @@ const columns = [
     key: 'action',
     width: 60,
     render: () => (
-      <Button type="primary" shape="circle" icon={<AppstoreOutlined />} style={{ background: '#1abc9c', border: 'none' }} />
+      <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
     ),
   },
 ];

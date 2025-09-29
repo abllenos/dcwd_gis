@@ -25,7 +25,7 @@ const Classification: React.FC = observer(() => {
     { title: 'Class Name', dataIndex: 'className', key: 'className', sorter: (a: any, b: any) => String(a.className || '').localeCompare(String(b.className || '')) },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassificationRecord) => (
       <Button
-        type="primary"
+        className="license-table-action-button"
         icon={<EditOutlined />}
         size="small"
         onClick={() => store.openEdit(record)}
@@ -41,7 +41,7 @@ const Classification: React.FC = observer(() => {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0, color: 'var(--text-primary)' }}>Classification - Maintenance</Title>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAddModal()}>
+          <Button className="license-register-button" icon={<PlusOutlined />} onClick={() => store.openAddModal()}>
             Add Classification
           </Button>
         </div>
@@ -98,15 +98,15 @@ const Classification: React.FC = observer(() => {
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
           <Text style={{ fontSize: 12 }}>Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries</Text>
           <Space>
-            <Button size="small" disabled={currentPage === 1} onClick={() => store.setCurrentPage(currentPage - 1)}>Previous</Button>
+            <Button className="license-pagination-button-prev-next" size="small" disabled={currentPage === 1} onClick={() => store.setCurrentPage(currentPage - 1)}>Previous</Button>
             {/* Simple numeric pages (cap to 5 for now) */}
             {Array.from({ length: Math.ceil(totalCount / pageSize) }).slice(0,5).map((_, i) => {
               const page = i + 1;
-              return <Button key={page} size="small" type={page === currentPage ? 'primary' : 'default'} onClick={() => store.setCurrentPage(page)}>{page}</Button>;
+              return <Button key={page} className={page === currentPage ? 'license-pagination-button-active' : 'license-pagination-button-inactive'} size="small" onClick={() => store.setCurrentPage(page)}>{page}</Button>;
             })}
-            {Math.ceil(totalCount / pageSize) > 5 && <Button size="small" disabled>...</Button>}
-            {Math.ceil(totalCount / pageSize) > 5 && <Button size="small" type={currentPage === Math.ceil(totalCount / pageSize) ? 'primary' : 'default'} onClick={() => store.setCurrentPage(Math.ceil(totalCount / pageSize))}>{Math.ceil(totalCount / pageSize)}</Button>}
-            <Button size="small" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => store.setCurrentPage(currentPage + 1)}>Next</Button>
+            {Math.ceil(totalCount / pageSize) > 5 && <Button className="license-pagination-button-disabled" size="small" disabled>...</Button>}
+            {Math.ceil(totalCount / pageSize) > 5 && <Button className={currentPage === Math.ceil(totalCount / pageSize) ? 'license-pagination-button-active' : 'license-pagination-button-inactive'} size="small" onClick={() => store.setCurrentPage(Math.ceil(totalCount / pageSize))}>{Math.ceil(totalCount / pageSize)}</Button>}
+            <Button className="license-pagination-button-prev-next" size="small" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => store.setCurrentPage(currentPage + 1)}>Next</Button>
           </Space>
         </div>
 

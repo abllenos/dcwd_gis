@@ -120,7 +120,7 @@ const LogPage: React.FC = observer(() => {
           open={logUiStore.isModalOpen}
           onCancel={() => logUiStore.close()}
           footer={[
-            <Button key="close" onClick={() => logUiStore.close()}>Close</Button>,
+            <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
           ]}
         >
           {logUiStore.selected && (
@@ -168,7 +168,7 @@ const LogPage: React.FC = observer(() => {
             )}
           </Space>
           <Space size={8}>
-            <Button onClick={() => logStore.fetchLogs()} loading={loading}>
+            <Button className="license-register-button" onClick={() => logStore.fetchLogs()} loading={loading}>
               Refresh
             </Button>
           </Space>

@@ -5,7 +5,6 @@ import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
-import Footer from './layout/Footer';
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 
 const { Search } = Input;
@@ -86,8 +85,8 @@ const IsolationValveList: React.FC = () => {
             key: 'actions',
             width: 80,
             render: () => (
-                <button style={{ background: '#1abc9c', border: 'none', borderRadius: 4, padding: 6, cursor: 'pointer' }}>
-                    <svg width="20" height="20" fill="#fff" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="none"/><path d="M160 160h704v704H160V160zm64 64v576h576V224H224zm64 64h448v448H288V288z"/></svg>
+                <button className="btn-action">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="none"/><path d="M160 160h704v704H160V160zm64 64v576h576V224H224zm64 64h448v448H288V288z"/></svg>
                 </button>
             ),
         },

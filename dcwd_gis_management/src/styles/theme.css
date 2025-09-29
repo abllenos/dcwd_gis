@@ -464,12 +464,15 @@
 
 .sider-logo-wrapper {
   text-align: center;
-  padding: 0;
-  height: 64px;
+  padding: 20px 12px;
+  height: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-sidebar);
+  border-bottom: none;
+  margin-bottom: 0;
+  margin-top: -20px;
 }
 
 .sider-logo {
@@ -478,19 +481,23 @@
 }
 
 .expanded-logo {
-  max-width: 220px;
-  height: 60px;           
-  border-radius: 8px;
+  max-width: 380px;
+  height: 100px;           
+  border-radius: 12px;
   margin: 0;  
-  object-fit: contain;  
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px 25px;
 }
 
 .collapsed-logo {
-  width: 32px;
-  height: 32px !important;
+  width: 80px;
+  height: 80px !important;
   border-radius: 50%;
   margin: 0;
   object-fit: cover;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px;
 }
 
 .custom-sidebar-menu.ant-menu-light {
@@ -1272,6 +1279,20 @@ html[data-theme="dark"] body .ant-layout .ant-layout-sider .modern-menu.ant-menu
 [data-theme="dark"] .ant-form ::-webkit-scrollbar-thumb:hover,
 [data-theme="dark"] .ant-input ::-webkit-scrollbar-thumb:hover {
   background: #60a5fa;
+}
+
+/* ===== SEAMLESS LOGO DARK MODE STYLES ===== */
+[data-theme="dark"] .sider-logo-wrapper {
+  background: var(--bg-sidebar);
+  border-bottom: none;
+}
+
+[data-theme="dark"] .expanded-logo {
+  background: rgba(31, 31, 31, 0.95);
+}
+
+[data-theme="dark"] .collapsed-logo {
+  background: rgba(31, 31, 31, 0.95);
 }
 
 /* Firefox scrollbar support */

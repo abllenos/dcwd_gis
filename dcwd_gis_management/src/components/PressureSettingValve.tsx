@@ -68,7 +68,7 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-        <Button type="primary" shape="circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }} style={{ background: '#00b894', borderColor: '#00b894' }}>
+        <Button className="btn-action-circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}>
           <UnorderedListOutlined />
         </Button>
       ),

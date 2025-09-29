@@ -11,6 +11,7 @@ import Home from '../Home';
 import LogPage from '../LogPage';
 import { observer } from 'mobx-react-lite';
 import { dashboardUiStore } from '../../stores/dashboardUiStore';
+import { sidebarUiStore } from '../../stores/sidebarUiStore';
 
 import DistrictMeteringAreaBoundaries from '../DistrictMeteringAreaBoundaries';
 import MapViewer from '../MapViewer';
@@ -50,6 +51,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
 }) => {
   const collapsed = dashboardUiStore.collapsed;
   const logoutModalVisible = dashboardUiStore.logoutModalVisible;
+  const sidebarWidth = collapsed ? 80 : sidebarUiStore.sidebarWidth;
       
   const navigate = useNavigate();
 
@@ -95,7 +97,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
         />
 
         <Layout style={{ 
-          marginLeft: collapsed ? 80 : 280, 
+          marginLeft: sidebarWidth, 
           transition: 'margin-left 0.2s ease',
         }}>
           <HeaderBar

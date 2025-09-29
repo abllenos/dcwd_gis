@@ -60,7 +60,7 @@ const PressureReleaseValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PressureReleaseValveRecord) => (
-        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
+        <button aria-label="actions" className="btn-action-circle" onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
           <UnorderedListOutlined />
         </button>
       ),

@@ -68,7 +68,7 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                   <Form.Item label="Status" name="status"><Select options={statusOptions} /></Form.Item>
                   <Form.Item label="Upload Photo" name="photo" valuePropName="fileList" getValueFromEvent={e => Array.isArray(e) ? e : e && e.fileList}>
                     <Upload beforeUpload={() => false} listType="picture">
-                      <Button icon={<UploadOutlined />}>Select File</Button>
+                      <Button className="btn-select" icon={<UploadOutlined />}>Select File</Button>
                     </Upload>
                   </Form.Item>
                 </Col>
@@ -115,10 +115,10 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" htmlType="submit" loading={loading} style={{ background: '#16a34a', border: 'none' }} onClick={form.submit}>
+          <Button className="btn-update" htmlType="submit" loading={loading} onClick={form.submit}>
             Update
           </Button>
-          <Button danger onClick={onClose} style={{ minWidth: 80 }}>
+          <Button className="btn-close" onClick={onClose}>
             Close
           </Button>
         </Space>

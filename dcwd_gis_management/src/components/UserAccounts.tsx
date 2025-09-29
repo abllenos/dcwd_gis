@@ -19,10 +19,9 @@ const UserAccounts: React.FC = observer(() => {
 		{ title: 'Role', dataIndex: 'role', key: 'role', width: 120 },
 		{ title: ' ', key: 'actions', width: 70, render: (_: unknown, record: UserAccountRecord) => (
 			<Button
-				type="primary"
+				className="btn-edit"
 				icon={<EditOutlined />}
 				size="small"
-				danger
 				onClick={() => store.openEdit(record)}
 			/>)
 		}
@@ -33,7 +32,7 @@ const UserAccounts: React.FC = observer(() => {
 			<Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} bodyStyle={{ padding: 20 }}>
 				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
 					<Title level={5} style={{ margin: 0 }}>User Accounts - Maintenance</Title>
-					<Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAdd()}>
+					<Button className="btn-add" icon={<PlusOutlined />} onClick={() => store.openAdd()}>
 						Add User
 					</Button>
 				</div>
@@ -84,14 +83,14 @@ const UserAccounts: React.FC = observer(() => {
 				<div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
 					<Text style={{ fontSize: 12 }}>Showing {(store.currentPage - 1) * store.pageSize + 1} to {Math.min(store.currentPage * store.pageSize, store.totalCount)} of {store.totalCount} entries</Text>
 					<Space>
-						<Button size="small" disabled={store.currentPage === 1} onClick={() => store.setCurrentPage(store.currentPage - 1)}>Previous</Button>
+						<Button className="btn-nav" size="small" disabled={store.currentPage === 1} onClick={() => store.setCurrentPage(store.currentPage - 1)}>Previous</Button>
 						{Array.from({ length: Math.ceil(store.totalCount / store.pageSize) }).slice(0,5).map((_, i) => {
 							const page = i + 1;
-							return <Button key={page} size="small" type={page === store.currentPage ? 'primary' : 'default'} onClick={() => store.setCurrentPage(page)}>{page}</Button>;
+							return <Button key={page} className={page === store.currentPage ? 'btn-nav-active' : 'btn-nav'} size="small" onClick={() => store.setCurrentPage(page)}>{page}</Button>;
 						})}
-						{Math.ceil(store.totalCount / store.pageSize) > 5 && <Button size="small" disabled>...</Button>}
-						{Math.ceil(store.totalCount / store.pageSize) > 5 && <Button size="small" type={store.currentPage === Math.ceil(store.totalCount / store.pageSize) ? 'primary' : 'default'} onClick={() => store.setCurrentPage(Math.ceil(store.totalCount / store.pageSize))}>{Math.ceil(store.totalCount / store.pageSize)}</Button>}
-						<Button size="small" disabled={store.currentPage >= Math.ceil(store.totalCount / store.pageSize)} onClick={() => store.setCurrentPage(store.currentPage + 1)}>Next</Button>
+						{Math.ceil(store.totalCount / store.pageSize) > 5 && <Button className="btn-nav" size="small" disabled>...</Button>}
+						{Math.ceil(store.totalCount / store.pageSize) > 5 && <Button className={store.currentPage === Math.ceil(store.totalCount / store.pageSize) ? 'btn-nav-active' : 'btn-nav'} size="small" onClick={() => store.setCurrentPage(Math.ceil(store.totalCount / store.pageSize))}>{Math.ceil(store.totalCount / store.pageSize)}</Button>}
+						<Button className="btn-nav" size="small" disabled={store.currentPage >= Math.ceil(store.totalCount / store.pageSize)} onClick={() => store.setCurrentPage(store.currentPage + 1)}>Next</Button>
 					</Space>
 				</div>
 
