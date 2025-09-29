@@ -1,51 +1,31 @@
 
 
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Button, Space, Spin, Alert } from 'antd';
-import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Table, Select, Input } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
-import { useQuery } from '@tanstack/react-query';
-import Footer from './layout/Footer';
-import axios from 'axios';
 
-const { Title } = Typography;
 
-interface DMAInletRecord {
-  id: number;
-  woNumber: string;
-  projectTitle: string;
-  size: number;
-  type: string;
-  length: number;
-}
-
-const API_URL = 'http://192.100.140.198/helpers/gis/mgtsys/getLayers/getDmaInlet.php';
-const fetchDMAInlet = async (): Promise<DMAInletRecord[]> => {
-  const response = await axios.get(API_URL);
-  let data = response.data;
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
-    data = data.results || data.data || [];
-  }
-  return (Array.isArray(data) ? data : []).map((item: any, idx: number) => ({
-    id: item.gid ?? item.id ?? idx + 1,
-    woNumber: item.woNumber || item.wo_number || item.wonumber || '',
-    projectTitle: item.projectTitle || item.project_title || '',
-    size: item.size || item.diameter || 0,
-    type: item.type || item.pipe_type || '',
-    length: item.length || item.pipe_length || 0,
-    ...item,
-  }));
-};
 
 
 
 
 const DMAInlet = observer(() => {
-  const { data, isLoading, error } = useQuery<DMAInletRecord[]>({
-    queryKey: ['dmaInletData'],
-    queryFn: fetchDMAInlet,
-  });
+
+
+
+  const initialData = [
+    { id: 1, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 150, type: 'CCIP', length: 74.008 },
+    { id: 2, woNumber: '05-02-02', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 196.857 },
+    { id: 3, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 300, type: 'MLCSP', length: 70.875 },
+    { id: 4, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 110.052 },
+    { id: 5, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 120.396 },
+    { id: 6, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 148.888 },
+    { id: 7, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 114.469 },
+    { id: 8, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 151.625 },
+    { id: 9, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 121.269 },
+    { id: 10, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 34.247 },
+  ];
 
   const columns = [
     { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id },
@@ -70,17 +50,19 @@ const DMAInlet = observer(() => {
           />
           <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
         </Space>
+
       ),
     },
   ];
 
-  const filteredData = (data || []).filter(
-    row =>
-      (row.woNumber?.toLowerCase() ?? '').includes(dmaInletStore.search.toLowerCase()) ||
-      (row.projectTitle?.toLowerCase() ?? '').includes(dmaInletStore.search.toLowerCase()) ||
-      String(row.size).includes(dmaInletStore.search) ||
-      (row.type?.toLowerCase() ?? '').includes(dmaInletStore.search.toLowerCase())
-  );
+    const filteredData = initialData.filter(
+      row =>
+        row.woNumber.toLowerCase().includes(dmaInletStore.search.toLowerCase()) ||
+        row.projectTitle.toLowerCase().includes(dmaInletStore.search.toLowerCase()) ||
+        String(row.size).includes(dmaInletStore.search) ||
+        row.type.toLowerCase().includes(dmaInletStore.search.toLowerCase())
+    );
+
 
   return (
     <>
@@ -114,32 +96,28 @@ const DMAInlet = observer(() => {
           </div>
         </div>
         {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load DMA Inlet data" /> : (
+
           <Table
             bordered
             rowKey="id"
             columns={columns}
             dataSource={filteredData}
             pagination={{
-              current: dmaInletStore.current,
+              current: 1,
               pageSize: dmaInletStore.pageSize,
-              total: data?.length || 0,
+              total: filteredData.length,
               showSizeChanger: false,
-              onChange: dmaInletStore.setCurrent.bind(dmaInletStore),
             }}
             style={{ background: '#fff', borderRadius: 8 }}
           />
-        )}
-        <div style={{ marginTop: 8, color: '#888' }}>
-          Showing 1 to {dmaInletStore.pageSize} of {data?.length || 0} entries
-        </div>
-      </Card>
-      <PipeConditionAssessmentModal
-        open={dmaInletStore.modalOpen}
-        onClose={() => dmaInletStore.setModalOpen(false)}
-        assetId={dmaInletStore.selectedAssetId}
-      />
-    </>
-  );
+        </Card>
+        <PipeConditionAssessmentModal
+          open={dmaInletStore.modalOpen}
+          onClose={() => dmaInletStore.setModalOpen(false)}
+          assetId={dmaInletStore.selectedAssetId}
+        />
+      </>
+    );
 });
 
 export default DMAInlet;

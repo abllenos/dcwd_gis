@@ -22,6 +22,15 @@ const MapViewer: React.FC = () => {
     if (mapRef.current && !mapInstanceRef.current) {
       // Initialize the map centered on Davao City, Philippines
       mapInstanceRef.current = L.map(mapRef.current).setView([7.1907, 125.4553], 12);
+      // Limit map to Davao del Sur bounds
+      // Approximate bounds for Davao del Sur province
+      const davaoDelSurBounds = L.latLngBounds([
+        [6.40, 124.90], // Southwest (near Malita)
+        [7.40, 125.70]  // Northeast (near Davao City)
+      ]);
+      mapInstanceRef.current.setMaxBounds(davaoDelSurBounds);
+      mapInstanceRef.current.setMinZoom(9);
+      mapInstanceRef.current.setMaxZoom(18);
 
       // Add OpenStreetMap tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

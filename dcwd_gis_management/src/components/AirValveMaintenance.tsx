@@ -1,12 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { airValveStore } from '../stores/airValveStore';
 import { Card, Typography, Space, Table, Spin, Alert, Input } from 'antd';
 import AirValveModal from './modal/AirValveModal';
+import AirValveDetailsModal from './modal/AirValveDetailsModal';
 import type { ColumnsType } from 'antd/es/table';
-import { UnorderedListOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import Footer from './layout/Footer';
 import { devApi } from './endpoints/Interceptor';
 
 const { Title, Text } = Typography;
@@ -56,12 +55,17 @@ const fetchAirValves = async (): Promise<AirValveRecord[]> => {
 
 
 const AirValveMaintenance: React.FC = observer(() => {
+
   const { pageSize, setPageSize, search, setSearch, modalVisible, setModalVisible, selectedRecord, setSelectedRecord } = airValveStore;
 
   const { data, isLoading, error } = useQuery<AirValveRecord[]>({
     queryKey: ['airValveData'],
     queryFn: fetchAirValves,
   });
+  // Sync MobX store with fetched data on load
+  useEffect(() => {
+    if (data) airValveStore.setData(data);
+  }, [data]);
 
   const columns: ColumnsType<AirValveRecord> = [
   { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
@@ -77,6 +81,14 @@ const AirValveMaintenance: React.FC = observer(() => {
       render: (_: any, _record: AirValveRecord) => (
         <button aria-label="actions" className="btn-action-circle" onClick={() => { setSelectedRecord(_record); setModalVisible(true); }}>
           <UnorderedListOutlined />
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => {
+            airValveStore.setDetailsRecord(_record);
+            airValveStore.setDetailsModalVisible(true);
+          }}
+        >
+          View
         </button>
       ),
     },
@@ -84,14 +96,15 @@ const AirValveMaintenance: React.FC = observer(() => {
 
   const filteredData = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return data || [];
-    return (data || []).filter((r) =>
+    const arr: AirValveRecord[] = airValveStore.data;
+    if (!q) return arr;
+    return arr.filter((r: AirValveRecord) =>
       String(r.id).includes(q) ||
       (r.arv_number?.toLowerCase() ?? '').includes(q) ||
       (r.location?.toLowerCase() ?? '').includes(q) ||
       (r.status?.toLowerCase() ?? '').includes(q)
     );
-  }, [search, data]);
+  }, [search, airValveStore.data]);
 
   return (
     <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
@@ -150,11 +163,15 @@ const AirValveMaintenance: React.FC = observer(() => {
           visible={modalVisible}
           record={selectedRecord}
           onCancel={() => setModalVisible(false)}
-          onUpdate={(values) => {
-            // handle update logic here, e.g. call API to update
-            console.log('Updated values', values);
+          onUpdate={(updated) => {
+            airValveStore.updateRecord(updated);
             setModalVisible(false);
           }}
+        />
+        <AirValveDetailsModal
+          visible={airValveStore.detailsModalVisible}
+          record={airValveStore.detailsRecord}
+          onCancel={() => airValveStore.setDetailsModalVisible(false)}
         />
       </Card>
     </div>

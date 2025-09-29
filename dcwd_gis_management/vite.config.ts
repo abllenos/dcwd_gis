@@ -33,12 +33,13 @@ export default defineConfig({
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/layers/, '/getAllLayer.php')
       },
-      // TEMPORARY WORKAROUND (CORS) for License endpoint (adjust endpoint mapping if backend changes)
+
       '/api/license': {
         target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/views',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/license/, '')
+
       },
       '/helpers/gis/mgtsys/getLayers': {
         target: 'http://192.100.140.198',

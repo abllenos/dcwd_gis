@@ -1,48 +1,50 @@
-
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 import BlowOffValveModal from './modal/BlowOffValveModal';
+
 import { Table, Input, Select, Button, Typography, Card } from 'antd';
 import { AppstoreOutlined } from '@ant-design/icons';
+
 import { blowOffValveStore } from '../stores/blowOffValveStore';
-
 const { Title, Text } = Typography;
-
-const initialData = [
-  { id: 1, workOrder: 'Un-Updated', location: 'Dapsa Village, St. John', status: 'Un-Updated', size: 50, project: 'Un-Updated' },
-  { id: 2, workOrder: 'Un-Updated', location: 'Dapsa Village, St. John', status: 'Un-Updated', size: 50, project: 'Un-Updated' },
-  { id: 3, workOrder: '02-02-05-17', location: 'Tahimik St., DAPSA', status: 'Un-Updated', size: 50, project: 'MI @ Purok 12-B, Tahimik St., DAPSA, Brgy. 76-A, Bucana, Davao City' },
-  { id: 4, workOrder: 'Un-Updated', location: 'Manggahan', status: 'Un-Updated', size: 50, project: 'Un-Updated' },
-  { id: 5, workOrder: 'Installation of 7 Units B.O.V. Bucana', location: 'Manggahan', status: 'Un-Updated', size: 50, project: 'Installation of 7 Units BOV @ Bucana' },
-  { id: 6, workOrder: 'Installation of 7 Units B.O.V. Bucana', location: 'Manggahan Bucan', status: 'Un-Updated', size: 50, project: 'Installation of 7 Units BOV @ Bucana' },
-];
 
 const columns = [
   {
     title: 'ID',
     dataIndex: 'id',
-    sorter: (a: any, b: any) => a.id - b.id,
     width: 60,
+    render: (_: any, __: any, idx: number) => idx + 1,
+    sorter: (a: any, b: any) => (a.id ?? 0) - (b.id ?? 0),
   },
   {
     title: 'Work Order No.',
-    dataIndex: 'workOrder',
+    dataIndex: 'wonumber',
+    width: 160,
+    sorter: (a: any, b: any) => (a.wonumber ?? '').localeCompare(b.wonumber ?? ''),
   },
   {
     title: 'Location',
     dataIndex: 'location',
+    width: 180,
+    sorter: (a: any, b: any) => (a.location ?? '').localeCompare(b.location ?? ''),
   },
   {
     title: 'Status',
-    dataIndex: 'status',
+    dataIndex: 'status_remarks',
+    width: 120,
+    sorter: (a: any, b: any) => (a.status_remarks ?? '').localeCompare(b.status_remarks ?? ''),
   },
   {
     title: 'Size',
     dataIndex: 'size',
-    width: 70,
+    width: 80,
+    sorter: (a: any, b: any) => (a.size ?? '').localeCompare(b.size ?? ''),
   },
   {
     title: 'Project Title',
-    dataIndex: 'project',
+    dataIndex: 'bovnumber',
+    width: 220,
+    sorter: (a: any, b: any) => (a.bovnumber ?? '').localeCompare(b.bovnumber ?? ''),
   },
   {
     title: '',
@@ -50,20 +52,40 @@ const columns = [
     width: 60,
     render: () => (
       <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
+    width: 80,
+    render: (_: any, record: any) => (
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+        onClick={e => {
+          e.stopPropagation();
+          blowOffValveStore.setSelectedRow(record);
+          blowOffValveStore.setModalOpen(true);
+        }}
+        title="View Details"
+      >
+        <span style={{ fontSize: 16 }}>👁️</span>
+        <span style={{ fontWeight: 500 }}>View</span>
+      </button>
     ),
   },
 ];
 
-
-
 const BlowOffValve = observer(() => {
-  const filteredData = initialData.filter(
+  // Fetch API data on mount
+  React.useEffect(() => {
+    blowOffValveStore.fetchBlowOffValves();
+  }, []);
+
+  const filteredData = blowOffValveStore.data.filter(
     row =>
-      row.workOrder.toLowerCase().includes(blowOffValveStore.search.toLowerCase()) ||
-      row.location.toLowerCase().includes(blowOffValveStore.search.toLowerCase()) ||
-      row.status.toLowerCase().includes(blowOffValveStore.search.toLowerCase()) ||
-      row.project.toLowerCase().includes(blowOffValveStore.search.toLowerCase())
-  );
+      (row.workOrder?.toLowerCase() ?? '').includes(blowOffValveStore.search.toLowerCase()) ||
+      (row.location?.toLowerCase() ?? '').includes(blowOffValveStore.search.toLowerCase()) ||
+      (row.status?.toLowerCase() ?? '').includes(blowOffValveStore.search.toLowerCase()) ||
+      (row.project?.toLowerCase() ?? '').includes(blowOffValveStore.search.toLowerCase())
+  ).map((row, idx) => ({
+    ...row,
+    key: `${row.bovnumber || ''}_${row.wonumber || ''}_${idx}`
+  }));
 
   return (
     <>
@@ -104,15 +126,18 @@ const BlowOffValve = observer(() => {
         </div>
         <Table
           bordered
-          rowKey="id"
+          rowKey="key"
           columns={columns}
           dataSource={filteredData}
           pagination={{ pageSize: blowOffValveStore.pageSize }}
           style={{ background: '#fff', borderRadius: 8 }}
           onRow={record => ({
-            onDoubleClick: () => {
-              blowOffValveStore.setSelectedRow(record);
-              blowOffValveStore.setModalOpen(true);
+            onDoubleClick: (event: React.MouseEvent) => {
+              // Only trigger row double click if not clicking the action button
+              if (!(event.target as HTMLElement).closest('button')) {
+                blowOffValveStore.setSelectedRow(record);
+                blowOffValveStore.setModalOpen(true);
+              }
             },
           })}
         />
@@ -127,3 +152,6 @@ const BlowOffValve = observer(() => {
 });
 
 export default BlowOffValve;
+
+
+

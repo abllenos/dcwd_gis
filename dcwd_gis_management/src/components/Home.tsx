@@ -1,6 +1,7 @@
 ﻿import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { Card, Row, Col, Spin, Typography, Statistic, Timeline } from "antd";
+
 import {
   UserOutlined,
   EnvironmentOutlined,
@@ -15,7 +16,17 @@ const { Text, Title } = Typography;
 
 const Home: React.FC = observer(() => {
   useEffect(() => {
-    // Initialize dashboard data if needed
+    // Fetch customer stat on mount
+    (async () => {
+      try {
+  const data = await getCustomerStat();
+  // API returns { data: [{ All: string, ... }] }
+  const count = data?.data?.[0]?.All ? Number(data.data[0].All) : 0;
+  dashboardStore.setCustomerCount(count);
+      } catch (e) {
+  dashboardStore.setCustomerCount(0);
+      }
+    })();
   }, []);
 
   return (
@@ -53,6 +64,7 @@ const Home: React.FC = observer(() => {
                     />
                   </div>
                   <UserOutlined className="stat-icon" />
+
                 </div>
               </Card>
             </Col>

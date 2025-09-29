@@ -47,7 +47,6 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
   const [accessibleMenuItems, setAccessibleMenuItems] = React.useState<MenuProps['items']>([]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
-  // ...existing code...
 
 
   const location = useLocation();

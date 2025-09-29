@@ -1,25 +1,16 @@
 
 
 import React, { useState, useMemo } from "react";
-import { Table, Input, Spin, Alert, Breadcrumb } from "antd";
-import { HomeOutlined } from "@ant-design/icons";
+import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
+import { UnorderedListOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+import IsolationValveDetailsModal from './modal/IsolationValveDetailsModal';
+import IsolationValveEditModal from './modal/IsolationValveEditModal';
+import type { IsolationValve } from './types/isolationValve';
 
-const { Search } = Input;
-interface IsolationValve {
-    gvnumber: string;
-    wonumber: string;
-    location: string;
-    size: number;
-    noofturns: number;
-    depth: number;
-    brand: string;
-    valve: string;
-    project_title: string;
-    barangay: string;
-}
+const { Title, Text } = Typography;
 
 const fetchIsolationValve = async (): Promise<IsolationValve[]> => {
     const res = await apiGis.get("helpers/gis/mgtsys/getLayers/getIsolation.php");
@@ -68,6 +59,11 @@ const IsolationValveList: React.FC = () => {
         );
     }, [data, searchText]);
 
+    // State for modals
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState<IsolationValve | null>(null);
+
     const columns: ColumnsType<IsolationValve> = [
         {
             title: "ID",
@@ -84,9 +80,11 @@ const IsolationValveList: React.FC = () => {
             title: '',
             key: 'actions',
             width: 80,
+
             render: () => (
                 <button className="btn-action">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="none"/><path d="M160 160h704v704H160V160zm64 64v576h576V224H224zm64 64h448v448H288V288z"/></svg>
+
                 </button>
             ),
         },
@@ -96,34 +94,64 @@ const IsolationValveList: React.FC = () => {
     if (error instanceof Error) return <Alert message="Error" description={error.message} type="error" showIcon/>;
 
     return (
-        <div style={{ padding: 20}}>
-            <Breadcrumb>
-                <Breadcrumb.Item href="/">
-                    <HomeOutlined/>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item>Isolation Valve</Breadcrumb.Item>
-            </Breadcrumb>
+        <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+            <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+                <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
+            </div>
+            <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+                <div style={{ marginBottom: 24 }}>
+                    <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
+                        Instructions:
+                    </Title>
+                    <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+                </div>
 
-            <Search
-                placeholder="Search"
-                value={searchText}
-                onChange={(e) => {
-                    setSearchText(e.target.value);
-                    setPagination({ ...pagination, current: 1});
-                }}
-                style={{ width: 300, marginBottom: 20, marginTop: 20}}
-            />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <Space>
+                        <Text>Search:</Text>
+                        <Input.Search
+                            placeholder="Search Isolation Valve"
+                            value={searchText}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setPagination({ ...pagination, current: 1 });
+                            }}
+                            style={{ width: 300 }}
+                        />
+                    </Space>
+                </div>
 
-            <Table
-                dataSource={filteredData}
-                columns={columns}
-                rowKey={(_record) => _record.gvnumber + _record.wonumber}
-                pagination={{
-                    ...pagination,
-                    total: filteredData.length,
-                    onChange: (page, pageSize) => setPagination({ current: page, pageSize}),
-                }}
-            />
+                <Table
+                    dataSource={filteredData}
+                    columns={columns}
+                    rowKey={(_record) => _record.gvnumber + _record.wonumber}
+                    pagination={{
+                        ...pagination,
+                        total: filteredData.length,
+                        onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                    }}
+                    onRow={(record) => ({
+                        onDoubleClick: () => {
+                            setSelectedRecord(record);
+                            setEditModalVisible(true);
+                        },
+                    })}
+                />
+                <IsolationValveDetailsModal
+                    visible={detailsModalVisible}
+                    record={selectedRecord}
+                    onCancel={() => setDetailsModalVisible(false)}
+                />
+                <IsolationValveEditModal
+                    visible={editModalVisible}
+                    record={selectedRecord}
+                    onCancel={() => setEditModalVisible(false)}
+                    onUpdate={() => {
+                        // handle update logic here
+                        setEditModalVisible(false);
+                    }}
+                />
+            </Card>
         </div>
     );
 };

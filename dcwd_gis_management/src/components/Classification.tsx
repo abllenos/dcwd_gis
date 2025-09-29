@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form, Alert, Empty } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { classificationStore } from '../stores/classificationStore';
 import type { ClassificationRecord } from '../stores/classificationStore';
 
@@ -28,8 +28,12 @@ const Classification: React.FC = observer(() => {
         className="license-table-action-button"
         icon={<EditOutlined />}
         size="small"
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
-      />)
+      >
+        View
+      </button>)
     }
   ];
 

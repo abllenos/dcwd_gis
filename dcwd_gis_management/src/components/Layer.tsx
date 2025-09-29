@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form, Alert, Empty } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { layerStore } from '../stores/layerStore';
 import type { LayerRecord } from '../stores/layerStore';
 
@@ -23,12 +23,12 @@ const Layer: React.FC = observer(() => {
     { title: 'Status Flag', dataIndex: 'statusFlag', key: 'statusFlag', width: 110, render: (v: number) => v === 1 ? <Tag color="green">1</Tag> : <Tag color="red">0</Tag> },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: LayerRecord) => (
-      <Button
-        type="primary"
-        icon={<EditOutlined />}
-        size="small"
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
-      />)
+      >
+        View
+      </button>)
     }
   ];
 

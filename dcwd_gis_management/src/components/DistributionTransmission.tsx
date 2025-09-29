@@ -1,10 +1,9 @@
 
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Button, Space } from 'antd';
-import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Table, Select, Input } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { distributionTransmissionStore } from '../stores/distributionTransmissionStore';
-import Footer from './layout/Footer';
+
 
 const { Title } = Typography;
 
@@ -48,6 +47,7 @@ const DistributionTransmission = observer(() => {
           />
           <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
         </Space>
+
       ),
     },
   ];
