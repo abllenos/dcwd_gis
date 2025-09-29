@@ -1,8 +1,9 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Space, Tag, Button, Modal, Descriptions, Progress } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
+import { layerSearchStore } from '../stores/layerSearchStore';
 import type { LogRecord } from '../stores/logTypes';
 import { formatAssetId, safeString } from '../utils/formatters';
 import { logUiStore } from '../stores/logUiStore';
@@ -21,15 +22,11 @@ const columns: ColumnsType<LogRecord> = [
 ];
 
 const LogPage: React.FC = observer(() => {
-  const { layerOptions, selectedLayer, pageSize, currentPage, search, filteredData, pagedData, loading, error, totalCount } = logStore;
-  // Progress: cached rows vs total rows from server
-  const loadedCount = logStore.lastCount;
-  const hasTotal = typeof totalCount === 'number' && totalCount > 0;
-  const showPercentBar = hasTotal && (loadedCount < totalCount || loading || logStore.backgroundLoading);
-  const showIndeterminate = !hasTotal && (loading || logStore.backgroundLoading);
-  const percent = (typeof totalCount === 'number' && totalCount > 0)
-    ? Math.min(100, Math.round((Math.min(loadedCount, totalCount) / totalCount) * 100))
-    : 0;
+  const { layerOptions, selectedLayer, pageSize, currentPage, search, loading, error, totalCount } = logStore;
+  // progress UI removed
+  const isSearching = layerSearchStore.active;
+  const tableData = isSearching ? layerSearchStore.results : logStore.data;
+  const tableLoading = loading || (isSearching && layerSearchStore.loading);
 
   return (
     <Card className="card shadow mb-4" style={{ borderRadius: 8 }}>
@@ -69,14 +66,50 @@ const LogPage: React.FC = observer(() => {
             </div>
           </Col>
           <Col xs={24} md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 320 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520 }}>
               <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
               <Input
                 placeholder="Type to filter..."
                 value={search}
-                onChange={(e) => logStore.setSearch(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  logStore.setSearch(v);
+                  // If emptied (user pressed X), clear any active/pending search and return to paged view
+                  if (!v.trim()) {
+                    layerSearchStore.clear();
+                  } else {
+                    // Debounced auto-start across-layer search
+                    layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
+                  }
+                }}
                 allowClear
               />
+              <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <Button
+                  type="default"
+                  disabled={!search.trim()}
+                  loading={layerSearchStore.loading}
+                  onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
+                >
+                  Search
+                </Button>
+                {layerSearchStore.active && (
+                  <Button onClick={() => layerSearchStore.cancel()} danger>
+                    Stop search
+                  </Button>
+                )}
+                {layerSearchStore.active && (
+                  <div style={{ color: 'var(--text-muted)' }}>
+                    scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
+                    {typeof layerSearchStore.totalExpected === 'number' && (
+                      <span> • total approx: {layerSearchStore.totalExpected}</span>
+                    )}
+                    {layerSearchStore.results.length > 0 && (
+                      <span> • matches: {layerSearchStore.results.length}</span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </Col>
         </Row>
@@ -101,24 +134,29 @@ const LogPage: React.FC = observer(() => {
           <Table
             rowKey="id"
             columns={columns}
-            dataSource={pagedData}
-            loading={loading}
+            dataSource={tableData}
+            loading={tableLoading}
             onRow={(record) => ({
               onClick: () => logUiStore.open(record),
               style: { cursor: 'pointer' },
             })}
-            pagination={{
-              pageSize: pageSize,
-              current: currentPage,
-              total: totalCount ?? filteredData.length,
-              onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); void logStore.fetchPage(p); },
-              showTotal: (total) => `${total} record${total === 1 ? '' : 's'}`
-            }}
+            pagination={
+              isSearching
+                ? false
+                : {
+                    pageSize: pageSize,
+                    current: currentPage,
+                    total: typeof totalCount === 'number' ? totalCount : 0,
+                    onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); },
+                    showTotal: (total) => `${total} record${total === 1 ? '' : 's'}`
+                  }
+            }
             scroll={{ x: 900 }}
             bordered
-            locale={{ emptyText: 'Empty' }}
+            locale={{ emptyText: isSearching ? (layerSearchStore.loading ? 'Searching…' : 'No matches') : 'Empty' }}
           />
         </div>
+        {/* Bottom search results table removed; search results now render in the main table above. */}
         <Modal
           title="Log Details"
           open={logUiStore.isModalOpen}
@@ -153,52 +191,7 @@ const LogPage: React.FC = observer(() => {
             </>
           )}
         </Modal>
-        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-          <Space size={8} wrap>
-            {logStore.debugStatus === 'ok' && (
-              <>
-                <Tag color="green">Loaded</Tag>
-                <Tag>Count: {logStore.lastCount}</Tag>
-                {logStore.lastFetchedAt && (
-                  <Tag>Fetched: {new Date(logStore.lastFetchedAt).toLocaleString()}</Tag>
-                )}
-              </>
-            )}
-            {logStore.debugStatus === 'empty' && (
-              <Tag color="gold">No Data Found</Tag>
-            )}
-            {logStore.debugStatus === 'disconnected' && (
-              <Tag color="red">Disconnected</Tag>
-            )}
-            {showPercentBar && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 260 }}>
-                <Progress percent={percent} size="small" style={{ width: 180 }} showInfo={false} status={(loading || logStore.backgroundLoading) ? 'active' : undefined} />
-                <span style={{ fontVariantNumeric: 'tabular-nums' }}>{loadedCount} / {totalCount}</span>
-              </div>
-            )}
-            {showIndeterminate && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 260 }}>
-                <Progress size="small" style={{ width: 180 }} showInfo={false} status="active" />
-                <span style={{ color: 'var(--text-muted)' }}>Loading… {loadedCount > 0 ? `${loadedCount} loaded` : ''}</span>
-              </div>
-            )}
-          </Space>
-          <Space size={8}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {typeof totalCount === 'number' ? `${totalCount} items • loaded ${loadedCount}` : `Loaded ${loadedCount}`}
-              </div>
-              <Button onClick={() => logStore.fetchLogs(true)} loading={loading}>
-                Refresh
-              </Button>
-              {(!logStore.backgroundLoading && typeof totalCount === 'number' && loadedCount < totalCount) && (
-                <Button onClick={() => logStore.fetchLogs(false)}>
-                  Load remaining
-                </Button>
-              )}
-            </div>
-          </Space>
-        </div>
+        {/* status/progress UI removed as requested */}
       </div>
     </Card>
   );

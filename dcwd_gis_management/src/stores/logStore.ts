@@ -1,10 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { devApi } from '../components/endpoints/Interceptor';
-import { parseMaybeJson, tryKeys, preferredPaths, deepFindArray, mapToLogRecord } from './logUtils';
-import { fetchRemainingPages as fetchRemainingPagesHelper } from './helpers/fetchRemainingPages';
 import type { LogRecord, LayerOption, DebugStatus } from './logTypes';
-import { fetchFirstPage } from './helpers/fetchFirstPage';
-import { defaultLayerOptions } from './logUtils';
+import { defaultLayerOptions, parseMaybeJson, preferredPaths, tryKeys, deepFindArray, mapToLogRecord } from './logUtils';
 
 export class LogStore {
   layerOptions: LayerOption[] = [];
@@ -32,32 +29,19 @@ export class LogStore {
   debugStatus: DebugStatus = null;
   lastErrorCode: string | null = null;
   lastErrorMessage: string | null = null;
-  totalCount: number | null = null; // server-side total rows for selected layer
-  backgroundLoading = false; // indicates background aggregation after first page
-  // Aggregation controls
-  readonly apiFetchPageSize = 1000; // ask nicely; server may cap
-  readonly apiMaxPageIterations = 40000; // safety guard
-  readonly commitBatchSize = 5000; // commit to observables every N rows
-  layerDataCache = new Map<number, LogRecord[]>();
-  // Per-layer per-page cache: Map<layerId, Map<page, LogRecord[]>>
-  layerPageCache = new Map<number, Map<number, LogRecord[]>>();
-  layerTotalCache = new Map<number, number | null>();
-  // Tracks pages currently being fetched to avoid duplicate requests
-  private loadingPages = new Set<string>();
-  private fetchToken = 0;
+  totalCount: number | null = null; // legacy endpoint often lacks totals
+  backgroundLoading = false; // no background paging in old flow
+  // Keep this for layer-wide search store; not used for paging here
+  readonly apiFetchPageSize = 1000;
 
   constructor() {
     makeAutoObservable(this, {
       apiFetchPageSize: false,
-      apiMaxPageIterations: false,
-      commitBatchSize: false,
-      layerDataCache: false,
-      layerTotalCache: false,
       // backgroundLoading is observable
     });
     this.initLayerOptions();
-    // Initial fetch aggregates into cache
-    void this.fetchLogs(true);
+    // Initial fetch (single request)
+    void this.fetchLogs();
   }
 
   initLayerOptions() {
@@ -74,19 +58,22 @@ export class LogStore {
   setPageSize(size: number) {
     this.pageSize = size;
     this.currentPage = 1;
-    // Local pagination; no fetch
+    // Server-side pagination: fetch first page with new size
+    void this.fetchLogs();
   }
 
   setPage(page: number) {
     this.currentPage = page;
-    // Local pagination; no fetch
+    // Server-side pagination: fetch selected page
+    void this.fetchLogs();
   }
 
   // Combined update to avoid double fetch when both page & size change from Table pagination event
   updatePagination(page: number, size: number) {
     this.pageSize = size;
     this.currentPage = page;
-    // Local pagination; no fetch
+    // Server-side pagination: fetch given page/size
+    void this.fetchLogs();
     return { sizeChanged: false };
   }
 
@@ -115,188 +102,146 @@ export class LogStore {
     return this.filteredData.slice(start, start + this.pageSize);
   }
 
-  async fetchLogs(force = false) {
-    const layerId = this.selectedLayer ?? 1;
-    if (force) {
-      this.layerDataCache.delete(layerId);
-    }
-    // Serve from cache if available
-    if (!force && this.layerDataCache.has(layerId)) {
-      const cached = this.layerDataCache.get(layerId) ?? [];
-      const cachedTotal = this.layerTotalCache.get(layerId) ?? null;
-      runInAction(() => {
-        this.data = cached;
-        this.totalCount = cachedTotal;
-        this.lastCount = cached.length;
-        this.debugStatus = cached.length ? 'ok' : 'empty';
-        this.error = null;
-        this.loading = false;
-      });
-      return;
-    }
-
-    this.loading = true;
-    this.error = null;
-    this.debugStatus = 'loading';
-    this.lastErrorCode = null;
-    this.lastErrorMessage = null;
+  async fetchLogs() {
+    runInAction(() => {
+      this.loading = true;
+      this.error = null;
+      this.debugStatus = 'loading';
+      this.lastErrorCode = null;
+      this.lastErrorMessage = null;
+      this.backgroundLoading = false;
+      // keep existing totalCount until new response arrives
+    });
     try {
-      const fetchSize = this.apiFetchPageSize;
-      const layerLabel = this.layerOptions.find(o => o.value === layerId)?.label ?? 'LAYER';
-      ++this.fetchToken;
+      const layerId = this.selectedLayer ?? 1;
+      const path = 'admin/logtrails/get';
+      const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
+      const pageIndex = this.currentPage;
+      const pageSize = this.pageSize;
+      const fullUrl = `${base}/${path}?LayerID=${layerId}&PageIndex=${pageIndex}&PageSize=${pageSize}`;
+      const resp = await devApi.get(path, {
+        params: { LayerID: layerId, PageIndex: pageIndex, PageSize: pageSize },
+        headers: { Accept: 'text/plain' },
+      });
+      const { status, headers } = resp as { status?: number; headers?: Record<string, string> };
+      const payload: unknown = parseMaybeJson(resp.data as unknown);
 
-      // First page via helper
-      const first = await fetchFirstPage({ layerId, fetchSize, layerLabel });
-      this.lastStatus = first.diagnostics.lastStatus;
-      this.lastContentType = first.diagnostics.lastContentType;
-      this.lastCurl = first.diagnostics.lastCurl;
-      this.lastEffectiveUrl = first.diagnostics.lastEffectiveUrl;
-      this.lastRequestParams = first.diagnostics.lastRequestParams;
-      this.rawPayloadType = first.diagnostics.rawPayloadType;
-      this.rawPayloadLength = first.diagnostics.rawPayloadLength;
-      this.payloadKeys = first.diagnostics.payloadKeys;
-      this.lastUrl = first.diagnostics.lastUrl;
+      const reqObj = (resp as unknown as { request?: { responseURL?: string } }).request;
+      const effectiveUrl = reqObj?.responseURL || (resp as { config?: { url?: string } }).config?.url || fullUrl;
 
-      if (first.appEmpty) {
-          // Treat as connected but no data; commit empty and return
-          runInAction(() => {
-            this.data = [];
-            this.layerDataCache.set(layerId, []);
-            this.layerTotalCache.set(layerId, 0);
-            this.lastSource = 'api';
-            this.lastFetchedAt = new Date().toISOString();
-            this.lastCount = 0;
-            this.totalCount = 0;
-            this.listKeyPath = null;
-            this.sampleItemKeys = null;
-            this.debugStatus = 'empty';
-            this.loading = false;
-            this.backgroundLoading = false;
-          });
-          return;
-        }
+      runInAction(() => {
+        this.lastStatus = status ?? null;
+        this.lastContentType = headers?.['content-type'] ?? headers?.['Content-Type'] ?? null;
+        this.lastCurl = `curl -X 'GET' '${fullUrl}' -H 'accept: text/plain'`;
+        this.lastEffectiveUrl = effectiveUrl;
+        this.lastRequestParams = { LayerID: layerId };
+        this.rawPayloadType = Array.isArray(payload) ? 'array' : typeof payload;
+        this.rawPayloadLength = typeof payload === 'string' ? payload.length : (Array.isArray(payload) ? payload.length : null);
+        this.payloadKeys = payload && typeof payload === 'object' && !Array.isArray(payload) ? Object.keys(payload) : null;
+      });
 
-        if (first.listEmpty) {
-          // Commit empty and stop early
-          runInAction(() => {
-            this.data = [];
-            this.layerDataCache.set(layerId, []);
-            this.layerTotalCache.set(layerId, 0);
-            this.lastSource = 'api';
-            this.lastFetchedAt = new Date().toISOString();
-            this.lastCount = 0;
-            this.totalCount = 0;
-            this.listKeyPath = first.usedPath;
-            this.sampleItemKeys = first.sampleItemKeys;
-            this.debugStatus = 'empty';
-            this.loading = false;
-            this.backgroundLoading = false;
-          });
-          return;
-        }
-
-        const aggregated = first.aggregated;
+      const appStatus = Number((payload && typeof payload === 'object' ? (payload as { statusCode?: number | string }).statusCode : undefined));
+      if (!Number.isNaN(appStatus) && appStatus >= 400) {
         runInAction(() => {
-          this.data = [...aggregated];
-          this.layerDataCache.set(layerId, [...aggregated]);
-          this.layerTotalCache.set(layerId, first.totalExpected);
-          // Init page cache for page 1
-          const pageMap = new Map<number, LogRecord[]>();
-          pageMap.set(1, [...aggregated.slice(0, this.apiFetchPageSize)]);
-          this.layerPageCache.set(layerId, pageMap);
+          this.data = [];
+          this.error = null;
           this.lastSource = 'api';
           this.lastFetchedAt = new Date().toISOString();
-          this.lastCount = aggregated.length;
-          this.totalCount = first.totalExpected !== null ? Math.max(first.totalExpected, aggregated.length) : null;
-          this.listKeyPath = first.usedPath;
-          this.sampleItemKeys = first.sampleItemKeys;
-          this.debugStatus = aggregated.length ? 'ok' : 'empty';
-          this.loading = false; // allow UI interactions while background continues
-          this.backgroundLoading = true; // signal background aggregation
+          this.lastUrl = fullUrl;
+          this.lastCount = 0;
+          this.listKeyPath = null;
+          this.sampleItemKeys = null;
+          this.debugStatus = 'empty';
+          this.backgroundLoading = false;
+          this.totalCount = 0;
         });
-      
+        return;
+      }
 
-      // Continue loading remaining pages in the background
-      void fetchRemainingPagesHelper({
-        layerId,
-        startPage: 2,
-        fetchSize,
-        observedServerPageSize: first.observedServerPageSize,
-        totalExpected: first.totalExpected,
-        usedPath: first.usedPath,
-        sampleItemKeys: first.sampleItemKeys,
-        layerLabel,
-        aggregated: [...this.data],
-        concurrency: 3,
-        batchSize: this.commitBatchSize,
-        token: this.fetchToken,
-      }, {
-        isCancelled: (t) => t !== this.fetchToken,
-        onBatch: ({ aggregated: ag, totalExpected: te, usedPath: up, sampleItemKeys: sk }) => {
-          runInAction(() => {
-            this.data = [...ag];
-            const lid = this.selectedLayer ?? layerId;
-            this.layerDataCache.set(lid, [...ag]);
-            // Update per-page cache heuristically: rebuild pages from aggregated snapshot
-            const pageMap = this.layerPageCache.get(lid) ?? new Map<number, LogRecord[]>();
-            for (let i = 0; i < ag.length; i += this.apiFetchPageSize) {
-              const p = Math.floor(i / this.apiFetchPageSize) + 1;
-              pageMap.set(p, ag.slice(i, i + this.apiFetchPageSize));
-            }
-            this.layerPageCache.set(lid, pageMap);
-            this.layerTotalCache.set(lid, te);
-            this.lastCount = ag.length;
-            this.totalCount = te !== null ? Math.max(te, ag.length) : null;
-            this.listKeyPath = up;
-            this.sampleItemKeys = sk;
-            this.debugStatus = ag.length ? 'ok' : 'empty';
-          });
-        },
-        onFinish: ({ aggregated: ag, totalExpected: te, usedPath: up, sampleItemKeys: sk }) => {
-          runInAction(() => {
-            this.data = [...ag];
-            const lid = this.selectedLayer ?? layerId;
-            this.layerDataCache.set(lid, [...ag]);
-            // Finalize per-page cache
-            const pageMap = this.layerPageCache.get(lid) ?? new Map<number, LogRecord[]>();
-            for (let i = 0; i < ag.length; i += this.apiFetchPageSize) {
-              const p = Math.floor(i / this.apiFetchPageSize) + 1;
-              pageMap.set(p, ag.slice(i, i + this.apiFetchPageSize));
-            }
-            this.layerPageCache.set(lid, pageMap);
-            this.layerTotalCache.set(lid, te);
-            this.lastCount = ag.length;
-            this.totalCount = te !== null ? Math.max(te, ag.length) : null;
-            this.listKeyPath = up;
-            this.sampleItemKeys = sk;
-            this.debugStatus = ag.length ? 'ok' : 'empty';
-            this.backgroundLoading = false;
-          });
-        },
-        onError: () => {
-          runInAction(() => { this.backgroundLoading = false; });
-        },
+      // Attempt to use the new paginated envelope: payload.data.{ data:[], count, totalCount, pageIndex, pageSize }
+      let list: unknown[] = [];
+      let usedPath: string | null = null;
+      let total: number | null = null;
+      if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+        const outer = payload as Record<string, unknown>;
+        const dataNode = outer.data as Record<string, unknown> | undefined;
+        const candidateList = dataNode?.data as unknown;
+        if (Array.isArray(candidateList)) {
+          list = candidateList as unknown[];
+          usedPath = 'data.data';
+          const c1 = Number((dataNode as { count?: unknown } | undefined)?.count);
+          const c2 = Number((dataNode as { totalCount?: unknown } | undefined)?.totalCount);
+          total = !Number.isNaN(c1) && c1 > 0 ? c1 : (!Number.isNaN(c2) && c2 > 0 ? c2 : null);
+        }
+      }
+      // Fallbacks: accept root array or other known shapes if envelope absent
+      if (!Array.isArray(list) || list.length === 0) {
+        if (Array.isArray(payload)) {
+          list = payload; usedPath = '(rootArray)';
+        } else if (payload && typeof payload === 'object') {
+          const r = tryKeys(payload as Record<string, unknown>, preferredPaths);
+          list = r.list; usedPath = r.path;
+          if ((!Array.isArray(list) || list.length === 0)) {
+            const d = deepFindArray(payload as Record<string, unknown>, 4, []);
+            if (Array.isArray(d.list)) { list = d.list; usedPath = d.path; }
+          }
+        }
+      }
+
+      if (!Array.isArray(list) || list.length === 0) {
+        runInAction(() => {
+          this.data = [];
+          this.error = null;
+          this.lastSource = 'api';
+          this.lastFetchedAt = new Date().toISOString();
+          this.lastUrl = fullUrl;
+          this.lastCount = 0;
+          this.lastCurl = `curl -X 'GET' '${fullUrl}' -H 'accept: text/plain'`;
+          this.listKeyPath = usedPath;
+          this.sampleItemKeys = null;
+          this.debugStatus = 'empty';
+          this.backgroundLoading = false;
+          this.totalCount = total ?? 0;
+        });
+        return;
+      }
+
+      const layerLabel = this.layerOptions.find(o => o.value === this.selectedLayer)?.label ?? 'LAYER';
+      const records = (list as unknown[]).map((it, idx): LogRecord => (
+        mapToLogRecord(it as Record<string, unknown>, idx, layerLabel)
+      ));
+
+      runInAction(() => {
+        this.data = records;
+        this.lastSource = 'api';
+        this.lastFetchedAt = new Date().toISOString();
+        this.lastUrl = fullUrl;
+        this.lastCount = records.length;
+        this.listKeyPath = usedPath;
+        try {
+          const first = (Array.isArray(list) && list.length > 0 ? list[0] : null) as unknown;
+          this.sampleItemKeys = (first && typeof first === 'object') ? Object.keys(first as object) : null;
+        } catch { this.sampleItemKeys = null; }
+        this.debugStatus = 'ok';
+        this.backgroundLoading = false;
+        this.totalCount = total;
       });
     } catch (err: unknown) {
-      // Narrow potential axios error shape without importing axios types here
-  const maybeResp = (err as { response?: { status?: number; headers?: Record<string, string> } }).response;
+      const maybeResp = (err as { response?: { status?: number; headers?: Record<string, string> } }).response;
       const status = maybeResp?.status;
-      // Decide whether to show error (disconnected) or treat as no data (reachable but HTTP error)
       const hasResponse = !!maybeResp;
       const maybeMessage = (err as { message?: string }).message;
+      const layerId = this.selectedLayer ?? 1;
+      const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
+      const fullUrl = `${base}/admin/logtrails/get?LayerID=${layerId}`;
       runInAction(() => {
         this.error = hasResponse ? null : (maybeMessage ?? 'Failed to reach API');
-        // No fallback; clear data
         this.data = [];
-        const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
-        const fullUrl = `${base}/admin/logtrails/get?LayerID=${layerId}&PageIndex=${this.currentPage}&PageSize=${this.pageSize}`;
         this.lastSource = hasResponse ? 'api' : 'error';
         this.lastFetchedAt = new Date().toISOString();
         this.lastUrl = fullUrl;
         this.lastCount = 0;
-        this.totalCount = 0;
         this.lastCurl = `curl -X 'GET' '${fullUrl}' -H 'accept: text/plain'`;
-        // Distinguish disconnected vs HTTP error
         this.debugStatus = hasResponse ? 'empty' : 'disconnected';
         this.lastStatus = hasResponse ? (status ?? null) : null;
         const headers = maybeResp?.headers as Record<string, string> | undefined;
@@ -304,105 +249,12 @@ export class LogStore {
         const maybeCode = (err as { code?: string | number }).code;
         this.lastErrorCode = hasResponse ? null : (typeof maybeCode !== 'undefined' ? String(maybeCode) : null);
         this.lastErrorMessage = hasResponse ? null : (maybeMessage ?? null);
+        this.backgroundLoading = false;
       });
     } finally {
-      runInAction(() => { this.loading = false; this.backgroundLoading = false; });
-    }
-  }
-
-  // Fetch a single page (1-based). Uses per-page cache when available. Prefetches adjacent pages.
-  async fetchPage(page: number): Promise<void> {
-    const layerId = this.selectedLayer ?? 1;
-    const pageMap = this.layerPageCache.get(layerId) ?? new Map<number, LogRecord[]>();
-    if (pageMap.has(page)) {
-      runInAction(() => {
-        this.data = (pageMap.get(page) ?? []).slice();
-        this.lastCount = this.data.length;
-        this.totalCount = this.layerTotalCache.get(layerId) ?? this.totalCount;
-        this.debugStatus = this.data.length ? 'ok' : 'empty';
-      });
-      // Prefetch neighbors
-      void this.prefetchPages(page);
-      return;
-    }
-
-    // Not in cache: fetch from API page-sized
-    const pageKey = `${layerId}:${page}`;
-    if (this.loadingPages.has(pageKey)) return; // already fetching
-    this.loadingPages.add(pageKey);
-    runInAction(() => { this.loading = true; this.error = null; });
-    try {
-      const resp = await devApi.get('admin/logtrails/get', {
-        params: { LayerID: layerId, PageIndex: page, PageSize: this.apiFetchPageSize },
-        headers: { Accept: 'text/plain' },
-      });
-
-      const parsed = parseMaybeJson(resp.data as unknown);
-      let list: unknown[] = [];
-      let usedPath: string | null = null;
-      if (Array.isArray(parsed)) {
-        list = parsed as unknown[];
-        usedPath = '(rootArray)';
-      } else if (parsed && typeof parsed === 'object') {
-        const r = tryKeys(parsed as Record<string, unknown>, preferredPaths);
-        list = r.list;
-        usedPath = r.path;
-        if ((!Array.isArray(list) || list.length === 0)) {
-          const d = deepFindArray(parsed as Record<string, unknown>, 4, []);
-          if (Array.isArray(d.list)) { list = d.list; usedPath = d.path; }
-        }
-      }
-
-      const layerLabel = this.layerOptions.find(o => o.value === layerId)?.label ?? 'LAYER';
-      const chunkSize = 200; // small chunk for responsive parsing
-      const mapped: LogRecord[] = [];
-      for (let i = 0; i < list.length; i += chunkSize) {
-        const slice = list.slice(i, i + chunkSize) as Record<string, unknown>[];
-        const part = slice.map((it, idx) => mapToLogRecord(it, ((page - 1) * this.apiFetchPageSize) + i + idx, layerLabel));
-        mapped.push(...part);
-        // commit incremental results so the UI sees rows as they are parsed
-        runInAction(() => {
-          const pm = pageMap;
-          pm.set(page, mapped.slice());
-          this.layerPageCache.set(layerId, pm);
-          this.data = mapped.slice();
-          this.lastCount = mapped.length;
-          this.listKeyPath = this.listKeyPath ?? usedPath;
-          this.debugStatus = mapped.length ? 'ok' : 'empty';
-        });
-        // yield to event loop to remain responsive
-  await Promise.resolve();
-      }
-
-      // final commit (ensure full page stored)
-      runInAction(() => {
-        const pm = pageMap;
-        pm.set(page, mapped.slice());
-        this.layerPageCache.set(layerId, pm);
-        this.data = mapped.slice();
-        this.lastCount = mapped.length;
-        this.debugStatus = mapped.length ? 'ok' : 'empty';
-      });
-      void this.prefetchPages(page);
-    } catch (err) {
-      runInAction(() => { this.error = (err as Error).message; this.debugStatus = 'disconnected'; });
-    } finally {
-      this.loadingPages.delete(pageKey);
       runInAction(() => { this.loading = false; });
     }
   }
-
-  // Prefetch adjacent pages (page-1, page+1)
-  private async prefetchPages(page: number): Promise<void> {
-    const layerId = this.selectedLayer ?? 1;
-    const pageMap = this.layerPageCache.get(layerId) ?? new Map<number, LogRecord[]>();
-    const toPrefetch = [page - 1, page + 1].filter(p => p >= 1 && !pageMap.has(p));
-    for (const p of toPrefetch) {
-      // fire-and-forget
-      void this.fetchPage(p);
-    }
-  }
-
   // Background fetch moved to helper
 }
 
