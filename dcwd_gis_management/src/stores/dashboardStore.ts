@@ -10,7 +10,12 @@ export interface Report {
   dispatchStat?: number; 
 }
 
+import { action } from "mobx";
+
 class DashboardStore {
+  setCustomerCount = action((count: number) => {
+    this.summary.customer = count;
+  });
   reports: Report[] = [];
   loading = false;
 
@@ -23,7 +28,8 @@ class DashboardStore {
     dispatched: number;
     pending: number;
     byStatus: Record<string, number>;
-  } = { total: 0, dispatched: 0, pending: 0, byStatus: {} };
+    customer: number;
+  } = { total: 0, dispatched: 0, pending: 0, byStatus: {}, customer: 0 };
 
   allReports: Report[] = [];
   allReportsLoaded = false;
