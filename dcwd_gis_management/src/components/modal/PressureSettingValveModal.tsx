@@ -32,7 +32,7 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
       footer={null}
       width={900}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+  styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable
     >

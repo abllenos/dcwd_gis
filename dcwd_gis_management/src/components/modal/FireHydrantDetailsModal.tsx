@@ -19,7 +19,7 @@ const FireHydrantDetailsModal: React.FC<FireHydrantDetailsModalProps> = ({ visib
       footer={null}
       width={700}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+  styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable
     >
