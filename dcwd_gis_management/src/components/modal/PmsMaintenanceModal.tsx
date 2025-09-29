@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 const { Title } = Typography;
 
-import type { ModalProps } from 'antd';
 
 interface PmsMaintenanceModalProps {
   open: boolean;
@@ -87,7 +86,7 @@ const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose
     >
       <div style={{ padding: '32px 32px 0 32px' }}>
         <Title level={3} style={{ margin: 0, color: '#444' }}>PMS Maintenance</Title>
-        <Button type="primary" style={{ margin: '24px 0 16px 0', fontWeight: 600, fontSize: 16 }}>
+        <Button className="btn-add" style={{ margin: '24px 0 16px 0' }}>
           Add Maintenance Record
         </Button>
         <div style={{ background: '#e6edfc', borderRadius: 12, padding: '18px 18px 8px 18px', marginBottom: 0 }}>

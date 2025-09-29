@@ -13,11 +13,6 @@ const { Option } = Select;
 const License: React.FC = observer(() => {
   const [form] = Form.useForm();
 
-  const [pageSize, setPageSize] = React.useState(10);
-  const [currentPage, setCurrentPage] = React.useState(1);
-
-  const [renewForm] = Form.useForm();
-
   // Function to handle API fetch with UI feedback
   const handleFetchUsers = async () => {
     try {
@@ -64,9 +59,18 @@ const License: React.FC = observer(() => {
     }
   };
 
-  // Development test function - can be called from browser console
+  // Development test functions - can be called from browser console
   React.useEffect(() => {
     (window as any).runLicenseAPITest = testLicenseApiIntegration;
+    
+    // Import and expose direct API testing
+    import('../utils/testLicenseApiDirect').then(module => {
+      (window as any).testDirectLicenseAPI = module.testDirectLicenseAPI;
+    });
+    
+    console.log('🔧 License debugging tools available:');
+    console.log('  - runLicenseAPITest() - Test license API integration'); 
+    console.log('  - testDirectLicenseAPI() - Test direct API endpoints');
   }, []);
 
   // Fetch data when component mounts
@@ -199,16 +203,12 @@ const License: React.FC = observer(() => {
       key: 'actions',
       width: 100,
       render: (_: any, record: any) => (
-        <Button
-          type="primary"
-          size="small"
-          className="license-table-action-button"
-          onClick={() => {
-            licenseStore.openInstallationDetails(record);
-          }}
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => record.onShowModal(record)}
         >
-          ≡
-        </Button>
+          View
+        </button>
       ),
     },
   ];
@@ -313,7 +313,7 @@ const License: React.FC = observer(() => {
 
             <Col xs={24} sm={12} md={6} lg={3}>
               <Form.Item>
-                <Button 
+                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                   type="primary" 
                   htmlType="submit" 
                   icon={<SaveOutlined />}
@@ -333,7 +333,7 @@ const License: React.FC = observer(() => {
         </Typography.Title>
         <Space>
           <Tooltip title="Refresh Users">
-            <Button
+            <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
               type="text"
               icon={<ReloadOutlined />}
               onClick={handleRefreshUsers}
@@ -393,6 +393,7 @@ const License: React.FC = observer(() => {
                 <Table
                   columns={columns}
                   dataSource={paginatedUsers}
+                  rowKey="key"
                   pagination={false}
                   size="small"
                   className="license-table"
@@ -425,7 +426,7 @@ const License: React.FC = observer(() => {
                 {licenseStore.searchText && ` (filtered from ${licenseStore.registeredUsers.length} total entries)`}
               </Typography.Text>
               <div className="license-pagination-buttons">
-                <Button 
+                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                   size="small" 
                   disabled={licenseStore.currentPage === 1 || totalItems === 0}
                   onClick={() => handlePageChange(licenseStore.currentPage - 1)}
@@ -438,7 +439,7 @@ const License: React.FC = observer(() => {
                   Previous
                 </Button>
                 {totalItems > 0 ? getPageNumbers().map(pageNum => (
-                  <Button 
+                  <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                     key={pageNum}
                     size="small" 
                     type={pageNum === licenseStore.currentPage ? "primary" : "default"}
@@ -452,7 +453,7 @@ const License: React.FC = observer(() => {
                     {pageNum}
                   </Button>
                 )) : (
-                  <Button 
+                  <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                     size="small" 
                     disabled
                     className="license-pagination-button-disabled"
@@ -460,7 +461,7 @@ const License: React.FC = observer(() => {
                     1
                   </Button>
                 )}
-                <Button 
+                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                   size="small" 
                   disabled={licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0}
                   onClick={() => handlePageChange(licenseStore.currentPage + 1)}

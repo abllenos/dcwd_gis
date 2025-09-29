@@ -1,0 +1,143 @@
+/* MapViewer Component Styles */
+
+.map-viewer-container {
+  padding: 24px;
+  background: var(--bg-tertiary, #f0f2f5);
+  min-height: 100vh;
+}
+
+.map-viewer-card {
+  background: var(--bg-primary, #ffffff);
+  border: 1px solid var(--border-color, #d9d9d9);
+}
+
+.map-viewer-title {
+  color: var(--primary-color, #1890ff);
+  margin: 0;
+}
+
+.map-legend-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: var(--bg-secondary, #fafafa);
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #d9d9d9);
+  margin-bottom: 16px;
+}
+
+.map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-legend-text {
+  font-size: 12px;
+  color: var(--text-primary, #000000);
+}
+
+.map-container {
+  height: 600px;
+  width: 100%;
+  border: 1px solid var(--border-color, #d9d9d9);
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.map-info-section {
+  margin-top: 16px;
+  color: var(--text-secondary, #666);
+  font-size: 12px;
+}
+
+.map-info-list {
+  margin-left: 20px;
+  color: var(--text-primary, #000000);
+}
+
+.map-info-italic {
+  font-style: italic;
+  color: var(--text-secondary, #666);
+}
+
+/* ===== DARK MODE STYLES ===== */
+[data-theme='dark'] .map-viewer-container {
+  background: #141414;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .map-viewer-card {
+  background: #1f1f1f;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .map-viewer-card .ant-card-body {
+  background: #1f1f1f;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .map-viewer-title {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .map-legend-container {
+  background: #262626;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .map-legend-text {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .map-container {
+  border-color: #434343;
+  background: #262626;
+}
+
+[data-theme='dark'] .map-info-section {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .map-info-list {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .map-info-italic {
+  color: #f1f5f9;
+}
+
+/* Leaflet map dark mode adjustments */
+[data-theme='dark'] .leaflet-container {
+  background: #262626;
+}
+
+[data-theme='dark'] .leaflet-popup-content-wrapper {
+  background: #1f1f1f;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .leaflet-popup-tip {
+  background: #1f1f1f;
+}
+
+[data-theme='dark'] .leaflet-control-zoom a {
+  background: #262626;
+  color: #f1f5f9;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .leaflet-control-zoom a:hover {
+  background: #434343;
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .leaflet-control-attribution {
+  background: rgba(31, 31, 31, 0.8);
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .leaflet-control-attribution a {
+  color: #60a5fa;
+}

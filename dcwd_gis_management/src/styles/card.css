@@ -8,5 +8,26 @@
 }
 
 .custom-card .ant-card-body {
-  padding: 25;
+  padding: 25px;
+}
+
+/* Dark Mode Styles */
+[data-theme='dark'] .custom-card {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='dark'] .custom-card .ant-card-body {
+  background-color: #1f1f1f;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .custom-card .ant-card-head {
+  background-color: #1f1f1f;
+  border-bottom-color: #434343;
+}
+
+[data-theme='dark'] .custom-card .ant-card-head-title {
+  color: #f1f5f9;
 }

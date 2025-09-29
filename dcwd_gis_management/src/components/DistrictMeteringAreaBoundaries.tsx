@@ -3,7 +3,10 @@ import { observer } from 'mobx-react-lite';
 import { dmaBoundariesStore } from '../stores/dmaBoundariesStore';
 import { Table, Input, Select, Card, Typography, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+
 import Footer from './layout/Footer';
+import '../styles/DistrictMeteringArea.css';
+
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -66,41 +69,37 @@ const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
 
   const locale = {
     emptyText: (
-      <div style={{ padding: '40px 0', color: '#999' }}>
+      <div className="dma-boundaries-empty-text">
         <div>No District Metering Area Inlet Record Available</div>
       </div>
     ),
   };
 
   return (
-    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
+    <div className="dma-boundaries-container">
       <Card>
         <div style={{ marginBottom: '24px' }}>
-          <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
+          <Title level={3} className="dma-boundaries-title">
             District Metering Area - Boundaries
           </Title>
         </div>
 
         <div style={{ marginBottom: '24px' }}>
-          <Title level={5} style={{ color: '#666', marginBottom: '8px' }}>
+          <Title level={5} className="dma-boundaries-instructions-title">
             Instructions:
           </Title>
-          <Text style={{ color: '#999' }}>
+          <Text className="dma-boundaries-instructions-text">
             Instruction: Double Click row to edit Details.
           </Text>
         </div>
 
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: '16px' 
-        }}>
-          <Space>
-            <Text>Display</Text>
+        <div className="dma-boundaries-controls">
+          <div className="dma-boundaries-display-controls">
+            <Text className="dma-boundaries-control-text">Display</Text>
             <Select
               value={pageSize.toString()}
               onChange={handlePageSizeChange}
+              size="small"
               style={{ width: 80 }}
             >
               <Option value="10">10</Option>
@@ -108,20 +107,21 @@ const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
               <Option value="50">50</Option>
               <Option value="100">100</Option>
             </Select>
-            <Text>records per page</Text>
-          </Space>
+            <Text className="dma-boundaries-control-text">records per page</Text>
+          </div>
 
-          <Space>
-            <Text>Search:</Text>
+          <div className="dma-boundaries-search-controls">
+            <Text className="dma-boundaries-control-text">Search:</Text>
             <Search
-              placeholder="Search..."
-              allowClear
+              placeholder=""
+              size="small"
               style={{ width: 200 }}
               value={search}
               onChange={e => setSearch(e.target.value)}
               onSearch={handleSearch}
+              enterButton
             />
-          </Space>
+          </div>
         </div>
 
         <Table
@@ -135,19 +135,14 @@ const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
               `Showing ${range[0]} to ${range[1]} of ${total} entries`,
           }}
           locale={locale}
-          style={{ marginBottom: '16px' }}
+          className="dma-boundaries-table"
         />
 
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          color: '#999'
-        }}>
-          <Text style={{ color: '#999' }}>No Record Available</Text>
+        <div className="dma-boundaries-footer-controls">
+          <Text className="dma-boundaries-footer-text">No Record Available</Text>
           <Space>
-            <Text style={{ color: '#999' }}>Previous</Text>
-            <Text style={{ color: '#999' }}>Next</Text>
+            <Text className="dma-boundaries-footer-text">Previous</Text>
+            <Text className="dma-boundaries-footer-text">Next</Text>
           </Space>
         </div>
       </Card>

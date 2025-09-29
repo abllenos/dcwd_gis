@@ -54,22 +54,25 @@ const LogPage: React.FC = observer(() => {
         {/* Row 2: Display (left) and Search (right) above the table */}
         <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 8 }}>
           <Col xs={24} md={12}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>Display</span>
+            <div className="license-display-controls">
+              <span className="license-control-text">Display</span>
               <Select
                 value={pageSize}
                 onChange={(v) => logStore.setPageSize(v)}
                 options={[10,20,50,100].map(n => ({ label: String(n), value: n }))}
-                style={{ width: 100 }}
+                style={{ width: 80 }}
+                size="small"
               />
-              <span>records per page</span>
+              <span className="license-control-text">records per page</span>
             </div>
           </Col>
           <Col xs={24} md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520 }}>
               <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
               <Input
                 placeholder="Type to filter..."
+
                 value={search}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -83,6 +86,9 @@ const LogPage: React.FC = observer(() => {
                   }
                 }}
                 allowClear
+                size="small"
+                enterButton
+                style={{ width: 200 }}
               />
               <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Button
@@ -162,7 +168,7 @@ const LogPage: React.FC = observer(() => {
           open={logUiStore.isModalOpen}
           onCancel={() => logUiStore.close()}
           footer={[
-            <Button key="close" onClick={() => logUiStore.close()}>Close</Button>,
+            <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
           ]}
         >
           {logUiStore.selected && (
@@ -191,7 +197,9 @@ const LogPage: React.FC = observer(() => {
             </>
           )}
         </Modal>
+
         {/* status/progress UI removed as requested */}
+
       </div>
     </Card>
   );

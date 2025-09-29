@@ -9,6 +9,8 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
+import { sidebarUiStore } from '../../stores/sidebarUiStore';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -21,7 +23,7 @@ interface HeaderBarProps {
   onLogoutClick: () => void;
 }
 
-const HeaderBar: React.FC<HeaderBarProps> = ({
+const HeaderBar: React.FC<HeaderBarProps> = observer(({
   collapsed,
   onToggleCollapse,
   isDarkMode,
@@ -29,6 +31,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
   onLogoutClick,
 }) => {
   const navigate = useNavigate();
+  const sidebarWidth = collapsed ? 80 : sidebarUiStore.sidebarWidth;
 
   return (
     <Header
@@ -37,7 +40,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
         position: 'fixed',
         top: 0,
         right: 0,
-        left: collapsed ? 80 : 280,
+        left: sidebarWidth,
         height: '64px',
         padding: '0 20px',
         background: 'var(--bg-header)',
@@ -45,7 +48,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        zIndex: 1100,
+        zIndex: 900,
         transition: 'left 0.2s ease',
         boxShadow: '2px 2px 8px var(--shadow-color)'
       }}
@@ -87,6 +90,6 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
       </div>  
     </Header>
   );
-};
+});
 
 export default HeaderBar;

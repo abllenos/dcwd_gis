@@ -4,9 +4,8 @@ import { Card, Typography, Space, Select, Input, Table, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
+import PressureSettingValveDetailsModal from './modal/PressureSettingValveDetailsModal';
 
-import Footer from './layout/Footer';
-import { useQuery } from '@tanstack/react-query';
 
 import { observer } from 'mobx-react-lite';
 import { psvStore } from '../stores/psvStore';
@@ -48,6 +47,10 @@ const PressureSettingValve: React.FC = observer(() => {
     fetchData();
   }, []);
 
+  // State for details modal
+  const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
+  const [detailsRecord, setDetailsRecord] = React.useState<PSVRecord | null>(null);
+
   const columns: ColumnsType<PSVRecord> = [
     {
       title: '#',
@@ -68,9 +71,11 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-        <Button type="primary" shape="circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }} style={{ background: '#00b894', borderColor: '#00b894' }}>
+
+        <Button className="btn-action-circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}>
           <UnorderedListOutlined />
         </Button>
+
       ),
     },
   ];
@@ -81,7 +86,6 @@ const PressureSettingValve: React.FC = observer(() => {
       <div style={{ marginBottom: 16 }}>
         {psvStore.isLoading && <div style={{ color: '#2563eb', fontWeight: 600 }}>Loading...</div>}
         {psvStore.error && <div style={{ color: 'red', fontWeight: 600 }}>Error: {psvStore.error.message}</div>}
-        <pre style={{ background: '#f8f8f8', color: '#c00', fontSize: 12, maxHeight: 200, overflow: 'auto' }}>{JSON.stringify(psvStore.data, null, 2)}</pre>
       </div>
       <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
         <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Setting Valves</span>
@@ -92,17 +96,16 @@ const PressureSettingValve: React.FC = observer(() => {
           <Text style={{ color: '#999' }}>Double click a row to edit details or use the action button.</Text>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Space>
-            <Text>Display</Text>
-            <Select value={String(psvStore.pageSize)} onChange={(v: string) => psvStore.setPageSize(Number(v))} style={{ width: 100 }} options={[{label:'10',value:'10'},{label:'25',value:'25'},{label:'50',value:'50'}]} />
-            <Text>records per page</Text>
-          </Space>
-
-          <Space>
-            <Text>Search:</Text>
-            <Search placeholder="Search" allowClear onSearch={(v: string) => psvStore.setSearch(v)} style={{ width: 320 }} />
-          </Space>
+        <div className="license-controls-container">
+          <div className="license-display-controls">
+            <span>Display</span>
+            <Select value={String(psvStore.pageSize)} onChange={(v: string) => psvStore.setPageSize(Number(v))} size="small" style={{ width: 90 }} options={[{label:'10',value:'10'},{label:'25',value:'25'},{label:'50',value:'50'}]} />
+            <span>records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span>Search:</span>
+            <Search placeholder="Search..." allowClear enterButton onSearch={(v: string) => psvStore.setSearch(v)} size="small" style={{ width: 200 }} />
+          </div>
         </div>
 
         {!psvStore.isLoading && !psvStore.error && (
@@ -121,6 +124,11 @@ const PressureSettingValve: React.FC = observer(() => {
           record={psvStore.selected}
           onCancel={() => psvStore.setModalVisible(false)}
           onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
+        />
+        <PressureSettingValveDetailsModal
+          visible={detailsModalVisible}
+          record={detailsRecord}
+          onCancel={() => setDetailsModalVisible(false)}
         />
       </Card>
     </div>

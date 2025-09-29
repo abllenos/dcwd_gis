@@ -1,23 +1,82 @@
 
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table } from 'antd';
+import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
+import { useState, useEffect } from 'react';
 
 const { Title } = Typography;
 
-const initialUsers = [
-  { id: 1, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'DESKTOP-01' },
-  { id: 2, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'DCWD391' },
-  { id: 3, licenseType: 'Trial Version', department: 'Engineering and Construction Department', computerName: 'DCWD400' },
-  { id: 4, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'DCWD172' },
-  { id: 5, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'EDP84' },
-  { id: 6, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'LAPTOP-JURD31VD' },
-  { id: 7, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'ICT13' },
-  { id: 8, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'DCWD166' },
-  { id: 9, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'DCWD394' },
-  { id: 10, licenseType: 'Viewer Version', department: 'Engineering and Construction Department', computerName: 'DCWD003' },
-];
+
+
+
+// Modal for Installation Details
+const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
+  // Example logs data (replace with real data as needed)
+  const logs = [
+    { key: 1, installDate: '2021-09-20', expDate: '2021-10-20', days: 'Expired', admin: 'Basio, Alexis L.' },
+    { key: 2, installDate: '2025-09-19', expDate: '2025-10-19', days: '24', admin: 'Llenos, Alvin B.' },
+  ];
+  const [logSearch, setLogSearch] = useState('');
+  const filteredLogs = logs.filter(l =>
+    l.installDate.includes(logSearch) ||
+    l.expDate.includes(logSearch) ||
+    l.days.toString().toLowerCase().includes(logSearch.toLowerCase()) ||
+    l.admin.toLowerCase().includes(logSearch.toLowerCase())
+  );
+  return (
+    <Modal open={visible} onCancel={onCancel} footer={null} width={800} title={null}>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
+          <Typography.Title level={4} style={{ color: '#222', margin: 0 }}>Installation Details</Typography.Title>
+        </div>
+        <div style={{ background: '#f6f8fc', borderRadius: 6, padding: 18, marginBottom: 18 }}>
+          <Row gutter={24}>
+            <Col span={12}>
+              <div><b>Registered To:</b> <span style={{ color: '#2563eb' }}>mpbaron</span></div>
+              <div><b>Software Version:</b> <span style={{ color: '#2563eb' }}>MapInfo Professional 19</span></div>
+              <div style={{ marginTop: 8 }}><Switch checkedChildren="Status" unCheckedChildren="Status" defaultChecked style={{ background: '#16c784' }} /></div>
+            </Col>
+            <Col span={12}>
+              <div><b>Department:</b> <span style={{ color: '#2563eb' }}>{user?.department}</span></div>
+              <div><b>License Type:</b> <span style={{ color: '#2563eb' }}>{user?.licenseType}</span></div>
+              <div><b>PC Name:</b> <span style={{ color: '#2563eb' }}>{user?.computerName}</span></div>
+            </Col>
+          </Row>
+        </div>
+        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 12 }}>
+          <Typography.Title level={5} style={{ color: '#222', margin: 0, fontWeight: 500 }}>Installation logs</Typography.Title>
+        </div>
+        <div style={{ background: '#f6f8fc', borderRadius: 6, padding: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 16 }}>
+            <span>Display</span>
+            <Select value={10} style={{ width: 80 }} options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))} disabled />
+            <span>records per page</span>
+            <div style={{ flex: 1 }} />
+            <span>Search:</span>
+            <Input value={logSearch} onChange={e => setLogSearch(e.target.value)} style={{ width: 200 }} allowClear />
+          </div>
+          <Table
+            bordered
+            rowKey="key"
+            columns={[
+              { title: 'Installation Date', dataIndex: 'installDate', sorter: (a, b) => a.installDate.localeCompare(b.installDate) },
+              { title: 'Expiration Date', dataIndex: 'expDate', sorter: (a, b) => a.expDate.localeCompare(b.expDate) },
+              { title: 'Remaining Days', dataIndex: 'days', sorter: (a, b) => a.days.toString().localeCompare(b.days.toString()) },
+              { title: 'Administered By', dataIndex: 'admin' },
+            ]}
+            dataSource={filteredLogs}
+            pagination={{ pageSize: 10, showSizeChanger: false }}
+            style={{ background: '#fff', borderRadius: 8 }}
+          />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 18 }}>
+          <Button type="primary" style={{ background: '#2563eb', fontWeight: 600 }}>Renew</Button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
 
 const columns = [
   { title: 'ID', dataIndex: 'id', width: 60, sorter: (a: any, b: any) => a.id - b.id },
@@ -28,20 +87,35 @@ const columns = [
     title: '',
     key: 'action',
     width: 60,
-    render: () => (
-      <Button type="primary" shape="circle" icon={<UserOutlined />} style={{ background: '#16c784', border: 'none' }} />
+    render: (_: any, record: any) => (
+  <button
+    style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+    onClick={() => record.onShowModal(record)}
+  >
+    View
+  </button>
     ),
   },
 ];
 
 
+
 const MapInfoUsers = observer(() => {
-  const filteredUsers = initialUsers.filter(
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  useEffect(() => {
+    mapInfoUsersStore.fetchUsers();
+  }, []);
+
+  const filteredUsers = mapInfoUsersStore.users.filter(
     u =>
-      u.licenseType.toLowerCase().includes(mapInfoUsersStore.search.toLowerCase()) ||
-      u.department.toLowerCase().includes(mapInfoUsersStore.search.toLowerCase()) ||
-      u.computerName.toLowerCase().includes(mapInfoUsersStore.search.toLowerCase())
+      (u.licenseType?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
+      (u.department?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
+      (u.computerName?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase())
   );
+  // Add modal handler to each row
+  const tableData = filteredUsers.map(u => ({ ...u, onShowModal: (user: any) => { setSelectedUser(user); setModalVisible(true); } }));
 
   return (
     <div>
@@ -71,7 +145,9 @@ const MapInfoUsers = observer(() => {
             <DatePicker value={mapInfoUsersStore.installDate} onChange={mapInfoUsersStore.setInstallDate.bind(mapInfoUsersStore)} style={{ width: '100%' }} format="DD/MM/YYYY" />
           </Col>
           <Col span={4} style={{ display: 'flex', alignItems: 'end', height: '100%' }}>
-            <Button type="primary" style={{ background: '#16c784', fontWeight: 600, width: '100%' }}>
+
+            <Button type="primary" className="license-register-button">
+
               Register
             </Button>
           </Col>
@@ -106,11 +182,12 @@ const MapInfoUsers = observer(() => {
           bordered
           rowKey="id"
           columns={columns}
-          dataSource={filteredUsers}
+          dataSource={tableData}
           pagination={{ pageSize: mapInfoUsersStore.pageSize, showSizeChanger: false }}
           style={{ background: '#fff', borderRadius: 8 }}
         />
       </Card>
+      <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
     </div>
   );
 });

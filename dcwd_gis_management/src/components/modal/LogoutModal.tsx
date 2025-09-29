@@ -24,16 +24,15 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onConfirm, onCancel 
       footer={
         <div style={{ textAlign: "center" }}>
           <Button 
+            className="btn-cancel"
             onClick={onCancel} 
-            style={{ fontSize: "16px", padding: "6px 20px" }}
           >
             Cancel
           </Button>
           <Button 
-            type="primary" 
-            danger 
+            className="btn-danger" 
             onClick={onConfirm} 
-            style={{ marginLeft: 14, fontSize: "16px", padding: "6px 20px" }}
+            style={{ marginLeft: 14 }}
           >
             Logout
           </Button>

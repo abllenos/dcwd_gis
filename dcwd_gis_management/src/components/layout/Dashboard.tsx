@@ -1,3 +1,4 @@
+import BuildingFootprints from '../BuildingFootprints';
 import React from 'react';
 import { Layout } from 'antd';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -10,6 +11,7 @@ import Home from '../Home';
 import LogPage from '../LogPage';
 import { observer } from 'mobx-react-lite';
 import { dashboardUiStore } from '../../stores/dashboardUiStore';
+import { sidebarUiStore } from '../../stores/sidebarUiStore';
 
 import DistrictMeteringAreaBoundaries from '../DistrictMeteringAreaBoundaries';
 import MapViewer from '../MapViewer';
@@ -19,17 +21,29 @@ import IsolationValve from '../IsolationValve';
 import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
+
+import Reports from '../Reports';
+
 import Reports from '../reports';
 import Classification from '../Classification';
 import ClassPage from '../Class';
 import Layer from '../Layer';
 import UserAccounts from '../UserAccounts';
 
+import Settings from '../Settings';
+
+import PressureReleaseValve from '../PressureReleaseValve';
 
 import BlowOffValve from '../BlowOffValve';
 import DMAInlet from '../DMAInlet';
+
 import PressureReleaseValve from '../PressureReleaseValve';
 import PressureMonitoringSystem from '../PressureMonitoringSystem';
+
+import MapInfoUsers from '../MapInfoUsers';
+import DistributionTransmission from '../DistributionTransmission';
+import BuildingFootprints from '../BuildingFootprints';
+
 
 const { Content } = Layout;
 
@@ -46,6 +60,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
 }) => {
   const collapsed = dashboardUiStore.collapsed;
   const logoutModalVisible = dashboardUiStore.logoutModalVisible;
+  const sidebarWidth = collapsed ? 80 : sidebarUiStore.sidebarWidth;
       
   const navigate = useNavigate();
 
@@ -91,7 +106,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
         />
 
         <Layout style={{ 
-          marginLeft: collapsed ? 80 : 280, 
+          marginLeft: sidebarWidth, 
           transition: 'margin-left 0.2s ease',
         }}>
           <HeaderBar
@@ -123,6 +138,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="blow-off-valve" element={<BlowOffValve />} />
               <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
               <Route path="dma-inlet" element={<DMAInlet />} />
+
               <Route path="/home" element={<Home />} />
               <Route path="/license" element={<License />} />
               <Route path="/vts" element={<VTS />} />
@@ -131,6 +147,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="/class" element={<ClassPage />} />
               <Route path="/layer" element={<Layer />} />
               <Route path="/user-accounts" element={<UserAccounts />} />
+              <Route path="/settings" element={<Settings isDarkMode={appIsDarkMode} setIsDarkMode={setAppIsDarkMode} />} />
               <Route path="log" element={<LogPage />} />
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="*" element={<Navigate to="/home" replace />} />

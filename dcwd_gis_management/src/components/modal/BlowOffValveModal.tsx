@@ -37,6 +37,9 @@ interface BlowOffValveModalProps {
 const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, initialValues = {}, loading = false }) => {
   const [form] = Form.useForm();
 
+  // All fields are disabled for view-only mode
+  const fieldProps = { disabled: true };
+
   return (
     <Modal
       open={open}
@@ -44,8 +47,8 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
       footer={null}
       width={900}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
-      destroyOnClose
+      styles={{ body: { padding: 0 } }}
+      destroyOnHidden
       maskClosable
       title={null}
     >
@@ -58,17 +61,19 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
             <Form form={form} layout="vertical" initialValues={initialValues}>
               <Row gutter={24}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Asset Tag" name="assetTag"><Input /></Form.Item>
-                  <Form.Item label="Date Installed" name="dateInstalled"><Input /></Form.Item>
-                  <Form.Item label="Location" name="location"><Input /></Form.Item>
-                  <Form.Item label="Water Source" name="waterSource"><Select options={waterSourceOptions} /></Form.Item>
-                  <Form.Item label="Barangay" name="barangay"><Select options={barangayOptions} /></Form.Item>
+                  <Form.Item label="Asset Tag" name="assetTag"><Input {...fieldProps} /></Form.Item>
+                  <Form.Item label="Date Installed" name="dateInstalled"><Input {...fieldProps} /></Form.Item>
+                  <Form.Item label="Location" name="location"><Input {...fieldProps} /></Form.Item>
+                  <Form.Item label="Water Source" name="waterSource"><Select options={waterSourceOptions} {...fieldProps} /></Form.Item>
+                  <Form.Item label="Barangay" name="barangay"><Select options={barangayOptions} {...fieldProps} /></Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Status" name="status"><Select options={statusOptions} /></Form.Item>
+                  <Form.Item label="Status" name="status"><Select options={statusOptions} {...fieldProps} /></Form.Item>
                   <Form.Item label="Upload Photo" name="photo" valuePropName="fileList" getValueFromEvent={e => Array.isArray(e) ? e : e && e.fileList}>
+
                     <Upload beforeUpload={() => false} listType="picture">
-                      <Button icon={<UploadOutlined />}>Select File</Button>
+                      <Button className="btn-select" icon={<UploadOutlined />}>Select File</Button>
+
                     </Upload>
                   </Form.Item>
                 </Col>
@@ -79,10 +84,10 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
             <Form form={form} layout="vertical" initialValues={initialValues}>
               <Row gutter={24}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Valve Size [mm]" name="valveSize"><Input /></Form.Item>
+                  <Form.Item label="Valve Size [mm]" name="valveSize"><Input {...fieldProps} /></Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Form.Item label="No of Turns" name="noOfTurns"><Input /></Form.Item>
+                  <Form.Item label="No of Turns" name="noOfTurns"><Input {...fieldProps} /></Form.Item>
                 </Col>
               </Row>
             </Form>
@@ -91,12 +96,12 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
             <Form form={form} layout="vertical" initialValues={initialValues}>
               <Row gutter={24}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Work Order No." name="workOrderNo"><Input /></Form.Item>
-                  <Form.Item label="Project Title" name="projectTitle"><Input /></Form.Item>
+                  <Form.Item label="Work Order No." name="workOrderNo"><Input {...fieldProps} /></Form.Item>
+                  <Form.Item label="Project Title" name="projectTitle"><Input {...fieldProps} /></Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Remarks" name="remarks"><Input /></Form.Item>
-                  <Form.Item label="Hotlink" name="hotlink"><Input /></Form.Item>
+                  <Form.Item label="Remarks" name="remarks"><Input {...fieldProps} /></Form.Item>
+                  <Form.Item label="Hotlink" name="hotlink"><Input {...fieldProps} /></Form.Item>
                 </Col>
               </Row>
             </Form>
@@ -115,10 +120,12 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" htmlType="submit" loading={loading} style={{ background: '#16a34a', border: 'none' }} onClick={form.submit}>
+
+          <Button className="btn-update" htmlType="submit" loading={loading} onClick={form.submit}>
             Update
           </Button>
-          <Button danger onClick={onClose} style={{ minWidth: 80 }}>
+          <Button className="btn-close" onClick={onClose}>
+
             Close
           </Button>
         </Space>

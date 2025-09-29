@@ -46,13 +46,19 @@ class LicenseApiService {
    */
   async getActiveUsers(): Promise<LicenseApiResponse> {
     try {
+      console.log('🔄 Making API request to:', licenseApi.defaults.baseURL + '/getRegUsers.php?mode=active');
+      
       const response = await licenseApi.get('getRegUsers.php', {
         params: {
           mode: 'active'
         }
       });
 
-      console.log(`License API Response: Successfully loaded ${response.data.length} users`);
+
+      console.log('📡 License API Response Status:', response.status);
+      console.log('📡 License API Response Data:', response.data);
+      console.log('📡 License API Response Type:', typeof response.data, Array.isArray(response.data));
+
 
       // Handle different possible response formats
       if (response.data) {
@@ -65,7 +71,7 @@ class LicenseApiService {
             message: `Successfully loaded ${response.data.length} active users`
           };
         }
-        
+
         // If response.data has a data property that contains the array
         if (response.data.data && Array.isArray(response.data.data)) {
           return {
@@ -84,6 +90,18 @@ class LicenseApiService {
             count: response.data.users.length,
             message: response.data.message || `Successfully loaded ${response.data.users.length} active users`
           };
+        }
+
+        // Try to find the first array property in the object
+        for (const key in response.data) {
+          if (Array.isArray(response.data[key])) {
+            return {
+              success: true,
+              data: response.data[key],
+              count: response.data[key].length,
+              message: `Loaded ${response.data[key].length} users from property '${key}'`
+            };
+          }
         }
 
         // If response indicates success but no data
@@ -114,7 +132,6 @@ class LicenseApiService {
 
     } catch (error: any) {
       console.error('Error fetching active users:', error);
-      
       // Handle different types of errors
       if (error.response) {
         // Server responded with error status

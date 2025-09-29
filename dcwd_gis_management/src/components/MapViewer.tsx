@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Card, Typography } from 'antd';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../styles/MapViewer.css';
 
 const { Title } = Typography;
 
@@ -21,6 +22,15 @@ const MapViewer: React.FC = () => {
     if (mapRef.current && !mapInstanceRef.current) {
       // Initialize the map centered on Davao City, Philippines
       mapInstanceRef.current = L.map(mapRef.current).setView([7.1907, 125.4553], 12);
+      // Limit map to Davao del Sur bounds
+      // Approximate bounds for Davao del Sur province
+      const davaoDelSurBounds = L.latLngBounds([
+        [6.40, 124.90], // Southwest (near Malita)
+        [7.40, 125.70]  // Northeast (near Davao City)
+      ]);
+      mapInstanceRef.current.setMaxBounds(davaoDelSurBounds);
+      mapInstanceRef.current.setMinZoom(9);
+      mapInstanceRef.current.setMaxZoom(18);
 
       // Add OpenStreetMap tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -115,70 +125,52 @@ const MapViewer: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
-      <Card>
+    <div className="map-viewer-container">
+      <Card className="map-viewer-card">
         <div style={{ marginBottom: '24px' }}>
-          <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
+          <Title level={3} className="map-viewer-title">
             Map Viewer
           </Title>
         </div>
 
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ 
-            display: 'flex', 
-            gap: '20px', 
-            flexWrap: 'wrap',
-            padding: '12px',
-            background: '#fafafa',
-            borderRadius: '6px',
-            border: '1px solid #d9d9d9'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '12px', height: '12px', backgroundColor: '#ff6b6b', borderRadius: '50%' }}></div>
-              <span style={{ fontSize: '12px' }}>Treatment Plants</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '12px', height: '12px', backgroundColor: '#4ecdc4', borderRadius: '50%' }}></div>
-              <span style={{ fontSize: '12px' }}>Pumping Stations</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '12px', height: '12px', backgroundColor: '#45b7d1', borderRadius: '50%' }}></div>
-              <span style={{ fontSize: '12px' }}>Water Storage</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '12px', height: '12px', backgroundColor: '#96ceb4', borderRadius: '50%' }}></div>
-              <span style={{ fontSize: '12px' }}>Distribution Hubs</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '20px', height: '3px', backgroundColor: '#2196F3' }}></div>
-              <span style={{ fontSize: '12px' }}>Water Pipes</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '20px', height: '12px', backgroundColor: '#ff7800', opacity: 0.3, border: '2px solid #ff7800' }}></div>
-              <span style={{ fontSize: '12px' }}>DMA Boundaries</span>
-            </div>
+        <div className="map-legend-container">
+          <div className="map-legend-item">
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#ff6b6b', borderRadius: '50%' }}></div>
+            <span className="map-legend-text">Treatment Plants</span>
+          </div>
+          <div className="map-legend-item">
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#4ecdc4', borderRadius: '50%' }}></div>
+            <span className="map-legend-text">Pumping Stations</span>
+          </div>
+          <div className="map-legend-item">
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#45b7d1', borderRadius: '50%' }}></div>
+            <span className="map-legend-text">Water Storage</span>
+          </div>
+          <div className="map-legend-item">
+            <div style={{ width: '12px', height: '12px', backgroundColor: '#96ceb4', borderRadius: '50%' }}></div>
+            <span className="map-legend-text">Distribution Hubs</span>
+          </div>
+          <div className="map-legend-item">
+            <div style={{ width: '20px', height: '3px', backgroundColor: '#2196F3' }}></div>
+            <span className="map-legend-text">Water Pipes</span>
+          </div>
+          <div className="map-legend-item">
+            <div style={{ width: '20px', height: '12px', backgroundColor: '#ff7800', opacity: 0.3, border: '2px solid #ff7800' }}></div>
+            <span className="map-legend-text">DMA Boundaries</span>
           </div>
         </div>
 
-        <div 
-          ref={mapRef} 
-          style={{ 
-            height: '600px', 
-            width: '100%',
-            border: '1px solid #d9d9d9',
-            borderRadius: '6px'
-          }} 
-        />
+        <div ref={mapRef} className="map-container" />
 
-        <div style={{ marginTop: '16px', color: '#666', fontSize: '12px' }}>
+        <div className="map-info-section">
           <p>Interactive GIS Map showing Davao City Water District infrastructure:</p>
-          <ul style={{ marginLeft: '20px' }}>
+          <ul className="map-info-list">
             <li>Water treatment facilities and pumping stations</li>
             <li>Distribution network and storage facilities</li>
             <li>District Metering Area (DMA) boundaries</li>
             <li>Water pipe network connections</li>
           </ul>
-          <p style={{ fontStyle: 'italic' }}>Click on markers and areas for more information.</p>
+          <p className="map-info-italic">Click on markers and areas for more information.</p>
         </div>
       </Card>
     </div>

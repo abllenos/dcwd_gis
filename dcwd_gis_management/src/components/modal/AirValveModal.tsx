@@ -61,7 +61,30 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
 
   const handleUpdate = () => {
     form.validateFields().then(values => {
-      onUpdate(values);
+      // Map form fields back to API fields
+      const updatePayload = {
+        ...record,
+        arv_number: values.assetTag,
+        status: values.status,
+        date_installed: values.dateInstalled,
+        location: values.location,
+        water_source: values.waterSource,
+        barangay: values.barangay,
+        arv_serial_no: values.avSerialNo,
+        type: values.avType,
+        size: values.avSize,
+        brand: values.avBrand,
+        gate_serial_no: values.gateSerialNo,
+        gate_valve_size: values.gateValveSize,
+        gate_valve_brand: values.gateValveBrand,
+        no_of_turns: values.noOfTurns,
+        depth: values.depth,
+        wonumber: values.workOrderNo,
+        remarks: values.remarks,
+        project_title: values.projectTitle,
+        hotlink: values.hotlink,
+      };
+      onUpdate(updatePayload);
     });
   };
 
@@ -72,7 +95,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
       footer={null}
       width={900}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+  styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable
     >
@@ -157,7 +180,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
+          <Button type="primary" onClick={handleUpdate} style={{ background: '#2563eb', borderColor: '#2563eb' }}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>

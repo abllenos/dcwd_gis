@@ -1,11 +1,8 @@
 
 import React, { useEffect } from 'react';
-import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
+import { Card, Typography, Space, Table, Spin, Alert, Input } from 'antd';
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';
-import { UnorderedListOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import Footer from './layout/Footer';
 
 import { observer } from 'mobx-react-lite';
 import { prvStore } from '../stores/prvStore';
@@ -60,8 +57,10 @@ const PressureReleaseValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PressureReleaseValveRecord) => (
-        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
+
+        <button aria-label="actions" className="btn-action-circle" onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
           <UnorderedListOutlined />
+
         </button>
       ),
     },
@@ -78,28 +77,29 @@ const PressureReleaseValve: React.FC = observer(() => {
           <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Space>
-            <Text>Display</Text>
+        <div className="license-controls-container">
+          <div className="license-display-controls">
+            <span>Display</span>
             <select value={String(prvStore.pageSize)} onChange={(e) => prvStore.setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <Text>records per page</Text>
-          </Space>
-
-          <Space>
-            <Text>Search:</Text>
-            <input
-              aria-label="Search"
+            <span>records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span>Search:</span>
+            <Input.Search
               placeholder="Search..."
+              size="small"
+              allowClear
+              enterButton
               value={prvStore.search}
               onChange={(e) => prvStore.setSearch(e.target.value)}
-              style={{ width: 260, padding: '6px 10px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+              style={{ width: 200 }}
             />
-          </Space>
+          </div>
         </div>
 
         {prvStore.isLoading ? <Spin /> : prvStore.error ? <Alert type="error" message="Failed to load data" /> : (

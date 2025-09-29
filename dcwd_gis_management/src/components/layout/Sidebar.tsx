@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Layout, Menu, Avatar, Typography } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { devApi } from '../endpoints/Interceptor';
 import dcwdIcon from '../../assets/image/dcwd.jpg';
 import dcwd from '../../assets/image/logo.png';
@@ -33,6 +33,7 @@ interface UserProfile {
 
 const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMenuClick }) => {
   const sidebarWidth = sidebarUiStore.sidebarWidth;
+  const navigate = useNavigate();
   const [userProfile, setUserProfile] = React.useState<UserProfile>({
     firstName: '',
     middleName: '',
@@ -46,11 +47,6 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
   const [accessibleMenuItems, setAccessibleMenuItems] = React.useState<MenuProps['items']>([]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
-  // ...existing code...
-  const [topLevelMenuItems, setTopLevelMenuItems] = useState<MenuProps['items']>([]);
-  const [sideOpen, setSideOpen] = useState(false);
-  const [sideTitle, setSideTitle] = useState('');
-  const [sideItems, setSideItems] = useState<{ key: string; label: string }[]>([]);
 
 
   const location = useLocation();
@@ -169,6 +165,13 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Handle logo click to navigate to dashboard
+  const handleLogoClick = () => {
+    navigate('/home');
+    // Force page reload to refresh dashboard data
+    window.location.reload();
+  };
+
   return (
     <Sider
       breakpoint='lg'
@@ -183,7 +186,7 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
         boxShadow: '2px 0 8px var(--shadow-color)',
       }}
     >
-      <div className="sider-logo-wrapper">
+      <div className="sider-logo-wrapper" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
         {collapsed ? (
           <img src={dcwdIcon} alt="DCWD Icon" className="sider-logo collapsed-logo" />
         ) : (
@@ -193,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
 
       {!collapsed && (
         <div style={{
-          padding: '20px',
+          padding: '3px',
           borderBottom: '1px solid var(--border-color)',
           textAlign: 'center'
         }}>

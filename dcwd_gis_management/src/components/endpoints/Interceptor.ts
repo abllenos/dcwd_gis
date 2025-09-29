@@ -1,14 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
-// Dynamic base: use dev-gis host in development to satisfy CORS (prod host lacks ACAO for localhost) but retain production host in builds
-const GIS_BASE = import.meta.env.DEV
-  ? 'https://dev-gis.davao-water.gov.ph/'
-  : 'https://api-gis.davao-water.gov.ph/';
 
 export const apiGis = axios.create({
 
   baseURL: import.meta.env.DEV ? '' : 'http://192.100.140.198/',
+
   headers: {
     'Content-Type': 'application/json',
   },
@@ -133,3 +130,4 @@ const PUBLIC_ENDPOINT_PATHS = [
     }
   );
 });
+

@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Table, Typography, Space, Form, Empty, Alert } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { classStore } from '../stores/classStore';
 import type { ClassRecord } from '../stores/classStore';
 
@@ -22,12 +22,12 @@ const ClassPage: React.FC = observer(() => {
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassRecord) => (
-      <Button
-        type="primary"
-        icon={<EditOutlined />}
-        size="small"
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
-      />
+      >
+        View
+      </button>
     ) }
   ];
 
@@ -47,21 +47,29 @@ const ClassPage: React.FC = observer(() => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-          <Space size={8}>
-            <Text>Display</Text>
+          <div className="license-display-controls">
+            <span className="license-control-text">Display</span>
             <select
               value={pageSize}
               onChange={(e) => store.setPageSize(parseInt(e.target.value, 10))}
-              style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--bg-primary)' }}
+              style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--bg-primary)', width: 80, fontSize: 14 }}
             >
               {[10,20,30,40,50].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
-            <Text>records per page</Text>
-          </Space>
-          <Space>
-            <Text>Search:</Text>
-            <Input size="small" allowClear value={store.search} onChange={e => store.setSearch(e.target.value)} />
-          </Space>
+            <span className="license-control-text">records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span className="license-control-text">Search:</span>
+            <Input.Search
+              size="small"
+              allowClear
+              placeholder=""
+              value={store.search}
+              onChange={e => store.setSearch(e.target.value)}
+              enterButton
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
 
         {store.diagnostics.lastError && !loading && (

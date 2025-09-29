@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form, Alert, Empty } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { classificationStore } from '../stores/classificationStore';
 import type { ClassificationRecord } from '../stores/classificationStore';
 
@@ -25,11 +25,15 @@ const Classification: React.FC = observer(() => {
     { title: 'Class Name', dataIndex: 'className', key: 'className', sorter: (a: any, b: any) => String(a.className || '').localeCompare(String(b.className || '')) },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassificationRecord) => (
       <Button
-        type="primary"
+        className="license-table-action-button"
         icon={<EditOutlined />}
         size="small"
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
-      />)
+      >
+        View
+      </button>)
     }
   ];
 
@@ -41,7 +45,7 @@ const Classification: React.FC = observer(() => {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0, color: 'var(--text-primary)' }}>Classification - Maintenance</Title>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAddModal()}>
+          <Button className="license-register-button" icon={<PlusOutlined />} onClick={() => store.openAddModal()}>
             Add Classification
           </Button>
         </div>
@@ -52,21 +56,29 @@ const Classification: React.FC = observer(() => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-          <Space size={8}>
-            <Text>Display</Text>
+          <div className="license-display-controls">
+            <span className="license-control-text">Display</span>
             <Select
               size="small"
               value={pageSize}
-              style={{ width: 90 }}
+              style={{ width: 80 }}
               onChange={(v) => store.setPageSize(v)}
               options={[10,20,30,40,50].map(n => ({ label: n, value: n }))}
             />
-            <Text>records per page</Text>
-          </Space>
-          <Space>
-            <Text>Search:</Text>
-            <Input size="small" allowClear placeholder="" value={store.search} onChange={e => store.setSearch(e.target.value)} />
-          </Space>
+            <span className="license-control-text">records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span className="license-control-text">Search:</span>
+            <Input.Search
+              size="small"
+              allowClear
+              placeholder=""
+              value={store.search}
+              onChange={e => store.setSearch(e.target.value)}
+              enterButton
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
 
         {store.diagnostics.lastError && !loading && (
@@ -90,15 +102,15 @@ const Classification: React.FC = observer(() => {
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
           <Text style={{ fontSize: 12 }}>Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries</Text>
           <Space>
-            <Button size="small" disabled={currentPage === 1} onClick={() => store.setCurrentPage(currentPage - 1)}>Previous</Button>
+            <Button className="license-pagination-button-prev-next" size="small" disabled={currentPage === 1} onClick={() => store.setCurrentPage(currentPage - 1)}>Previous</Button>
             {/* Simple numeric pages (cap to 5 for now) */}
             {Array.from({ length: Math.ceil(totalCount / pageSize) }).slice(0,5).map((_, i) => {
               const page = i + 1;
-              return <Button key={page} size="small" type={page === currentPage ? 'primary' : 'default'} onClick={() => store.setCurrentPage(page)}>{page}</Button>;
+              return <Button key={page} className={page === currentPage ? 'license-pagination-button-active' : 'license-pagination-button-inactive'} size="small" onClick={() => store.setCurrentPage(page)}>{page}</Button>;
             })}
-            {Math.ceil(totalCount / pageSize) > 5 && <Button size="small" disabled>...</Button>}
-            {Math.ceil(totalCount / pageSize) > 5 && <Button size="small" type={currentPage === Math.ceil(totalCount / pageSize) ? 'primary' : 'default'} onClick={() => store.setCurrentPage(Math.ceil(totalCount / pageSize))}>{Math.ceil(totalCount / pageSize)}</Button>}
-            <Button size="small" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => store.setCurrentPage(currentPage + 1)}>Next</Button>
+            {Math.ceil(totalCount / pageSize) > 5 && <Button className="license-pagination-button-disabled" size="small" disabled>...</Button>}
+            {Math.ceil(totalCount / pageSize) > 5 && <Button className={currentPage === Math.ceil(totalCount / pageSize) ? 'license-pagination-button-active' : 'license-pagination-button-inactive'} size="small" onClick={() => store.setCurrentPage(Math.ceil(totalCount / pageSize))}>{Math.ceil(totalCount / pageSize)}</Button>}
+            <Button className="license-pagination-button-prev-next" size="small" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => store.setCurrentPage(currentPage + 1)}>Next</Button>
           </Space>
         </div>
 

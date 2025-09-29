@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form, Alert, Empty } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { layerStore } from '../stores/layerStore';
 import type { LayerRecord } from '../stores/layerStore';
 
@@ -23,12 +23,12 @@ const Layer: React.FC = observer(() => {
     { title: 'Status Flag', dataIndex: 'statusFlag', key: 'statusFlag', width: 110, render: (v: number) => v === 1 ? <Tag color="green">1</Tag> : <Tag color="red">0</Tag> },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: LayerRecord) => (
-      <Button
-        type="primary"
-        icon={<EditOutlined />}
-        size="small"
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
-      />)
+      >
+        View
+      </button>)
     }
   ];
 
@@ -47,9 +47,9 @@ const Layer: React.FC = observer(() => {
           <Text style={{ fontSize: 12 }}>Instruction: Double Click row to edit Class Details.</Text>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-          <Space size={8}>
-            <Text>Display</Text>
+        <div className="license-controls-container">
+          <div className="license-display-controls">
+            <span>Display</span>
             <Select
               size="small"
               value={pageSize}
@@ -57,12 +57,20 @@ const Layer: React.FC = observer(() => {
               onChange={(v) => store.setPageSize(v)}
               options={[10,20,30,40,50].map(n => ({ label: n, value: n }))}
             />
-            <Text>records per page</Text>
-          </Space>
-          <Space>
-            <Text>Search:</Text>
-            <Input size="small" allowClear value={store.search} onChange={e => store.setSearch(e.target.value)} />
-          </Space>
+            <span>records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span>Search:</span>
+            <Input.Search
+              placeholder="Search..."
+              size="small"
+              allowClear
+              enterButton
+              value={store.search}
+              onChange={e => store.setSearch(e.target.value)}
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
 
         {store.diagnostics.lastError && !loading && (
