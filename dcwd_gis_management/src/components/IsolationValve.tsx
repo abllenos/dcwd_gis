@@ -82,14 +82,13 @@ const IsolationValveList: React.FC = () => {
             width: 80,
             render: (_: any, record: IsolationValve) => (
                 <button
-                    aria-label="actions"
-                    style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
                     onClick={() => {
                         setSelectedRecord(record);
                         setDetailsModalVisible(true);
                     }}
                 >
-                    <UnorderedListOutlined />
+                    View
                 </button>
             ),
         },

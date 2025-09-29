@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 
 import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
 const { Title, Text } = Typography;
-import { UnorderedListOutlined } from "@ant-design/icons";
 import FireHydrantDetailsModal from './modal/FireHydrantDetailsModal';
 import FireHydrantEditModal from './modal/FireHydrantEditModal';
 import { observer } from 'mobx-react-lite';
@@ -40,14 +39,13 @@ const FireHydrantList: React.FC = observer(() => {
             width: 80,
             render: (_: any, record: FireHydrant) => (
                 <button
-                    aria-label="actions"
-                    style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
                     onClick={() => {
                         fireHydrantListStore.setSelectedRecord(record);
                         fireHydrantListStore.setDetailsModalVisible(true);
                     }}
                 >
-                    <UnorderedListOutlined />
+                    View
                 </button>
             ),
         },

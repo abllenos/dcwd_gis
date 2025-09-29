@@ -5,7 +5,6 @@ import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
 import AirValveModal from './modal/AirValveModal';
 import AirValveDetailsModal from './modal/AirValveDetailsModal';
 import type { ColumnsType } from 'antd/es/table';
-import { UnorderedListOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { devApi } from './endpoints/Interceptor';
 
@@ -81,14 +80,13 @@ const AirValveMaintenance: React.FC = observer(() => {
       width: 80,
       render: (_: any, _record: AirValveRecord) => (
         <button
-          aria-label="actions"
-               style={{ background: '#2563eb', borderColor: '#2563eb', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
           onClick={() => {
             airValveStore.setDetailsRecord(_record);
             airValveStore.setDetailsModalVisible(true);
           }}
         >
-          <UnorderedListOutlined />
+          View
         </button>
       ),
     },

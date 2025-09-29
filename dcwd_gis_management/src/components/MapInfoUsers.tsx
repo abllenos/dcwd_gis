@@ -88,7 +88,12 @@ const columns = [
     key: 'action',
     width: 60,
     render: (_: any, record: any) => (
-  <Button type="primary" shape="circle" icon={<UserOutlined />} style={{ background: '#2563eb', border: 'none' }} onClick={() => record.onShowModal(record)} />
+  <button
+    style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+    onClick={() => record.onShowModal(record)}
+  >
+    View
+  </button>
     ),
   },
 ];

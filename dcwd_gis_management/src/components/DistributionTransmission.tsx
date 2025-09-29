@@ -1,7 +1,6 @@
 
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Button, Space } from 'antd';
-import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Table, Select, Input } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { distributionTransmissionStore } from '../stores/distributionTransmissionStore';
 
@@ -37,19 +36,15 @@ const DistributionTransmission = observer(() => {
       key: 'action',
       width: 90,
       render: (_: any, record: any) => (
-        <Space>
-          <Button
-            type="primary"
-            shape="circle"
-            icon={<SettingOutlined />}
-            style={{ background: '#16c784', border: 'none' }}
-            onClick={() => {
-              distributionTransmissionStore.setSelectedAssetId(record.id);
-              distributionTransmissionStore.setModalOpen(true);
-            }}
-          />
-          <Button type="primary" shape="circle" icon={<InfoCircleOutlined />} style={{ background: '#3b82f6', border: 'none' }} />
-        </Space>
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => {
+            distributionTransmissionStore.setSelectedAssetId(record.id);
+            distributionTransmissionStore.setModalOpen(true);
+          }}
+        >
+          View
+        </button>
       ),
     },
   ];

@@ -71,9 +71,12 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-        <Button type="primary" shape="circle" onClick={() => { setDetailsRecord(_record); setDetailsModalVisible(true); }} style={{ background: '#00b894', borderColor: '#00b894' }}>
-          <UnorderedListOutlined />
-        </Button>
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => { setDetailsRecord(_record); setDetailsModalVisible(true); }}
+        >
+          View
+        </button>
       ),
     },
   ];

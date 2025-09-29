@@ -194,16 +194,12 @@ const License: React.FC = observer(() => {
       key: 'actions',
       width: 100,
       render: (_: any, record: any) => (
-  <Button
-          type="primary"
-          size="small"
-          className="license-table-action-button"
-          onClick={() => {
-            licenseStore.openInstallationDetails(record);
-          }}
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => record.onShowModal(record)}
         >
-          ≡
-        </Button>
+          View
+        </button>
       ),
     },
   ];

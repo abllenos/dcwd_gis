@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Table, Typography, Space, Form, Empty, Alert } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { classStore } from '../stores/classStore';
 import type { ClassRecord } from '../stores/classStore';
 
@@ -22,12 +22,12 @@ const ClassPage: React.FC = observer(() => {
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassRecord) => (
-      <Button
-        type="primary"
-        icon={<EditOutlined />}
-        size="small"
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
-      />
+      >
+        View
+      </button>
     ) }
   ];
 
