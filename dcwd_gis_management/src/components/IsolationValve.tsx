@@ -80,15 +80,11 @@ const IsolationValveList: React.FC = () => {
             title: '',
             key: 'actions',
             width: 80,
-            render: (_: any, record: IsolationValve) => (
-                <button
-                    style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-                    onClick={() => {
-                        setSelectedRecord(record);
-                        setDetailsModalVisible(true);
-                    }}
-                >
-                    View
+
+            render: () => (
+                <button className="btn-action">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="none"/><path d="M160 160h704v704H160V160zm64 64v576h576V224H224zm64 64h448v448H288V288z"/></svg>
+
                 </button>
             ),
         },

@@ -131,11 +131,23 @@ export const filterMenuByAccess = (
     // Build item with proper handling for disabled header items
     const { key, label, icon, disabled } = item;
     
-    // If item is disabled, make it a group header (non-clickable title)
+    // If item is disabled, make it a group header (non-clickable title) with blue styling in dark mode
     if (disabled) {
+      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
       return { 
         key, 
-        label, 
+        label: (
+          <span style={{ 
+            color: isDarkMode ? '#6699ff' : '#666666',
+            fontWeight: 'bold',
+            fontSize: '12px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            {label}
+          </span>
+        ), 
         type: 'group' as const,
         children: undefined 
       };

@@ -64,6 +64,59 @@ const Reports: React.FC = observer(() => {
     reportsStore.downloadReport(report);
   };
 
+  const handlePreviewReport = (report: ReportFile) => {
+    try {
+      const extension = report.fileName.split('.').pop()?.toLowerCase();
+      
+      // Set up window features for PDF preview
+      const windowFeatures = 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=yes,menubar=no,location=no,status=no';
+      
+      if (extension === 'pdf') {
+        // For PDFs, open directly in browser's built-in PDF viewer
+        const previewWindow = window.open(report.filePath, `preview_${report.id}`, windowFeatures);
+        if (!previewWindow) {
+          message.warning('Please allow popups to preview PDF files');
+        }
+      } else if (extension === 'csv' || extension === 'txt') {
+        // For CSV and text files, create a PDF-like preview using Google Docs Viewer
+        const encodedUrl = encodeURIComponent(window.location.origin + report.filePath);
+        const googleDocsUrl = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
+        
+        const previewWindow = window.open(googleDocsUrl, `preview_${report.id}`, windowFeatures);
+        if (!previewWindow) {
+          // Fallback to direct file view
+          window.open(report.filePath, `preview_${report.id}`, windowFeatures);
+        }
+      } else if (extension === 'xlsx' || extension === 'xls') {
+        // For Excel files, use Google Docs Viewer for PDF-like preview
+        const encodedUrl = encodeURIComponent(window.location.origin + report.filePath);
+        const googleDocsUrl = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
+        
+        const previewWindow = window.open(googleDocsUrl, `preview_${report.id}`, windowFeatures);
+        if (!previewWindow) {
+          message.info('Excel files will open in your default application');
+          window.open(report.filePath, `preview_${report.id}`, windowFeatures);
+        }
+      } else {
+        // For other file types, try Google Docs Viewer first
+        const encodedUrl = encodeURIComponent(window.location.origin + report.filePath);
+        const googleDocsUrl = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
+        
+        const previewWindow = window.open(googleDocsUrl, `preview_${report.id}`, windowFeatures);
+        if (!previewWindow) {
+          // Fallback to direct file view
+          window.open(report.filePath, `preview_${report.id}`, windowFeatures);
+        }
+      }
+      
+      message.success(`Opening PDF preview for: ${report.displayName}`);
+      console.log(`PDF Preview: ${report.displayName} (${report.fileName})`);
+    } catch (error) {
+      message.error(`Failed to preview ${report.displayName}`);
+      console.error('PDF Preview error:', error);
+    }
+  };
+
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
     switch (extension) {
@@ -150,7 +203,6 @@ const Reports: React.FC = observer(() => {
       title: 'Actions',
       key: 'actions',
       render: (record: ReportFile) => {
-        const isCSV = record.fileName.toLowerCase().endsWith('.csv');
         return (
           <Space size="small">
             <Button 
@@ -168,14 +220,14 @@ const Reports: React.FC = observer(() => {
             <Button 
               size="small" 
               icon={<PrinterOutlined />}
-              onClick={() => window.open(record.filePath, '_blank')}
+              onClick={() => handlePreviewReport(record)}
               style={{ 
                 borderRadius: '6px',
                 fontWeight: '500'
               }}
-              title={isCSV ? "Open CSV file" : "View file"}
+              title="Preview file as PDF in browser"
             >
-              {isCSV ? 'Open' : 'View'}
+              Open
             </Button>
           </Space>
         );

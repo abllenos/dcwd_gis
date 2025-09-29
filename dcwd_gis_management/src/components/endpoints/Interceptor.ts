@@ -3,7 +3,9 @@ import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
 
 export const apiGis = axios.create({
-  baseURL: import.meta.env.DEV ? '' : 'https://api.davao-water.gov.ph/',
+
+  baseURL: import.meta.env.DEV ? '' : 'http://192.100.140.198/',
+
   headers: {
     'Content-Type': 'application/json',
   },
@@ -128,3 +130,4 @@ const PUBLIC_ENDPOINT_PATHS = [
     }
   );
 });
+

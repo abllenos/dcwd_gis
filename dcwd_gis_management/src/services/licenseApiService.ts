@@ -46,14 +46,19 @@ class LicenseApiService {
    */
   async getActiveUsers(): Promise<LicenseApiResponse> {
     try {
+      console.log('🔄 Making API request to:', licenseApi.defaults.baseURL + '/getRegUsers.php?mode=active');
+      
       const response = await licenseApi.get('getRegUsers.php', {
         params: {
           mode: 'active'
         }
       });
 
-      // Debug: log the full API response structure
-      console.log('Full License API response:', response.data);
+
+      console.log('📡 License API Response Status:', response.status);
+      console.log('📡 License API Response Data:', response.data);
+      console.log('📡 License API Response Type:', typeof response.data, Array.isArray(response.data));
+
 
       // Handle different possible response formats
       if (response.data) {

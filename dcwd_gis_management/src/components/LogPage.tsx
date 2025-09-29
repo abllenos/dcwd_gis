@@ -49,25 +49,29 @@ const LogPage: React.FC = observer(() => {
         {/* Row 2: Display (left) and Search (right) above the table */}
         <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 8 }}>
           <Col xs={24} md={12}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>Display</span>
+            <div className="license-display-controls">
+              <span className="license-control-text">Display</span>
               <Select
                 value={pageSize}
                 onChange={(v) => logStore.setPageSize(v)}
                 options={[10,20,50,100].map(n => ({ label: String(n), value: n }))}
-                style={{ width: 100 }}
+                style={{ width: 80 }}
+                size="small"
               />
-              <span>records per page</span>
+              <span className="license-control-text">records per page</span>
             </div>
           </Col>
           <Col xs={24} md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 320 }}>
-              <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
-              <Input
-                placeholder="Type to filter..."
+            <div className="license-search-controls">
+              <span className="license-control-text">Search:</span>
+              <Input.Search
+                placeholder=""
                 value={search}
                 onChange={(e) => logStore.setSearch(e.target.value)}
                 allowClear
+                size="small"
+                enterButton
+                style={{ width: 200 }}
               />
             </div>
           </Col>
@@ -116,7 +120,7 @@ const LogPage: React.FC = observer(() => {
           open={logUiStore.isModalOpen}
           onCancel={() => logUiStore.close()}
           footer={[
-            <Button key="close" onClick={() => logUiStore.close()}>Close</Button>,
+            <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
           ]}
         >
           {logUiStore.selected && (
@@ -164,7 +168,7 @@ const LogPage: React.FC = observer(() => {
             )}
           </Space>
           <Space size={8}>
-            <Button onClick={() => logStore.fetchLogs()} loading={loading}>
+            <Button className="license-register-button" onClick={() => logStore.fetchLogs()} loading={loading}>
               Refresh
             </Button>
           </Space>

@@ -39,15 +39,18 @@ const DMAInlet = observer(() => {
       key: 'action',
       width: 90,
       render: (_: any, record: any) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-          onClick={() => {
-            dmaInletStore.setSelectedAssetId(record.id);
-            dmaInletStore.setModalOpen(true);
-          }}
-        >
-          View
-        </button>
+        <Space>
+          <Button
+            className="btn-action-circle"
+            icon={<SettingOutlined />}
+            onClick={() => {
+              dmaInletStore.setSelectedAssetId(record.id);
+              dmaInletStore.setModalOpen(true);
+            }}
+          />
+          <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
+        </Space>
+
       ),
     },
   ];
@@ -60,30 +63,40 @@ const DMAInlet = observer(() => {
         row.type.toLowerCase().includes(dmaInletStore.search.toLowerCase())
     );
 
-    return (
-      <>
-        <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-          <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-            <Typography.Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Typography.Title>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 16 }}>
+
+  return (
+    <>
+      <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
+        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
+          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
+        </div>
+        <div className="license-controls-container">
+          <div className="license-display-controls">
             <span>Display</span>
             <Select
               value={dmaInletStore.pageSize}
               onChange={dmaInletStore.setPageSize.bind(dmaInletStore)}
-              style={{ width: 80 }}
+              size="small"
+              style={{ width: 90 }}
               options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
             />
             <span>records per page</span>
-            <div style={{ flex: 1 }} />
+          </div>
+          <div className="license-search-controls">
             <span>Search:</span>
-            <Input
+            <Input.Search
+              placeholder="Search..."
+              size="small"
+              allowClear
+              enterButton
               value={dmaInletStore.search}
               onChange={e => dmaInletStore.setSearch(e.target.value)}
-              style={{ width: 260 }}
-              allowClear
+              style={{ width: 200 }}
             />
           </div>
+        </div>
+        {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load DMA Inlet data" /> : (
+
           <Table
             bordered
             rowKey="id"

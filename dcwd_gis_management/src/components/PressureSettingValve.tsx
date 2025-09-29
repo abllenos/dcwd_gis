@@ -71,12 +71,11 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-          onClick={() => { setDetailsRecord(_record); setDetailsModalVisible(true); }}
-        >
-          View
-        </button>
+
+        <Button className="btn-action-circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}>
+          <UnorderedListOutlined />
+        </Button>
+
       ),
     },
   ];
@@ -97,17 +96,16 @@ const PressureSettingValve: React.FC = observer(() => {
           <Text style={{ color: '#999' }}>Double click a row to edit details or use the action button.</Text>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Space>
-            <Text>Display</Text>
-            <Select value={String(psvStore.pageSize)} onChange={(v: string) => psvStore.setPageSize(Number(v))} style={{ width: 100 }} options={[{label:'10',value:'10'},{label:'25',value:'25'},{label:'50',value:'50'}]} />
-            <Text>records per page</Text>
-          </Space>
-
-          <Space>
-            <Text>Search:</Text>
-            <Search placeholder="Search" allowClear onSearch={(v: string) => psvStore.setSearch(v)} style={{ width: 320 }} />
-          </Space>
+        <div className="license-controls-container">
+          <div className="license-display-controls">
+            <span>Display</span>
+            <Select value={String(psvStore.pageSize)} onChange={(v: string) => psvStore.setPageSize(Number(v))} size="small" style={{ width: 90 }} options={[{label:'10',value:'10'},{label:'25',value:'25'},{label:'50',value:'50'}]} />
+            <span>records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span>Search:</span>
+            <Search placeholder="Search..." allowClear enterButton onSearch={(v: string) => psvStore.setSearch(v)} size="small" style={{ width: 200 }} />
+          </div>
         </div>
 
         {!psvStore.isLoading && !psvStore.error && (

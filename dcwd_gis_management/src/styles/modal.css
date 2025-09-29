@@ -561,3 +561,170 @@
   background-color: #f0f9ff;
   border-color: #bae6fd;
 }
+
+/* ===== DARK MODE STYLES ===== */
+[data-theme='dark'] {
+  --modal-content-bg: #262626;
+  --modal-border-color: #434343;
+  --modal-text-primary: #f1f5f9;
+  --modal-text-secondary: #94a3b8;
+}
+
+/* Dispatch Modal Dark Mode */
+[data-theme='dark'] .dispatch-modal .ant-modal-content {
+  background-color: #1f1f1f;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .dispatch-modal-header {
+  background-color: #262626;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dispatch-modal-title {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dispatch-modal-close-btn {
+  color: #f1f5f9 !important;
+}
+
+[data-theme='dark'] .dispatch-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme='dark'] .dispatch-modal-api-status {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+  color: #dbeafe;
+  border-bottom-color: #3b82f6;
+}
+
+[data-theme='dark'] .dispatch-modal-body {
+  background-color: #1f1f1f;
+}
+
+[data-theme='dark'] .dispatch-modal-main-text {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dispatch-modal-label-text {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dispatch-modal-select .ant-select-selector {
+  background-color: #262626;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dispatch-modal-select:hover .ant-select-selector {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1);
+}
+
+[data-theme='dark'] .dispatch-modal-select.ant-select-focused .ant-select-selector {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+}
+
+[data-theme='dark'] .dispatch-modal-field-value {
+  background-color: #262626;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .dispatch-modal-section-title {
+  color: #f1f5f9;
+  border-bottom-color: #434343;
+}
+
+[data-theme='dark'] .dispatch-modal-footer {
+  border-top-color: #434343;
+}
+
+/* Leak Options Modal Dark Mode */
+[data-theme='dark'] .leak-options-modal .ant-modal-content {
+  background-color: #1f1f1f;
+}
+
+[data-theme='dark'] .leak-options-modal-header {
+  border-bottom-color: #60a5fa;
+}
+
+[data-theme='dark'] .leak-options-modal-header-icon {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .leak-options-modal-header-title {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .leak-options-modal-button {
+  background-color: #60a5fa !important;
+  border-color: #60a5fa !important;
+}
+
+[data-theme='dark'] .leak-options-modal-button:hover {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Common Modal Components Dark Mode */
+[data-theme='dark'] .modal-header-primary {
+  background-color: #60a5fa;
+  color: #1f1f1f;
+}
+
+[data-theme='dark'] .modal-content-light {
+  background-color: #262626;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .modal-label {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .modal-value {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .modal-footer {
+  border-top-color: #434343;
+}
+
+[data-theme='dark'] .modal-btn-primary {
+  background-color: #60a5fa !important;
+  border-color: #60a5fa !important;
+  color: #1f1f1f !important;
+}
+
+[data-theme='dark'] .modal-btn-secondary {
+  background-color: #262626;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .modal-btn-secondary:hover {
+  background-color: #434343;
+  border-color: #60a5fa;
+}
+
+/* Specific Modal Types Dark Mode */
+[data-theme='dark'] .confirmation-modal .ant-modal-content,
+[data-theme='dark'] .form-modal .ant-modal-content,
+[data-theme='dark'] .info-modal .ant-modal-content {
+  background-color: #1f1f1f;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .form-modal .ant-form-item-label {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .info-modal .modal-content-light {
+  background-color: #1e3a8a;
+  border-color: #3b82f6;
+  color: #dbeafe;
+}

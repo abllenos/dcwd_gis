@@ -319,3 +319,240 @@
   gap: 8px;
   margin-top: 24px;
 }
+
+/* ===== DARK MODE STYLES ===== */
+[data-theme='dark'] .license-container {
+  background-color: #1f1f1f;
+  color: #f1f5f9;
+}
+
+/* Form Section - Dark Mode */
+[data-theme='dark'] .license-form-header {
+  background-color: #262626;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .license-form-title {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .license-form-container {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-form-label {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-form-input {
+  background-color: #262626;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-form-input:hover {
+  border-color: #60a5fa;
+}
+
+[data-theme='dark'] .license-form-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+[data-theme='dark'] .license-register-button {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+  color: #1f1f1f;
+}
+
+[data-theme='dark'] .license-register-button:hover {
+  background-color: #1f1f1f !important;
+  border-color: #60a5fa !important;
+  color: #60a5fa !important;
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+}
+
+[data-theme='dark'] .license-register-button:not(:hover) {
+  background-color: #60a5fa !important;
+  border-color: #60a5fa !important;
+  color: #1f1f1f !important;
+}
+
+/* List Section - Dark Mode */
+[data-theme='dark'] .license-list-header {
+  background-color: #262626;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .license-list-title {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .license-action-button {
+  color: #60a5fa;
+  border-color: #60a5fa;
+  background-color: transparent;
+}
+
+[data-theme='dark'] .license-action-button:hover {
+  background-color: #60a5fa;
+  color: #1f1f1f;
+}
+
+[data-theme='dark'] .license-list-container {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+/* Tab Style - Dark Mode */
+[data-theme='dark'] .license-tab-header {
+  background-color: #1f1f1f;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .license-tab-text {
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .license-tab-content {
+  background-color: #1f1f1f;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+/* Controls - Dark Mode */
+[data-theme='dark'] .license-control-text {
+  color: #f1f5f9;
+}
+
+/* Table - Dark Mode */
+[data-theme='dark'] .license-table {
+  background-color: #1f1f1f;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .license-table .ant-table-thead > tr > th {
+  background-color: #262626 !important;
+  border-color: #434343 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme='dark'] .license-table .ant-table-tbody > tr > td {
+  background-color: #1f1f1f !important;
+  border-color: #434343 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme='dark'] .license-table .ant-table-tbody > tr:hover > td {
+  background-color: #262626 !important;
+}
+
+[data-theme='dark'] .license-table-action-button {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+  color: #1f1f1f;
+}
+
+[data-theme='dark'] .license-table-action-button:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Empty State - Dark Mode */
+[data-theme='dark'] .license-empty-state {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-empty-icon {
+  color: #434343;
+}
+
+[data-theme='dark'] .license-empty-text {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-loading-state {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-loading-text {
+  color: #f1f5f9;
+}
+
+/* Pagination - Dark Mode */
+[data-theme='dark'] .license-pagination-text {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-pagination-buttons {
+  background-color: #262626;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .license-pagination-button {
+  background-color: transparent;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-pagination-button-prev-next {
+  background-color: transparent;
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .license-pagination-button-active {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+  color: #1f1f1f;
+}
+
+[data-theme='dark'] .license-pagination-button-inactive {
+  background-color: transparent;
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .license-pagination-button-disabled {
+  background-color: #262626;
+  color: #434343;
+}
+
+[data-theme='dark'] .license-pagination-button-disabled-prev-next {
+  background-color: transparent;
+  color: #434343;
+}
+
+/* Modal Styles - Dark Mode */
+[data-theme='dark'] .license-modal-section {
+  background-color: #262626;
+  border-color: #434343;
+}
+
+[data-theme='dark'] .license-modal-section-title {
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-modal-form-button {
+  background-color: #262626;
+  border-color: #434343;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .license-modal-form-button:hover {
+  background-color: #434343;
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+[data-theme='dark'] .license-modal-form-button-primary {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+  color: #1f1f1f;
+}
+
+[data-theme='dark'] .license-modal-form-button-primary:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #1f1f1f;
+}

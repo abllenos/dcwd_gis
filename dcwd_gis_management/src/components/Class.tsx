@@ -47,21 +47,29 @@ const ClassPage: React.FC = observer(() => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-          <Space size={8}>
-            <Text>Display</Text>
+          <div className="license-display-controls">
+            <span className="license-control-text">Display</span>
             <select
               value={pageSize}
               onChange={(e) => store.setPageSize(parseInt(e.target.value, 10))}
-              style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--bg-primary)' }}
+              style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--bg-primary)', width: 80, fontSize: 14 }}
             >
               {[10,20,30,40,50].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
-            <Text>records per page</Text>
-          </Space>
-          <Space>
-            <Text>Search:</Text>
-            <Input size="small" allowClear value={store.search} onChange={e => store.setSearch(e.target.value)} />
-          </Space>
+            <span className="license-control-text">records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span className="license-control-text">Search:</span>
+            <Input.Search
+              size="small"
+              allowClear
+              placeholder=""
+              value={store.search}
+              onChange={e => store.setSearch(e.target.value)}
+              enterButton
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
 
         {store.diagnostics.lastError && !loading && (

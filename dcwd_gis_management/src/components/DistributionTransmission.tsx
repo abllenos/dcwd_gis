@@ -36,15 +36,18 @@ const DistributionTransmission = observer(() => {
       key: 'action',
       width: 90,
       render: (_: any, record: any) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-          onClick={() => {
-            distributionTransmissionStore.setSelectedAssetId(record.id);
-            distributionTransmissionStore.setModalOpen(true);
-          }}
-        >
-          View
-        </button>
+        <Space>
+          <Button
+            className="btn-action-circle"
+            icon={<SettingOutlined />}
+            onClick={() => {
+              distributionTransmissionStore.setSelectedAssetId(record.id);
+              distributionTransmissionStore.setModalOpen(true);
+            }}
+          />
+          <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
+        </Space>
+
       ),
     },
   ];
@@ -63,23 +66,30 @@ const DistributionTransmission = observer(() => {
         <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
           <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 16 }}>
-          <span>Display</span>
-          <Select
-            value={distributionTransmissionStore.pageSize}
-            onChange={distributionTransmissionStore.setPageSize.bind(distributionTransmissionStore)}
-            style={{ width: 80 }}
-            options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
-          />
-          <span>records per page</span>
-          <div style={{ flex: 1 }} />
-          <span>Search:</span>
-          <Input
-            value={distributionTransmissionStore.search}
-            onChange={e => distributionTransmissionStore.setSearch(e.target.value)}
-            style={{ width: 260 }}
-            allowClear
-          />
+        <div className="license-controls-container">
+          <div className="license-display-controls">
+            <span>Display</span>
+            <Select
+              value={distributionTransmissionStore.pageSize}
+              onChange={distributionTransmissionStore.setPageSize.bind(distributionTransmissionStore)}
+              size="small"
+              style={{ width: 90 }}
+              options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
+            />
+            <span>records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span>Search:</span>
+            <Input.Search
+              placeholder="Search..."
+              size="small"
+              allowClear
+              enterButton
+              value={distributionTransmissionStore.search}
+              onChange={e => distributionTransmissionStore.setSearch(e.target.value)}
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
         <Table
           bordered
