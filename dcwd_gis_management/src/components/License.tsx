@@ -194,7 +194,7 @@ const License: React.FC = observer(() => {
       key: 'actions',
       width: 100,
       render: (_: any, record: any) => (
-        <Button
+  <Button
           type="primary"
           size="small"
           className="license-table-action-button"
@@ -308,7 +308,7 @@ const License: React.FC = observer(() => {
 
             <Col xs={24} sm={12} md={6} lg={3}>
               <Form.Item>
-                <Button 
+                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                   type="primary" 
                   htmlType="submit" 
                   icon={<SaveOutlined />}
@@ -328,7 +328,7 @@ const License: React.FC = observer(() => {
         </Typography.Title>
         <Space>
           <Tooltip title="Refresh Users">
-            <Button
+            <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
               type="text"
               icon={<ReloadOutlined />}
               onClick={handleRefreshUsers}
@@ -421,7 +421,7 @@ const License: React.FC = observer(() => {
                 {licenseStore.searchText && ` (filtered from ${licenseStore.registeredUsers.length} total entries)`}
               </Typography.Text>
               <div className="license-pagination-buttons">
-                <Button 
+                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                   size="small" 
                   disabled={licenseStore.currentPage === 1 || totalItems === 0}
                   onClick={() => handlePageChange(licenseStore.currentPage - 1)}
@@ -434,7 +434,7 @@ const License: React.FC = observer(() => {
                   Previous
                 </Button>
                 {totalItems > 0 ? getPageNumbers().map(pageNum => (
-                  <Button 
+                  <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                     key={pageNum}
                     size="small" 
                     type={pageNum === licenseStore.currentPage ? "primary" : "default"}
@@ -448,7 +448,7 @@ const License: React.FC = observer(() => {
                     {pageNum}
                   </Button>
                 )) : (
-                  <Button 
+                  <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                     size="small" 
                     disabled
                     className="license-pagination-button-disabled"
@@ -456,7 +456,7 @@ const License: React.FC = observer(() => {
                     1
                   </Button>
                 )}
-                <Button 
+                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
                   size="small" 
                   disabled={licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0}
                   onClick={() => handlePageChange(licenseStore.currentPage + 1)}

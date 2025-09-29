@@ -3,7 +3,7 @@ import type { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
 
 export const apiGis = axios.create({
-  baseURL: import.meta.env.DEV ? '' : 'http://192.100.140.198/',
+  baseURL: import.meta.env.DEV ? '' : 'https://api.davao-water.gov.ph/',
   headers: {
     'Content-Type': 'application/json',
   },

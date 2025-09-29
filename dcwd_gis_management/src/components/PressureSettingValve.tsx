@@ -4,6 +4,7 @@ import { Card, Typography, Space, Select, Input, Table, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
+import PressureSettingValveDetailsModal from './modal/PressureSettingValveDetailsModal';
 
 
 import { observer } from 'mobx-react-lite';
@@ -46,6 +47,10 @@ const PressureSettingValve: React.FC = observer(() => {
     fetchData();
   }, []);
 
+  // State for details modal
+  const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
+  const [detailsRecord, setDetailsRecord] = React.useState<PSVRecord | null>(null);
+
   const columns: ColumnsType<PSVRecord> = [
     {
       title: '#',
@@ -66,7 +71,7 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-        <Button type="primary" shape="circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }} style={{ background: '#00b894', borderColor: '#00b894' }}>
+        <Button type="primary" shape="circle" onClick={() => { setDetailsRecord(_record); setDetailsModalVisible(true); }} style={{ background: '#00b894', borderColor: '#00b894' }}>
           <UnorderedListOutlined />
         </Button>
       ),
@@ -118,6 +123,11 @@ const PressureSettingValve: React.FC = observer(() => {
           record={psvStore.selected}
           onCancel={() => psvStore.setModalVisible(false)}
           onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
+        />
+        <PressureSettingValveDetailsModal
+          visible={detailsModalVisible}
+          record={detailsRecord}
+          onCancel={() => setDetailsModalVisible(false)}
         />
       </Card>
     </div>

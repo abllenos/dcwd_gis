@@ -118,7 +118,7 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={onUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
+          <Button type="primary" onClick={onUpdate} style={{ background: '#2563eb', borderColor: '#2563eb' }}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>

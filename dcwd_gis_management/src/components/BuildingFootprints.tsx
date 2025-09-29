@@ -67,7 +67,7 @@ const BuildingFootprints = observer(() => {
             />
           </Col>
           <Col span={4}>
-            <Button type="primary" icon={<FilterOutlined />} style={{ background: '#16c784', fontWeight: 600, width: 100 }}>
+            <Button type="primary" icon={<FilterOutlined />} style={{ background: '#2563eb', fontWeight: 600, width: 100 }}>
               Filter
             </Button>
           </Col>

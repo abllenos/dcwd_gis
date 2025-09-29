@@ -3,22 +3,11 @@ import { observer } from 'mobx-react-lite';
 import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const { Title } = Typography;
 
-const initialUsers = [
-  { id: 1, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'DESKTOP-01' },
-  { id: 2, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'DCWD391' },
-  { id: 3, licenseType: 'Trial Version', department: 'Engineering and Construction Department', computerName: 'DCWD400' },
-  { id: 4, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'DCWD172' },
-  { id: 5, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'EDP84' },
-  { id: 6, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'LAPTOP-JURD31VD' },
-  { id: 7, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'ICT13' },
-  { id: 8, licenseType: 'Trial Version', department: 'Commercial Services Department', computerName: 'DCWD166' },
-  { id: 9, licenseType: 'Trial Version', department: 'Pipelines and Appurtenances Maintenance Department', computerName: 'DCWD394' },
-  { id: 10, licenseType: 'Viewer Version', department: 'Engineering and Construction Department', computerName: 'DCWD003' },
-];
+
 
 
 // Modal for Installation Details
@@ -82,7 +71,7 @@ const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
           />
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 18 }}>
-          <Button type="primary" style={{ background: '#16c784', fontWeight: 600 }}>Renew</Button>
+          <Button type="primary" style={{ background: '#2563eb', fontWeight: 600 }}>Renew</Button>
         </div>
       </div>
     </Modal>
@@ -99,7 +88,7 @@ const columns = [
     key: 'action',
     width: 60,
     render: (_: any, record: any) => (
-      <Button type="primary" shape="circle" icon={<UserOutlined />} style={{ background: '#16c784', border: 'none' }} onClick={() => record.onShowModal(record)} />
+  <Button type="primary" shape="circle" icon={<UserOutlined />} style={{ background: '#2563eb', border: 'none' }} onClick={() => record.onShowModal(record)} />
     ),
   },
 ];
@@ -109,11 +98,16 @@ const columns = [
 const MapInfoUsers = observer(() => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
-  const filteredUsers = initialUsers.filter(
+
+  useEffect(() => {
+    mapInfoUsersStore.fetchUsers();
+  }, []);
+
+  const filteredUsers = mapInfoUsersStore.users.filter(
     u =>
-      u.licenseType.toLowerCase().includes(mapInfoUsersStore.search.toLowerCase()) ||
-      u.department.toLowerCase().includes(mapInfoUsersStore.search.toLowerCase()) ||
-      u.computerName.toLowerCase().includes(mapInfoUsersStore.search.toLowerCase())
+      (u.licenseType?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
+      (u.department?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
+      (u.computerName?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase())
   );
   // Add modal handler to each row
   const tableData = filteredUsers.map(u => ({ ...u, onShowModal: (user: any) => { setSelectedUser(user); setModalVisible(true); } }));
@@ -146,7 +140,7 @@ const MapInfoUsers = observer(() => {
             <DatePicker value={mapInfoUsersStore.installDate} onChange={mapInfoUsersStore.setInstallDate.bind(mapInfoUsersStore)} style={{ width: '100%' }} format="DD/MM/YYYY" />
           </Col>
           <Col span={4} style={{ display: 'flex', alignItems: 'end', height: '100%' }}>
-            <Button type="primary" style={{ background: '#16c784', fontWeight: 600, width: '100%' }}>
+            <Button type="primary" style={{ background: '#2563eb', fontWeight: 600, width: '100%' }}>
               Register
             </Button>
           </Col>
