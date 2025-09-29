@@ -45,7 +45,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        zIndex: 1100,
+        zIndex: 900,
         transition: 'left 0.2s ease',
         boxShadow: '2px 2px 8px var(--shadow-color)'
       }}

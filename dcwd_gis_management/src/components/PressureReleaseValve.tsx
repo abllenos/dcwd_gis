@@ -3,9 +3,6 @@ import React, { useEffect } from 'react';
 import { Card, Typography, Space, Table, Spin, Alert } from 'antd';
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';
-import { UnorderedListOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import Footer from './layout/Footer';
 
 import { observer } from 'mobx-react-lite';
 import { prvStore } from '../stores/prvStore';
@@ -60,8 +57,11 @@ const PressureReleaseValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PressureReleaseValveRecord) => (
-        <button aria-label="actions" style={{ background: '#00b894', borderColor: '#00b894', color: '#fff', borderRadius: '50%', width: 36, height: 36, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
-          <UnorderedListOutlined />
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}
+        >
+          View
         </button>
       ),
     },

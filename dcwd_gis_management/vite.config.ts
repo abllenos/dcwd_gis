@@ -33,7 +33,14 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/layers/, '/getAllLayer.php')
-        rewrite: (path) => path.replace(/^\/api\/license/, '')
+      },
+
+      // Dedicated proxy for License API
+      '/api/license': {
+        target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/views',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/license/, ''),
       },
       '/helpers/gis/mgtsys/getLayers': {
         target: 'http://192.100.140.198',

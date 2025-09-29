@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 const { Title } = Typography;
 
-import type { ModalProps } from 'antd';
+
 
 interface PmsMaintenanceModalProps {
   open: boolean;

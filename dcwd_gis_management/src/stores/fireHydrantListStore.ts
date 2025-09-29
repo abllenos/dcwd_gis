@@ -12,22 +12,28 @@ export interface FireHydrant {
   remarks: string;
 }
 
+
 class FireHydrantListStore {
   data: FireHydrant[] = [];
   loading = false;
   error: any = null;
   searchText = "";
   pagination: TablePaginationConfig = { current: 1, pageSize: 10 };
+  detailsModalVisible = false;
+  editModalVisible = false;
+  selectedRecord: FireHydrant | null = null;
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  setSearchText(val: string) {
-    this.searchText = val;
-  }
-  setPagination(val: TablePaginationConfig) {
-    this.pagination = val;
+  setSearchText(val: string) { this.searchText = val; }
+  setPagination(val: TablePaginationConfig) { this.pagination = val; }
+  setDetailsModalVisible(val: boolean) { this.detailsModalVisible = val; }
+  setEditModalVisible(val: boolean) { this.editModalVisible = val; }
+  setSelectedRecord(val: FireHydrant | null) { this.selectedRecord = val; }
+  updateRecord(updated: FireHydrant) {
+    this.data = this.data.map((item) => item.assetid === updated.assetid ? { ...item, ...updated } : item);
   }
 
   setData(data: FireHydrant[]) {
