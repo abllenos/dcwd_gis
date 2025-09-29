@@ -27,6 +27,23 @@
   margin-bottom: 16px;
 }
 
+.dma-boundaries-display-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dma-boundaries-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dma-boundaries-control-text {
+  font-size: 14px;
+  color: #595959;
+}
+
 .dma-boundaries-table {
   margin-bottom: 16px;
 }
@@ -75,4 +92,8 @@
 
 [data-theme='dark'] .dma-boundaries-empty-text {
   color: #9ca3af;
+}
+
+[data-theme='dark'] .dma-boundaries-control-text {
+  color: #f1f5f9;
 }

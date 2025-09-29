@@ -35,7 +35,7 @@ export default defineConfig({
       },
       // TEMPORARY WORKAROUND (CORS) for License endpoint (adjust endpoint mapping if backend changes)
       '/api/license': {
-        target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/views',
+        target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/query',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/license/, '')

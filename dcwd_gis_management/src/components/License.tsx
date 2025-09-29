@@ -64,9 +64,18 @@ const License: React.FC = observer(() => {
     }
   };
 
-  // Development test function - can be called from browser console
+  // Development test functions - can be called from browser console
   React.useEffect(() => {
     (window as any).runLicenseAPITest = testLicenseApiIntegration;
+    
+    // Import and expose direct API testing
+    import('../utils/testLicenseApiDirect').then(module => {
+      (window as any).testDirectLicenseAPI = module.testDirectLicenseAPI;
+    });
+    
+    console.log('🔧 License debugging tools available:');
+    console.log('  - runLicenseAPITest() - Test license API integration'); 
+    console.log('  - testDirectLicenseAPI() - Test direct API endpoints');
   }, []);
 
   // Fetch data when component mounts

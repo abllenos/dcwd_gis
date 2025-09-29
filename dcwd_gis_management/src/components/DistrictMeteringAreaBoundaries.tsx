@@ -92,11 +92,12 @@ const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
         </div>
 
         <div className="dma-boundaries-controls">
-          <Space>
-            <Text>Display</Text>
+          <div className="dma-boundaries-display-controls">
+            <Text className="dma-boundaries-control-text">Display</Text>
             <Select
               value={pageSize.toString()}
               onChange={handlePageSizeChange}
+              size="small"
               style={{ width: 80 }}
             >
               <Option value="10">10</Option>
@@ -104,20 +105,21 @@ const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
               <Option value="50">50</Option>
               <Option value="100">100</Option>
             </Select>
-            <Text>records per page</Text>
-          </Space>
+            <Text className="dma-boundaries-control-text">records per page</Text>
+          </div>
 
-          <Space>
-            <Text>Search:</Text>
+          <div className="dma-boundaries-search-controls">
+            <Text className="dma-boundaries-control-text">Search:</Text>
             <Search
-              placeholder="Search..."
-              allowClear
+              placeholder=""
+              size="small"
               style={{ width: 200 }}
               value={search}
               onChange={e => setSearch(e.target.value)}
               onSearch={handleSearch}
+              enterButton
             />
-          </Space>
+          </div>
         </div>
 
         <Table
