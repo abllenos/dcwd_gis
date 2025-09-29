@@ -71,7 +71,7 @@ const MapInfoUsers = observer(() => {
             <DatePicker value={mapInfoUsersStore.installDate} onChange={mapInfoUsersStore.setInstallDate.bind(mapInfoUsersStore)} style={{ width: '100%' }} format="DD/MM/YYYY" />
           </Col>
           <Col span={4} style={{ display: 'flex', alignItems: 'end', height: '100%' }}>
-            <Button type="primary" style={{ background: '#16c784', fontWeight: 600, width: '100%' }}>
+            <Button type="primary" className="license-register-button">
               Register
             </Button>
           </Col>

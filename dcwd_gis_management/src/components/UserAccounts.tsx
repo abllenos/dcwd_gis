@@ -43,9 +43,9 @@ const UserAccounts: React.FC = observer(() => {
 					<Text style={{ fontSize: 12 }}>Instruction: Double Click row to edit Account Details.</Text>
 				</div>
 
-				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-					<Space size={8}>
-						<Text>Display</Text>
+				<div className="license-controls-container">
+					<div className="license-display-controls">
+						<span>Display</span>
 						<Select
 							size="small"
 							value={store.pageSize}
@@ -53,12 +53,20 @@ const UserAccounts: React.FC = observer(() => {
 							onChange={(v) => store.setPageSize(v)}
 							options={[10,20,30,40,50].map(n => ({ label: n, value: n }))}
 						/>
-						<Text>records per page</Text>
-					</Space>
-					<Space>
-						<Text>Search:</Text>
-						<Input size="small" allowClear value={store.search} onChange={e => store.setSearch(e.target.value)} />
-					</Space>
+						<span>records per page</span>
+					</div>
+					<div className="license-search-controls">
+						<span>Search:</span>
+						<Input.Search
+							placeholder="Search..."
+							size="small"
+							allowClear
+							enterButton
+							value={store.search}
+							onChange={e => store.setSearch(e.target.value)}
+							style={{ width: 200 }}
+						/>
+					</div>
 				</div>
 
 				<Table

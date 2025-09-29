@@ -52,21 +52,29 @@ const Classification: React.FC = observer(() => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-          <Space size={8}>
-            <Text>Display</Text>
+          <div className="license-display-controls">
+            <span className="license-control-text">Display</span>
             <Select
               size="small"
               value={pageSize}
-              style={{ width: 90 }}
+              style={{ width: 80 }}
               onChange={(v) => store.setPageSize(v)}
               options={[10,20,30,40,50].map(n => ({ label: n, value: n }))}
             />
-            <Text>records per page</Text>
-          </Space>
-          <Space>
-            <Text>Search:</Text>
-            <Input size="small" allowClear placeholder="" value={store.search} onChange={e => store.setSearch(e.target.value)} />
-          </Space>
+            <span className="license-control-text">records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span className="license-control-text">Search:</span>
+            <Input.Search
+              size="small"
+              allowClear
+              placeholder=""
+              value={store.search}
+              onChange={e => store.setSearch(e.target.value)}
+              enterButton
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
 
         {store.diagnostics.lastError && !loading && (

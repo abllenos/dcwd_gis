@@ -33,6 +33,7 @@ import PressureMonitoringSystem from '../PressureMonitoringSystem';
 import DMAInlet from '../DMAInlet';
 import MapInfoUsers from '../MapInfoUsers';
 import DistributionTransmission from '../DistributionTransmission';
+import BuildingFootprints from '../BuildingFootprints';
 
 const { Content } = Layout;
 
@@ -127,6 +128,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
               <Route path="dma-inlet" element={<DMAInlet />} />
               <Route path="distribution-transmission" element={<DistributionTransmission />} />
+              <Route path="building-footprints" element={<BuildingFootprints />} />
               <Route path="mapinfo-users" element={<MapInfoUsers />} />
               <Route path="/home" element={<Home />} />
               <Route path="/license" element={<License />} />

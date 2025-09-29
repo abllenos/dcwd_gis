@@ -89,23 +89,30 @@ const PressureMonitoringSystem = observer(() => {
         <div style={{ background: '#e6edfc', borderRadius: 8, padding: '16px 24px', marginBottom: 24 }}>
           <Title level={4} style={{ color: '#2563eb', margin: 0 }}>Pressure Monitoring System - Maintenance</Title>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18, gap: 16 }}>
-          <span>Show</span>
-          <Select
-            value={pressureMonitoringSystemStore.pageSize}
-            onChange={pressureMonitoringSystemStore.setPageSize.bind(pressureMonitoringSystemStore)}
-            style={{ width: 80 }}
-            options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
-          />
-          <span>entries</span>
-          <div style={{ flex: 1 }} />
-          <span>Search:</span>
-          <Input
-            value={pressureMonitoringSystemStore.search}
-            onChange={e => pressureMonitoringSystemStore.setSearch(e.target.value)}
-            style={{ width: 260 }}
-            allowClear
-          />
+        <div className="license-controls-container">
+          <div className="license-display-controls">
+            <span>Display</span>
+            <Select
+              value={pressureMonitoringSystemStore.pageSize}
+              onChange={pressureMonitoringSystemStore.setPageSize.bind(pressureMonitoringSystemStore)}
+              size="small"
+              style={{ width: 90 }}
+              options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
+            />
+            <span>records per page</span>
+          </div>
+          <div className="license-search-controls">
+            <span>Search:</span>
+            <Input.Search
+              placeholder="Search..."
+              size="small"
+              allowClear
+              enterButton
+              value={pressureMonitoringSystemStore.search}
+              onChange={e => pressureMonitoringSystemStore.setSearch(e.target.value)}
+              style={{ width: 200 }}
+            />
+          </div>
         </div>
         {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load data" /> : (
           <Table
