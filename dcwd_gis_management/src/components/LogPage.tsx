@@ -111,7 +111,7 @@ const LogPage: React.FC = observer(() => {
               pageSize: pageSize,
               current: currentPage,
               total: totalCount ?? filteredData.length,
-              onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); },
+              onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); void logStore.fetchPage(p); },
               showTotal: (total) => `${total} record${total === 1 ? '' : 's'}`
             }}
             scroll={{ x: 900 }}
@@ -184,9 +184,19 @@ const LogPage: React.FC = observer(() => {
             )}
           </Space>
           <Space size={8}>
-            <Button onClick={() => logStore.fetchLogs(true)} loading={loading}>
-              Refresh
-            </Button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {typeof totalCount === 'number' ? `${totalCount} items • loaded ${loadedCount}` : `Loaded ${loadedCount}`}
+              </div>
+              <Button onClick={() => logStore.fetchLogs(true)} loading={loading}>
+                Refresh
+              </Button>
+              {(!logStore.backgroundLoading && typeof totalCount === 'number' && loadedCount < totalCount) && (
+                <Button onClick={() => logStore.fetchLogs(false)}>
+                  Load remaining
+                </Button>
+              )}
+            </div>
           </Space>
         </div>
       </div>

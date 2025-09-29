@@ -38,6 +38,8 @@ export class LogStore {
   readonly apiMaxPageIterations = 40000; // safety guard
   readonly commitBatchSize = 5000; // commit to observables every N rows
   layerDataCache = new Map<number, LogRecord[]>();
+  // Per-layer per-page cache: Map<layerId, Map<page, LogRecord[]>>
+  layerPageCache = new Map<number, Map<number, LogRecord[]>>();
   layerTotalCache = new Map<number, number | null>();
   private fetchToken = 0;
 
@@ -195,6 +197,10 @@ export class LogStore {
           this.data = [...aggregated];
           this.layerDataCache.set(layerId, [...aggregated]);
           this.layerTotalCache.set(layerId, first.totalExpected);
+          // Init page cache for page 1
+          const pageMap = new Map<number, LogRecord[]>();
+          pageMap.set(1, [...aggregated.slice(0, this.apiFetchPageSize)]);
+          this.layerPageCache.set(layerId, pageMap);
           this.lastSource = 'api';
           this.lastFetchedAt = new Date().toISOString();
           this.lastCount = aggregated.length;
@@ -218,6 +224,8 @@ export class LogStore {
         sampleItemKeys: first.sampleItemKeys,
         layerLabel,
         aggregated: [...this.data],
+        concurrency: 3,
+        batchSize: this.commitBatchSize,
         token: this.fetchToken,
       }, {
         isCancelled: (t) => t !== this.fetchToken,
@@ -226,6 +234,13 @@ export class LogStore {
             this.data = [...ag];
             const lid = this.selectedLayer ?? layerId;
             this.layerDataCache.set(lid, [...ag]);
+            // Update per-page cache heuristically: rebuild pages from aggregated snapshot
+            const pageMap = this.layerPageCache.get(lid) ?? new Map<number, LogRecord[]>();
+            for (let i = 0; i < ag.length; i += this.apiFetchPageSize) {
+              const p = Math.floor(i / this.apiFetchPageSize) + 1;
+              pageMap.set(p, ag.slice(i, i + this.apiFetchPageSize));
+            }
+            this.layerPageCache.set(lid, pageMap);
             this.layerTotalCache.set(lid, te);
             this.lastCount = ag.length;
             this.totalCount = te !== null ? Math.max(te, ag.length) : null;
@@ -239,6 +254,13 @@ export class LogStore {
             this.data = [...ag];
             const lid = this.selectedLayer ?? layerId;
             this.layerDataCache.set(lid, [...ag]);
+            // Finalize per-page cache
+            const pageMap = this.layerPageCache.get(lid) ?? new Map<number, LogRecord[]>();
+            for (let i = 0; i < ag.length; i += this.apiFetchPageSize) {
+              const p = Math.floor(i / this.apiFetchPageSize) + 1;
+              pageMap.set(p, ag.slice(i, i + this.apiFetchPageSize));
+            }
+            this.layerPageCache.set(lid, pageMap);
             this.layerTotalCache.set(lid, te);
             this.lastCount = ag.length;
             this.totalCount = te !== null ? Math.max(te, ag.length) : null;
@@ -282,6 +304,78 @@ export class LogStore {
       });
     } finally {
       runInAction(() => { this.loading = false; this.backgroundLoading = false; });
+    }
+  }
+
+  // Fetch a single page (1-based). Uses per-page cache when available. Prefetches adjacent pages.
+  async fetchPage(page: number): Promise<void> {
+    const layerId = this.selectedLayer ?? 1;
+    const pageMap = this.layerPageCache.get(layerId) ?? new Map<number, LogRecord[]>();
+    if (pageMap.has(page)) {
+      runInAction(() => {
+        this.data = (pageMap.get(page) ?? []).slice();
+        this.lastCount = this.data.length;
+        this.totalCount = this.layerTotalCache.get(layerId) ?? this.totalCount;
+        this.debugStatus = this.data.length ? 'ok' : 'empty';
+      });
+      // Prefetch neighbors
+      void this.prefetchPages(page);
+      return;
+    }
+
+    // Not in cache: fetch from API page-sized
+    runInAction(() => { this.loading = true; this.error = null; });
+    try {
+      const resp = await devApi.get('admin/logtrails/get', {
+        params: { LayerID: layerId, PageIndex: page, PageSize: this.apiFetchPageSize },
+        headers: { Accept: 'text/plain' },
+      });
+      const payload = resp.data;
+      // Reuse existing normalization helper (mapToLogRecord) isn't exported; instead, store raw in page cache
+      // For now, store minimal records by mapping our existing listKeyPath when available
+      // A simple defensive parse: if payload is array, map directly; otherwise attempt to find preferred paths
+      const parsed = JSON.parse(typeof payload === 'string' ? payload : JSON.stringify(payload));
+      let list: unknown[] = [];
+      if (Array.isArray(parsed)) list = parsed;
+      else if (parsed && typeof parsed === 'object') {
+        const r = (parsed as Record<string, unknown>)[this.listKeyPath ?? 'data'];
+        if (Array.isArray(r)) list = r as unknown[];
+      }
+      const mapped = (list as unknown[]).map((it, idx) => ({
+        id: ((page - 1) * this.apiFetchPageSize) + idx + 1,
+        layerId: String(layerId),
+        assetId: String((it as Record<string, unknown>)['AssetID'] ?? (it as Record<string, unknown>)['assetId'] ?? ''),
+        modifiedBy: String((it as Record<string, unknown>)['modifiedBy'] ?? ''),
+        accessFlag: String((it as Record<string, unknown>)['accessFlag'] ?? ''),
+        dateTime: String((it as Record<string, unknown>)['dateTime'] ?? ''),
+        description: String((it as Record<string, unknown>)['description'] ?? ''),
+      } as LogRecord));
+
+      runInAction(() => {
+        const pm = pageMap;
+        pm.set(page, mapped);
+        this.layerPageCache.set(layerId, pm);
+        this.data = mapped.slice();
+        this.lastCount = mapped.length;
+        this.listKeyPath = this.listKeyPath ?? null;
+        this.debugStatus = mapped.length ? 'ok' : 'empty';
+      });
+      void this.prefetchPages(page);
+    } catch (err) {
+      runInAction(() => { this.error = (err as Error).message; this.debugStatus = 'disconnected'; });
+    } finally {
+      runInAction(() => { this.loading = false; });
+    }
+  }
+
+  // Prefetch adjacent pages (page-1, page+1)
+  private async prefetchPages(page: number): Promise<void> {
+    const layerId = this.selectedLayer ?? 1;
+    const pageMap = this.layerPageCache.get(layerId) ?? new Map<number, LogRecord[]>();
+    const toPrefetch = [page - 1, page + 1].filter(p => p >= 1 && !pageMap.has(p));
+    for (const p of toPrefetch) {
+      // fire-and-forget
+      void this.fetchPage(p);
     }
   }
 
