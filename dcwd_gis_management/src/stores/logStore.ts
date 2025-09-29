@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { devApi } from '../components/endpoints/Interceptor';
+import { parseMaybeJson, tryKeys, preferredPaths, deepFindArray, mapToLogRecord } from './logUtils';
 import { fetchRemainingPages as fetchRemainingPagesHelper } from './helpers/fetchRemainingPages';
 import type { LogRecord, LayerOption, DebugStatus } from './logTypes';
 import { fetchFirstPage } from './helpers/fetchFirstPage';
@@ -41,6 +42,8 @@ export class LogStore {
   // Per-layer per-page cache: Map<layerId, Map<page, LogRecord[]>>
   layerPageCache = new Map<number, Map<number, LogRecord[]>>();
   layerTotalCache = new Map<number, number | null>();
+  // Tracks pages currently being fetched to avoid duplicate requests
+  private loadingPages = new Set<string>();
   private fetchToken = 0;
 
   constructor() {
@@ -324,46 +327,67 @@ export class LogStore {
     }
 
     // Not in cache: fetch from API page-sized
+    const pageKey = `${layerId}:${page}`;
+    if (this.loadingPages.has(pageKey)) return; // already fetching
+    this.loadingPages.add(pageKey);
     runInAction(() => { this.loading = true; this.error = null; });
     try {
       const resp = await devApi.get('admin/logtrails/get', {
         params: { LayerID: layerId, PageIndex: page, PageSize: this.apiFetchPageSize },
         headers: { Accept: 'text/plain' },
       });
-      const payload = resp.data;
-      // Reuse existing normalization helper (mapToLogRecord) isn't exported; instead, store raw in page cache
-      // For now, store minimal records by mapping our existing listKeyPath when available
-      // A simple defensive parse: if payload is array, map directly; otherwise attempt to find preferred paths
-      const parsed = JSON.parse(typeof payload === 'string' ? payload : JSON.stringify(payload));
-      let list: unknown[] = [];
-      if (Array.isArray(parsed)) list = parsed;
-      else if (parsed && typeof parsed === 'object') {
-        const r = (parsed as Record<string, unknown>)[this.listKeyPath ?? 'data'];
-        if (Array.isArray(r)) list = r as unknown[];
-      }
-      const mapped = (list as unknown[]).map((it, idx) => ({
-        id: ((page - 1) * this.apiFetchPageSize) + idx + 1,
-        layerId: String(layerId),
-        assetId: String((it as Record<string, unknown>)['AssetID'] ?? (it as Record<string, unknown>)['assetId'] ?? ''),
-        modifiedBy: String((it as Record<string, unknown>)['modifiedBy'] ?? ''),
-        accessFlag: String((it as Record<string, unknown>)['accessFlag'] ?? ''),
-        dateTime: String((it as Record<string, unknown>)['dateTime'] ?? ''),
-        description: String((it as Record<string, unknown>)['description'] ?? ''),
-      } as LogRecord));
 
+      const parsed = parseMaybeJson(resp.data as unknown);
+      let list: unknown[] = [];
+      let usedPath: string | null = null;
+      if (Array.isArray(parsed)) {
+        list = parsed as unknown[];
+        usedPath = '(rootArray)';
+      } else if (parsed && typeof parsed === 'object') {
+        const r = tryKeys(parsed as Record<string, unknown>, preferredPaths);
+        list = r.list;
+        usedPath = r.path;
+        if ((!Array.isArray(list) || list.length === 0)) {
+          const d = deepFindArray(parsed as Record<string, unknown>, 4, []);
+          if (Array.isArray(d.list)) { list = d.list; usedPath = d.path; }
+        }
+      }
+
+      const layerLabel = this.layerOptions.find(o => o.value === layerId)?.label ?? 'LAYER';
+      const chunkSize = 200; // small chunk for responsive parsing
+      const mapped: LogRecord[] = [];
+      for (let i = 0; i < list.length; i += chunkSize) {
+        const slice = list.slice(i, i + chunkSize) as Record<string, unknown>[];
+        const part = slice.map((it, idx) => mapToLogRecord(it, ((page - 1) * this.apiFetchPageSize) + i + idx, layerLabel));
+        mapped.push(...part);
+        // commit incremental results so the UI sees rows as they are parsed
+        runInAction(() => {
+          const pm = pageMap;
+          pm.set(page, mapped.slice());
+          this.layerPageCache.set(layerId, pm);
+          this.data = mapped.slice();
+          this.lastCount = mapped.length;
+          this.listKeyPath = this.listKeyPath ?? usedPath;
+          this.debugStatus = mapped.length ? 'ok' : 'empty';
+        });
+        // yield to event loop to remain responsive
+  await Promise.resolve();
+      }
+
+      // final commit (ensure full page stored)
       runInAction(() => {
         const pm = pageMap;
-        pm.set(page, mapped);
+        pm.set(page, mapped.slice());
         this.layerPageCache.set(layerId, pm);
         this.data = mapped.slice();
         this.lastCount = mapped.length;
-        this.listKeyPath = this.listKeyPath ?? null;
         this.debugStatus = mapped.length ? 'ok' : 'empty';
       });
       void this.prefetchPages(page);
     } catch (err) {
       runInAction(() => { this.error = (err as Error).message; this.debugStatus = 'disconnected'; });
     } finally {
+      this.loadingPages.delete(pageKey);
       runInAction(() => { this.loading = false; });
     }
   }
