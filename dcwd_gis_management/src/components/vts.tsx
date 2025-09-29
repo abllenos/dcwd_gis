@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Table, Typography, Row, Col, Input, Space, Button, Dropdown, Select, Alert, Spin, message } from 'antd';
-import { UserOutlined, EnvironmentOutlined, GlobalOutlined, DownOutlined, ReloadOutlined, ApiOutlined } from '@ant-design/icons';
+import { UserOutlined, EnvironmentOutlined, GlobalOutlined, DownOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { vtsStore } from '../stores/vtsStore';
 import Footer from './layout/Footer';

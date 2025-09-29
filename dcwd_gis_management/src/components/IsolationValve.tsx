@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo } from "react";
 import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
-import { UnorderedListOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";

@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Card, Typography, Space, Select, Input, Table, Button } from 'antd';
+import { Card, Typography, Select, Input, Table, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
@@ -49,7 +49,6 @@ const PressureSettingValve: React.FC = observer(() => {
 
   // State for details modal
   const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
-  const [detailsRecord, setDetailsRecord] = React.useState<PSVRecord | null>(null);
 
   const columns: ColumnsType<PSVRecord> = [
     {
@@ -127,7 +126,7 @@ const PressureSettingValve: React.FC = observer(() => {
         />
         <PressureSettingValveDetailsModal
           visible={detailsModalVisible}
-          record={detailsRecord}
+          record={psvStore.selected}
           onCancel={() => setDetailsModalVisible(false)}
         />
       </Card>

@@ -10,6 +10,7 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import { dashboardStore } from "../stores/dashboardStore";
+import { getCustomerStat } from '../api/getCustomerStat';
 import "../styles/Home.css";
 
 const { Text, Title } = Typography;

@@ -129,22 +129,7 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
     localStorage.setItem('userSettings', JSON.stringify(settingsToSave));
   };
 
-  const handleAutoSave = (newSettings: SettingsFormData) => {
-    if (newSettings.autoSave) {
-      setSettings(newSettings);
-      saveToLocalStorage(newSettings);
-      setHasUnsavedChanges(false);
-      
-      notification.success({
-        message: 'Auto-saved',
-        description: 'Changes saved automatically',
-        placement: 'topRight',
-        duration: 2
-      });
-    } else {
-      setHasUnsavedChanges(true);
-    }
-  };
+  // handleAutoSave removed - autosave flow handled inline in other handlers
 
   const handleThemeChange = (theme: string) => {
     const newSettings = { ...tempSettings, theme };

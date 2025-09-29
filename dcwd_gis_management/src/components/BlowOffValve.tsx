@@ -49,23 +49,23 @@ const columns = [
   {
     title: '',
     key: 'action',
-    width: 60,
-    render: () => (
-      <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
-    width: 80,
+    width: 150,
     render: (_: any, record: any) => (
-      <button
-        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
-        onClick={e => {
-          e.stopPropagation();
-          blowOffValveStore.setSelectedRow(record);
-          blowOffValveStore.setModalOpen(true);
-        }}
-        title="View Details"
-      >
-        <span style={{ fontSize: 16 }}>👁️</span>
-        <span style={{ fontWeight: 500 }}>View</span>
-      </button>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+          onClick={e => {
+            e.stopPropagation();
+            blowOffValveStore.setSelectedRow(record);
+            blowOffValveStore.setModalOpen(true);
+          }}
+          title="View Details"
+        >
+          <span style={{ fontSize: 16 }}>👁️</span>
+          <span style={{ fontWeight: 500 }}>View</span>
+        </button>
+      </div>
     ),
   },
 ];

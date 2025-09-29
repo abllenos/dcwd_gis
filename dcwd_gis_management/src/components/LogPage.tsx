@@ -70,9 +70,8 @@ const LogPage: React.FC = observer(() => {
 
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520 }}>
               <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
-              <Input
+              <Input.Search
                 placeholder="Type to filter..."
-
                 value={search}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -89,6 +88,12 @@ const LogPage: React.FC = observer(() => {
                 size="small"
                 enterButton
                 style={{ width: 200 }}
+                onSearch={(val) => {
+                  // explicit search when user presses Enter or clicks the button
+                  if ((val ?? '').toString().trim()) {
+                    layerSearchStore.start((val ?? '').toString(), selectedLayer ?? 1, logStore.apiFetchPageSize);
+                  }
+                }}
               />
               <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Button

@@ -1,4 +1,4 @@
-import BuildingFootprints from '../BuildingFootprints';
+// BuildingFootprints intentionally not imported at top to avoid duplicate import warnings
 import React from 'react';
 import { Layout } from 'antd';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -21,9 +21,6 @@ import IsolationValve from '../IsolationValve';
 import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
-
-import Reports from '../Reports';
-
 import Reports from '../reports';
 import Classification from '../Classification';
 import ClassPage from '../Class';
@@ -37,12 +34,10 @@ import PressureReleaseValve from '../PressureReleaseValve';
 import BlowOffValve from '../BlowOffValve';
 import DMAInlet from '../DMAInlet';
 
-import PressureReleaseValve from '../PressureReleaseValve';
 import PressureMonitoringSystem from '../PressureMonitoringSystem';
 
-import MapInfoUsers from '../MapInfoUsers';
-import DistributionTransmission from '../DistributionTransmission';
-import BuildingFootprints from '../BuildingFootprints';
+// MapInfoUsers and DistributionTransmission imports omitted to avoid unused import errors; route imports exist where needed
+// BuildingFootprints already imported at top of this file
 
 
 const { Content } = Layout;

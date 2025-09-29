@@ -1,7 +1,9 @@
 
 
+// React import not needed with the new JSX transform
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input } from 'antd';
+import { Card, Typography, Table, Select, Input, Space, Button } from 'antd';
+import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 
@@ -62,7 +64,7 @@ const DMAInlet = observer(() => {
         String(row.size).includes(dmaInletStore.search) ||
         row.type.toLowerCase().includes(dmaInletStore.search.toLowerCase())
     );
-
+  const { Title } = Typography;
 
   return (
     <>
@@ -95,29 +97,28 @@ const DMAInlet = observer(() => {
             />
           </div>
         </div>
-        {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load DMA Inlet data" /> : (
 
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={filteredData}
-            pagination={{
-              current: 1,
-              pageSize: dmaInletStore.pageSize,
-              total: filteredData.length,
-              showSizeChanger: false,
-            }}
-            style={{ background: '#fff', borderRadius: 8 }}
-          />
-        </Card>
-        <PipeConditionAssessmentModal
-          open={dmaInletStore.modalOpen}
-          onClose={() => dmaInletStore.setModalOpen(false)}
-          assetId={dmaInletStore.selectedAssetId}
+        <Table
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={filteredData}
+          pagination={{
+            current: 1,
+            pageSize: dmaInletStore.pageSize,
+            total: filteredData.length,
+            showSizeChanger: false,
+          }}
+          style={{ background: '#fff', borderRadius: 8 }}
         />
-      </>
-    );
+      </Card>
+      <PipeConditionAssessmentModal
+        open={dmaInletStore.modalOpen}
+        onClose={() => dmaInletStore.setModalOpen(false)}
+        assetId={dmaInletStore.selectedAssetId}
+      />
+    </>
+  );
 });
 
 export default DMAInlet;
