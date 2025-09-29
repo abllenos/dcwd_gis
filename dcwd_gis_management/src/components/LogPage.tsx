@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Space, Tag, Button, Modal, Descriptions, Divider } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Space, Tag, Button, Modal, Descriptions, Progress } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import type { LogRecord } from '../stores/logTypes';
@@ -21,7 +21,15 @@ const columns: ColumnsType<LogRecord> = [
 ];
 
 const LogPage: React.FC = observer(() => {
-  const { layerOptions, selectedLayer, pageSize, currentPage, search, filteredData, loading, error, totalCount } = logStore;
+  const { layerOptions, selectedLayer, pageSize, currentPage, search, filteredData, pagedData, loading, error, totalCount } = logStore;
+  // Progress: cached rows vs total rows from server
+  const loadedCount = logStore.lastCount;
+  const hasTotal = typeof totalCount === 'number' && totalCount > 0;
+  const showPercentBar = hasTotal && (loadedCount < totalCount || loading || logStore.backgroundLoading);
+  const showIndeterminate = !hasTotal && (loading || logStore.backgroundLoading);
+  const percent = (typeof totalCount === 'number' && totalCount > 0)
+    ? Math.min(100, Math.round((Math.min(loadedCount, totalCount) / totalCount) * 100))
+    : 0;
 
   return (
     <Card className="card shadow mb-4" style={{ borderRadius: 8 }}>
@@ -93,7 +101,7 @@ const LogPage: React.FC = observer(() => {
           <Table
             rowKey="id"
             columns={columns}
-            dataSource={filteredData}
+            dataSource={pagedData}
             loading={loading}
             onRow={(record) => ({
               onClick: () => logUiStore.open(record),
@@ -162,9 +170,21 @@ const LogPage: React.FC = observer(() => {
             {logStore.debugStatus === 'disconnected' && (
               <Tag color="red">Disconnected</Tag>
             )}
+            {showPercentBar && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 260 }}>
+                <Progress percent={percent} size="small" style={{ width: 180 }} showInfo={false} status={(loading || logStore.backgroundLoading) ? 'active' : undefined} />
+                <span style={{ fontVariantNumeric: 'tabular-nums' }}>{loadedCount} / {totalCount}</span>
+              </div>
+            )}
+            {showIndeterminate && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 260 }}>
+                <Progress size="small" style={{ width: 180 }} showInfo={false} status="active" />
+                <span style={{ color: 'var(--text-muted)' }}>Loading… {loadedCount > 0 ? `${loadedCount} loaded` : ''}</span>
+              </div>
+            )}
           </Space>
           <Space size={8}>
-            <Button onClick={() => logStore.fetchLogs()} loading={loading}>
+            <Button onClick={() => logStore.fetchLogs(true)} loading={loading}>
               Refresh
             </Button>
           </Space>
