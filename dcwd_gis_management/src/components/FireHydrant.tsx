@@ -1,7 +1,6 @@
-import { Button } from 'antd';
 import React, { useEffect } from "react";
 
-import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
+import { Table, Input, Spin, Alert, Card, Typography } from "antd";
 const { Title, Text } = Typography;
 import FireHydrantDetailsModal from './modal/FireHydrantDetailsModal';
 import FireHydrantEditModal from './modal/FireHydrantEditModal';
@@ -79,19 +78,17 @@ const FireHydrantList: React.FC = observer(() => {
                         <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <Space>
-                            <Text>Search:</Text>
-                            <Input.Search
-                                placeholder="Search Fire Hydrant"
-                                value={searchText}
-                                onChange={(e) => {
-                                    setSearchText(e.target.value);
-                                    setPagination({ ...pagination, current: 1 });
-                                }}
-                                style={{ width: 300 }}
-                            />
-                        </Space>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16, gap: 8 }}>
+                        <Text>Search:</Text>
+                        <Input.Search
+                            placeholder="Search Fire Hydrant"
+                            value={searchText}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setPagination({ ...pagination, current: 1 });
+                            }}
+                            style={{ width: 200 }}
+                        />
                     </div>
 
                     <Table
