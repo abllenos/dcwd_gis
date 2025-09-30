@@ -7,6 +7,7 @@ import { layerSearchStore } from '../stores/layerSearchStore';
 import type { LogRecord } from '../stores/logTypes';
 import { formatAssetId, safeString } from '../utils/formatters';
 import { logUiStore } from '../stores/logUiStore';
+import { Progress, Space } from 'antd';
 import MapView from './MapView';
 
 const { Title } = Typography;
@@ -70,54 +71,81 @@ const LogPage: React.FC = observer(() => {
 
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520 }}>
               <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
-              <Input.Search
-                placeholder="Type to filter..."
-                value={search}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  logStore.setSearch(v);
-                  // If emptied (user pressed X), clear any active/pending search and return to paged view
-                  if (!v.trim()) {
-                    layerSearchStore.clear();
-                  } else {
-                    // Debounced auto-start across-layer search
-                    layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
-                  }
-                }}
-                allowClear
-                size="small"
-                enterButton
-                style={{ width: 200 }}
-                onSearch={(val) => {
-                  // explicit search when user presses Enter or clicks the button
-                  if ((val ?? '').toString().trim()) {
-                    layerSearchStore.start((val ?? '').toString(), selectedLayer ?? 1, logStore.apiFetchPageSize);
-                  }
-                }}
-              />
-              <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <Button
-                  type="default"
-                  disabled={!search.trim()}
-                  loading={layerSearchStore.loading}
-                  onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
-                >
-                  Search
-                </Button>
-                {layerSearchStore.active && (
-                  <Button onClick={() => layerSearchStore.cancel()} danger>
-                    Stop search
+              {/* Improved search input: larger, accessible, Escape clears, Enter triggers search */}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Input.Search
+                  placeholder="Search across layers (press Enter to search, Esc to clear)"
+                  value={search}
+                  allowClear
+                  enterButton
+                  size="middle"
+                  aria-label="Search logs"
+                  style={{ width: '100%', minWidth: 240 }}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    logStore.setSearch(v);
+                    if (!v.trim()) {
+                      layerSearchStore.clear();
+                    } else {
+                      layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
+                    }
+                  }}
+                  onSearch={(val) => {
+                    if ((val ?? '').toString().trim()) {
+                      layerSearchStore.start((val ?? '').toString(), selectedLayer ?? 1, logStore.apiFetchPageSize);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      logStore.setSearch('');
+                      layerSearchStore.clear();
+                    }
+                  }}
+                />
+
+                <Space>
+                  <Button
+                    type="default"
+                    disabled={!search.trim()}
+                    loading={layerSearchStore.loading}
+                    onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
+                  >
+                    Search
                   </Button>
-                )}
+                  {layerSearchStore.active && (
+                    <Button onClick={() => layerSearchStore.cancel()} danger>
+                      Stop search
+                    </Button>
+                  )}
+                </Space>
+              </div>
+              {/* Progress / scanned indicator */}
+              <div style={{ marginTop: 8 }}>
                 {layerSearchStore.active && (
-                  <div style={{ color: 'var(--text-muted)' }}>
-                    scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
-                    {typeof layerSearchStore.totalExpected === 'number' && (
-                      <span> • total approx: {layerSearchStore.totalExpected}</span>
-                    )}
-                    {layerSearchStore.results.length > 0 && (
-                      <span> • matches: {layerSearchStore.results.length}</span>
-                    )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <Progress
+                        percent={
+                          typeof layerSearchStore.totalPages === 'number' && layerSearchStore.totalPages > 0
+                            ? Math.min(100, Math.round((layerSearchStore.scannedPages / (layerSearchStore.totalPages || 1)) * 100))
+                            : undefined
+                        }
+                        status={layerSearchStore.loading ? 'active' : 'normal'}
+                        showInfo={false}
+                      />
+                    </div>
+                    <div style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+                      scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
+                      {typeof layerSearchStore.totalPages === 'number' && (
+                        <span> • total approx: {layerSearchStore.totalPages} pages</span>
+                      )}
+                      {typeof layerSearchStore.totalPages !== 'number' && typeof layerSearchStore.totalRecords === 'number' && (
+                        <span> • total approx: {layerSearchStore.totalRecords} records</span>
+                      )}
+                      {layerSearchStore.results.length > 0 && (
+                        <span> • matches: {layerSearchStore.results.length}</span>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

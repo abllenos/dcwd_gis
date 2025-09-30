@@ -14,7 +14,11 @@ class LayerSearchStore {
   scanning = false;     // true if more pages are being scanned
   nextPage = 1;         // next PageIndex to scan (1-based)
   scannedPages = 0;     // pages scanned so far
-  totalExpected: number | null = null;
+  // totalRecords: total number of records reported by server (if provided)
+  totalRecords: number | null = null;
+  // totalPages: derived number of pages (when lastFetchSize known)
+  totalPages: number | null = null;
+  lastFetchSize: number | null = null; // page size used for most recent scan (records per page)
   lastError: string | null = null;
   private token = 0;    // cancellation token
   private typingTimer: number | null = null;
@@ -45,7 +49,9 @@ class LayerSearchStore {
       this.scanning = true;
       this.nextPage = 1;
       this.scannedPages = 0;
-      this.totalExpected = null;
+      this.totalRecords = null;
+      this.totalPages = null;
+      this.lastFetchSize = fetchSize;
       this.lastError = null;
     });
     // Auto-scan all pages in batches until the server returns no data or the search is cancelled.
@@ -91,11 +97,11 @@ class LayerSearchStore {
       this.results = [];
       this.nextPage = 1;
       this.scannedPages = 0;
-      this.totalExpected = null;
+      this.totalRecords = null;
+      this.totalPages = null;
       this.lastError = null;
     });
   }
-
   cancel() {
     this.token++;
     runInAction(() => {
@@ -143,9 +149,25 @@ class LayerSearchStore {
       runInAction(() => {
         // Append new matches in a single commit
         if (matches.length) this.results = [...this.results, ...matches];
-        this.scannedPages += Math.max(0, Math.min(end, schedule - 1) - start + 1);
+        const pagesRequested = Math.max(0, Math.min(end, schedule - 1) - start + 1);
+        this.scannedPages += pagesRequested;
         this.nextPage = Math.max(this.nextPage, schedule);
         this.loading = false;
+        // Normalize totalPages if we know totalRecords and fetchSize
+        if (this.totalRecords !== null && this.lastFetchSize) {
+          this.totalPages = Math.ceil(this.totalRecords / this.lastFetchSize);
+        }
+        // If we've reached the end, ensure scannedPages reflects total pages
+        if (reachedEnd) {
+          if (this.totalPages === null && this.lastFetchSize) {
+            // If server ended without providing totals, estimate pages as nextPage-1
+            this.totalPages = Math.max(this.scannedPages, this.nextPage - 1);
+          }
+          // Clamp scannedPages to totalPages if available
+          if (typeof this.totalPages === 'number') {
+            this.scannedPages = Math.min(this.scannedPages, this.totalPages);
+          }
+        }
         // Continue scanning only if no end-of-data and no error occurred
         this.scanning = !reachedEnd && !hadError;
       });
@@ -183,8 +205,8 @@ class LayerSearchStore {
           const c1 = Number((dataNode as { count?: unknown } | undefined)?.count);
           const c2 = Number((dataNode as { totalCount?: unknown } | undefined)?.totalCount);
           const cand = !Number.isNaN(c1) && c1 > 0 ? c1 : (!Number.isNaN(c2) && c2 > 0 ? c2 : null);
-          if (cand && (this.totalExpected === null || cand > this.totalExpected)) {
-            runInAction(() => { this.totalExpected = cand; });
+          if (cand && (this.totalRecords === null || cand > this.totalRecords)) {
+            runInAction(() => { this.totalRecords = cand; });
           }
         }
         // Fallbacks for legacy shapes
@@ -197,8 +219,8 @@ class LayerSearchStore {
           }
           // Also try totals from outer if present
           const outerTotal = Number((outer as { totalCount?: unknown }).totalCount);
-          if (!Number.isNaN(outerTotal) && outerTotal > 0 && (this.totalExpected === null || outerTotal > this.totalExpected)) {
-            runInAction(() => { this.totalExpected = outerTotal; });
+          if (!Number.isNaN(outerTotal) && outerTotal > 0 && (this.totalRecords === null || outerTotal > this.totalRecords)) {
+            runInAction(() => { this.totalRecords = outerTotal; });
           }
         }
       }
