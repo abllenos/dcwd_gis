@@ -2,8 +2,8 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import BlowOffValveModal from './modal/BlowOffValveModal';
 
-import { Table, Input, Select, Button, Typography, Card } from 'antd';
-import { AppstoreOutlined } from '@ant-design/icons';
+import { Table, Input, Select, Typography, Card } from 'antd';
+
 
 import { blowOffValveStore } from '../stores/blowOffValveStore';
 const { Title, Text } = Typography;
@@ -49,9 +49,6 @@ const columns = [
   {
     title: '',
     key: 'action',
-    width: 60,
-    render: () => (
-      <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
     width: 80,
     render: (_: any, record: any) => (
       <button
@@ -63,7 +60,6 @@ const columns = [
         }}
         title="View Details"
       >
-        <span style={{ fontSize: 16 }}>👁️</span>
         <span style={{ fontWeight: 500 }}>View</span>
       </button>
     ),

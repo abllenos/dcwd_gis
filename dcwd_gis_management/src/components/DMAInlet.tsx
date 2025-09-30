@@ -1,7 +1,7 @@
 
 
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input } from 'antd';
+import { Card, Typography, Table, Select, Input, Spin, Alert } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 
@@ -39,18 +39,15 @@ const DMAInlet = observer(() => {
       key: 'action',
       width: 90,
       render: (_: any, record: any) => (
-        <Space>
-          <Button
-            className="btn-action-circle"
-            icon={<SettingOutlined />}
-            onClick={() => {
-              dmaInletStore.setSelectedAssetId(record.id);
-              dmaInletStore.setModalOpen(true);
-            }}
-          />
-          <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
-        </Space>
-
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => {
+            dmaInletStore.setSelectedAssetId(record.id);
+            dmaInletStore.setModalOpen(true);
+          }}
+        >
+          View
+        </button>
       ),
     },
   ];
@@ -68,7 +65,7 @@ const DMAInlet = observer(() => {
     <>
       <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
         <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
+          <Typography.Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Typography.Title>
         </div>
         <div className="license-controls-container">
           <div className="license-display-controls">
@@ -95,22 +92,20 @@ const DMAInlet = observer(() => {
             />
           </div>
         </div>
-        {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load DMA Inlet data" /> : (
-
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={filteredData}
-            pagination={{
-              current: 1,
-              pageSize: dmaInletStore.pageSize,
-              total: filteredData.length,
-              showSizeChanger: false,
-            }}
-            style={{ background: '#fff', borderRadius: 8 }}
-          />
-        </Card>
+        <Table
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={filteredData}
+          pagination={{
+            current: 1,
+            pageSize: dmaInletStore.pageSize,
+            total: filteredData.length,
+            showSizeChanger: false,
+          }}
+          style={{ background: '#fff', borderRadius: 8 }}
+        />
+      </Card>
         <PipeConditionAssessmentModal
           open={dmaInletStore.modalOpen}
           onClose={() => dmaInletStore.setModalOpen(false)}

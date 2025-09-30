@@ -43,7 +43,13 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
       },
-      // Lowercase variant (defensive); some refactors normalize to lowercase.
+      // Proxy for license API (MapInfoUsers)
+      '/api/license': {
+        target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/views/',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/license/, '')
+      },
       '/helpers/gis/api/userlogs/getlogsgeometry.php': {
         target: 'https://api-gis.davao-water.gov.ph',
         changeOrigin: true,

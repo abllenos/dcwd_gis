@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
+import { mapApiUserToTableRow } from '../utils/mapApiUserToTableRow';
 import { useState, useEffect } from 'react';
 
 const { Title } = Typography;
@@ -80,20 +81,20 @@ const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
 
 const columns = [
   { title: 'ID', dataIndex: 'id', width: 60, sorter: (a: any, b: any) => a.id - b.id },
-  { title: 'License Type', dataIndex: 'licenseType' },
+  { title: 'License Type', dataIndex: 'software' },
   { title: 'Department', dataIndex: 'department' },
-  { title: 'Computer Name', dataIndex: 'computerName' },
+  { title: 'Computer Name', dataIndex: 'deviceName' },
   {
     title: '',
     key: 'action',
     width: 60,
     render: (_: any, record: any) => (
-  <button
-    style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-    onClick={() => record.onShowModal(record)}
-  >
-    View
-  </button>
+      <button
+        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+        onClick={() => record.onShowModal(record)}
+      >
+        View
+      </button>
     ),
   },
 ];
@@ -110,12 +111,14 @@ const MapInfoUsers = observer(() => {
 
   const filteredUsers = mapInfoUsersStore.users.filter(
     u =>
-      (u.licenseType?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
+      (u.software?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
       (u.department?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
       (u.computerName?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase())
   );
-  // Add modal handler to each row
-  const tableData = filteredUsers.map(u => ({ ...u, onShowModal: (user: any) => { setSelectedUser(user); setModalVisible(true); } }));
+  const tableData = filteredUsers.map((u, idx) => ({
+  ...mapApiUserToTableRow(u, idx),
+  onShowModal: (user: ReturnType<typeof mapApiUserToTableRow>) => { setSelectedUser(user); setModalVisible(true); }
+  }));
 
   return (
     <div>
@@ -145,9 +148,7 @@ const MapInfoUsers = observer(() => {
             <DatePicker value={mapInfoUsersStore.installDate} onChange={mapInfoUsersStore.setInstallDate.bind(mapInfoUsersStore)} style={{ width: '100%' }} format="DD/MM/YYYY" />
           </Col>
           <Col span={4} style={{ display: 'flex', alignItems: 'end', height: '100%' }}>
-
             <Button type="primary" className="license-register-button">
-
               Register
             </Button>
           </Col>
@@ -178,14 +179,20 @@ const MapInfoUsers = observer(() => {
             allowClear
           />
         </div>
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={tableData}
-          pagination={{ pageSize: mapInfoUsersStore.pageSize, showSizeChanger: false }}
-          style={{ background: '#fff', borderRadius: 8 }}
-        />
+        {mapInfoUsersStore.loading ? (
+          <div style={{ color: '#2563eb', fontWeight: 600, marginBottom: 16 }}>Loading...</div>
+        ) : mapInfoUsersStore.error ? (
+          <div style={{ color: 'red', fontWeight: 600, marginBottom: 16 }}>Error: {mapInfoUsersStore.error}</div>
+        ) : (
+          <Table
+            bordered
+            rowKey="key"
+            columns={columns}
+            dataSource={tableData}
+            pagination={{ pageSize: mapInfoUsersStore.pageSize, showSizeChanger: false }}
+            style={{ background: '#fff', borderRadius: 8 }}
+          />
+        )}
       </Card>
       <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
     </div>
