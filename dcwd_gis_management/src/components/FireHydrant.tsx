@@ -42,26 +42,19 @@ const FireHydrantList: React.FC = observer(() => {
             title: '',
             key: 'actions',
             width: 80,
+            align: 'center' as const,
             render: (_: any, record: FireHydrant) => (
-                <Button
-                    style={{
-                        background: '#18c964',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 8,
-                        padding: '8px 24px',
-                        fontWeight: 500,
-                        boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
-                        display: 'block',
-                        margin: '0 auto',
-                    }}
-                    onClick={() => {
-                        fireHydrantListStore.setSelectedRecord(record);
-                        fireHydrantListStore.setDetailsModalVisible(true);
-                    }}
-                >
-                    View
-                </Button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <button
+                        className="license-table-action-button"
+                        onClick={() => {
+                            fireHydrantListStore.setSelectedRecord(record);
+                            fireHydrantListStore.setDetailsModalVisible(true);
+                        }}
+                        title="View Details"
+                    >
+                    </button>
+                </div>
             ),
         },
     ];

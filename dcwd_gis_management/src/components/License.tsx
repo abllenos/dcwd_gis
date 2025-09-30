@@ -201,14 +201,20 @@ const License: React.FC = observer(() => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
+      width: 80,
+      align: 'center' as const,
       render: (_: any, record: any) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-          onClick={() => record.onShowModal(record)}
-        >
-          View
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <button
+            className="license-table-action-button"
+            onClick={() => {
+              licenseStore.setSelectedUser(record);
+              licenseStore.setModalVisible(true);
+            }}
+            title="View Details"
+          >
+          </button>
+        </div>
       ),
     },
   ];
@@ -419,61 +425,28 @@ const License: React.FC = observer(() => {
               </div>
             )}
 
-            {/* Pagination - Always visible */}
-            <div className="license-pagination-container">
-              <Typography.Text className="license-pagination-text">
+            {/* Pagination */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+              <Typography.Text style={{ fontSize: 12 }}>
                 Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
                 {licenseStore.searchText && ` (filtered from ${licenseStore.registeredUsers.length} total entries)`}
               </Typography.Text>
-              <div className="license-pagination-buttons">
-                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
-                  size="small" 
-                  disabled={licenseStore.currentPage === 1 || totalItems === 0}
-                  onClick={() => handlePageChange(licenseStore.currentPage - 1)}
-                  className={
-                    (licenseStore.currentPage === 1 || totalItems === 0) 
-                      ? "license-pagination-button-disabled-prev-next" 
-                      : "license-pagination-button-prev-next"
-                  }
-                >
-                  Previous
-                </Button>
+              <Space>
+                <Button size="small" disabled={licenseStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(licenseStore.currentPage - 1)}>Previous</Button>
                 {totalItems > 0 ? getPageNumbers().map(pageNum => (
-                  <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
-                    key={pageNum}
+                  <Button 
+                    key={pageNum} 
                     size="small" 
-                    type={pageNum === licenseStore.currentPage ? "primary" : "default"}
-                    className={
-                      pageNum === licenseStore.currentPage 
-                        ? "license-pagination-button-active" 
-                        : "license-pagination-button-inactive"
-                    }
+                    type={pageNum === licenseStore.currentPage ? 'primary' : 'default'} 
                     onClick={() => handlePageChange(pageNum)}
                   >
                     {pageNum}
                   </Button>
                 )) : (
-                  <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
-                    size="small" 
-                    disabled
-                    className="license-pagination-button-disabled"
-                  >
-                    1
-                  </Button>
+                  <Button size="small" disabled>1</Button>
                 )}
-                <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
-                  size="small" 
-                  disabled={licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0}
-                  onClick={() => handlePageChange(licenseStore.currentPage + 1)}
-                  className={
-                    (licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0)
-                      ? "license-pagination-button-disabled-prev-next" 
-                      : "license-pagination-button-prev-next"
-                  }
-                >
-                  Next
-                </Button>
-              </div>
+                <Button size="small" disabled={licenseStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(licenseStore.currentPage + 1)}>Next</Button>
+              </Space>
             </div>
           </div>
         </div>

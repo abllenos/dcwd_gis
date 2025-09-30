@@ -21,13 +21,15 @@ const ClassPage: React.FC = observer(() => {
     { title: 'ID', dataIndex: 'id', key: 'id', width: 70, sorter: (a: any, b: any) => (Number(a.id) || 0) - (Number(b.id) || 0) },
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
-    { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassRecord) => (
-      <button
-        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-        onClick={() => store.openEdit(record)}
-      >
-        View
-      </button>
+    { title: ' ', key: 'actions', width: 80, align: 'center' as const, render: (_: unknown, record: ClassRecord) => (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <button
+          className="license-table-action-button"
+          onClick={() => store.openEdit(record)}
+          title="View Details"
+        >
+        </button>
+      </div>
     ) }
   ];
 

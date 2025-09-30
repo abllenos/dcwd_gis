@@ -87,14 +87,17 @@ const columns = [
   {
     title: '',
     key: 'action',
-    width: 60,
+    width: 80,
+    align: 'center' as const,
     render: (_: any, record: any) => (
-      <button
-        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-        onClick={() => record.onShowModal(record)}
-      >
-        View
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <button
+          className="license-table-action-button"
+          onClick={() => record.onShowModal(record)}
+          title="View Details"
+        >
+        </button>
+      </div>
     ),
   },
 ];

@@ -22,13 +22,15 @@ const Layer: React.FC = observer(() => {
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Status Flag', dataIndex: 'statusFlag', key: 'statusFlag', width: 110, render: (v: number) => v === 1 ? <Tag color="green">1</Tag> : <Tag color="red">0</Tag> },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
-    { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: LayerRecord) => (
-      <button
-        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-        onClick={() => store.openEdit(record)}
-      >
-        View
-      </button>)
+    { title: ' ', key: 'actions', width: 80, align: 'center' as const, render: (_: unknown, record: LayerRecord) => (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <button
+          className="license-table-action-button"
+          onClick={() => store.openEdit(record)}
+          title="View Details"
+        >
+        </button>
+      </div>)
     }
   ];
 

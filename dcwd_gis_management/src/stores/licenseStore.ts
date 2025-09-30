@@ -138,11 +138,8 @@ class LicenseStore {
     
     const searchLower = this.searchText.toLowerCase();
     return this.registeredUsers.filter(user => 
-      user.software?.toLowerCase().includes(searchLower) ||
       user.deviceName?.toLowerCase().includes(searchLower) ||
-      user.department?.toLowerCase().includes(searchLower) ||
-      user.userId?.toLowerCase().includes(searchLower) ||
-      user.installationDate?.toLowerCase().includes(searchLower)
+      user.department?.toLowerCase().includes(searchLower)
     );
   }
 

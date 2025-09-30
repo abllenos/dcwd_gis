@@ -77,26 +77,19 @@ const IsolationValveList: React.FC = observer(() => {
             title: '',
             key: 'actions',
             width: 80,
+            align: 'center' as const,
             render: (_text, record) => (
-                <Button
-                    style={{
-                        background: '#18c964',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 8,
-                        padding: '8px 24px',
-                        fontWeight: 500,
-                        boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
-                        display: 'block',
-                        margin: '0 auto',
-                    }}
-                    onClick={() => {
-                        isolationValveStore.setSelected(record);
-                        isolationValveStore.setModalVisible(true);
-                    }}
-                >
-                    View
-                </Button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <button
+                        className="license-table-action-button"
+                        onClick={() => {
+                            isolationValveStore.setSelected(record);
+                            isolationValveStore.setModalVisible(true);
+                        }}
+                        title="View Details"
+                    >
+                    </button>
+                </div>
             ),
         },
     ];

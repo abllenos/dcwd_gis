@@ -34,17 +34,20 @@ const DistributionTransmission = observer(() => {
     {
       title: 'Action',
       key: 'action',
-      width: 90,
+      width: 80,
+      align: 'center' as const,
       render: (_: any, record: any) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-          onClick={() => {
-            distributionTransmissionStore.setSelectedAssetId(record.id);
-            distributionTransmissionStore.setModalOpen(true);
-          }}
-        >
-          View
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <button
+            className="license-table-action-button"
+            onClick={() => {
+              distributionTransmissionStore.setSelectedAssetId(record.id);
+              distributionTransmissionStore.setModalOpen(true);
+            }}
+            title="View Details"
+          >
+          </button>
+        </div>
       ),
     },
   ];
