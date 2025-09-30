@@ -1,10 +1,10 @@
-
 import { observer } from 'mobx-react-lite';
 import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
 import { mapApiUserToTableRow } from '../utils/mapApiUserToTableRow';
 import { useState, useEffect } from 'react';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 
@@ -198,6 +198,7 @@ const MapInfoUsers = observer(() => {
         )}
       </Card>
       <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
+      <Footer />
     </div>
   );
 });

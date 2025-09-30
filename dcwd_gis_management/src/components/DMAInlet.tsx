@@ -1,6 +1,5 @@
 import { Button } from 'antd';
-
-
+import Footer from './layout/Footer';
 import { observer } from 'mobx-react-lite';
 import { Card, Typography, Table, Select, Input, Spin, Alert } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
@@ -110,13 +109,14 @@ const DMAInlet = observer(() => {
           style={{ background: '#fff', borderRadius: 8 }}
         />
       </Card>
-        <PipeConditionAssessmentModal
-          open={dmaInletStore.modalOpen}
-          onClose={() => dmaInletStore.setModalOpen(false)}
-          assetId={dmaInletStore.selectedAssetId}
-        />
-      </>
-    );
+      <PipeConditionAssessmentModal
+        open={dmaInletStore.modalOpen}
+        onClose={() => dmaInletStore.setModalOpen(false)}
+        assetId={dmaInletStore.selectedAssetId}
+      />
+      <Footer />
+    </>
+  );
 });
 
 export default DMAInlet;

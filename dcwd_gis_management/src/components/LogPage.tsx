@@ -8,6 +8,7 @@ import type { LogRecord } from '../stores/logTypes';
 import { formatAssetId, safeString } from '../utils/formatters';
 import { logUiStore } from '../stores/logUiStore';
 import MapView from './MapView';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 
@@ -208,6 +209,7 @@ const LogPage: React.FC = observer(() => {
         {/* status/progress UI removed as requested */}
 
       </div>
+      <Footer />
     </Card>
   );
 });

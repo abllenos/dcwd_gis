@@ -4,6 +4,7 @@ import { Button, Card, Input, Modal, Table, Typography, Space, Form, Empty, Aler
 import { PlusOutlined } from '@ant-design/icons';
 import { classStore } from '../stores/classStore';
 import type { ClassRecord } from '../stores/classStore';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -130,6 +131,8 @@ const ClassPage: React.FC = observer(() => {
           <Form.Item label="Description" name="description" required rules={[{ required: true }]}> <Input /> </Form.Item>
         </Form>
       </Modal>
+
+      <Footer />
     </div>
   );
 });

@@ -1,4 +1,3 @@
-
 import { observer } from 'mobx-react-lite';
 import { Table, Input, Select, Button, Typography, Card, Space, Spin, Alert } from 'antd';
 import { ToolOutlined, InfoCircleOutlined } from '@ant-design/icons';
@@ -6,6 +5,7 @@ import PmsMaintenanceModal from './modal/PmsMaintenanceModal';
 import { pressureMonitoringSystemStore } from '../stores/pressureMonitoringSystemStore';
 import { useQuery } from '@tanstack/react-query';
 import { apiGis } from './endpoints/Interceptor';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 
@@ -32,8 +32,6 @@ const fetchPMSData = async (): Promise<PMSRecord[]> => {
     ...item,
   }));
 };
-
-
 
 const PressureMonitoringSystem = observer(() => {
   // Fetch PMS data
@@ -125,6 +123,10 @@ const PressureMonitoringSystem = observer(() => {
         )}
       </Card>
       <PmsMaintenanceModal open={pressureMonitoringSystemStore.modalOpen} onClose={() => pressureMonitoringSystemStore.setModalOpen(false)} />
+      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+        {/* ...existing content... */}
+      </div>
+      <Footer />
     </>
   );
 });

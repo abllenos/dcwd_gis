@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, Typography, Table, Spin, Alert, Input, Button } from 'antd';
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
@@ -7,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { observer } from 'mobx-react-lite';
 import { prvStore } from '../stores/prvStore';
 import { apiGis } from './endpoints/Interceptor';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -71,68 +71,71 @@ const PressureReleaseValve: React.FC = observer(() => {
   ];
 
   return (
-    <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-      <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-        <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
-      </div>
-      <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
-        <div style={{ marginBottom: 24 }}>
-          <Title level={5} style={{ color: '#666', marginBottom: 8 }}>Instructions:</Title>
-          <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+    <>
+      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+        <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+          <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
         </div>
-
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <span>Display</span>
-            <select value={String(prvStore.pageSize)} onChange={(e) => prvStore.setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-            <span>records per page</span>
+        <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+          <div style={{ marginBottom: 24 }}>
+            <Title level={5} style={{ color: '#666', marginBottom: 8 }}>Instructions:</Title>
+            <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
           </div>
-          <div className="license-search-controls">
-            <span>Search:</span>
-            <Input.Search
-              placeholder="Search..."
-              size="small"
-              allowClear
-              enterButton
-              value={prvStore.search}
-              onChange={(e) => prvStore.setSearch(e.target.value)}
-              style={{ width: 200 }}
+
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <span>Display</span>
+              <select value={String(prvStore.pageSize)} onChange={(e) => prvStore.setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span>records per page</span>
+            </div>
+            <div className="license-search-controls">
+              <span>Search:</span>
+              <Input.Search
+                placeholder="Search..."
+                size="small"
+                allowClear
+                enterButton
+                value={prvStore.search}
+                onChange={(e) => prvStore.setSearch(e.target.value)}
+                style={{ width: 200 }}
+              />
+            </div>
+          </div>
+
+          {prvStore.isLoading ? <Spin /> : prvStore.error ? <Alert type="error" message="Failed to load data" /> : (
+            <Table
+              columns={columns as any}
+              dataSource={prvStore.filteredData}
+              pagination={{ pageSize: prvStore.pageSize }}
+              rowKey={(r: PressureReleaseValveRecord) => r.key}
+              onRow={(record: PressureReleaseValveRecord) => ({
+                onDoubleClick: () => {
+                  prvStore.setSelectedRecord(record);
+                  prvStore.setModalVisible(true);
+                },
+              })}
+              bordered
             />
-          </div>
-        </div>
+          )}
 
-        {prvStore.isLoading ? <Spin /> : prvStore.error ? <Alert type="error" message="Failed to load data" /> : (
-          <Table
-            columns={columns as any}
-            dataSource={prvStore.filteredData}
-            pagination={{ pageSize: prvStore.pageSize }}
-            rowKey={(r: PressureReleaseValveRecord) => r.key}
-            onRow={(record: PressureReleaseValveRecord) => ({
-              onDoubleClick: () => {
-                prvStore.setSelectedRecord(record);
-                prvStore.setModalVisible(true);
-              },
-            })}
-            bordered
+          <PressureReleaseValveModal
+            visible={prvStore.modalVisible}
+            record={prvStore.selectedRecord}
+            onCancel={() => prvStore.setModalVisible(false)}
+            onUpdate={() => {
+              console.log('Updated', prvStore.selectedRecord);
+              prvStore.setModalVisible(false);
+            }}
           />
-        )}
-
-        <PressureReleaseValveModal
-          visible={prvStore.modalVisible}
-          record={prvStore.selectedRecord}
-          onCancel={() => prvStore.setModalVisible(false)}
-          onUpdate={() => {
-            console.log('Updated', prvStore.selectedRecord);
-            prvStore.setModalVisible(false);
-          }}
-        />
-      </Card>
-    </div>
+        </Card>
+      </div>
+      <Footer />
+    </>
   );
 });
 

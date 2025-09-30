@@ -4,6 +4,7 @@ import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form } fr
 import { PlusOutlined } from '@ant-design/icons';
 import { userAccountsStore } from '../stores/userAccountsStore';
 import type { UserAccountRecord } from '../stores/userAccountsStore';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -133,6 +134,8 @@ const UserAccounts: React.FC = observer(() => {
 					<Form.Item label="Role" name="role"> <Select options={[{ label: 'Administrator', value: 'Administrator' }, { label: 'Viewer', value: 'Viewer' }, { label: 'Editor', value: 'Editor' }]} /> </Form.Item>
 				</Form>
 			</Modal>
+
+			<Footer />
 		</div>
 	);
 });

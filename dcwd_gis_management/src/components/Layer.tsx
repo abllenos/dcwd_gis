@@ -4,6 +4,7 @@ import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form
 import { PlusOutlined } from '@ant-design/icons';
 import { layerStore } from '../stores/layerStore';
 import type { LayerRecord } from '../stores/layerStore';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -35,8 +36,9 @@ const Layer: React.FC = observer(() => {
   ];
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto' }}>
-  <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} styles={{ body: { padding: 20 } }}>
+    <>
+      <div style={{ maxWidth: '100%', margin: '0 auto' }}>
+        <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} styles={{ body: { padding: 20 } }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0 }}>Layer - Maintenance</Title>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAdd()}>
@@ -133,7 +135,9 @@ const Layer: React.FC = observer(() => {
           <Form.Item label="Status" name="statusFlag"> <Select options={[{ label: 'Active (1)', value: 1 }, { label: 'Inactive (0)', value: 0 }]} /> </Form.Item>
         </Form>
       </Modal>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 });
 

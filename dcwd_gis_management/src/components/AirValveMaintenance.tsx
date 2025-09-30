@@ -8,6 +8,7 @@ import AirValveDetailsModal from './modal/AirValveDetailsModal';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery } from '@tanstack/react-query';
 import { devApi } from './endpoints/Interceptor';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -176,6 +177,7 @@ const AirValveMaintenance: React.FC = observer(() => {
           onCancel={() => airValveStore.setDetailsModalVisible(false)}
         />
       </Card>
+      <Footer />
     </div>
   );
 });

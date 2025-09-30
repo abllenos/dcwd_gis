@@ -256,7 +256,7 @@ class LicenseStore {
   fetchAllUsers = async (): Promise<LicenseApiResponse> => {
     try {
       this.setLoading(true);
-      const response = await licenseApiService.getAllUsers();
+      const response = await licenseApiService.getUsersByStatus('all');
       
       if (response.success && response.data) {
         this.clearUsers();

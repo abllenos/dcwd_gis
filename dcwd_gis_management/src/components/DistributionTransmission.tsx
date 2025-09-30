@@ -1,8 +1,8 @@
-
 import { observer } from 'mobx-react-lite';
 import { Card, Typography, Table, Select, Input } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { distributionTransmissionStore } from '../stores/distributionTransmissionStore';
+import Footer from './layout/Footer';
 
 
 const { Title } = Typography;
@@ -62,58 +62,61 @@ const DistributionTransmission = observer(() => {
 
   return (
     <>
-      <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
-        </div>
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <span>Display</span>
-            <Select
-              value={distributionTransmissionStore.pageSize}
-              onChange={distributionTransmissionStore.setPageSize.bind(distributionTransmissionStore)}
-              size="small"
-              style={{ width: 90 }}
-              options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
-            />
-            <span>records per page</span>
+      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+        <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
+          <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
+            <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
           </div>
-          <div className="license-search-controls">
-            <span>Search:</span>
-            <Input.Search
-              placeholder="Search..."
-              size="small"
-              allowClear
-              enterButton
-              value={distributionTransmissionStore.search}
-              onChange={e => distributionTransmissionStore.setSearch(e.target.value)}
-              style={{ width: 200 }}
-            />
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <span>Display</span>
+              <Select
+                value={distributionTransmissionStore.pageSize}
+                onChange={distributionTransmissionStore.setPageSize.bind(distributionTransmissionStore)}
+                size="small"
+                style={{ width: 90 }}
+                options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
+              />
+              <span>records per page</span>
+            </div>
+            <div className="license-search-controls">
+              <span>Search:</span>
+              <Input.Search
+                placeholder="Search..."
+                size="small"
+                allowClear
+                enterButton
+                value={distributionTransmissionStore.search}
+                onChange={e => distributionTransmissionStore.setSearch(e.target.value)}
+                style={{ width: 200 }}
+              />
+            </div>
           </div>
-        </div>
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredData}
-          pagination={{
-            current: distributionTransmissionStore.current,
-            pageSize: distributionTransmissionStore.pageSize,
-            total: totalEntries,
-            showSizeChanger: false,
-            onChange: distributionTransmissionStore.setCurrent.bind(distributionTransmissionStore),
-          }}
-          style={{ background: '#fff', borderRadius: 8 }}
+          <Table
+            bordered
+            rowKey="id"
+            columns={columns}
+            dataSource={filteredData}
+            pagination={{
+              current: distributionTransmissionStore.current,
+              pageSize: distributionTransmissionStore.pageSize,
+              total: totalEntries,
+              showSizeChanger: false,
+              onChange: distributionTransmissionStore.setCurrent.bind(distributionTransmissionStore),
+            }}
+            style={{ background: '#fff', borderRadius: 8 }}
+          />
+          <div style={{ marginTop: 8, color: '#888' }}>
+            Showing 1 to {distributionTransmissionStore.pageSize} of {totalEntries} entries
+          </div>
+        </Card>
+        <PipeConditionAssessmentModal
+          open={distributionTransmissionStore.modalOpen}
+          onClose={() => distributionTransmissionStore.setModalOpen(false)}
+          assetId={distributionTransmissionStore.selectedAssetId}
         />
-        <div style={{ marginTop: 8, color: '#888' }}>
-          Showing 1 to {distributionTransmissionStore.pageSize} of {totalEntries} entries
-        </div>
-      </Card>
-      <PipeConditionAssessmentModal
-        open={distributionTransmissionStore.modalOpen}
-        onClose={() => distributionTransmissionStore.setModalOpen(false)}
-        assetId={distributionTransmissionStore.selectedAssetId}
-      />
+      </div>
+      <Footer />
     </>
   );
 });

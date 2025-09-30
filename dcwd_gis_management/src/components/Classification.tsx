@@ -4,6 +4,7 @@ import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form, Ale
 import { PlusOutlined } from '@ant-design/icons';
 import { classificationStore } from '../stores/classificationStore';
 import type { ClassificationRecord } from '../stores/classificationStore';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -140,6 +141,8 @@ const Classification: React.FC = observer(() => {
           {/* Status field removed per design; store still keeps statusFlag if needed */}
         </Form>
       </Modal>
+
+      <Footer />
     </div>
   );
 });
