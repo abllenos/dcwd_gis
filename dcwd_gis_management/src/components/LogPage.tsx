@@ -43,7 +43,12 @@ const LogPage: React.FC = observer(() => {
               <Select
                 value={selectedLayer}
                 style={{ width: '100%', cursor: 'pointer' }}
-                onChange={(val) => logStore.setLayer(val)}
+                onChange={(val) => {
+                  // when changing layer, clear any active search and input
+                  logStore.setLayer(val);
+                  logStore.setSearch('');
+                  layerSearchStore.clear();
+                }}
                 showSearch={false}
                 allowClear={false}
                 options={layerOptions.map(o => ({ label: o.label, value: o.value }))}
@@ -135,15 +140,15 @@ const LogPage: React.FC = observer(() => {
                       />
                     </div>
                     <div style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
-                      scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
+                      Scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
                       {typeof layerSearchStore.totalPages === 'number' && (
-                        <span> • total approx: {layerSearchStore.totalPages} pages</span>
+                        <span> • Total approx: {layerSearchStore.totalPages} pages</span>
                       )}
                       {typeof layerSearchStore.totalPages !== 'number' && typeof layerSearchStore.totalRecords === 'number' && (
-                        <span> • total approx: {layerSearchStore.totalRecords} records</span>
+                        <span> • Total approx: {layerSearchStore.totalRecords} records</span>
                       )}
                       {layerSearchStore.results.length > 0 && (
-                        <span> • matches: {layerSearchStore.results.length}</span>
+                        <span> • Matches: {layerSearchStore.results.length}</span>
                       )}
                     </div>
                   </div>
