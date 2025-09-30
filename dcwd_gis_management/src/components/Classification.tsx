@@ -24,17 +24,13 @@ const Classification: React.FC = observer(() => {
     { title: 'Layer Name', dataIndex: 'layerName', key: 'layerName', sorter: (a: any, b: any) => String(a.layerName || '').localeCompare(String(b.layerName || '')) },
     { title: 'Class Name', dataIndex: 'className', key: 'className', sorter: (a: any, b: any) => String(a.className || '').localeCompare(String(b.className || '')) },
     { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: ClassificationRecord) => (
-      <Button
-        className="license-table-action-button"
-        icon={<EditOutlined />}
-        size="small"
       <button
         style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
         onClick={() => store.openEdit(record)}
       >
         View
-      </button>)
-    }
+      </button>
+    ) }
   ];
 
   return (

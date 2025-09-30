@@ -1,74 +1,76 @@
+import { Button } from 'antd';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import BlowOffValveModal from './modal/BlowOffValveModal';
 
-import { Table, Input, Select, Button, Typography, Card } from 'antd';
-import { AppstoreOutlined } from '@ant-design/icons';
+import { Table, Input, Select, Typography, Card } from 'antd';
+
 
 import { blowOffValveStore } from '../stores/blowOffValveStore';
 const { Title, Text } = Typography;
 
 const columns = [
   {
-    title: 'ID',
-    dataIndex: 'id',
-    width: 60,
-    render: (_: any, __: any, idx: number) => idx + 1,
-    sorter: (a: any, b: any) => (a.id ?? 0) - (b.id ?? 0),
+    title: 'BOV Number',
+    dataIndex: 'bovnumber',
   },
   {
-    title: 'Work Order No.',
+    title: 'WO Number',
     dataIndex: 'wonumber',
-    width: 160,
-    sorter: (a: any, b: any) => (a.wonumber ?? '').localeCompare(b.wonumber ?? ''),
   },
   {
-    title: 'Location',
-    dataIndex: 'location',
-    width: 180,
-    sorter: (a: any, b: any) => (a.location ?? '').localeCompare(b.location ?? ''),
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status_remarks',
-    width: 120,
-    sorter: (a: any, b: any) => (a.status_remarks ?? '').localeCompare(b.status_remarks ?? ''),
+    title: 'Date Geocoded',
+    dataIndex: 'dategeocoded',
   },
   {
     title: 'Size',
     dataIndex: 'size',
-    width: 80,
-    sorter: (a: any, b: any) => (a.size ?? '').localeCompare(b.size ?? ''),
   },
   {
-    title: 'Project Title',
-    dataIndex: 'bovnumber',
-    width: 220,
-    sorter: (a: any, b: any) => (a.bovnumber ?? '').localeCompare(b.bovnumber ?? ''),
+    title: 'Status',
+    dataIndex: 'status_remarks',
   },
   {
-    title: '',
+    title: 'Date Commissioned',
+    dataIndex: 'date_commissioned',
+  },
+  {
+    title: 'Location',
+    dataIndex: 'location',
+  },
+  {
+    title: 'Barangay',
+    dataIndex: 'brgycode',
+  },
+  {
+    title: 'Action',
     key: 'action',
-    width: 60,
-    render: () => (
-      <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
-    width: 80,
+    width: 90,
     render: (_: any, record: any) => (
-      <button
-        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
-        onClick={e => {
-          e.stopPropagation();
+      <Button
+        style={{
+          background: '#18c964',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 8,
+          padding: '8px 24px',
+          fontWeight: 500,
+          boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
+          display: 'block',
+          margin: '0 auto',
+        }}
+        onClick={() => {
           blowOffValveStore.setSelectedRow(record);
           blowOffValveStore.setModalOpen(true);
         }}
         title="View Details"
       >
-        <span style={{ fontSize: 16 }}>👁️</span>
-        <span style={{ fontWeight: 500 }}>View</span>
-      </button>
+        View
+      </Button>
     ),
   },
 ];
+// ...existing code...
 
 const BlowOffValve = observer(() => {
   // Fetch API data on mount

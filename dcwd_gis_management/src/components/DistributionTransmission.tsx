@@ -36,18 +36,15 @@ const DistributionTransmission = observer(() => {
       key: 'action',
       width: 90,
       render: (_: any, record: any) => (
-        <Space>
-          <Button
-            className="btn-action-circle"
-            icon={<SettingOutlined />}
-            onClick={() => {
-              distributionTransmissionStore.setSelectedAssetId(record.id);
-              distributionTransmissionStore.setModalOpen(true);
-            }}
-          />
-          <Button className="btn-info-circle" icon={<InfoCircleOutlined />} />
-        </Space>
-
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => {
+            distributionTransmissionStore.setSelectedAssetId(record.id);
+            distributionTransmissionStore.setModalOpen(true);
+          }}
+        >
+          View
+        </button>
       ),
     },
   ];

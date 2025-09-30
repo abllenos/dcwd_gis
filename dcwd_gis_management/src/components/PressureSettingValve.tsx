@@ -1,8 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { Card, Typography, Space, Select, Input, Table, Button } from 'antd';
+import { Card, Typography, Select, Input, Table, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { UnorderedListOutlined } from '@ant-design/icons';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
 import PressureSettingValveDetailsModal from './modal/PressureSettingValveDetailsModal';
 
@@ -49,7 +48,7 @@ const PressureSettingValve: React.FC = observer(() => {
 
   // State for details modal
   const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
-  const [detailsRecord, setDetailsRecord] = React.useState<PSVRecord | null>(null);
+  const [detailsRecord] = React.useState<PSVRecord | null>(null);
 
   const columns: ColumnsType<PSVRecord> = [
     {
@@ -71,11 +70,22 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-
-        <Button className="btn-action-circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}>
-          <UnorderedListOutlined />
+        <Button
+          style={{
+            background: '#18c964',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 24px',
+            fontWeight: 500,
+            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
+            display: 'block',
+            margin: '0 auto',
+          }}
+          onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}
+        >
+          View
         </Button>
-
       ),
     },
   ];

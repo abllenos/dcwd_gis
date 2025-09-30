@@ -10,6 +10,7 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 import { dashboardStore } from "../stores/dashboardStore";
+import { getCustomerStat } from '../api/getCustomerStat';
 import "../styles/Home.css";
 
 const { Text, Title } = Typography;
@@ -59,7 +60,7 @@ const Home: React.FC = observer(() => {
                   <div className="stat-info">
                     <Text className="stat-label">Total Customers</Text>
                     <Statistic 
-                      value={dashboardStore.summary.dispatched || 15847} 
+                      value={dashboardStore.summary.customer || 15847} 
                       className="stat-number"
                     />
                   </div>
