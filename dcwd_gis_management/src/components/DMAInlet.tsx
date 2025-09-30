@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 
 
 import { observer } from 'mobx-react-lite';
@@ -39,15 +40,25 @@ const DMAInlet = observer(() => {
       key: 'action',
       width: 90,
       render: (_: any, record: any) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+        <Button
+          style={{
+            background: '#18c964',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 24px',
+            fontWeight: 500,
+            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
+            display: 'block',
+            margin: '0 auto',
+          }}
           onClick={() => {
             dmaInletStore.setSelectedAssetId(record.id);
             dmaInletStore.setModalOpen(true);
           }}
         >
           View
-        </button>
+        </Button>
       ),
     },
   ];

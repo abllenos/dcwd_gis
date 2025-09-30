@@ -70,11 +70,22 @@ const PressureSettingValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PSVRecord) => (
-
-        <Button className="btn-action-circle" onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}>
+        <Button
+          style={{
+            background: '#18c964',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 24px',
+            fontWeight: 500,
+            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
+            display: 'block',
+            margin: '0 auto',
+          }}
+          onClick={() => { psvStore.setSelected(_record); psvStore.setModalVisible(true); }}
+        >
           View
         </Button>
-
       ),
     },
   ];

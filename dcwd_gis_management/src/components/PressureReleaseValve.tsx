@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Card, Typography, Table, Spin, Alert, Input } from 'antd';
+import { Card, Typography, Table, Spin, Alert, Input, Button } from 'antd';
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -57,11 +57,22 @@ const PressureReleaseValve: React.FC = observer(() => {
       key: 'actions',
       width: 80,
       render: (_: any, _record: PressureReleaseValveRecord) => (
-
-        <button aria-label="actions" className="btn-action-circle" onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}>
+        <Button
+          style={{
+            background: '#18c964',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 24px',
+            fontWeight: 500,
+            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
+            display: 'block',
+            margin: '0 auto',
+          }}
+          onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}
+        >
           View
-
-        </button>
+        </Button>
       ),
     },
   ];
