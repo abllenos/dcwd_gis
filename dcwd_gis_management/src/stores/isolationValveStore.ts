@@ -2,6 +2,9 @@ import { makeAutoObservable } from "mobx";
 
 class IsolationValveStore {
   pageSize = 10;
+  currentPage = 1;
+  setCurrentPage(page: number) { this.currentPage = page; }
+  setPageSize(size: number) { this.pageSize = size; this.currentPage = 1; }
   search = '';
   modalVisible = false;
   editModalVisible = false;
@@ -11,7 +14,6 @@ class IsolationValveStore {
     makeAutoObservable(this);
   }
 
-  setPageSize(val: number) { this.pageSize = val; }
   setSearch(val: string) { this.search = val; }
   setModalVisible(val: boolean) { this.modalVisible = val; }
   setEditModalVisible(val: boolean) { this.editModalVisible = val; }

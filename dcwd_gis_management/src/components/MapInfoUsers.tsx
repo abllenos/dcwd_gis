@@ -112,19 +112,26 @@ const MapInfoUsers = observer(() => {
     mapInfoUsersStore.fetchUsers();
   }, []);
 
+  const { currentPage, pageSize, setCurrentPage, search } = mapInfoUsersStore;
   const filteredUsers = mapInfoUsersStore.users.filter(
     u =>
-      (u.software?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
-      (u.department?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase()) ||
-      (u.computerName?.toLowerCase() ?? '').includes(mapInfoUsersStore.search.toLowerCase())
+      (u.software?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (u.department?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (u.computerName?.toLowerCase() ?? '').includes(search.toLowerCase())
   );
-  const tableData = filteredUsers.map((u, idx) => ({
+  // Manual pagination logic
+  const totalItems = filteredUsers.length;
+  const pageCount = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedData = filteredUsers.slice(startIndex, endIndex);
+  const tableData = paginatedData.map((u, idx) => ({
   ...mapApiUserToTableRow(u, idx),
   onShowModal: (user: ReturnType<typeof mapApiUserToTableRow>) => { setSelectedUser(user); setModalVisible(true); }
   }));
 
   return (
-    <div>
+    <>
       <Card style={{ marginBottom: 24, background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
         <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
           <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Create / Update Registered Users</Title>
@@ -156,50 +163,54 @@ const MapInfoUsers = observer(() => {
             </Button>
           </Col>
         </Row>
-      </Card>
-      <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>List of Registered Users</Title>
-        </div>
-        <div style={{ marginBottom: 8 }}>
-          <Button style={{ marginRight: 8 }}>All Users</Button>
-        </div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 16 }}>
-          <span>Display</span>
-          <Select
-            value={mapInfoUsersStore.pageSize}
-            onChange={mapInfoUsersStore.setPageSize.bind(mapInfoUsersStore)}
-            style={{ width: 80 }}
-            options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
-          />
-          <span>records per page</span>
-          <div style={{ flex: 1 }} />
           <span>Search:</span>
-          <Input
-            value={mapInfoUsersStore.search}
-            onChange={e => mapInfoUsersStore.setSearch(e.target.value)}
-            style={{ width: 260 }}
+          <Input.Search
+            placeholder="Search..."
+            size="small"
             allowClear
+            enterButton
+            value={search}
+            onChange={e => { mapInfoUsersStore.setSearch(e.target.value); setCurrentPage(1); }}
+            style={{ width: 200 }}
           />
         </div>
-        {mapInfoUsersStore.loading ? (
-          <div style={{ color: '#2563eb', fontWeight: 600, marginBottom: 16 }}>Loading...</div>
-        ) : mapInfoUsersStore.error ? (
-          <div style={{ color: 'red', fontWeight: 600, marginBottom: 16 }}>Error: {mapInfoUsersStore.error}</div>
-        ) : (
-          <Table
-            bordered
-            rowKey="key"
-            columns={columns}
-            dataSource={tableData}
-            pagination={{ pageSize: mapInfoUsersStore.pageSize, showSizeChanger: false }}
-            style={{ background: '#fff', borderRadius: 8 }}
-          />
-        )}
+        <Table
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={tableData}
+          pagination={false}
+          style={{ background: '#fff', borderRadius: 8 }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
+          <span style={{ fontSize: 12 }}>
+            Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+          </span>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <button
+              disabled={currentPage === 1}
+              style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >Previous</button>
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map(pageNum => (
+              <button
+                key={pageNum}
+                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
+                onClick={() => setCurrentPage(pageNum)}
+              >{pageNum}</button>
+            ))}
+            <button
+              disabled={currentPage === pageCount || pageCount === 0}
+              style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >Next</button>
+          </div>
+        </div>
       </Card>
       <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
       <Footer />
-    </div>
+    </>
   );
 });
 

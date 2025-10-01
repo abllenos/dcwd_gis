@@ -45,11 +45,12 @@ const PressureSettingValve: React.FC = observer(() => {
   const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
   const [detailsRecord] = React.useState<PSVRecord | null>(null);
 
+  const { currentPage, pageSize, setCurrentPage, filteredData } = psvStore;
   const columns: ColumnsType<PSVRecord> = [
     {
       title: '#',
       key: 'index',
-      render: (_text, _record, index) => index + 1,
+      render: (_text, _record, index) => (currentPage - 1) * pageSize + index + 1,
       width: 60,
     },
     { title: 'PSV Number', dataIndex: 'psv_number', key: 'psv_number' },
@@ -107,16 +108,65 @@ const PressureSettingValve: React.FC = observer(() => {
             </div>
           </div>
 
-          {!psvStore.isLoading && !psvStore.error && (
-            <Table
-              columns={columns}
-              dataSource={psvStore.filteredData}
-              pagination={{ pageSize: psvStore.pageSize }}
-              rowKey={(r) => r.psv_number}
-              onRow={(record) => ({ onDoubleClick: () => { psvStore.setSelected(record); psvStore.setModalVisible(true); } })}
-              bordered
-            />
-          )}
+          {!psvStore.isLoading && !psvStore.error && (() => {
+            // Manual pagination logic
+            const totalItems = filteredData.length;
+            const pageCount = Math.ceil(totalItems / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, totalItems);
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+            const getPageNumbers = () => {
+              const pages = [];
+              const maxVisiblePages = 5;
+              if (pageCount <= maxVisiblePages) {
+                for (let i = 1; i <= pageCount; i++) pages.push(i);
+              } else {
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                for (let i = startPage; i <= endPage; i++) pages.push(i);
+              }
+              return pages;
+            };
+
+            return <>
+              <Table
+                columns={columns}
+                dataSource={paginatedData}
+                pagination={false}
+                rowKey={(r) => r.psv_number}
+                onRow={(record) => ({ onDoubleClick: () => { psvStore.setSelected(record); psvStore.setModalVisible(true); } })}
+                bordered
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
+                <span style={{ fontSize: 12 }}>
+                  Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                </span>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button
+                    disabled={currentPage === 1}
+                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >Previous</button>
+                  {getPageNumbers().map(pageNum => (
+                    <button
+                      key={pageNum}
+                      style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >{pageNum}</button>
+                  ))}
+                  <button
+                    disabled={currentPage === pageCount || pageCount === 0}
+                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >Next</button>
+                </div>
+              </div>
+            </>;
+          })()}
 
           <PressureSettingValveModal
             visible={psvStore.modalVisible}
