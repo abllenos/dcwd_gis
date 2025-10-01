@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Table, Input, Spin, Alert, Card, Typography } from "antd";
+import { Table, Input, Spin, Alert, Card, Typography, Button, Space } from "antd";
 const { Title, Text } = Typography;
 import FireHydrantDetailsModal from './modal/FireHydrantDetailsModal';
 import FireHydrantEditModal from './modal/FireHydrantEditModal';
@@ -23,6 +23,37 @@ const FireHydrantList: React.FC = observer(() => {
         fireHydrantListStore.fetchData();
     }, []);
 
+    const handlePageChange = (page: number) => {
+        fireHydrantListStore.setCurrentPage(page);
+    };
+
+    // Simple pagination logic
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalItems);
+    const paginatedUsers = filteredData.slice(startIndex, endIndex);
+
+    // Generate page numbers for pagination
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+        }
+        return pages;
+    };
 
     const columns: ColumnsType<FireHydrant> = [
         {
@@ -63,28 +94,7 @@ const FireHydrantList: React.FC = observer(() => {
     if (error)
         return <Alert message="Error" description={error.message || String(error)} type="error" showIcon />;
 
-        // Manual pagination logic
-        const totalItems = filteredData.length;
-        const pageCount = Math.ceil(totalItems / pageSize);
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, totalItems);
-        const paginatedData = filteredData.slice(startIndex, endIndex);
 
-        const getPageNumbers = () => {
-            const pages = [];
-            const maxVisiblePages = 5;
-            if (pageCount <= maxVisiblePages) {
-                for (let i = 1; i <= pageCount; i++) pages.push(i);
-            } else {
-                let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
-                if (endPage - startPage < maxVisiblePages - 1) {
-                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                }
-                for (let i = startPage; i <= endPage; i++) pages.push(i);
-            }
-            return pages;
-        };
 
         return (
             <>
@@ -117,7 +127,8 @@ const FireHydrantList: React.FC = observer(() => {
                         </div>
 
                         <Table
-                            dataSource={paginatedData}
+                            key={`page-${currentPage}`}
+                            dataSource={paginatedUsers}
                             columns={columns}
                             rowKey="assetid"
                             pagination={false}
@@ -128,29 +139,26 @@ const FireHydrantList: React.FC = observer(() => {
                                 },
                             })}
                         />
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
                             <span style={{ fontSize: 12 }}>
                                 Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
                             </span>
-                            <div style={{ display: 'flex', gap: 4 }}>
-                                <button
-                                    disabled={currentPage === 1}
-                                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                                    onClick={() => setCurrentPage(currentPage - 1)}
-                                >Previous</button>
-                                {getPageNumbers().map(pageNum => (
-                                    <button
-                                        key={pageNum}
-                                        style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
-                                        onClick={() => setCurrentPage(pageNum)}
-                                    >{pageNum}</button>
-                                ))}
-                                <button
-                                    disabled={currentPage === pageCount || pageCount === 0}
-                                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
-                                    onClick={() => setCurrentPage(currentPage + 1)}
-                                >Next</button>
-                            </div>
+                            <Space>
+                                <Button size="small" disabled={currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(currentPage - 1)}>Previous</Button>
+                                {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                                    <Button 
+                                        key={pageNum} 
+                                        size="small" 
+                                        type={pageNum === currentPage ? 'primary' : 'default'} 
+                                        onClick={() => handlePageChange(pageNum)}
+                                    >
+                                        {pageNum}
+                                    </Button>
+                                )) : (
+                                    <Button size="small" disabled>1</Button>
+                                )}
+                                <Button size="small" disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(currentPage + 1)}>Next</Button>
+                            </Space>
                         </div>
                         <FireHydrantDetailsModal
                             visible={fireHydrantListStore.detailsModalVisible}

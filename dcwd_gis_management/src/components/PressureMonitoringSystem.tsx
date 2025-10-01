@@ -47,7 +47,7 @@ const PressureMonitoringSystem = observer(() => {
       dataIndex: 'id',
       sorter: (a: any, b: any) => a.id - b.id,
       width: 60,
-      render: (_: any, _record: PMSRecord, index) => (currentPage - 1) * pageSize + index + 1,
+      render: (_: any, _record: PMSRecord, index: number) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: 'PMS Number',

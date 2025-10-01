@@ -1,7 +1,7 @@
-import { Button } from 'antd';
+// Removed unused Button import
 import Footer from './layout/Footer';
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Spin, Alert } from 'antd';
+import { Card, Typography, Table, Select, Input } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 
@@ -29,7 +29,7 @@ const DMAInlet = observer(() => {
 
   const { currentPage, pageSize, setCurrentPage, search } = dmaInletStore;
   const columns = [
-    { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id, render: (_: any, _record: any, index) => (currentPage - 1) * pageSize + index + 1 },
+  { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id, render: (_: any, _record: any, index: number) => (currentPage - 1) * pageSize + index + 1 },
     { title: 'WO Number', dataIndex: 'woNumber' },
     { title: 'Project Title', dataIndex: 'projectTitle' },
     { title: 'Size', dataIndex: 'size', width: 80 },
