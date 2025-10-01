@@ -16,6 +16,7 @@ class PsvStore {
   isLoading = false;
   error: any = null;
   pageSize = 10;
+  currentPage = 1;
   search = '';
   modalVisible = false;
   selected: PSVRecord | null = null;
@@ -26,6 +27,10 @@ class PsvStore {
 
   setPageSize(size: number) {
     this.pageSize = size;
+    this.currentPage = 1;
+  }
+  setCurrentPage(page: number) {
+    this.currentPage = page;
   }
 
   setSearch(value: string) {

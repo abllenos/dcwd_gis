@@ -1,8 +1,7 @@
-import { Button } from 'antd';
-
-
+// Removed unused Button import
+import Footer from './layout/Footer';
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Spin, Alert } from 'antd';
+import { Card, Typography, Table, Select, Input } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 
@@ -28,8 +27,9 @@ const DMAInlet = observer(() => {
     { id: 10, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 100, type: 'PVC', length: 34.247 },
   ];
 
+  const { currentPage, pageSize, setCurrentPage, search } = dmaInletStore;
   const columns = [
-    { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id },
+  { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id, render: (_: any, _record: any, index: number) => (currentPage - 1) * pageSize + index + 1 },
     { title: 'WO Number', dataIndex: 'woNumber' },
     { title: 'Project Title', dataIndex: 'projectTitle' },
     { title: 'Size', dataIndex: 'size', width: 80 },
@@ -38,38 +38,54 @@ const DMAInlet = observer(() => {
     {
       title: 'Action',
       key: 'action',
-      width: 90,
+      width: 80,
+      align: 'center' as const,
       render: (_: any, record: any) => (
-        <Button
-          style={{
-            background: '#18c964',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '8px 24px',
-            fontWeight: 500,
-            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
-            display: 'block',
-            margin: '0 auto',
-          }}
-          onClick={() => {
-            dmaInletStore.setSelectedAssetId(record.id);
-            dmaInletStore.setModalOpen(true);
-          }}
-        >
-          View
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <button
+            className="license-table-action-button"
+            onClick={() => {
+              dmaInletStore.setSelectedAssetId(record.id);
+              dmaInletStore.setModalOpen(true);
+            }}
+            title="View Details"
+          >
+          </button>
+        </div>
       ),
     },
   ];
 
     const filteredData = initialData.filter(
       row =>
-        row.woNumber.toLowerCase().includes(dmaInletStore.search.toLowerCase()) ||
-        row.projectTitle.toLowerCase().includes(dmaInletStore.search.toLowerCase()) ||
-        String(row.size).includes(dmaInletStore.search) ||
-        row.type.toLowerCase().includes(dmaInletStore.search.toLowerCase())
+        row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
+        row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+        String(row.size).includes(search) ||
+        row.type.toLowerCase().includes(search.toLowerCase())
     );
+
+    // Manual pagination logic
+    const totalItems = filteredData.length;
+    const pageCount = Math.ceil(totalItems / pageSize);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalItems);
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+
+    const getPageNumbers = () => {
+      const pages = [];
+      const maxVisiblePages = 5;
+      if (pageCount <= maxVisiblePages) {
+        for (let i = 1; i <= pageCount; i++) pages.push(i);
+      } else {
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+        if (endPage - startPage < maxVisiblePages - 1) {
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        for (let i = startPage; i <= endPage; i++) pages.push(i);
+      }
+      return pages;
+    };
 
 
   return (
@@ -107,23 +123,43 @@ const DMAInlet = observer(() => {
           bordered
           rowKey="id"
           columns={columns}
-          dataSource={filteredData}
-          pagination={{
-            current: 1,
-            pageSize: dmaInletStore.pageSize,
-            total: filteredData.length,
-            showSizeChanger: false,
-          }}
+          dataSource={paginatedData}
+          pagination={false}
           style={{ background: '#fff', borderRadius: 8 }}
         />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
+          <span style={{ fontSize: 12 }}>
+            Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+          </span>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <button
+              disabled={currentPage === 1}
+              style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >Previous</button>
+            {getPageNumbers().map(pageNum => (
+              <button
+                key={pageNum}
+                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
+                onClick={() => setCurrentPage(pageNum)}
+              >{pageNum}</button>
+            ))}
+            <button
+              disabled={currentPage === pageCount || pageCount === 0}
+              style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >Next</button>
+          </div>
+        </div>
       </Card>
-        <PipeConditionAssessmentModal
-          open={dmaInletStore.modalOpen}
-          onClose={() => dmaInletStore.setModalOpen(false)}
-          assetId={dmaInletStore.selectedAssetId}
-        />
-      </>
-    );
+      <PipeConditionAssessmentModal
+        open={dmaInletStore.modalOpen}
+        onClose={() => dmaInletStore.setModalOpen(false)}
+        assetId={dmaInletStore.selectedAssetId}
+      />
+      <Footer />
+    </>
+  );
 });
 
 export default DMAInlet;

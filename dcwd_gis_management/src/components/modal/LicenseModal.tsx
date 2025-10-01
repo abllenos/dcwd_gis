@@ -124,7 +124,20 @@ const LicenseModal: React.FC<LicenseModalProps> = observer(() => {
                 </Col>
                 <Col>
                   <Typography.Text>Search: </Typography.Text>
-                  <Input size="small" style={{ width: 200, marginLeft: 8 }} />
+                  <Input.Search
+                    size="small"
+                    placeholder=""
+                    style={{ width: 200, marginLeft: 8 }}
+                    enterButton
+                    onSearch={(value) => {
+                      // Add search functionality here if needed
+                      console.log('Search value:', value);
+                    }}
+                    onChange={(e) => {
+                      // Add onChange functionality here if needed
+                      console.log('Search change:', e.target.value);
+                    }}
+                  />
                 </Col>
               </Row>
             </div>

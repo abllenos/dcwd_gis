@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { devApi } from '../components/endpoints/Interceptor';
+import { apiGis } from '../components/endpoints/Interceptor';
 import type { LogRecord, LayerOption, DebugStatus } from './logTypes';
 import { defaultLayerOptions, parseMaybeJson, preferredPaths, tryKeys, deepFindArray, mapToLogRecord } from './logUtils';
 
@@ -115,11 +115,11 @@ export class LogStore {
     try {
       const layerId = this.selectedLayer ?? 1;
       const path = 'admin/logtrails/get';
-      const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
+      const base = (apiGis.defaults.baseURL ?? '').replace(/\/$/, '');
       const pageIndex = this.currentPage;
       const pageSize = this.pageSize;
       const fullUrl = `${base}/${path}?LayerID=${layerId}&PageIndex=${pageIndex}&PageSize=${pageSize}`;
-      const resp = await devApi.get(path, {
+      const resp = await apiGis.get(path, {
         params: { LayerID: layerId, PageIndex: pageIndex, PageSize: pageSize },
         headers: { Accept: 'text/plain' },
       });
@@ -232,7 +232,7 @@ export class LogStore {
       const hasResponse = !!maybeResp;
       const maybeMessage = (err as { message?: string }).message;
       const layerId = this.selectedLayer ?? 1;
-      const base = (devApi.defaults.baseURL ?? '').replace(/\/$/, '');
+      const base = (apiGis.defaults.baseURL ?? '').replace(/\/$/, '');
       const fullUrl = `${base}/admin/logtrails/get?LayerID=${layerId}`;
       runInAction(() => {
         this.error = hasResponse ? null : (maybeMessage ?? 'Failed to reach API');
