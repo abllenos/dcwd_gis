@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Table, Input, Spin, Alert, Card, Typography } from "antd";
+import { Table, Input, Spin, Alert, Card, Typography, Button, Space, Select } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
 import type { ColumnsType } from "antd/es/table";
@@ -36,7 +36,7 @@ const IsolationValveList: React.FC = observer(() => {
         queryFn: fetchIsolationValve,
     });
 
-    const { currentPage, pageSize, setCurrentPage } = isolationValveStore;
+    const { currentPage, pageSize } = isolationValveStore;
 
         const filteredData = useMemo(() => {
                 if (!data) return [];
@@ -55,30 +55,60 @@ const IsolationValveList: React.FC = observer(() => {
                 );
         }, [data, isolationValveStore.search]);
 
-        // Manual pagination logic
-        const totalItems = filteredData.length;
-        const pageCount = Math.ceil(totalItems / pageSize);
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, totalItems);
-        const paginatedData = filteredData.slice(startIndex, endIndex);
+    // Pagination helpers (License.tsx style)
+    const handlePageSizeChange = (value: string) => {
+        const newPageSize = parseInt(value);
+        const newTotalPages = Math.ceil(filteredData.length / newPageSize);
+        isolationValveStore.setPageSize(newPageSize);
+        // Adjust current page if it would be out of bounds with the new page size
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+            isolationValveStore.setCurrentPage(newTotalPages);
+        } else if (newTotalPages === 0) {
+            isolationValveStore.setCurrentPage(1);
+        }
+    };
 
-        const getPageNumbers = () => {
-            const pages = [];
-            const maxVisiblePages = 5;
-            if (pageCount <= maxVisiblePages) {
-                for (let i = 1; i <= pageCount; i++) pages.push(i);
-            } else {
-                let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
-                if (endPage - startPage < maxVisiblePages - 1) {
-                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                }
-                for (let i = startPage; i <= endPage; i++) pages.push(i);
+    const handlePageChange = (page: number) => {
+        const totalPages = Math.ceil(filteredData.length / isolationValveStore.pageSize);
+        // Ensure page is within valid bounds
+        if (page >= 1 && page <= totalPages) {
+            isolationValveStore.setCurrentPage(page);
+        }
+    };
+
+    const handleSearch = (value: string) => {
+        isolationValveStore.setSearch(value);
+        isolationValveStore.setCurrentPage(1); // Reset to first page when searching
+    };
+
+    // Simple pagination logic (License.tsx style)
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / isolationValveStore.pageSize);
+    const startIndex = (isolationValveStore.currentPage - 1) * isolationValveStore.pageSize;
+    const endIndex = Math.min(startIndex + isolationValveStore.pageSize, totalItems);
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+
+    // Generate page numbers for pagination (License.tsx style)
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        const currentPage = isolationValveStore.currentPage;
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
             }
-            return pages;
-        };
-
-    // State for modals and selected record now in MobX store
+        } else {
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+        }
+        return pages;
+    };    // State for modals and selected record now in MobX store
 
     const columns: ColumnsType<IsolationValve> = [
         {
@@ -116,88 +146,104 @@ const IsolationValveList: React.FC = observer(() => {
     if (error instanceof Error) return <Alert message="Error" description={error.message} type="error" showIcon/>;
 
         return (
-            <>
-                <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-                    <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-                        <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
-                    </div>
-                    <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
-                        <div style={{ marginBottom: 4 }}>
-                            <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
-                                Instructions:
-                            </Title>
-                            <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
-                        </div>
-                        {/* Search bar aligned right with matching icon */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16 }}>
-                            <Text style={{ marginRight: 8 }}>Search:</Text>
-                            <Input.Search
-                                placeholder="Search "
-                                value={isolationValveStore.search}
-                                onChange={(e) => {
-                                    isolationValveStore.setSearch(e.target.value);
-                                }}
-                                style={{ width: 200 }}
-                                size="small"
-                                enterButton
+                <>
+                    <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+                        <Card style={{ background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
+                            <div style={{ background: '#e9edfa', borderRadius: 8, padding: '18px 32px 12px 32px', marginBottom: 24 }}>
+                                <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <Text strong>Instructions:</Text>
+                                <div style={{ marginLeft: 12, marginTop: 2 }}>
+                                    <Text>Instruction: Double Click row to edit Details.</Text>
+                                </div>
+                            </div>
+                            <div className="license-controls-container">
+                                <div className="license-display-controls">
+                                    <Text className="license-control-text">Display</Text>
+                                    <Select
+                                        value={isolationValveStore.pageSize.toString()}
+                                        onChange={handlePageSizeChange}
+                                        size="small"
+                                        style={{ width: 80 }}
+                                        options={[
+                                            { value: '10', label: '10' },
+                                            { value: '25', label: '25' },
+                                            { value: '50', label: '50' },
+                                            { value: '100', label: '100' }
+                                        ]}
+                                    />
+                                    <Text className="license-control-text">records per page</Text>
+                                </div>
+                                <div className="license-search-controls">
+                                    <Text className="license-control-text">Search:</Text>
+                                    <Input.Search
+                                        size="small"
+                                        placeholder=""
+                                        style={{ width: 200 }}
+                                        enterButton
+                                        onSearch={handleSearch}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <Table
+                                key={`isolation-table-page-${isolationValveStore.currentPage}-size-${isolationValveStore.pageSize}`}
+                                bordered
+                                rowKey={record => `isolation-${record.gvnumber}-${record.wonumber}-${record.location}`}
+                                columns={columns}
+                                dataSource={paginatedData}
+                                pagination={false}
+                                style={{ background: '#fff', borderRadius: 8 }}
+                                onRow={record => ({
+                                    onDoubleClick: () => {
+                                        isolationValveStore.setSelected(record);
+                                        isolationValveStore.setEditModalVisible(true);
+                                    }
+                                })}
                             />
-                        </div>
-                                                <Table
-                                                        columns={columns}
-                                                        dataSource={paginatedData}
-                                                        pagination={false}
-                                                        rowKey={(record) => record.gvnumber + record.wonumber}
-                                                        onRow={(record) => ({
-                                                                onDoubleClick: () => {
-                                                                        isolationValveStore.setSelected(record);
-                                                                        isolationValveStore.setEditModalVisible(true);
-                                                                }
-                                                        })}
-                                                />
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
-                                                    <span style={{ fontSize: 12 }}>
-                                                        Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-                                                    </span>
-                                                    <div style={{ display: 'flex', gap: 4 }}>
-                                                        <button
-                                                            disabled={currentPage === 1}
-                                                            style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                                                            onClick={() => setCurrentPage(currentPage - 1)}
-                                                        >Previous</button>
-                                                        {getPageNumbers().map(pageNum => (
-                                                            <button
-                                                                key={pageNum}
-                                                                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
-                                                                onClick={() => setCurrentPage(pageNum)}
-                                                            >{pageNum}</button>
-                                                        ))}
-                                                        <button
-                                                            disabled={currentPage === pageCount || pageCount === 0}
-                                                            style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
-                                                            onClick={() => setCurrentPage(currentPage + 1)}
-                                                        >Next</button>
-                                                    </div>
-                                                </div>
-                    </Card>
-                    {/* Modals */}
-                    <IsolationValveDetailsModal
-                        visible={isolationValveStore.modalVisible}
-                        record={isolationValveStore.selected}
-                        onCancel={() => isolationValveStore.setModalVisible(false)}
-                    />
-                    <IsolationValveEditModal
-                        visible={isolationValveStore.editModalVisible}
-                        record={isolationValveStore.selected}
-                        onCancel={() => isolationValveStore.setEditModalVisible(false)}
-                        onUpdate={(values) => {
-                            // handle update logic here
-                            isolationValveStore.setSelected({ ...isolationValveStore.selected, ...values });
-                            isolationValveStore.setEditModalVisible(false);
-                        }}
-                    />
-                </div>
-                <Footer />
-            </>
+                            {/* Pagination (License.tsx style) */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                                    {isolationValveStore.search && ` (filtered from ${data?.length || 0} total entries)`}
+                                </Text>
+                                <Space>
+                                    <Button size="small" disabled={isolationValveStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(isolationValveStore.currentPage - 1)}>Previous</Button>
+                                    {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                                        <Button 
+                                            key={pageNum} 
+                                            size="small" 
+                                            type={pageNum === isolationValveStore.currentPage ? 'primary' : 'default'} 
+                                            onClick={() => handlePageChange(pageNum)}
+                                        >
+                                            {pageNum}
+                                        </Button>
+                                    )) : (
+                                        <Button size="small" disabled>1</Button>
+                                    )}
+                                    <Button size="small" disabled={isolationValveStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(isolationValveStore.currentPage + 1)}>Next</Button>
+                                </Space>
+                            </div>
+                        </Card>
+                        {/* Modals */}
+                        <IsolationValveDetailsModal
+                            visible={isolationValveStore.modalVisible}
+                            record={isolationValveStore.selected}
+                            onCancel={() => isolationValveStore.setModalVisible(false)}
+                        />
+                        <IsolationValveEditModal
+                            visible={isolationValveStore.editModalVisible}
+                            record={isolationValveStore.selected}
+                            onCancel={() => isolationValveStore.setEditModalVisible(false)}
+                            onUpdate={values => {
+                                isolationValveStore.setSelected({ ...isolationValveStore.selected, ...values });
+                                isolationValveStore.setEditModalVisible(false);
+                            }}
+                        />
+                    </div>
+                    <Footer />
+                </>
         );
 });
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Card, Typography, Select, Input, Table, Button } from 'antd';
+import { Card, Typography, Select, Input, Table, Button, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
 import PressureSettingValveDetailsModal from './modal/PressureSettingValveDetailsModal';
@@ -45,7 +45,33 @@ const PressureSettingValve: React.FC = observer(() => {
   const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
   const [detailsRecord] = React.useState<PSVRecord | null>(null);
 
-  const { currentPage, pageSize, setCurrentPage, filteredData } = psvStore;
+  const { currentPage, pageSize, filteredData } = psvStore;
+  
+  // Pagination helpers (License.tsx style)
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value);
+    const newTotalPages = Math.ceil(filteredData.length / newPageSize);
+    psvStore.setPageSize(newPageSize);
+    // Adjust current page if it would be out of bounds with the new page size
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      psvStore.setCurrentPage(newTotalPages);
+    } else if (newTotalPages === 0) {
+      psvStore.setCurrentPage(1);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    const totalPages = Math.ceil(filteredData.length / psvStore.pageSize);
+    // Ensure page is within valid bounds
+    if (page >= 1 && page <= totalPages) {
+      psvStore.setCurrentPage(page);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    psvStore.setSearch(value);
+    psvStore.setCurrentPage(1); // Reset to first page when searching
+  };
   const columns: ColumnsType<PSVRecord> = [
     {
       title: '#',
@@ -98,72 +124,97 @@ const PressureSettingValve: React.FC = observer(() => {
 
           <div className="license-controls-container">
             <div className="license-display-controls">
-              <span>Display</span>
-              <Select value={String(psvStore.pageSize)} onChange={(v: string) => psvStore.setPageSize(Number(v))} size="small" style={{ width: 90 }} options={[{label:'10',value:'10'},{label:'25',value:'25'},{label:'50',value:'50'}]} />
-              <span>records per page</span>
+              <Text className="license-control-text">Display</Text>
+              <Select
+                value={psvStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
+              />
+              <Text className="license-control-text">records per page</Text>
             </div>
             <div className="license-search-controls">
-              <span>Search:</span>
-              <Search placeholder="Search..." allowClear enterButton onSearch={(v: string) => psvStore.setSearch(v)} size="small" style={{ width: 200 }} />
+              <Text className="license-control-text">Search:</Text>
+              <Input.Search
+                size="small"
+                placeholder=""
+                style={{ width: 200 }}
+                enterButton
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
             </div>
           </div>
 
-          {!psvStore.isLoading && !psvStore.error && (() => {
-            // Manual pagination logic
+          {(() => {
+            // Simple pagination logic (License.tsx style)
             const totalItems = filteredData.length;
-            const pageCount = Math.ceil(totalItems / pageSize);
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = Math.min(startIndex + pageSize, totalItems);
+            const totalPages = Math.ceil(totalItems / psvStore.pageSize);
+            const startIndex = (psvStore.currentPage - 1) * psvStore.pageSize;
+            const endIndex = Math.min(startIndex + psvStore.pageSize, totalItems);
             const paginatedData = filteredData.slice(startIndex, endIndex);
 
+            // Generate page numbers for pagination (License.tsx style)
             const getPageNumbers = () => {
               const pages = [];
               const maxVisiblePages = 5;
-              if (pageCount <= maxVisiblePages) {
-                for (let i = 1; i <= pageCount; i++) pages.push(i);
+              const currentPage = psvStore.currentPage;
+              if (totalPages <= maxVisiblePages) {
+                for (let i = 1; i <= totalPages; i++) {
+                  pages.push(i);
+                }
               } else {
                 let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
                 if (endPage - startPage < maxVisiblePages - 1) {
                   startPage = Math.max(1, endPage - maxVisiblePages + 1);
                 }
-                for (let i = startPage; i <= endPage; i++) pages.push(i);
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(i);
+                }
               }
               return pages;
             };
 
             return <>
               <Table
+                key={`psv-table-page-${psvStore.currentPage}-size-${psvStore.pageSize}`}
                 columns={columns}
                 dataSource={paginatedData}
                 pagination={false}
-                rowKey={(r) => r.psv_number}
+                rowKey={(r) => `psv-${r.psv_number}-${r.accountnumber}`}
                 onRow={(record) => ({ onDoubleClick: () => { psvStore.setSelected(record); psvStore.setModalVisible(true); } })}
                 bordered
+                style={{ background: '#fff', borderRadius: 8 }}
               />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
-                <span style={{ fontSize: 12 }}>
+              {/* Pagination (License.tsx style) */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+                <Text style={{ fontSize: 12 }}>
                   Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-                </span>
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <button
-                    disabled={currentPage === 1}
-                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >Previous</button>
-                  {getPageNumbers().map(pageNum => (
-                    <button
-                      key={pageNum}
-                      style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
-                      onClick={() => setCurrentPage(pageNum)}
-                    >{pageNum}</button>
-                  ))}
-                  <button
-                    disabled={currentPage === pageCount || pageCount === 0}
-                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >Next</button>
-                </div>
+                  {psvStore.search && ` (filtered from ${psvStore.data?.length || 0} total entries)`}
+                </Text>
+                <Space>
+                  <Button size="small" disabled={psvStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(psvStore.currentPage - 1)}>Previous</Button>
+                  {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                    <Button 
+                      key={pageNum} 
+                      size="small" 
+                      type={pageNum === psvStore.currentPage ? 'primary' : 'default'} 
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  )) : (
+                    <Button size="small" disabled>1</Button>
+                  )}
+                  <Button size="small" disabled={psvStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(psvStore.currentPage + 1)}>Next</Button>
+                </Space>
               </div>
             </>;
           })()}
