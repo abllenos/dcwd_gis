@@ -4,12 +4,14 @@ import type { TablePaginationConfig } from "antd/es/table";
 import { apiGis } from "../components/endpoints/Interceptor";
 
 export interface FireHydrant {
+  id?: string;
   assetid: string;
   location: string;
   barangay: string;
   size: string;
   type_description: string;
   remarks: string;
+  geom?: string; // WKB hex string from PostGIS
 }
 
 

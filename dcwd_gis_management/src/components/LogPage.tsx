@@ -1,13 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
 import type { LogRecord } from '../stores/logTypes';
 import { formatAssetId, safeString } from '../utils/formatters';
 import { logUiStore } from '../stores/logUiStore';
-import { Progress, Space } from 'antd';
 import MapView from './MapView';
 import Footer from './layout/Footer';
 

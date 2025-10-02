@@ -221,29 +221,21 @@ const PressureSettingValve: React.FC = observer(() => {
               </div>
             </>;
           })()}
+        </Card>
+      </div>
 
-          <PressureSettingValveModal
-            visible={psvStore.modalVisible}
-            record={psvStore.selected}
-            onCancel={() => psvStore.setModalVisible(false)}
-            onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
-          />
-        )}
-
-        <PressureSettingValveModal
-          visible={psvStore.modalVisible}
-          record={psvStore.selected}
-          onCancel={() => psvStore.setModalVisible(false)}
-          onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
-        />
-        <PressureSettingValveDetailsModal
-          visible={detailsModalVisible}
-          record={psvStore.selected}
-          onCancel={() => setDetailsModalVisible(false)}
-        />
-      </Card>
-    </div>
-
+      <PressureSettingValveModal
+        visible={psvStore.modalVisible}
+        record={psvStore.selected}
+        onCancel={() => psvStore.setModalVisible(false)}
+        onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
+      />
+      <PressureSettingValveDetailsModal
+        visible={detailsModalVisible}
+        record={psvStore.selected}
+        onCancel={() => setDetailsModalVisible(false)}
+      />
+    </>
   );
 });
 

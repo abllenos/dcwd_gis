@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Select, Row, Col, Button, Typography, Space, Tabs, Table, Card } from "antd";
 import type { FireHydrant } from '../../stores/fireHydrantListStore';
+import GeometryMap from "../GeometryMap";
+import { coordinatesToWKB, parseWKB } from "../../utils/wkbParser";
 
 const { Title } = Typography;
 
@@ -62,9 +64,9 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
       open={visible}
       onCancel={onCancel}
       footer={null}
-      width={900}
+      width={1200}
       style={{ top: 24 }}
-  styles={{ body: { padding: 0 } }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable
     >
@@ -86,8 +88,33 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
                   <Form.Item label="Hydrant Classification" name="hydrant_classification"><Select options={hydrantClassOptions} allowClear /></Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Location Map</label>
+                    {visible && (
+                      <GeometryMap 
+                        key={record?.id || 'new'}
+                        geom={record?.geom} 
+                        height={500}
+                        editable
+                        markerColor="#ff6b6b"
+                        markerLabel="Fire Hydrant"
+                        onLocationChange={(lng: number, lat: number) => {
+                          const wkb = coordinatesToWKB(lng, lat);
+                          form.setFieldsValue({ geom: wkb });
+                        }}
+                      />
+                    )}
+                    <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>
+                      {(() => {
+                        const coords = parseWKB(record?.geom);
+                        return coords 
+                          ? `Current: ${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`
+                          : 'No location data';
+                      })()}
+                    </div>
+                  </div>
                   <Form.Item label="Remarks" name="remarks">
-                    <Input.TextArea rows={8} style={{ resize: 'none' }} />
+                    <Input.TextArea rows={3} style={{ resize: 'none' }} />
                   </Form.Item>
                 </Col>
               </Row>

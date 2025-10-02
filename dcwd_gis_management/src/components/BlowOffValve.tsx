@@ -1,9 +1,8 @@
-import { Button, Space } from 'antd';
+import { Space, Button } from 'antd';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import BlowOffValveModal from './modal/BlowOffValveModal';
 import Footer from './layout/Footer';
-
 import { Table, Input, Select, Typography, Card } from 'antd';
 
 
@@ -44,24 +43,21 @@ const columns = [
     dataIndex: 'brgycode',
   },
   {
-    title: 'Action',
+    title: '',
     key: 'action',
-    width: 150,
+    width: 80,
+    align: 'center' as const,
     render: (_: any, record: any) => (
-      <div style={{ display: 'flex', gap: 8 }}>
-        <Button className="btn-action-circle" icon={<AppstoreOutlined />} />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
-          onClick={e => {
+          className="license-table-action-button"
+          onClick={(e) => {
             e.stopPropagation();
             blowOffValveStore.setSelectedRow(record);
             blowOffValveStore.setModalOpen(true);
           }}
           title="View Details"
         >
-          <span style={{ fontSize: 16 }}>👁️</span>
-          <span style={{ fontWeight: 500 }}>View</span>
-
         </button>
       </div>
     ),
