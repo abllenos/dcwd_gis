@@ -1,13 +1,15 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
 import type { LogRecord } from '../stores/logTypes';
 import { formatAssetId, safeString } from '../utils/formatters';
 import { logUiStore } from '../stores/logUiStore';
+import { Progress, Space } from 'antd';
 import MapView from './MapView';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 
@@ -42,7 +44,12 @@ const LogPage: React.FC = observer(() => {
               <Select
                 value={selectedLayer}
                 style={{ width: '100%', cursor: 'pointer' }}
-                onChange={(val) => logStore.setLayer(val)}
+                onChange={(val) => {
+                  // when changing layer, clear any active search and input
+                  logStore.setLayer(val);
+                  logStore.setSearch('');
+                  layerSearchStore.clear();
+                }}
                 showSearch={false}
                 allowClear={false}
                 options={layerOptions.map(o => ({ label: o.label, value: o.value }))}
@@ -70,49 +77,82 @@ const LogPage: React.FC = observer(() => {
 
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520 }}>
               <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
-              <Input
-                placeholder="Type to filter..."
+              {/* Improved search input: larger, accessible, Escape clears, Enter triggers search */}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Input.Search
+                  placeholder="Search across layers (press Enter to search, Esc to clear)"
+                  value={search}
+                  allowClear
+                  enterButton
+                  size="middle"
+                  aria-label="Search logs"
+                  style={{ width: '100%', minWidth: 240 }}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    logStore.setSearch(v);
+                    if (!v.trim()) {
+                      layerSearchStore.clear();
+                    } else {
+                      layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
+                    }
+                  }}
+                  onSearch={(val) => {
+                    if ((val ?? '').toString().trim()) {
+                      layerSearchStore.start((val ?? '').toString(), selectedLayer ?? 1, logStore.apiFetchPageSize);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      logStore.setSearch('');
+                      layerSearchStore.clear();
+                    }
+                  }}
+                />
 
-                value={search}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  logStore.setSearch(v);
-                  // If emptied (user pressed X), clear any active/pending search and return to paged view
-                  if (!v.trim()) {
-                    layerSearchStore.clear();
-                  } else {
-                    // Debounced auto-start across-layer search
-                    layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
-                  }
-                }}
-                allowClear
-                size="small"
-                enterButton
-                style={{ width: 200 }}
-              />
-              <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <Button
-                  type="default"
-                  disabled={!search.trim()}
-                  loading={layerSearchStore.loading}
-                  onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
-                >
-                  Search
-                </Button>
-                {layerSearchStore.active && (
-                  <Button onClick={() => layerSearchStore.cancel()} danger>
-                    Stop search
+                <Space>
+                  <Button
+                    type="default"
+                    disabled={!search.trim()}
+                    loading={layerSearchStore.loading}
+                    onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
+                  >
+                    Search
+
                   </Button>
-                )}
+                  {layerSearchStore.active && (
+                    <Button onClick={() => layerSearchStore.cancel()} danger>
+                      Stop search
+                    </Button>
+                  )}
+                </Space>
+              </div>
+              {/* Progress / scanned indicator */}
+              <div style={{ marginTop: 8 }}>
                 {layerSearchStore.active && (
-                  <div style={{ color: 'var(--text-muted)' }}>
-                    scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
-                    {typeof layerSearchStore.totalExpected === 'number' && (
-                      <span> • total approx: {layerSearchStore.totalExpected}</span>
-                    )}
-                    {layerSearchStore.results.length > 0 && (
-                      <span> • matches: {layerSearchStore.results.length}</span>
-                    )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <Progress
+                        percent={
+                          typeof layerSearchStore.totalPages === 'number' && layerSearchStore.totalPages > 0
+                            ? Math.min(100, Math.round((layerSearchStore.scannedPages / (layerSearchStore.totalPages || 1)) * 100))
+                            : undefined
+                        }
+                        status={layerSearchStore.loading ? 'active' : 'normal'}
+                        showInfo={false}
+                      />
+                    </div>
+                    <div style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+                      Scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
+                      {typeof layerSearchStore.totalPages === 'number' && (
+                        <span> • Total approx: {layerSearchStore.totalPages} pages</span>
+                      )}
+                      {typeof layerSearchStore.totalPages !== 'number' && typeof layerSearchStore.totalRecords === 'number' && (
+                        <span> • Total approx: {layerSearchStore.totalRecords} records</span>
+                      )}
+                      {layerSearchStore.results.length > 0 && (
+                        <span> • Matches: {layerSearchStore.results.length}</span>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -146,21 +186,33 @@ const LogPage: React.FC = observer(() => {
               onClick: () => logUiStore.open(record),
               style: { cursor: 'pointer' },
             })}
-            pagination={
-              isSearching
-                ? false
-                : {
-                    pageSize: pageSize,
-                    current: currentPage,
-                    total: typeof totalCount === 'number' ? totalCount : 0,
-                    onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); },
-                    showTotal: (total) => `${total} record${total === 1 ? '' : 's'}`
-                  }
-            }
+            pagination={false}
             scroll={{ x: 900 }}
             bordered
             locale={{ emptyText: isSearching ? (layerSearchStore.loading ? 'Searching…' : 'No matches') : 'Empty' }}
+            style={{ marginBottom: 16 }}
           />
+
+          {/* Custom Pagination */}
+          {!isSearching && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
+              <Typography.Text style={{ fontSize: 12 }}>
+                Showing {((currentPage - 1) * pageSize + 1)} to {Math.min(currentPage * pageSize, totalCount || 0)} of {totalCount || 0} entries
+              </Typography.Text>
+              <Space>
+                <Button size="small" disabled={currentPage === 1} onClick={() => logStore.updatePagination(currentPage - 1, pageSize)}>Previous</Button>
+                {Array.from({ length: Math.ceil((totalCount || 0) / pageSize) }).slice(0, 5).map((_, i) => {
+                  const page = i + 1;
+                  return <Button key={page} size="small" type={page === currentPage ? 'primary' : 'default'} onClick={() => logStore.updatePagination(page, pageSize)}>{page}</Button>;
+                })}
+                {Math.ceil((totalCount || 0) / pageSize) > 5 && <Button size="small" disabled>...</Button>}
+                {Math.ceil((totalCount || 0) / pageSize) > 5 && (
+                  <Button size="small" type={currentPage === Math.ceil((totalCount || 0) / pageSize) ? 'primary' : 'default'} onClick={() => logStore.updatePagination(Math.ceil((totalCount || 0) / pageSize), pageSize)}>{Math.ceil((totalCount || 0) / pageSize)}</Button>
+                )}
+                <Button size="small" disabled={currentPage >= Math.ceil((totalCount || 0) / pageSize)} onClick={() => logStore.updatePagination(currentPage + 1, pageSize)}>Next</Button>
+              </Space>
+            </div>
+          )}
         </div>
         {/* Bottom search results table removed; search results now render in the main table above. */}
         <Modal
@@ -201,6 +253,7 @@ const LogPage: React.FC = observer(() => {
         {/* status/progress UI removed as requested */}
 
       </div>
+      <Footer />
     </Card>
   );
 });

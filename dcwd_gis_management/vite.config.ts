@@ -60,6 +60,13 @@ export default defineConfig({
         target: 'http://192.100.140.198',
         changeOrigin: true,
         secure: false,
+      },
+      // Proxy for log trails API
+      '/admin/logtrails': {
+        target: 'https://dev-api.davao-water.gov.ph/dcwd-gis/api/v1',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/admin\/logtrails/, '/admin/logtrails')
       }
     }
   }

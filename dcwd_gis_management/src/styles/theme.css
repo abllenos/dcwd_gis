@@ -1,3 +1,47 @@
+/* Light mode scrollbar styles */
+:root ::-webkit-scrollbar {
+  width: 10px;
+  background: #f5f6fa;
+}
+:root ::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 8px;
+  border: 2px solid #f5f6fa;
+}
+:root ::-webkit-scrollbar-thumb:hover {
+  background: #cccccc;
+}
+:root ::-webkit-scrollbar-corner {
+  background: #f5f6fa;
+}
+
+/* Firefox */
+:root {
+  scrollbar-color: #e0e0e0 #f5f6fa;
+  scrollbar-width: thin;
+}
+/* Dark mode scrollbar styles */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 10px;
+  background: #181818;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 8px;
+  border: 2px solid #181818;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+[data-theme="dark"] ::-webkit-scrollbar-corner {
+  background: #181818;
+}
+
+/* Firefox */
+[data-theme="dark"] {
+  scrollbar-color: #333 #181818;
+  scrollbar-width: thin;
+}
 :root {
   /* DCWD Brand Colors */
   --dcwd-primary: #1890ff;

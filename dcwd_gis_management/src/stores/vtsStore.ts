@@ -4,6 +4,26 @@ import type { RegisteredUser } from "./licenseStore";
 
 export type MapLayerType = 'googleMaps' | 'googleSatellite' | 'googleHybrid' | 'googleTerrain';
 
+// Constants
+const DEFAULTS = {
+  PAGE_SIZE: 10,
+  CURRENT_PAGE: 1,
+  ZOOM_LEVEL: 14,
+  FOCUS_ZOOM: 16,
+  COORDINATE_RADIUS: 0.05, // 5km radius
+  MAX_VISIBLE_PAGES: 3,
+};
+
+const DAVAO_CENTER: [number, number] = [7.0731, 125.6128];
+
+const STATUS_OPTIONS: Array<'online' | 'offline' | 'unknown'> = ['online', 'online', 'online', 'offline', 'unknown'];
+
+const SAMPLE_USERS = [
+  { software: 'MapInfo Professional 19', department: 'Engineering and Construction Department', prefix: 'eng' },
+  { software: 'QGIS', department: 'Production Department', prefix: 'prod' },
+  { software: 'MapInfo Professional 17', department: 'Information and Communication Technology Department', prefix: 'ict' },
+];
+
 export interface VTSUser {
   key: number;
   id: number;
@@ -37,13 +57,13 @@ class VTSStore {
   searchText = '';
   
   // Pagination
-  pageSize = 10;
-  currentPage = 1;
+  pageSize = DEFAULTS.PAGE_SIZE;
+  currentPage = DEFAULTS.CURRENT_PAGE;
   
   // Map state
   mapState: MapState = {
-    center: [7.0731, 125.6128], // Davao City center
-    zoom: 14,
+    center: DAVAO_CENTER,
+    zoom: DEFAULTS.ZOOM_LEVEL,
     currentLayer: 'googleMaps',
     initialized: false,
     selectedUserId: null
@@ -78,23 +98,13 @@ class VTSStore {
     }));
   };
 
-  // Generate random coordinates around Davao City
-  private generateRandomCoordinates = (): [number, number] => {
-    const baseLat = 7.0731;
-    const baseLng = 125.6128;
-    const radius = 0.05; // Approximately 5km radius
-    
-    const lat = baseLat + (Math.random() - 0.5) * radius;
-    const lng = baseLng + (Math.random() - 0.5) * radius;
-    
-    return [lat, lng];
-  };
+  // Utility methods
+  private generateRandomCoordinates = (): [number, number] => [
+    DAVAO_CENTER[0] + (Math.random() - 0.5) * DEFAULTS.COORDINATE_RADIUS,
+    DAVAO_CENTER[1] + (Math.random() - 0.5) * DEFAULTS.COORDINATE_RADIUS
+  ];
 
-  // Generate random status for demo purposes
-  private getRandomStatus = (): 'online' | 'offline' | 'unknown' => {
-    const statuses: Array<'online' | 'offline' | 'unknown'> = ['online', 'online', 'online', 'offline', 'unknown'];
-    return statuses[Math.floor(Math.random() * statuses.length)];
-  };
+  private getRandomStatus = () => STATUS_OPTIONS[Math.floor(Math.random() * STATUS_OPTIONS.length)];
 
   // Load users from license store
   private loadUsersFromLicenseStore = () => {
@@ -109,47 +119,19 @@ class VTSStore {
 
   // Fallback sample data (kept for when license store is empty)
   private initializeSampleUsers = () => {
-    this.users = [
-      {
-        key: 1,
-        id: 1,
-        software: 'MapInfo Professional 19',
-        deviceName: 'DCWD-WS-001',
-        department: 'Engineering and Construction Department',
-        userId: 'eng001',
-        installationDate: '2025-09-15',
-        status: 'online',
-        isActive: true,
-        coordinates: [7.0731, 125.6128],
-        lastSeen: '2025-09-24 10:30:00'
-      },
-      {
-        key: 2,
-        id: 2,
-        software: 'QGIS',
-        deviceName: 'DCWD-WS-002',
-        department: 'Production Department',
-        userId: 'prod001',
-        installationDate: '2025-09-20',
-        status: 'online',
-        isActive: true,
-        coordinates: [7.0800, 125.6200],
-        lastSeen: '2025-09-24 11:15:00'
-      },
-      {
-        key: 3,
-        id: 3,
-        software: 'MapInfo Professional 17',
-        deviceName: 'DCWD-WS-003',
-        department: 'Information and Communication Technology Department',
-        userId: 'ict001',
-        installationDate: '2025-09-18',
-        status: 'online',
-        isActive: true,
-        coordinates: [7.0650, 125.6050],
-        lastSeen: '2025-09-24 09:45:00'
-      }
-    ];
+    this.users = SAMPLE_USERS.map((sample, index) => ({
+      key: index + 1,
+      id: index + 1,
+      software: sample.software,
+      deviceName: `DCWD-WS-${String(index + 1).padStart(3, '0')}`,
+      department: sample.department,
+      userId: `${sample.prefix}${String(index + 1).padStart(3, '0')}`,
+      installationDate: new Date().toISOString().split('T')[0],
+      status: this.getRandomStatus(),
+      isActive: true,
+      coordinates: this.generateRandomCoordinates(),
+      lastSeen: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    }));
     this.filteredUsers = [...this.users];
   };
 
@@ -244,7 +226,7 @@ class VTSStore {
     const user = this.users.find(u => u.id === userId);
     if (user && user.coordinates) {
       this.setMapCenter(user.coordinates);
-      this.setMapZoom(16);
+      this.setMapZoom(DEFAULTS.FOCUS_ZOOM);
       this.setSelectedUser(user);
     }
   };
@@ -281,23 +263,15 @@ class VTSStore {
 
   get pageNumbers() {
     const pages = [];
-    const maxVisiblePages = 3;
+    const maxPages = DEFAULTS.MAX_VISIBLE_PAGES;
     
-    if (this.totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pages.push(i);
-      }
+    if (this.totalPages <= maxPages) {
+      for (let i = 1; i <= this.totalPages; i++) pages.push(i);
     } else {
-      let startPage = Math.max(1, this.currentPage - 1);
-      let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+      const startPage = Math.max(1, Math.min(this.currentPage - 1, this.totalPages - maxPages + 1));
+      const endPage = Math.min(this.totalPages, startPage + maxPages - 1);
       
-      if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-      
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
+      for (let i = startPage; i <= endPage; i++) pages.push(i);
     }
     
     return pages;
@@ -348,75 +322,49 @@ class VTSStore {
     return this.dataSource.isFromAPI;
   }
 
-  // API integration methods using license store
-  fetchUsers = async () => {
+  // Unified API handler
+  private handleLicenseApiCall = async (
+    apiCall: () => Promise<any>, 
+    shouldClearFirst: boolean = false
+  ) => {
     this.setLoading(true);
     this.setError(null);
     
     try {
-      // Fetch users from license store API
-      const result = await licenseStore.fetchRegisteredUsers();
+      if (shouldClearFirst) licenseStore.clearUsers();
+      
+      const result = await apiCall();
       
       if (result.success) {
-        // Convert license users to VTS users
         this.users = this.convertLicenseUsersToVTSUsers(licenseStore.registeredUsers);
         this.updateFilteredUsers();
         console.log(`VTS loaded ${this.users.length} users from license API`);
       } else {
-        this.setError(result.error || 'Failed to fetch users from license API');
-        // Use sample data as fallback
+        this.setError(result.error || 'Failed to fetch from API');
         this.initializeSampleUsers();
       }
       
     } catch (error: any) {
-      this.setError('Failed to fetch users from license API');
-      console.error('Error fetching VTS users:', error);
-      // Use sample data as fallback
+      this.setError('API call failed');
+      console.error('VTS API Error:', error);
       this.initializeSampleUsers();
     } finally {
       this.setLoading(false);
     }
   };
 
-  refreshUsers = async () => {
-    await this.fetchUsers();
-  };
+  // API integration methods
+  fetchUsers = () => this.handleLicenseApiCall(() => licenseStore.fetchRegisteredUsers());
+  
+  refreshUsers = () => this.fetchUsers();
+  
+  forceRefreshFromAPI = () => this.handleLicenseApiCall(() => licenseStore.fetchRegisteredUsers(), true);
 
-  // Method to sync with license store data
   syncWithLicenseStore = () => {
     if (licenseStore.registeredUsers.length > 0) {
       this.users = this.convertLicenseUsersToVTSUsers(licenseStore.registeredUsers);
       this.updateFilteredUsers();
       console.log(`VTS synced with ${this.users.length} license users`);
-    }
-  };
-
-  // Method to force refresh from API
-  forceRefreshFromAPI = async () => {
-    this.setLoading(true);
-    this.setError(null);
-    
-    try {
-      // Clear existing license data to force fresh fetch
-      licenseStore.clearUsers();
-      
-      // Fetch fresh license data
-      const result = await licenseStore.fetchRegisteredUsers();
-      
-      if (result.success) {
-        // Convert and update VTS users
-        this.users = this.convertLicenseUsersToVTSUsers(licenseStore.registeredUsers);
-        this.updateFilteredUsers();
-        console.log(`VTS refreshed with ${this.users.length} users from API`);
-      } else {
-        this.setError(result.error || 'Failed to refresh from API');
-      }
-      
-    } catch (error: any) {
-      this.setError('Failed to refresh from API');
-      console.error('Error refreshing VTS users:', error);
-    } finally {
-      this.setLoading(false);
     }
   };
 }

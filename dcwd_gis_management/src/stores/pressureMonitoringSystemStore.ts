@@ -3,6 +3,7 @@ import { makeAutoObservable } from "mobx";
 class PressureMonitoringSystemStore {
   search = '';
   pageSize = 10;
+  currentPage = 1;
   modalOpen = false;
   // Add other state as needed
 
@@ -15,6 +16,12 @@ class PressureMonitoringSystemStore {
   }
   setPageSize(val: number) {
     this.pageSize = val;
+    this.currentPage = 1;
+  }
+  setCurrentPage(page: number) {
+    if (page >= 1) {
+      this.currentPage = page;
+    }
   }
   setModalOpen(val: boolean) {
     this.modalOpen = val;

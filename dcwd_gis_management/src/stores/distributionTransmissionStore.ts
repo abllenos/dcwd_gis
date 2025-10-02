@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 class DistributionTransmissionStore {
   search = '';
   pageSize = 10;
-  current = 1;
+  currentPage = 1;
   modalOpen = false;
   selectedAssetId: number | string = '';
 
@@ -16,9 +16,12 @@ class DistributionTransmissionStore {
   }
   setPageSize(val: number) {
     this.pageSize = val;
+    this.currentPage = 1;
   }
-  setCurrent(val: number) {
-    this.current = val;
+  setCurrentPage(page: number) {
+    if (page >= 1) {
+      this.currentPage = page;
+    }
   }
   setModalOpen(val: boolean) {
     this.modalOpen = val;

@@ -2,13 +2,7 @@
 import { useEffect } from "react";
 import { Card, Row, Col, Spin, Typography, Statistic, Timeline } from "antd";
 
-import {
-  UserOutlined,
-  EnvironmentOutlined,
-  SettingOutlined,
-  TrophyOutlined,
-  HomeOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, EnvironmentOutlined, SettingOutlined, TrophyOutlined, HomeOutlined } from "@ant-design/icons";
 import { dashboardStore } from "../stores/dashboardStore";
 import { getCustomerStat } from '../api/getCustomerStat';
 import "../styles/Home.css";

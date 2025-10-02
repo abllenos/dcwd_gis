@@ -1,11 +1,13 @@
-
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input } from 'antd';
+import { Card, Typography, Table, Select, Input, Space, Button } from 'antd';
+import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { distributionTransmissionStore } from '../stores/distributionTransmissionStore';
+import Footer from './layout/Footer';
 
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const initialData = [
   { id: 1, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 150, type: 'CCIP', length: 74.008 },
@@ -23,9 +25,49 @@ const initialData = [
 
 
 const DistributionTransmission = observer(() => {
-  const totalEntries = 23495;
+  const { currentPage, pageSize, search } = distributionTransmissionStore;
+  
+  // Pagination helpers (License.tsx style)
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value);
+    const filteredData = initialData.filter(
+      row =>
+        row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
+        row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+        String(row.size).includes(search) ||
+        row.type.toLowerCase().includes(search.toLowerCase())
+    );
+    const newTotalPages = Math.ceil(filteredData.length / newPageSize);
+    distributionTransmissionStore.setPageSize(newPageSize);
+    // Adjust current page if it would be out of bounds with the new page size
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      distributionTransmissionStore.setCurrentPage(newTotalPages);
+    } else if (newTotalPages === 0) {
+      distributionTransmissionStore.setCurrentPage(1);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    const filteredData = initialData.filter(
+      row =>
+        row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
+        row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+        String(row.size).includes(search) ||
+        row.type.toLowerCase().includes(search.toLowerCase())
+    );
+    const totalPages = Math.ceil(filteredData.length / distributionTransmissionStore.pageSize);
+    // Ensure page is within valid bounds
+    if (page >= 1 && page <= totalPages) {
+      distributionTransmissionStore.setCurrentPage(page);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    distributionTransmissionStore.setSearch(value);
+    distributionTransmissionStore.setCurrentPage(1); // Reset to first page when searching
+  };
   const columns = [
-    { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id },
+  { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id, render: (_: any, _record: any, index: number) => (currentPage - 1) * pageSize + index + 1 },
     { title: 'WO Number', dataIndex: 'woNumber' },
     { title: 'Project Title', dataIndex: 'projectTitle' },
     { title: 'Size', dataIndex: 'size', width: 80 },
@@ -34,83 +76,137 @@ const DistributionTransmission = observer(() => {
     {
       title: 'Action',
       key: 'action',
-      width: 90,
+      width: 80,
+      align: 'center' as const,
       render: (_: any, record: any) => (
-        <button
-          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-          onClick={() => {
-            distributionTransmissionStore.setSelectedAssetId(record.id);
-            distributionTransmissionStore.setModalOpen(true);
-          }}
-        >
-          View
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <button
+            className="license-table-action-button"
+            onClick={() => {
+              distributionTransmissionStore.setSelectedAssetId(record.id);
+              distributionTransmissionStore.setModalOpen(true);
+            }}
+            title="View Details"
+          >
+          </button>
+        </div>
       ),
     },
   ];
 
   const filteredData = initialData.filter(
     row =>
-      row.woNumber.toLowerCase().includes(distributionTransmissionStore.search.toLowerCase()) ||
-      row.projectTitle.toLowerCase().includes(distributionTransmissionStore.search.toLowerCase()) ||
-      String(row.size).includes(distributionTransmissionStore.search) ||
-      row.type.toLowerCase().includes(distributionTransmissionStore.search.toLowerCase())
+      row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
+      row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+      String(row.size).includes(search) ||
+      row.type.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Simple pagination logic (License.tsx style)
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / distributionTransmissionStore.pageSize);
+  const startIndex = (distributionTransmissionStore.currentPage - 1) * distributionTransmissionStore.pageSize;
+  const endIndex = Math.min(startIndex + distributionTransmissionStore.pageSize, totalItems);
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  // Generate page numbers for pagination (License.tsx style)
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    const currentPage = distributionTransmissionStore.currentPage;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    return pages;
+  };
 
   return (
     <>
-      <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
-        </div>
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <span>Display</span>
-            <Select
-              value={distributionTransmissionStore.pageSize}
-              onChange={distributionTransmissionStore.setPageSize.bind(distributionTransmissionStore)}
-              size="small"
-              style={{ width: 90 }}
-              options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
-            />
-            <span>records per page</span>
+      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+        <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
+          <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
+            <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
           </div>
-          <div className="license-search-controls">
-            <span>Search:</span>
-            <Input.Search
-              placeholder="Search..."
-              size="small"
-              allowClear
-              enterButton
-              value={distributionTransmissionStore.search}
-              onChange={e => distributionTransmissionStore.setSearch(e.target.value)}
-              style={{ width: 200 }}
-            />
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <Text className="license-control-text">Display</Text>
+              <Select
+                value={distributionTransmissionStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
+              />
+              <Text className="license-control-text">records per page</Text>
+            </div>
+            <div className="license-search-controls">
+              <Text className="license-control-text">Search:</Text>
+              <Input.Search
+                size="small"
+                placeholder=""
+                style={{ width: 200 }}
+                enterButton
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
           </div>
-        </div>
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredData}
-          pagination={{
-            current: distributionTransmissionStore.current,
-            pageSize: distributionTransmissionStore.pageSize,
-            total: totalEntries,
-            showSizeChanger: false,
-            onChange: distributionTransmissionStore.setCurrent.bind(distributionTransmissionStore),
-          }}
-          style={{ background: '#fff', borderRadius: 8 }}
+          <Table
+            key={`distribution-table-page-${distributionTransmissionStore.currentPage}-size-${distributionTransmissionStore.pageSize}`}
+            bordered
+            rowKey={(record) => `distribution-${record.id}-${record.woNumber}`}
+            columns={columns}
+            dataSource={paginatedData}
+            pagination={false}
+            style={{ background: '#fff', borderRadius: 8 }}
+          />
+          {/* Pagination (License.tsx style) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+            <Text style={{ fontSize: 12 }}>
+              Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+              {distributionTransmissionStore.search && ` (filtered from ${initialData.length} total entries)`}
+            </Text>
+            <Space>
+              <Button size="small" disabled={distributionTransmissionStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(distributionTransmissionStore.currentPage - 1)}>Previous</Button>
+              {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                <Button 
+                  key={pageNum} 
+                  size="small" 
+                  type={pageNum === distributionTransmissionStore.currentPage ? 'primary' : 'default'} 
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              )) : (
+                <Button size="small" disabled>1</Button>
+              )}
+              <Button size="small" disabled={distributionTransmissionStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(distributionTransmissionStore.currentPage + 1)}>Next</Button>
+            </Space>
+          </div>
+        </Card>
+        <PipeConditionAssessmentModal
+          open={distributionTransmissionStore.modalOpen}
+          onClose={() => distributionTransmissionStore.setModalOpen(false)}
+          assetId={distributionTransmissionStore.selectedAssetId}
         />
-        <div style={{ marginTop: 8, color: '#888' }}>
-          Showing 1 to {distributionTransmissionStore.pageSize} of {totalEntries} entries
-        </div>
-      </Card>
-      <PipeConditionAssessmentModal
-        open={distributionTransmissionStore.modalOpen}
-        onClose={() => distributionTransmissionStore.setModalOpen(false)}
-        assetId={distributionTransmissionStore.selectedAssetId}
-      />
+      </div>
+      <Footer />
     </>
   );
 });

@@ -30,6 +30,7 @@ export interface AirValveRecord {
 
 class AirValveStore {
   pageSize = 10;
+  currentPage = 1;
   search = '';
   modalVisible = false;
   selectedRecord: AirValveRecord | null = null;
@@ -41,7 +42,8 @@ class AirValveStore {
     makeAutoObservable(this);
   }
 
-  setPageSize = (val: number) => { this.pageSize = val; };
+  setPageSize = (val: number) => { this.pageSize = val; this.currentPage = 1; };
+  setCurrentPage = (page: number) => { this.currentPage = page; };
   setSearch = (val: string) => { this.search = val; };
   setModalVisible = (val: boolean) => { this.modalVisible = val; };
   setSelectedRecord = (val: AirValveRecord | null) => { this.selectedRecord = val; };

@@ -14,6 +14,7 @@ class PrvStore {
   isLoading = false;
   error: any = null;
   pageSize = 10;
+  currentPage = 1;
   search = '';
   modalVisible = false;
   selectedRecord: PressureReleaseValveRecord | null = null;
@@ -24,6 +25,12 @@ class PrvStore {
 
   setPageSize(size: number) {
     this.pageSize = size;
+    this.currentPage = 1;
+  }
+  setCurrentPage(page: number) {
+    if (page >= 1) {
+      this.currentPage = page;
+    }
   }
 
   setSearch(value: string) {
@@ -39,7 +46,13 @@ class PrvStore {
   }
 
   setData(data: PressureReleaseValveRecord[]) {
-    this.data = data;
+    this.data = [...data]; // Create new array to avoid reference issues
+  }
+
+  clearData() {
+    this.data = [];
+    this.currentPage = 1;
+    this.search = '';
   }
 
   setLoading(loading: boolean) {

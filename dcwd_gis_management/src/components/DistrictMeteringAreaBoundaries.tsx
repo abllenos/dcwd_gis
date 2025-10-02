@@ -4,7 +4,7 @@ import { dmaBoundariesStore } from '../stores/dmaBoundariesStore';
 import { Table, Input, Select, Card, Typography, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
-import Footer from './layout/Footer';
+// Footer removed - unused import
 import '../styles/DistrictMeteringArea.css';
 
 
@@ -76,77 +76,80 @@ const DistrictMeteringAreaBoundaries: React.FC = observer(() => {
   };
 
   return (
-    <div className="dma-boundaries-container">
-      <Card>
-        <div style={{ marginBottom: '24px' }}>
-          <Title level={3} className="dma-boundaries-title">
-            District Metering Area - Boundaries
-          </Title>
-        </div>
-
-        <div style={{ marginBottom: '24px' }}>
-          <Title level={5} className="dma-boundaries-instructions-title">
-            Instructions:
-          </Title>
-          <Text className="dma-boundaries-instructions-text">
-            Instruction: Double Click row to edit Details.
-          </Text>
-        </div>
-
-        <div className="dma-boundaries-controls">
-          <div className="dma-boundaries-display-controls">
-            <Text className="dma-boundaries-control-text">Display</Text>
-            <Select
-              value={pageSize.toString()}
-              onChange={handlePageSizeChange}
-              size="small"
-              style={{ width: 80 }}
-            >
-              <Option value="10">10</Option>
-              <Option value="25">25</Option>
-              <Option value="50">50</Option>
-              <Option value="100">100</Option>
-            </Select>
-            <Text className="dma-boundaries-control-text">records per page</Text>
+    <>
+      <div className="dma-boundaries-container">
+        <Card>
+          <div style={{ marginBottom: '24px' }}>
+            <Title level={3} className="dma-boundaries-title">
+              District Metering Area - Boundaries
+            </Title>
           </div>
 
-          <div className="dma-boundaries-search-controls">
-            <Text className="dma-boundaries-control-text">Search:</Text>
-            <Search
-              placeholder=""
-              size="small"
-              style={{ width: 200 }}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onSearch={handleSearch}
-              enterButton
-            />
+          <div style={{ marginBottom: '24px' }}>
+            <Title level={5} className="dma-boundaries-instructions-title">
+              Instructions:
+            </Title>
+            <Text className="dma-boundaries-instructions-text">
+              Instruction: Double Click row to edit Details.
+            </Text>
           </div>
-        </div>
 
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={{
-            pageSize: pageSize,
-            showSizeChanger: false,
-            showQuickJumper: false,
-            showTotal: (total, range) => 
-              `Showing ${range[0]} to ${range[1]} of ${total} entries`,
-          }}
-          locale={locale}
-          className="dma-boundaries-table"
-        />
+          <div className="dma-boundaries-controls">
+            <div className="dma-boundaries-display-controls">
+              <Text className="dma-boundaries-control-text">Display</Text>
+              <Select
+                value={pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+              >
+                <Option value="10">10</Option>
+                <Option value="25">25</Option>
+                <Option value="50">50</Option>
+                <Option value="100">100</Option>
+              </Select>
+              <Text className="dma-boundaries-control-text">records per page</Text>
+            </div>
 
-        <div className="dma-boundaries-footer-controls">
-          <Text className="dma-boundaries-footer-text">No Record Available</Text>
-          <Space>
-            <Text className="dma-boundaries-footer-text">Previous</Text>
-            <Text className="dma-boundaries-footer-text">Next</Text>
-          </Space>
-        </div>
-      </Card>
-    </div>
+            <div className="dma-boundaries-search-controls">
+              <Text className="dma-boundaries-control-text">Search:</Text>
+              <Search
+                placeholder=""
+                size="small"
+                style={{ width: 200 }}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onSearch={handleSearch}
+                enterButton
+              />
+            </div>
+          </div>
+
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={{
+              pageSize: pageSize,
+              showSizeChanger: false,
+              showQuickJumper: false,
+              showTotal: (total, range) => 
+                `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+            }}
+            locale={locale}
+            className="dma-boundaries-table"
+          />
+
+          <div className="dma-boundaries-footer-controls">
+            <Text className="dma-boundaries-footer-text">No Record Available</Text>
+            <Space>
+              <Text className="dma-boundaries-footer-text">Previous</Text>
+              <Text className="dma-boundaries-footer-text">Next</Text>
+            </Space>
+          </div>
+        </Card>
+      </div>
+      <Footer />
+    </>
   );
 });
 

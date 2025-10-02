@@ -3,6 +3,7 @@ import { Card, Typography } from 'antd';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/MapViewer.css';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 
@@ -125,55 +126,58 @@ const MapViewer: React.FC = () => {
   }, []);
 
   return (
-    <div className="map-viewer-container">
-      <Card className="map-viewer-card">
-        <div style={{ marginBottom: '24px' }}>
-          <Title level={3} className="map-viewer-title">
-            Map Viewer
-          </Title>
-        </div>
+    <>
+      <div className="map-viewer-container">
+        <Card className="map-viewer-card">
+          <div style={{ marginBottom: '24px' }}>
+            <Title level={3} className="map-viewer-title">
+              Map Viewer
+            </Title>
+          </div>
 
-        <div className="map-legend-container">
-          <div className="map-legend-item">
-            <div style={{ width: '12px', height: '12px', backgroundColor: '#ff6b6b', borderRadius: '50%' }}></div>
-            <span className="map-legend-text">Treatment Plants</span>
+          <div className="map-legend-container">
+            <div className="map-legend-item">
+              <div style={{ width: '12px', height: '12px', backgroundColor: '#ff6b6b', borderRadius: '50%' }}></div>
+              <span className="map-legend-text">Treatment Plants</span>
+            </div>
+            <div className="map-legend-item">
+              <div style={{ width: '12px', height: '12px', backgroundColor: '#4ecdc4', borderRadius: '50%' }}></div>
+              <span className="map-legend-text">Pumping Stations</span>
+            </div>
+            <div className="map-legend-item">
+              <div style={{ width: '12px', height: '12px', backgroundColor: '#45b7d1', borderRadius: '50%' }}></div>
+              <span className="map-legend-text">Water Storage</span>
+            </div>
+            <div className="map-legend-item">
+              <div style={{ width: '12px', height: '12px', backgroundColor: '#96ceb4', borderRadius: '50%' }}></div>
+              <span className="map-legend-text">Distribution Hubs</span>
+            </div>
+            <div className="map-legend-item">
+              <div style={{ width: '20px', height: '3px', backgroundColor: '#2196F3' }}></div>
+              <span className="map-legend-text">Water Pipes</span>
+            </div>
+            <div className="map-legend-item">
+              <div style={{ width: '20px', height: '12px', backgroundColor: '#ff7800', opacity: 0.3, border: '2px solid #ff7800' }}></div>
+              <span className="map-legend-text">DMA Boundaries</span>
+            </div>
           </div>
-          <div className="map-legend-item">
-            <div style={{ width: '12px', height: '12px', backgroundColor: '#4ecdc4', borderRadius: '50%' }}></div>
-            <span className="map-legend-text">Pumping Stations</span>
-          </div>
-          <div className="map-legend-item">
-            <div style={{ width: '12px', height: '12px', backgroundColor: '#45b7d1', borderRadius: '50%' }}></div>
-            <span className="map-legend-text">Water Storage</span>
-          </div>
-          <div className="map-legend-item">
-            <div style={{ width: '12px', height: '12px', backgroundColor: '#96ceb4', borderRadius: '50%' }}></div>
-            <span className="map-legend-text">Distribution Hubs</span>
-          </div>
-          <div className="map-legend-item">
-            <div style={{ width: '20px', height: '3px', backgroundColor: '#2196F3' }}></div>
-            <span className="map-legend-text">Water Pipes</span>
-          </div>
-          <div className="map-legend-item">
-            <div style={{ width: '20px', height: '12px', backgroundColor: '#ff7800', opacity: 0.3, border: '2px solid #ff7800' }}></div>
-            <span className="map-legend-text">DMA Boundaries</span>
-          </div>
-        </div>
 
-        <div ref={mapRef} className="map-container" />
+          <div ref={mapRef} className="map-container" />
 
-        <div className="map-info-section">
-          <p>Interactive GIS Map showing Davao City Water District infrastructure:</p>
-          <ul className="map-info-list">
-            <li>Water treatment facilities and pumping stations</li>
-            <li>Distribution network and storage facilities</li>
-            <li>District Metering Area (DMA) boundaries</li>
-            <li>Water pipe network connections</li>
-          </ul>
-          <p className="map-info-italic">Click on markers and areas for more information.</p>
-        </div>
-      </Card>
-    </div>
+          <div className="map-info-section">
+            <p>Interactive GIS Map showing Davao City Water District infrastructure:</p>
+            <ul className="map-info-list">
+              <li>Water treatment facilities and pumping stations</li>
+              <li>Distribution network and storage facilities</li>
+              <li>District Metering Area (DMA) boundaries</li>
+              <li>Water pipe network connections</li>
+            </ul>
+            <p className="map-info-italic">Click on markers and areas for more information.</p>
+          </div>
+        </Card>
+      </div>
+      <Footer />
+    </>
   );
 };
 

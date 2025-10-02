@@ -1,12 +1,14 @@
-
 import React, { useEffect } from 'react';
-import { Card, Typography, Table, Spin, Alert, Input, Button } from 'antd';
+import { Card, Typography, Table, Spin, Alert, Input } from 'antd';
+import { UnorderedListOutlined } from '@ant-design/icons';
+
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';
 
 import { observer } from 'mobx-react-lite';
 import { prvStore } from '../stores/prvStore';
 import { apiGis } from './endpoints/Interceptor';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -47,8 +49,35 @@ const PressureReleaseValve: React.FC = observer(() => {
     fetchData();
   }, []);
 
+  const { currentPage, pageSize, filteredData } = prvStore;
+  
+  // Pagination helpers (License.tsx style)
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value);
+    const newTotalPages = Math.ceil(filteredData.length / newPageSize);
+    prvStore.setPageSize(newPageSize);
+    // Adjust current page if it would be out of bounds with the new page size
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      prvStore.setCurrentPage(newTotalPages);
+    } else if (newTotalPages === 0) {
+      prvStore.setCurrentPage(1);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    const totalPages = Math.ceil(filteredData.length / prvStore.pageSize);
+    // Ensure page is within valid bounds
+    if (page >= 1 && page <= totalPages) {
+      prvStore.setCurrentPage(page);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    prvStore.setSearch(value);
+    prvStore.setCurrentPage(1); // Reset to first page when searching
+  };
   const columns: ColumnsType<PressureReleaseValveRecord> = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 80, render: (_: any, _record: PressureReleaseValveRecord, index) => (currentPage - 1) * pageSize + index + 1 },
     { title: 'PRV Number', dataIndex: 'prvNumber', key: 'prvNumber' },
     { title: 'Location', dataIndex: 'location', key: 'location', ellipsis: true },
     { title: 'Status', dataIndex: 'status', key: 'status', width: 160 },
@@ -56,90 +85,147 @@ const PressureReleaseValve: React.FC = observer(() => {
       title: '',
       key: 'actions',
       width: 80,
+      align: 'center' as const,
       render: (_: any, _record: PressureReleaseValveRecord) => (
-        <Button
-          style={{
-            background: '#18c964',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '8px 24px',
-            fontWeight: 500,
-            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
-            display: 'block',
-            margin: '0 auto',
-          }}
-          onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}
-        >
-          View
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <button
+            className="license-table-action-button"
+            onClick={() => { prvStore.setSelectedRecord(_record); prvStore.setModalVisible(true); }}
+            title="View Details"
+          >
+          </button>
+        </div>
       ),
     },
   ];
 
   return (
-    <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-      <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-        <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
-      </div>
-      <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
-        <div style={{ marginBottom: 24 }}>
-          <Title level={5} style={{ color: '#666', marginBottom: 8 }}>Instructions:</Title>
-          <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+    <>
+      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+        <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+          <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
         </div>
-
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <span>Display</span>
-            <select value={String(prvStore.pageSize)} onChange={(e) => prvStore.setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-            <span>records per page</span>
+        <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+          <div style={{ marginBottom: 24 }}>
+            <Title level={5} style={{ color: '#666', marginBottom: 8 }}>Instructions:</Title>
+            <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
           </div>
-          <div className="license-search-controls">
-            <span>Search:</span>
-            <Input.Search
-              placeholder="Search..."
-              size="small"
-              allowClear
-              enterButton
-              value={prvStore.search}
-              onChange={(e) => prvStore.setSearch(e.target.value)}
-              style={{ width: 200 }}
-            />
-          </div>
-        </div>
 
-        {prvStore.isLoading ? <Spin /> : prvStore.error ? <Alert type="error" message="Failed to load data" /> : (
-          <Table
-            columns={columns as any}
-            dataSource={prvStore.filteredData}
-            pagination={{ pageSize: prvStore.pageSize }}
-            rowKey={(r: PressureReleaseValveRecord) => r.key}
-            onRow={(record: PressureReleaseValveRecord) => ({
-              onDoubleClick: () => {
-                prvStore.setSelectedRecord(record);
-                prvStore.setModalVisible(true);
-              },
-            })}
-            bordered
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <Text className="license-control-text">Display</Text>
+              <Select
+                value={prvStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
+              />
+              <Text className="license-control-text">records per page</Text>
+            </div>
+            <div className="license-search-controls">
+              <Text className="license-control-text">Search:</Text>
+              <Input.Search
+                size="small"
+                placeholder=""
+                style={{ width: 200 }}
+                enterButton
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {prvStore.isLoading ? <Spin /> : prvStore.error ? <Alert type="error" message="Failed to load data" /> : (() => {
+            // Simple pagination logic (License.tsx style)
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / prvStore.pageSize);
+            const startIndex = (prvStore.currentPage - 1) * prvStore.pageSize;
+            const endIndex = Math.min(startIndex + prvStore.pageSize, totalItems);
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+            // Generate page numbers for pagination (License.tsx style)
+            const getPageNumbers = () => {
+              const pages = [];
+              const maxVisiblePages = 5;
+              const currentPage = prvStore.currentPage;
+              if (totalPages <= maxVisiblePages) {
+                for (let i = 1; i <= totalPages; i++) {
+                  pages.push(i);
+                }
+              } else {
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(i);
+                }
+              }
+              return pages;
+            };
+
+            return <>
+              <Table
+                key={`prv-table-page-${prvStore.currentPage}-size-${prvStore.pageSize}`}
+                columns={columns as any}
+                dataSource={paginatedData}
+                pagination={false}
+                rowKey={(r: PressureReleaseValveRecord) => `prv-${r.prvNumber}-${r.id}`}
+                onRow={(record: PressureReleaseValveRecord) => ({
+                  onDoubleClick: () => {
+                    prvStore.setSelectedRecord(record);
+                    prvStore.setModalVisible(true);
+                  },
+                })}
+                bordered
+                style={{ background: '#fff', borderRadius: 8 }}
+              />
+              {/* Pagination (License.tsx style) */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+                <Text style={{ fontSize: 12 }}>
+                  Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                  {prvStore.search && ` (filtered from ${prvStore.data?.length || 0} total entries)`}
+                </Text>
+                <Space>
+                  <Button size="small" disabled={prvStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(prvStore.currentPage - 1)}>Previous</Button>
+                  {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                    <Button 
+                      key={pageNum} 
+                      size="small" 
+                      type={pageNum === prvStore.currentPage ? 'primary' : 'default'} 
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  )) : (
+                    <Button size="small" disabled>1</Button>
+                  )}
+                  <Button size="small" disabled={prvStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(prvStore.currentPage + 1)}>Next</Button>
+                </Space>
+              </div>
+            </>;
+          })()}
+
+          <PressureReleaseValveModal
+            visible={prvStore.modalVisible}
+            record={prvStore.selectedRecord}
+            onCancel={() => prvStore.setModalVisible(false)}
+            onUpdate={() => {
+              console.log('Updated', prvStore.selectedRecord);
+              prvStore.setModalVisible(false);
+            }}
           />
-        )}
-
-        <PressureReleaseValveModal
-          visible={prvStore.modalVisible}
-          record={prvStore.selectedRecord}
-          onCancel={() => prvStore.setModalVisible(false)}
-          onUpdate={() => {
-            console.log('Updated', prvStore.selectedRecord);
-            prvStore.setModalVisible(false);
-          }}
-        />
-      </Card>
-    </div>
+        </Card>
+      </div>
+      <Footer />
+    </>
   );
 });
 

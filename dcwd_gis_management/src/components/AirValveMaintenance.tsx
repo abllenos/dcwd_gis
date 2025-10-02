@@ -1,13 +1,15 @@
-import { Button } from 'antd';
 import React, { useMemo, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { airValveStore } from '../stores/airValveStore';
-import { Card, Typography, Table, Spin, Alert, Input } from 'antd';
+import { Card, Typography, Space, Table, Spin, Alert, Input, Button } from 'antd';
+import { UnorderedListOutlined } from '@ant-design/icons';
+
 import AirValveModal from './modal/AirValveModal';
 import AirValveDetailsModal from './modal/AirValveDetailsModal';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery } from '@tanstack/react-query';
 import { devApi } from './endpoints/Interceptor';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -78,27 +80,25 @@ const AirValveMaintenance: React.FC = observer(() => {
     {
       title: '',
       key: 'actions',
-      width: 80,
+      width: 150,
       render: (_: any, _record: AirValveRecord) => (
-        <Button
-          style={{
-            background: '#18c964',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '8px 24px',
-            fontWeight: 500,
-            boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
-            display: 'block',
-            margin: '0 auto',
-          }}
-          onClick={() => {
-            airValveStore.setDetailsRecord(_record);
-            airValveStore.setDetailsModalVisible(true);
-          }}
-        >
-          View
-        </Button>
+        <Space>
+          <Button aria-label="open-list" className="btn-action-circle" onClick={() => { setSelectedRecord(_record); setModalVisible(true); }}>
+            <UnorderedListOutlined />
+          </Button>
+          <Button
+            type="primary"
+            style={{ background: '#22c55e', borderRadius: 4, fontWeight: 500 }}
+
+            onClick={() => {
+              airValveStore.setDetailsRecord(_record);
+              airValveStore.setDetailsModalVisible(true);
+            }}
+          >
+            View
+          </Button>
+        </Space>
+
       ),
     },
   ];
@@ -154,19 +154,71 @@ const AirValveMaintenance: React.FC = observer(() => {
         </div>
 
         {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load data" /> : (
-          <Table
-            columns={columns as any}
-            dataSource={filteredData}
-            pagination={{ pageSize }}
-            rowKey={(r: AirValveRecord) => r.id}
-            onRow={(record: AirValveRecord) => ({
-              onDoubleClick: () => {
-                setSelectedRecord(record);
-                setModalVisible(true);
-              },
-            })}
-            bordered
-          />
+          (() => {
+            // Manual pagination logic
+            const totalItems = filteredData.length;
+            const pageCount = Math.ceil(totalItems / pageSize);
+            const currentPage = airValveStore.currentPage || 1;
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, totalItems);
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+            const getPageNumbers = () => {
+              const pages = [];
+              const maxVisiblePages = 5;
+              if (pageCount <= maxVisiblePages) {
+                for (let i = 1; i <= pageCount; i++) pages.push(i);
+              } else {
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                for (let i = startPage; i <= endPage; i++) pages.push(i);
+              }
+              return pages;
+            };
+
+            return <>
+              <Table
+                columns={columns as any}
+                dataSource={paginatedData}
+                pagination={false}
+                rowKey={(r: AirValveRecord) => r.id}
+                onRow={(record: AirValveRecord) => ({
+                  onDoubleClick: () => {
+                    setSelectedRecord(record);
+                    setModalVisible(true);
+                  },
+                })}
+                bordered
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
+                <span style={{ fontSize: 12 }}>
+                  Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                </span>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button
+                    disabled={currentPage === 1}
+                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+                    onClick={() => airValveStore.setCurrentPage(currentPage - 1)}
+                  >Previous</button>
+                  {getPageNumbers().map(pageNum => (
+                    <button
+                      key={pageNum}
+                      style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
+                      onClick={() => airValveStore.setCurrentPage(pageNum)}
+                    >{pageNum}</button>
+                  ))}
+                  <button
+                    disabled={currentPage === pageCount || pageCount === 0}
+                    style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
+                    onClick={() => airValveStore.setCurrentPage(currentPage + 1)}
+                  >Next</button>
+                </div>
+              </div>
+            </>;
+          })()
         )}
         <AirValveModal
           visible={modalVisible}
@@ -183,6 +235,7 @@ const AirValveMaintenance: React.FC = observer(() => {
           onCancel={() => airValveStore.setDetailsModalVisible(false)}
         />
       </Card>
+      <Footer />
     </div>
   );
 });

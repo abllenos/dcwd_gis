@@ -21,6 +21,10 @@ class FireHydrantListStore {
   error: any = null;
   searchText = "";
   pagination: TablePaginationConfig = { current: 1, pageSize: 10 };
+  currentPage = 1;
+  pageSize = 10;
+  setCurrentPage(page: number) { this.currentPage = page; }
+  setPageSize(size: number) { this.pageSize = size; this.currentPage = 1; }
   detailsModalVisible = false;
   editModalVisible = false;
   selectedRecord: FireHydrant | null = null;

@@ -1,15 +1,15 @@
+import React, { useState, useMemo } from "react";
+import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
 
-
-import React, { useMemo } from "react";
-import { Table, Input, Spin, Alert, Card, Typography, Space, Button } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
-import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+import type { ColumnsType } from "antd/es/table";
 import IsolationValveDetailsModal from './modal/IsolationValveDetailsModal';
 import IsolationValveEditModal from './modal/IsolationValveEditModal';
 import type { IsolationValve } from './types/isolationValve';
 import { observer } from 'mobx-react-lite';
 import { isolationValveStore } from '../stores/isolationValveStore';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -37,36 +37,85 @@ const IsolationValveList: React.FC = observer(() => {
         queryFn: fetchIsolationValve,
     });
 
-    const pagination: TablePaginationConfig = {
-        current: 1,
-        pageSize: isolationValveStore.pageSize,
+    const { currentPage, pageSize } = isolationValveStore;
+
+        const filteredData = useMemo(() => {
+                if (!data) return [];
+                const lowerValue = isolationValveStore.search.toLowerCase();
+                return data.filter((isolation) =>
+                        (isolation.gvnumber?.toLowerCase() ?? "").includes(lowerValue) ||
+                        (isolation.wonumber?.toLowerCase() ?? "").includes(lowerValue) ||
+                        (isolation.location?.toLowerCase() ?? "").includes(lowerValue) ||
+                        (isolation.size?.toString() ?? "").includes(lowerValue) ||
+                        (isolation.noofturns?.toString() ?? "").includes(lowerValue) ||
+                        (isolation.depth?.toString() ?? "").includes(lowerValue) ||
+                        (isolation.brand?.toLowerCase() ?? "").includes(lowerValue) ||
+                        (isolation.valve?.toLowerCase() ?? "").includes(lowerValue) ||
+                        (isolation.project_title?.toLowerCase() ?? "").includes(lowerValue) ||
+                        (isolation.barangay?.toLowerCase() ?? "").includes(lowerValue)
+                );
+        }, [data, isolationValveStore.search]);
+
+    // Pagination helpers (License.tsx style)
+    const handlePageSizeChange = (value: string) => {
+        const newPageSize = parseInt(value);
+        const newTotalPages = Math.ceil(filteredData.length / newPageSize);
+        isolationValveStore.setPageSize(newPageSize);
+        // Adjust current page if it would be out of bounds with the new page size
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+            isolationValveStore.setCurrentPage(newTotalPages);
+        } else if (newTotalPages === 0) {
+            isolationValveStore.setCurrentPage(1);
+        }
     };
 
-    const filteredData = useMemo(() => {
-        if (!data) return [];
-        const lowerValue = isolationValveStore.search.toLowerCase();
-        return data.filter((isolation) =>
-            (isolation.gvnumber?.toLowerCase() ?? "").includes(lowerValue) ||
-            (isolation.wonumber?.toLowerCase() ?? "").includes(lowerValue) ||
-            (isolation.location?.toLowerCase() ?? "").includes(lowerValue) ||
-            (isolation.size?.toString() ?? "").includes(lowerValue) ||
-            (isolation.noofturns?.toString() ?? "").includes(lowerValue) ||
-            (isolation.depth?.toString() ?? "").includes(lowerValue) ||
-            (isolation.brand?.toLowerCase() ?? "").includes(lowerValue) ||
-            (isolation.valve?.toLowerCase() ?? "").includes(lowerValue) ||
-            (isolation.project_title?.toLowerCase() ?? "").includes(lowerValue) ||
-            (isolation.barangay?.toLowerCase() ?? "").includes(lowerValue)
-        );
-    }, [data, isolationValveStore.search]);
+    const handlePageChange = (page: number) => {
+        const totalPages = Math.ceil(filteredData.length / isolationValveStore.pageSize);
+        // Ensure page is within valid bounds
+        if (page >= 1 && page <= totalPages) {
+            isolationValveStore.setCurrentPage(page);
+        }
+    };
 
-    // State for modals and selected record now in MobX store
+    const handleSearch = (value: string) => {
+        isolationValveStore.setSearch(value);
+        isolationValveStore.setCurrentPage(1); // Reset to first page when searching
+    };
+
+    // Simple pagination logic (License.tsx style)
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / isolationValveStore.pageSize);
+    const startIndex = (isolationValveStore.currentPage - 1) * isolationValveStore.pageSize;
+    const endIndex = Math.min(startIndex + isolationValveStore.pageSize, totalItems);
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+
+    // Generate page numbers for pagination (License.tsx style)
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        const currentPage = isolationValveStore.currentPage;
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+        }
+        return pages;
+    };    // State for modals and selected record now in MobX store
 
     const columns: ColumnsType<IsolationValve> = [
         {
             title: "ID",
             key: "index",
-            render: (_text, _record, index) =>
-                ((pagination.current || 1) - 1) * (pagination.pageSize || 10) + index + 1,
+            render: (_text, _record, index) => (currentPage - 1) * pageSize + index + 1,
             width: 60,
         },
         { title: "GV Number", dataIndex: "gvnumber", key: "gvnumber" },
@@ -77,26 +126,19 @@ const IsolationValveList: React.FC = observer(() => {
             title: '',
             key: 'actions',
             width: 80,
+            align: 'center' as const,
             render: (_text, record) => (
-                <Button
-                    style={{
-                        background: '#18c964',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 8,
-                        padding: '8px 24px',
-                        fontWeight: 500,
-                        boxShadow: '0 2px 8px rgba(24,201,100,0.08)',
-                        display: 'block',
-                        margin: '0 auto',
-                    }}
-                    onClick={() => {
-                        isolationValveStore.setSelected(record);
-                        isolationValveStore.setModalVisible(true);
-                    }}
-                >
-                    View
-                </Button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <button
+                        className="license-table-action-button"
+                        onClick={() => {
+                            isolationValveStore.setSelected(record);
+                            isolationValveStore.setModalVisible(true);
+                        }}
+                        title="View Details"
+                    >
+                    </button>
+                </div>
             ),
         },
     ];
@@ -105,60 +147,104 @@ const IsolationValveList: React.FC = observer(() => {
     if (error instanceof Error) return <Alert message="Error" description={error.message} type="error" showIcon/>;
 
         return (
-            <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-                <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-                    <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
-                </div>
-                <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
-                    <div style={{ marginBottom: 24 }}>
-                        <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
-                            Instructions:
-                        </Title>
-                        <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <Space>
-                            <Text>Search:</Text>
-                            <Input.Search
-                                placeholder="Search Isolation Valve"
-                                value={isolationValveStore.search}
-                                onChange={(e) => {
-                                    isolationValveStore.setSearch(e.target.value);
-                                }}
-                                style={{ width: 300 }}
+                <>
+                    <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+                        <Card style={{ background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
+                            <div style={{ background: '#e9edfa', borderRadius: 8, padding: '18px 32px 12px 32px', marginBottom: 24 }}>
+                                <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <Text strong>Instructions:</Text>
+                                <div style={{ marginLeft: 12, marginTop: 2 }}>
+                                    <Text>Instruction: Double Click row to edit Details.</Text>
+                                </div>
+                            </div>
+                            <div className="license-controls-container">
+                                <div className="license-display-controls">
+                                    <Text className="license-control-text">Display</Text>
+                                    <Select
+                                        value={isolationValveStore.pageSize.toString()}
+                                        onChange={handlePageSizeChange}
+                                        size="small"
+                                        style={{ width: 80 }}
+                                        options={[
+                                            { value: '10', label: '10' },
+                                            { value: '25', label: '25' },
+                                            { value: '50', label: '50' },
+                                            { value: '100', label: '100' }
+                                        ]}
+                                    />
+                                    <Text className="license-control-text">records per page</Text>
+                                </div>
+                                <div className="license-search-controls">
+                                    <Text className="license-control-text">Search:</Text>
+                                    <Input.Search
+                                        size="small"
+                                        placeholder=""
+                                        style={{ width: 200 }}
+                                        enterButton
+                                        onSearch={handleSearch}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <Table
+                                key={`isolation-table-page-${isolationValveStore.currentPage}-size-${isolationValveStore.pageSize}`}
+                                bordered
+                                rowKey={record => `isolation-${record.gvnumber}-${record.wonumber}-${record.location}`}
+                                columns={columns}
+                                dataSource={paginatedData}
+                                pagination={false}
+                                style={{ background: '#fff', borderRadius: 8 }}
+                                onRow={record => ({
+                                    onDoubleClick: () => {
+                                        isolationValveStore.setSelected(record);
+                                        isolationValveStore.setEditModalVisible(true);
+                                    }
+                                })}
                             />
-                        </Space>
+                            {/* Pagination (License.tsx style) */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                                    {isolationValveStore.search && ` (filtered from ${data?.length || 0} total entries)`}
+                                </Text>
+                                <Space>
+                                    <Button size="small" disabled={isolationValveStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(isolationValveStore.currentPage - 1)}>Previous</Button>
+                                    {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                                        <Button 
+                                            key={pageNum} 
+                                            size="small" 
+                                            type={pageNum === isolationValveStore.currentPage ? 'primary' : 'default'} 
+                                            onClick={() => handlePageChange(pageNum)}
+                                        >
+                                            {pageNum}
+                                        </Button>
+                                    )) : (
+                                        <Button size="small" disabled>1</Button>
+                                    )}
+                                    <Button size="small" disabled={isolationValveStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(isolationValveStore.currentPage + 1)}>Next</Button>
+                                </Space>
+                            </div>
+                        </Card>
+                        {/* Modals */}
+                        <IsolationValveDetailsModal
+                            visible={isolationValveStore.modalVisible}
+                            record={isolationValveStore.selected}
+                            onCancel={() => isolationValveStore.setModalVisible(false)}
+                        />
+                        <IsolationValveEditModal
+                            visible={isolationValveStore.editModalVisible}
+                            record={isolationValveStore.selected}
+                            onCancel={() => isolationValveStore.setEditModalVisible(false)}
+                            onUpdate={values => {
+                                isolationValveStore.setSelected({ ...isolationValveStore.selected, ...values });
+                                isolationValveStore.setEditModalVisible(false);
+                            }}
+                        />
                     </div>
-                    <Table
-                        columns={columns}
-                        dataSource={filteredData}
-                        pagination={pagination}
-                        rowKey={(record) => record.gvnumber + record.wonumber}
-                        onRow={(record) => ({
-                            onDoubleClick: () => {
-                                isolationValveStore.setSelected(record);
-                                isolationValveStore.setEditModalVisible(true);
-                            }
-                        })}
-                    />
-                </Card>
-                {/* Modals */}
-                <IsolationValveDetailsModal
-                    visible={isolationValveStore.modalVisible}
-                    record={isolationValveStore.selected}
-                    onCancel={() => isolationValveStore.setModalVisible(false)}
-                />
-                <IsolationValveEditModal
-                    visible={isolationValveStore.editModalVisible}
-                    record={isolationValveStore.selected}
-                    onCancel={() => isolationValveStore.setEditModalVisible(false)}
-                    onUpdate={(values) => {
-                        // handle update logic here
-                        isolationValveStore.setSelected({ ...isolationValveStore.selected, ...values });
-                        isolationValveStore.setEditModalVisible(false);
-                    }}
-                />
-            </div>
+                    <Footer />
+                </>
         );
 });
 

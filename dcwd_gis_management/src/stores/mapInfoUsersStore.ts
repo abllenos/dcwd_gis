@@ -8,6 +8,7 @@ class MapInfoUsersStore {
   installDate: Date | null = null;
   search = '';
   pageSize = 10;
+  currentPage = 1;
   users: any[] = [];
   loading = false;
   error: string | null = null;
@@ -22,7 +23,18 @@ class MapInfoUsersStore {
   setUserId(val: string) { this.userId = val; }
   setInstallDate(val: Date | null) { this.installDate = val; }
   setSearch(val: string) { this.search = val; }
-  setPageSize(val: number) { this.pageSize = val; }
+  setPageSize(val: number) { this.pageSize = val; this.currentPage = 1; }
+  setCurrentPage(page: number) { 
+    const filteredData = this.search 
+      ? this.users.filter(user => 
+          Object.values(user).some((val: any) =>
+            val?.toString().toLowerCase().includes(this.search.toLowerCase())
+          )
+        )
+      : this.users;
+    const totalPages = Math.ceil(filteredData.length / this.pageSize) || 1;
+    this.currentPage = Math.max(1, Math.min(page, totalPages)); 
+  }
 
   async fetchUsers() {
     runInAction(() => {
