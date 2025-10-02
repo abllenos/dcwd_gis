@@ -1,23 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Table, 
-  Typography, 
-  Row, 
-  Col, 
-  Select, 
-  Button, 
-  Space,
-  message,
-  Spin,
-  Alert
-} from 'antd';
-import { 
-  FileTextOutlined, 
-  PrinterOutlined,
-  DownloadOutlined,
-  ReloadOutlined
-} from '@ant-design/icons';
+import { Card, Table, Typography, Row, Col, Select, Button, Space, message, Spin, Alert } from 'antd';
+import { FileTextOutlined, PrinterOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { reportsStore } from '../stores/reportsStore';
 import type { ReportFile } from '../stores/reportsStore';
@@ -27,38 +10,50 @@ import '../styles/reports.css';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
+// Constants
+const REPORT_CATEGORIES = [
+  { value: 'all', label: 'All Categories' },
+  { value: 'infrastructure', label: 'Infrastructure' },
+  { value: 'customer', label: 'Customer Reports' },
+  { value: 'performance', label: 'Performance' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'gis', label: 'GIS Analysis' },
+  { value: 'system', label: 'System Reports' }
+];
+
+const FILE_ICONS = {
+  csv: '📊',
+  pdf: '📄',
+  xlsx: '📈',
+  xls: '📈',
+  default: '📋'
+};
+
+const PREVIEW_WINDOW_FEATURES = 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=yes,menubar=no,location=no,status=no';
+
+/**
+ * Reports Component - Clean and organized implementation
+ * Features: Report filtering, download, preview, file management
+ */
 const Reports: React.FC = observer(() => {
   const [selectedReportType, setSelectedReportType] = useState<string>('all');
 
-  // Function to refresh reports via store
+  // Initialize data on component mount
+  useEffect(() => {
+    reportsStore.fetchReports();
+  }, []);
+
+  // Event handlers
   const handleRefreshReports = async () => {
     try {
       await reportsStore.refreshReports();
-      if (!reportsStore.error) {
-        message.success(`Reports refreshed! Loaded ${reportsStore.reports.length} local files`);
-      } else {
-        message.error(reportsStore.error);
-      }
+      const successMessage = `Reports refreshed! Loaded ${reportsStore.reports.length} local files`;
+      message[reportsStore.error ? 'error' : 'success'](reportsStore.error || successMessage);
     } catch (error) {
       message.error('Error refreshing reports');
       console.error('Refresh error:', error);
     }
   };
-
-  // Load reports when component mounts
-  useEffect(() => {
-    reportsStore.fetchReports();
-  }, []);
-  
-  // Debug logging
-  console.log('Reports Debug:', {
-    totalReportsCount: reportsStore.reports.length,
-    localReportsCount: reportsStore.localReports.length,
-    isLoading: reportsStore.loading,
-    error: reportsStore.error
-  });
-
-
 
   const handleDownloadReport = (report: ReportFile) => {
     reportsStore.downloadReport(report);
@@ -67,70 +62,47 @@ const Reports: React.FC = observer(() => {
   const handlePreviewReport = (report: ReportFile) => {
     try {
       const extension = report.fileName.split('.').pop()?.toLowerCase();
+      const windowName = `preview_${report.id}`;
       
-      // Set up window features for PDF preview
-      const windowFeatures = 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=yes,menubar=no,location=no,status=no';
-      
+      const openPreview = (url: string, fallbackUrl?: string) => {
+        const previewWindow = window.open(url, windowName, PREVIEW_WINDOW_FEATURES);
+        if (!previewWindow && fallbackUrl) {
+          window.open(fallbackUrl, windowName, PREVIEW_WINDOW_FEATURES);
+        }
+        return previewWindow;
+      };
+
       if (extension === 'pdf') {
-        // For PDFs, open directly in browser's built-in PDF viewer
-        const previewWindow = window.open(report.filePath, `preview_${report.id}`, windowFeatures);
-        if (!previewWindow) {
-          message.warning('Please allow popups to preview PDF files');
-        }
-      } else if (extension === 'csv' || extension === 'txt') {
-        // For CSV and text files, create a PDF-like preview using Google Docs Viewer
-        const encodedUrl = encodeURIComponent(window.location.origin + report.filePath);
-        const googleDocsUrl = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
-        
-        const previewWindow = window.open(googleDocsUrl, `preview_${report.id}`, windowFeatures);
-        if (!previewWindow) {
-          // Fallback to direct file view
-          window.open(report.filePath, `preview_${report.id}`, windowFeatures);
-        }
-      } else if (extension === 'xlsx' || extension === 'xls') {
-        // For Excel files, use Google Docs Viewer for PDF-like preview
-        const encodedUrl = encodeURIComponent(window.location.origin + report.filePath);
-        const googleDocsUrl = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
-        
-        const previewWindow = window.open(googleDocsUrl, `preview_${report.id}`, windowFeatures);
-        if (!previewWindow) {
-          message.info('Excel files will open in your default application');
-          window.open(report.filePath, `preview_${report.id}`, windowFeatures);
-        }
+        openPreview(report.filePath);
       } else {
-        // For other file types, try Google Docs Viewer first
         const encodedUrl = encodeURIComponent(window.location.origin + report.filePath);
         const googleDocsUrl = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
+        openPreview(googleDocsUrl, report.filePath);
         
-        const previewWindow = window.open(googleDocsUrl, `preview_${report.id}`, windowFeatures);
-        if (!previewWindow) {
-          // Fallback to direct file view
-          window.open(report.filePath, `preview_${report.id}`, windowFeatures);
+        if (extension === 'xlsx' || extension === 'xls') {
+          message.info('Excel files will open in your default application');
         }
       }
       
-      message.success(`Opening PDF preview for: ${report.displayName}`);
-      console.log(`PDF Preview: ${report.displayName} (${report.fileName})`);
+      message.success(`Opening preview for: ${report.displayName}`);
     } catch (error) {
       message.error(`Failed to preview ${report.displayName}`);
-      console.error('PDF Preview error:', error);
+      console.error('Preview error:', error);
     }
   };
 
+  // Helper functions
   const getFileIcon = (fileName: string) => {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    switch (extension) {
-      case 'csv':
-        return '📊';
-      case 'pdf':
-        return '📄';
-      case 'xlsx':
-      case 'xls':
-        return '📈';
-      default:
-        return '📋';
-    }
+    const extension = fileName.split('.').pop()?.toLowerCase() || 'default';
+    return FILE_ICONS[extension as keyof typeof FILE_ICONS] || FILE_ICONS.default;
   };
+
+  // Computed values
+  const filteredReports = selectedReportType === 'all' 
+    ? reportsStore.reports 
+    : reportsStore.reports.filter(report => 
+        report.category.toLowerCase().includes(selectedReportType.toLowerCase())
+      );
 
   const columns = [
     {
@@ -235,13 +207,6 @@ const Reports: React.FC = observer(() => {
     },
   ];
 
-  // Get filtered reports from store
-  const filteredReports = selectedReportType === 'all' 
-    ? reportsStore.reports 
-    : reportsStore.reports.filter(report => 
-        report.category.toLowerCase().includes(selectedReportType.toLowerCase())
-      );
-
   return (
     <div className="reports-container">
       {/* Page Header */}
@@ -279,13 +244,11 @@ const Reports: React.FC = observer(() => {
                 placeholder="Select report category"
                 size="large"
               >
-                <Option value="all">All Categories</Option>
-                <Option value="infrastructure">Infrastructure</Option>
-                <Option value="customer">Customer Reports</Option>
-                <Option value="performance">Performance</Option>
-                <Option value="maintenance">Maintenance</Option>
-                <Option value="gis">GIS Analysis</Option>
-                <Option value="system">System Reports</Option>
+                {REPORT_CATEGORIES.map(category => (
+                  <Option key={category.value} value={category.value}>
+                    {category.label}
+                  </Option>
+                ))}
               </Select>
             </div>
           </Col>
