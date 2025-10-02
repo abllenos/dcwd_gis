@@ -16,6 +16,7 @@ class PsvStore {
   isLoading = false;
   error: any = null;
   pageSize = 10;
+  currentPage = 1;
   search = '';
   modalVisible = false;
   selected: PSVRecord | null = null;
@@ -26,6 +27,12 @@ class PsvStore {
 
   setPageSize(size: number) {
     this.pageSize = size;
+    this.currentPage = 1;
+  }
+  setCurrentPage(page: number) {
+    if (page >= 1) {
+      this.currentPage = page;
+    }
   }
 
   setSearch(value: string) {
@@ -41,7 +48,13 @@ class PsvStore {
   }
 
   setData(data: PSVRecord[]) {
-    this.data = data;
+    this.data = [...data]; // Create new array to avoid reference issues
+  }
+
+  clearData() {
+    this.data = [];
+    this.currentPage = 1;
+    this.search = '';
   }
 
   setLoading(loading: boolean) {

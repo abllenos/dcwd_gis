@@ -168,10 +168,54 @@
 
 .license-table-action-button {
   background-color: #1890ff;
-  border-color: #1890ff;
+  border: none;
+  border-radius: 8px;
+  color: white;
   font-size: 12px;
-  height: 28px;
-  padding: 0 8px;
+  height: 32px;
+  width: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  outline: none;
+}
+
+.license-table-action-button:hover {
+  background-color: #40a9ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.license-table-action-button:active {
+  background-color: #096dd9;
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.license-table-action-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.2), 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Three horizontal lines icon */
+.license-table-action-button::before {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 10px;
+  background-image: 
+    linear-gradient(to right, white 0%, white 100%),
+    linear-gradient(to right, white 0%, white 100%),
+    linear-gradient(to right, white 0%, white 100%);
+  background-size: 14px 2px;
+  background-position: 0 0, 0 4px, 0 8px;
+  background-repeat: no-repeat;
+  opacity: 0.95;
 }
 
 /* Empty State */
@@ -451,14 +495,32 @@
 }
 
 [data-theme='dark'] .license-table-action-button {
-  background-color: #60a5fa;
-  border-color: #60a5fa;
-  color: #1f1f1f;
+  background-color: #1668dc;
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme='dark'] .license-table-action-button:hover {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
+  background-color: #3c89e8;
+  box-shadow: 0 4px 8px rgba(22, 104, 220, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .license-table-action-button:active {
+  background-color: #0958d9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] .license-table-action-button:focus {
+  box-shadow: 0 0 0 3px rgba(22, 104, 220, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Three horizontal lines icon for dark mode */
+[data-theme='dark'] .license-table-action-button::before {
+  background-image: 
+    linear-gradient(to right, white 0%, white 100%),
+    linear-gradient(to right, white 0%, white 100%),
+    linear-gradient(to right, white 0%, white 100%);
+  opacity: 0.95;
 }
 
 /* Empty State - Dark Mode */

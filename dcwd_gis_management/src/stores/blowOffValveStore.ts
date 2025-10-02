@@ -4,6 +4,7 @@ import axios from "axios";
 class BlowOffValveStore {
   search = '';
   pageSize = 10;
+  currentPage = 1;
   modalOpen = false;
   selectedRow: any | null = null;
   data: any[] = [];
@@ -19,6 +20,12 @@ class BlowOffValveStore {
   }
   setPageSize(val: number) {
     this.pageSize = val;
+    this.currentPage = 1;
+  }
+  setCurrentPage(page: number) {
+    if (page >= 1) {
+      this.currentPage = page;
+    }
   }
   setModalOpen(val: boolean) {
     this.modalOpen = val;

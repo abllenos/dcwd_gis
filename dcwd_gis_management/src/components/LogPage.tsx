@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
@@ -9,6 +9,7 @@ import { formatAssetId, safeString } from '../utils/formatters';
 import { logUiStore } from '../stores/logUiStore';
 import { Progress, Space } from 'antd';
 import MapView from './MapView';
+import Footer from './layout/Footer';
 
 const { Title } = Typography;
 
@@ -116,6 +117,7 @@ const LogPage: React.FC = observer(() => {
                     onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
                   >
                     Search
+
                   </Button>
                   {layerSearchStore.active && (
                     <Button onClick={() => layerSearchStore.cancel()} danger>
@@ -184,21 +186,33 @@ const LogPage: React.FC = observer(() => {
               onClick: () => logUiStore.open(record),
               style: { cursor: 'pointer' },
             })}
-            pagination={
-              isSearching
-                ? false
-                : {
-                    pageSize: pageSize,
-                    current: currentPage,
-                    total: typeof totalCount === 'number' ? totalCount : 0,
-                    onChange: (p, s) => { logStore.updatePagination(p, s || pageSize); },
-                    showTotal: (total) => `${total} record${total === 1 ? '' : 's'}`
-                  }
-            }
+            pagination={false}
             scroll={{ x: 900 }}
             bordered
             locale={{ emptyText: isSearching ? (layerSearchStore.loading ? 'Searching…' : 'No matches') : 'Empty' }}
+            style={{ marginBottom: 16 }}
           />
+
+          {/* Custom Pagination */}
+          {!isSearching && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
+              <Typography.Text style={{ fontSize: 12 }}>
+                Showing {((currentPage - 1) * pageSize + 1)} to {Math.min(currentPage * pageSize, totalCount || 0)} of {totalCount || 0} entries
+              </Typography.Text>
+              <Space>
+                <Button size="small" disabled={currentPage === 1} onClick={() => logStore.updatePagination(currentPage - 1, pageSize)}>Previous</Button>
+                {Array.from({ length: Math.ceil((totalCount || 0) / pageSize) }).slice(0, 5).map((_, i) => {
+                  const page = i + 1;
+                  return <Button key={page} size="small" type={page === currentPage ? 'primary' : 'default'} onClick={() => logStore.updatePagination(page, pageSize)}>{page}</Button>;
+                })}
+                {Math.ceil((totalCount || 0) / pageSize) > 5 && <Button size="small" disabled>...</Button>}
+                {Math.ceil((totalCount || 0) / pageSize) > 5 && (
+                  <Button size="small" type={currentPage === Math.ceil((totalCount || 0) / pageSize) ? 'primary' : 'default'} onClick={() => logStore.updatePagination(Math.ceil((totalCount || 0) / pageSize), pageSize)}>{Math.ceil((totalCount || 0) / pageSize)}</Button>
+                )}
+                <Button size="small" disabled={currentPage >= Math.ceil((totalCount || 0) / pageSize)} onClick={() => logStore.updatePagination(currentPage + 1, pageSize)}>Next</Button>
+              </Space>
+            </div>
+          )}
         </div>
         {/* Bottom search results table removed; search results now render in the main table above. */}
         <Modal
@@ -239,6 +253,7 @@ const LogPage: React.FC = observer(() => {
         {/* status/progress UI removed as requested */}
 
       </div>
+      <Footer />
     </Card>
   );
 });

@@ -4,6 +4,7 @@ import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form
 import { PlusOutlined } from '@ant-design/icons';
 import { layerStore } from '../stores/layerStore';
 import type { LayerRecord } from '../stores/layerStore';
+import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
 
@@ -22,19 +23,22 @@ const Layer: React.FC = observer(() => {
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Status Flag', dataIndex: 'statusFlag', key: 'statusFlag', width: 110, render: (v: number) => v === 1 ? <Tag color="green">1</Tag> : <Tag color="red">0</Tag> },
     { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
-    { title: ' ', key: 'actions', width: 70, render: (_: unknown, record: LayerRecord) => (
-      <button
-        style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
-        onClick={() => store.openEdit(record)}
-      >
-        View
-      </button>)
+    { title: ' ', key: 'actions', width: 80, align: 'center' as const, render: (_: unknown, record: LayerRecord) => (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <button
+          className="license-table-action-button"
+          onClick={() => store.openEdit(record)}
+          title="View Details"
+        >
+        </button>
+      </div>)
     }
   ];
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto' }}>
-  <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} styles={{ body: { padding: 20 } }}>
+    <>
+      <div style={{ maxWidth: '100%', margin: '0 auto' }}>
+        <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} styles={{ body: { padding: 20 } }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0 }}>Layer - Maintenance</Title>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAdd()}>
@@ -131,7 +135,9 @@ const Layer: React.FC = observer(() => {
           <Form.Item label="Status" name="statusFlag"> <Select options={[{ label: 'Active (1)', value: 1 }, { label: 'Inactive (0)', value: 0 }]} /> </Form.Item>
         </Form>
       </Modal>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 });
 

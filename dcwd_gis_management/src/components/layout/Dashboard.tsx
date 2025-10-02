@@ -1,4 +1,6 @@
-// BuildingFootprints intentionally not imported at top to avoid duplicate import warnings
+
+import PressureReleaseValve from '../PressureReleaseValve';
+import BuildingFootprints from '../BuildingFootprints';
 import React from 'react';
 import { Layout } from 'antd';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -21,6 +23,7 @@ import IsolationValve from '../IsolationValve';
 import PressureSettingValve from '../PressureSettingValve';
 import License from '../License';
 import VTS from '../vts';
+
 import Reports from '../reports';
 import Classification from '../Classification';
 import ClassPage from '../Class';
@@ -29,15 +32,13 @@ import UserAccounts from '../UserAccounts';
 
 import Settings from '../Settings';
 
-import PressureReleaseValve from '../PressureReleaseValve';
-
 import BlowOffValve from '../BlowOffValve';
 import DMAInlet from '../DMAInlet';
-
 import PressureMonitoringSystem from '../PressureMonitoringSystem';
+import PressureMonitoringSystem from '../PressureMonitoringSystem';
+import MapInfoUsers from '../MapInfoUsers';
+import DistributionTransmission from '../DistributionTransmission';
 
-// MapInfoUsers and DistributionTransmission imports omitted to avoid unused import errors; route imports exist where needed
-// BuildingFootprints already imported at top of this file
 
 
 const { Content } = Layout;
@@ -130,8 +131,12 @@ const Dashboard: React.FC<DashboardProps> = observer(({
               <Route path="isolation-valve" element={<IsolationValve />} />
               <Route path="pressure-setting-valve" element={<PressureSettingValve />} />
               <Route path="pressure-release-valve" element={<PressureReleaseValve />} />
+              <Route path="mapinfo-users" element={<MapInfoUsers />} />
+              <Route path="building-footprints" element={<BuildingFootprints />} />
               <Route path="blow-off-valve" element={<BlowOffValve />} />
               <Route path="pressure-monitoring-system" element={<PressureMonitoringSystem />} />
+
+              <Route path="distribution-transmission" element={<DistributionTransmission />} />
               <Route path="dma-inlet" element={<DMAInlet />} />
 
               <Route path="/home" element={<Home />} />

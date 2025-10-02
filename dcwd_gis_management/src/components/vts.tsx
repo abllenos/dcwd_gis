@@ -8,161 +8,119 @@ import '../styles/vts.css';
 
 const { Title, Text } = Typography;
 
+// Constants
+const MAP_ID = 'vts-map';
+const PAGE_SIZE_OPTIONS = [
+  { value: '10', label: '10' },
+  { value: '20', label: '20' },
+  { value: '50', label: '50' }
+];
+
+const MAP_LAYER_ITEMS = [
+  { key: 'googleMaps', label: 'Google Maps' },
+  { key: 'googleSatellite', label: 'Satellite' },
+  { key: 'googleHybrid', label: 'Hybrid' },
+  { key: 'googleTerrain', label: 'Terrain' }
+];
+
+const TABLE_COLUMNS = [
+  { title: 'ID', dataIndex: 'id', key: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id },
+  { title: 'Computer Name', dataIndex: 'deviceName', key: 'deviceName', width: 140, sorter: (a: any, b: any) => a.deviceName.localeCompare(b.deviceName) },
+  { title: 'Department', dataIndex: 'department', key: 'department', width: 180, sorter: (a: any, b: any) => a.department.localeCompare(b.department) }
+];
+
+
 const VTS: React.FC = observer(() => {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const mapInitialized = React.useRef(false);
 
-  // Fetch VTS data when component mounts
+  // Initialize data on component mount
   React.useEffect(() => {
     if (vtsStore.users.length === 0) {
       vtsStore.fetchUsers();
     }
   }, []);
 
-  // Handle refresh from API
+  // Event handlers
   const handleRefreshFromAPI = async () => {
     try {
       await vtsStore.forceRefreshFromAPI();
-      if (!vtsStore.error) {
-        message.success(`VTS data refreshed! Loaded ${vtsStore.users.length} users from API`);
-      } else {
-        message.error(vtsStore.error);
-      }
+      const successMessage = `VTS data refreshed! Loaded ${vtsStore.users.length} users from API`;
+      message[vtsStore.error ? 'error' : 'success'](vtsStore.error || successMessage);
     } catch (error) {
       message.error('Error refreshing VTS data');
       console.error('Refresh error:', error);
     }
   };
 
-  React.useEffect(() => {
-    // Initialize the map when component mounts
-    if (mapRef.current && !mapInitialized.current && window.MapAPI && !vtsStore.mapState.initialized) {
-      const mapId = 'vts-map';
-      mapRef.current.id = mapId;
+  const handleSearch = (value: string) => vtsStore.setSearchText(value);
+  const handlePageSizeChange = (value: string) => vtsStore.setPageSize(parseInt(value));
+  const handlePageChange = (page: number) => vtsStore.setCurrentPage(page);
+  
+  const handleMapLayerChange = (layerType: 'googleMaps' | 'googleSatellite' | 'googleHybrid' | 'googleTerrain') => {
+    vtsStore.setMapLayer(layerType);
+    if (window.MapAPI) {
+      window.MapAPI.switchTileLayer(MAP_ID, layerType);
+    }
+  };
+  const handleUserClick = (userId: number) => {
+    vtsStore.focusOnUser(userId);
+    if (window.MapAPI) {
+      const map = window.MapAPI.getMap(MAP_ID);
+      if (map) {
+        const user = vtsStore.users.find(u => u.id === userId);
+        if (user?.coordinates) {
+          window.MapAPI.setView(MAP_ID, user.coordinates, 16);
+        } else {
+          window.MapAPI.focusOnDavaoCity(MAP_ID);
+        }
+      }
+    }
+  };
 
-      // Create the map with coordinates from store
-      window.MapAPI.createMap(mapId, {
+  // Map initialization
+  React.useEffect(() => {
+    if (mapRef.current && !mapInitialized.current && window.MapAPI && !vtsStore.mapState.initialized) {
+      mapRef.current.id = MAP_ID;
+      
+      window.MapAPI.createMap(MAP_ID, {
         center: vtsStore.mapState.center,
         zoom: vtsStore.mapState.zoom,
         scrollWheelZoom: true,
         zoomControl: true,
       });
 
-      // Add Davao water facilities instead of generic markers
-      window.MapAPI.addDavaoWaterFacilities(mapId);
-
+      window.MapAPI.addDavaoWaterFacilities(MAP_ID);
       mapInitialized.current = true;
       vtsStore.setMapInitialized(true);
     }
 
-    // Cleanup function
     return () => {
       if (mapInitialized.current && window.MapAPI) {
-        window.MapAPI.destroyMap('vts-map');
+        window.MapAPI.destroyMap(MAP_ID);
         mapInitialized.current = false;
         vtsStore.setMapInitialized(false);
       }
     };
   }, []);
 
-  const handleSearch = (value: string) => {
-    vtsStore.setSearchText(value);
+  // Computed values from store
+  const { totalItems, totalPages, startIndex, endIndex, paginatedUsers, currentPage, pageSize, pageNumbers } = {
+    totalItems: vtsStore.totalItems,
+    totalPages: vtsStore.totalPages,
+    startIndex: vtsStore.startIndex,
+    endIndex: vtsStore.endIndex,
+    paginatedUsers: vtsStore.paginatedUsers,
+    currentPage: vtsStore.currentPage,
+    pageSize: vtsStore.pageSize,
+    pageNumbers: vtsStore.pageNumbers
   };
 
-  // Pagination helpers
-  const handlePageSizeChange = (value: string) => {
-    const newPageSize = parseInt(value);
-    vtsStore.setPageSize(newPageSize);
-  };
-
-  const handlePageChange = (page: number) => {
-    vtsStore.setCurrentPage(page);
-  };
-
-  // Get computed values from store
-  const totalItems = vtsStore.totalItems;
-  const totalPages = vtsStore.totalPages;
-  const startIndex = vtsStore.startIndex;
-  const endIndex = vtsStore.endIndex;
-  const paginatedUsers = vtsStore.paginatedUsers;
-  const currentPage = vtsStore.currentPage;
-  const pageSize = vtsStore.pageSize;
-  const pageNumbers = vtsStore.pageNumbers;
-
-  const handleUserClick = (userId: number) => {
-    // Focus on user location and select in store
-    vtsStore.focusOnUser(userId);
-    
-    // Example of how to interact with the map when a user is clicked
-    if (window.MapAPI) {
-      const map = window.MapAPI.getMap('vts-map');
-      if (map) {
-        // Focus on user location if coordinates are available
-        const user = vtsStore.users.find(u => u.id === userId);
-        if (user && user.coordinates) {
-          window.MapAPI.setView('vts-map', user.coordinates, 16);
-        } else {
-          // Fallback to Davao city bounds
-          window.MapAPI.focusOnDavaoCity('vts-map');
-        }
-        console.log(`User ${userId} selected, map focused on user location`);
-      }
-    }
-  };
-
-  const handleMapLayerChange = (layerType: 'googleMaps' | 'googleSatellite' | 'googleHybrid' | 'googleTerrain') => {
-    vtsStore.setMapLayer(layerType);
-    if (window.MapAPI) {
-      window.MapAPI.switchTileLayer('vts-map', layerType);
-    }
-  };
-
-  const mapLayerItems = [
-    {
-      key: 'googleMaps',
-      label: 'Google Maps',
-      onClick: () => handleMapLayerChange('googleMaps'),
-    },
-    {
-      key: 'googleSatellite',
-      label: 'Satellite',
-      onClick: () => handleMapLayerChange('googleSatellite'),
-    },
-    {
-      key: 'googleHybrid',
-      label: 'Hybrid',
-      onClick: () => handleMapLayerChange('googleHybrid'),
-    },
-    {
-      key: 'googleTerrain',
-      label: 'Terrain',
-      onClick: () => handleMapLayerChange('googleTerrain'),
-    },
-  ];
-
-  const columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 80,
-      sorter: (a: any, b: any) => a.id - b.id,
-    },
-    {
-      title: 'Computer Name',
-      dataIndex: 'deviceName',
-      key: 'deviceName',
-      width: 140,
-      sorter: (a: any, b: any) => a.deviceName.localeCompare(b.deviceName),
-    },
-    {
-      title: 'Department',
-      dataIndex: 'department',
-      key: 'department',
-      width: 180,
-      sorter: (a: any, b: any) => a.department.localeCompare(b.department),
-    },
-  ];
+  // Dynamic map layer items with handlers
+  const mapLayerItems = MAP_LAYER_ITEMS.map(item => ({
+    ...item,
+    onClick: () => handleMapLayerChange(item.key as any)
+  }));
 
   return (
     <div className="vts-container">
@@ -273,11 +231,7 @@ const VTS: React.FC = observer(() => {
                   size="small" 
                   style={{ width: 60 }}
                   onChange={handlePageSizeChange}
-                  options={[
-                    { value: '10', label: '10' },
-                    { value: '20', label: '20' },
-                    { value: '50', label: '50' }
-                  ]}
+                  options={PAGE_SIZE_OPTIONS}
                 />
                 <Typography.Text className="vts-control-text">records per page</Typography.Text>
               </div>
@@ -298,7 +252,7 @@ const VTS: React.FC = observer(() => {
             <div className="vts-user-table-container">
               {totalItems > 0 ? (
                 <Table
-                  columns={columns}
+                  columns={TABLE_COLUMNS}
                   dataSource={paginatedUsers}
                   pagination={false}
                   size="small"
