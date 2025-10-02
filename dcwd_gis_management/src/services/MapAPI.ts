@@ -170,7 +170,7 @@ class MapAPI {
       maxBounds: davaoBounds,
       maxBoundsViscosity: 1.0, // Prevents panning outside bounds
       minZoom: 10, // Minimum zoom to keep focus on Davao City
-      maxZoom: 16  // Maximum zoom for efficient performance
+      maxZoom: 18  // Maximum zoom for detailed view
     });
 
     // Add default tile layer (Google Maps for cleaner appearance)

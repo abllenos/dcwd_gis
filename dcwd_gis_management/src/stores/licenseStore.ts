@@ -1,7 +1,8 @@
 import { makeAutoObservable } from "mobx";
 import { licenseApiService } from "../services/licenseApiService";
-import type { LicenseUser, LicenseApiResponse } from "../services/licenseApiService";
+import type { LicenseApiResponse } from "../services/licenseApiService";
 
+// Types and Interfaces
 export interface RegisteredUser {
   key: number;
   id: number;
@@ -22,43 +23,48 @@ export interface InstallationLog {
   notes?: string;
 }
 
+// Constants
+const DEFAULTS = {
+  PAGE_SIZE: 10,
+  CURRENT_PAGE: 1,
+};
+
+const FIELD_MAPPINGS = {
+  software: ['software', 'license_type', 'licenseType', 'Software'],
+  deviceName: ['deviceName', 'device_name', 'pc_name', 'computerName', 'ComputerName', 'DeviceName'],
+  department: ['department', 'Department', 'dept'],
+  userId: ['userId', 'user_id', 'username', 'userName', 'UserName', 'id', 'ID'],
+  installationDate: ['installationDate', 'installation_date', 'dateInstalled', 'created_at']
+};
+
+/**
+ * LicenseStore - Clean and organized MobX store for license management
+ * Handles user registration, pagination, search, and API operations
+ */
 class LicenseStore {
+  // Core state
   registeredUsers: RegisteredUser[] = [];
   selectedUser: RegisteredUser | null = null;
   searchText = '';
   userStatus = true;
-  modalVisible = false;
-  renewModalVisible = false;
   loading = false;
 
-  // MobX state for pagination
-  pageSize = 10;
-  currentPage = 1;
+  // Modal state
+  modalVisible = false;
+  renewModalVisible = false;
 
-  // Mock installation logs data
-  installationLogs: InstallationLog[] = [
-    {
-      key: 1,
-      id: 1,
-      date: '2024-01-15',
-      action: 'Initial Installation',
-      status: 'Completed',
-      notes: 'MapInfo Professional 19 installed successfully'
-    },
-    {
-      key: 2,
-      id: 2,
-      date: '2024-01-16',
-      action: 'License Activation',
-      status: 'Active',
-      notes: 'Trial license activated for 30 days'
-    }
-  ];
+  // Pagination state
+  pageSize = DEFAULTS.PAGE_SIZE;
+  currentPage = DEFAULTS.CURRENT_PAGE;
+
+  // Installation logs (mock data)
+  installationLogs: InstallationLog[] = [];
 
   constructor() {
     makeAutoObservable(this);
   }
 
+  // Pagination actions
   setPageSize = (size: number) => {
     this.pageSize = size;
   };
@@ -67,7 +73,7 @@ class LicenseStore {
     this.currentPage = page;
   };
 
-  // Actions
+  // User management actions
   addUser = (userData: Omit<RegisteredUser, 'key' | 'id'>) => {
     const newUser: RegisteredUser = {
       key: Date.now() + Math.random(), // More unique key
@@ -102,6 +108,7 @@ class LicenseStore {
     }
   };
 
+  // Selection and search actions
   setSelectedUser = (user: RegisteredUser | null) => {
     this.selectedUser = user;
     if (user) {
@@ -120,6 +127,7 @@ class LicenseStore {
     }
   };
 
+  // Modal actions
   setModalVisible = (visible: boolean) => {
     this.modalVisible = visible;
   };
@@ -128,6 +136,7 @@ class LicenseStore {
     this.renewModalVisible = visible;
   };
 
+  // Loading state actions
   setLoading = (loading: boolean) => {
     this.loading = loading;
   };
@@ -171,7 +180,7 @@ class LicenseStore {
     return stats;
   }
 
-  // Methods for modal workflows
+  // Modal workflow helpers
   openInstallationDetails = (user: RegisteredUser) => {
     this.setSelectedUser(user);
     this.setModalVisible(true);
@@ -188,138 +197,87 @@ class LicenseStore {
     this.setSelectedUser(null);
   };
 
+  // Helper methods for data processing
+  private getFieldValue = (user: any, fieldMappings: string[]): string => {
+    return fieldMappings.find(field => user[field]) || 'N/A';
+  };
+
+  private createUserFromApiData = (user: any): Omit<RegisteredUser, 'key' | 'id'> => {
+    if (Array.isArray(user)) {
+      return {
+        software: user[1] || 'N/A',
+        deviceName: user[3] || 'N/A', 
+        department: user[2] || 'N/A',
+        userId: user[0] || 'N/A',
+        installationDate: new Date().toLocaleDateString('en-GB'),
+      };
+    }
+    
+    return {
+      software: this.getFieldValue(user, FIELD_MAPPINGS.software),
+      deviceName: this.getFieldValue(user, FIELD_MAPPINGS.deviceName),
+      department: this.getFieldValue(user, FIELD_MAPPINGS.department),
+      userId: this.getFieldValue(user, FIELD_MAPPINGS.userId),
+      installationDate: this.getFieldValue(user, FIELD_MAPPINGS.installationDate) || new Date().toLocaleDateString('en-GB'),
+    };
+  };
+
+  private processApiResponse = (data: any[]): LicenseApiResponse => {
+    this.clearUsers();
+    
+    data.forEach((user: any) => {
+      const userData = this.createUserFromApiData(user);
+      this.addUser(userData);
+    });
+
+    return {
+      success: true,
+      count: data.length,
+      message: `Successfully loaded ${data.length} registered users`
+    };
+  };
+
+  // Unified API method
+  private fetchUsers = async (
+    apiCall: () => Promise<LicenseApiResponse>,
+    errorPrefix: string
+  ): Promise<LicenseApiResponse> => {
+    try {
+      this.setLoading(true);
+      const response = await apiCall();
+      
+      if (response.success && response.data) {
+        return this.processApiResponse(response.data);
+      }
+      
+      return response;
+    } catch (error: any) {
+      console.error(`${errorPrefix}:`, error);
+      return {
+        success: false,
+        error: `${errorPrefix}`,
+        count: 0
+      };
+    } finally {
+      this.setLoading(false);
+    }
+  };
+
   // API methods
-  fetchRegisteredUsers = async (): Promise<LicenseApiResponse> => {
-    try {
-      this.setLoading(true);
-      const response = await licenseApiService.getActiveUsers();
-      
-      console.log('License API Response:', response);
-      
-      if (response.success && response.data) {
-        // Clear existing users and add API data
-        this.clearUsers();
-        
-        console.log(`Processing ${response.data.length} users from API`);
-        
-        response.data.forEach((user: any) => {
-          // Handle both object and array formats
-          let userData;
-          if (Array.isArray(user)) {
-            // API returns array format: [id, software, department, deviceName]
-            userData = {
-              software: user[1] || 'N/A',      // Second element is software/license type
-              deviceName: user[3] || 'N/A',    // Fourth element is device/computer name
-              department: user[2] || 'N/A',    // Third element is department
-              userId: user[0] || 'N/A',        // First element is ID/user identifier
-              installationDate: new Date().toLocaleDateString('en-GB'),
-            };
-          } else {
-            // Fallback for object format
-            userData = {
-              software: user.software || user.license_type || user.licenseType || user.Software || 'N/A',
-              deviceName: user.deviceName || user.device_name || user.pc_name || user.computerName || user.ComputerName || user.DeviceName || 'N/A',
-              department: user.department || user.Department || user.dept || 'N/A',
-              userId: user.userId || user.user_id || user.username || user.userName || user.UserName || user.id || user.ID || 'N/A',
-              installationDate: user.installationDate || user.installation_date || user.dateInstalled || user.created_at || new Date().toLocaleDateString('en-GB'),
-            };
-          }
-          
-          this.addUser(userData);
-        });
-        
-        return {
-          success: true,
-          count: response.data.length,
-          message: response.message || `Successfully loaded ${response.data.length} registered users`
-        };
-      } else {
-        return {
-          success: true,
-          count: 0,
-          message: response.message || 'No registered users found in API response'
-        };
-      }
-    } catch (error: any) {
-      console.error('Error fetching registered users:', error);
-      return {
-        success: false,
-        error: 'Failed to load registered users from API',
-        count: 0
-      };
-    } finally {
-      this.setLoading(false);
-    }
-  };
+  fetchRegisteredUsers = () => this.fetchUsers(
+    () => licenseApiService.getActiveUsers(),
+    'Error fetching registered users'
+  );
 
-  // Additional API methods for enhanced functionality
-  fetchAllUsers = async (): Promise<LicenseApiResponse> => {
-    try {
-      this.setLoading(true);
-      const response = await licenseApiService.getUsersByStatus('all');
-      
-      if (response.success && response.data) {
-        this.clearUsers();
-        
-        response.data.forEach((user: LicenseUser) => {
-          this.addUser({
-            software: user.software || user.license_type || 'N/A',
-            deviceName: user.deviceName || user.device_name || user.pc_name || 'N/A',
-            department: user.department || 'N/A',
-            userId: user.userId || user.user_id || user.username || user.id || 'N/A',
-            installationDate: user.installationDate || user.installation_date || new Date().toLocaleDateString('en-GB'),
-          });
-        });
-        
-        return response;
-      }
-      
-      return response;
-    } catch (error: any) {
-      console.error('Error fetching all users:', error);
-      return {
-        success: false,
-        error: 'Failed to load all users from API',
-        count: 0
-      };
-    } finally {
-      this.setLoading(false);
-    }
-  };
+  fetchAllUsers = () => this.fetchUsers(
+    () => licenseApiService.getUsersByStatus('all'),
+    'Error fetching all users'
+  );
 
-  fetchUsersByStatus = async (status: 'active' | 'inactive' | 'all'): Promise<LicenseApiResponse> => {
-    try {
-      this.setLoading(true);
-      const response = await licenseApiService.getUsersByStatus(status);
-      
-      if (response.success && response.data) {
-        this.clearUsers();
-        
-        response.data.forEach((user: LicenseUser) => {
-          this.addUser({
-            software: user.software || user.license_type || 'N/A',
-            deviceName: user.deviceName || user.device_name || user.pc_name || 'N/A',
-            department: user.department || 'N/A',
-            userId: user.userId || user.user_id || user.username || user.id || 'N/A',
-            installationDate: user.installationDate || user.installation_date || new Date().toLocaleDateString('en-GB'),
-          });
-        });
-        
-        return response;
-      }
-      
-      return response;
-    } catch (error: any) {
-      console.error(`Error fetching ${status} users:`, error);
-      return {
-        success: false,
-        error: `Failed to load ${status} users from API`,
-        count: 0
-      };
-    } finally {
-      this.setLoading(false);
-    }
-  };
+  fetchUsersByStatus = (status: 'active' | 'inactive' | 'all') => this.fetchUsers(
+    () => licenseApiService.getUsersByStatus(status),
+    `Error fetching ${status} users`
+  );
 
   testApiConnection = async (): Promise<{ success: boolean; message: string }> => {
     try {

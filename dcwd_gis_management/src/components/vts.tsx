@@ -29,11 +29,7 @@ const TABLE_COLUMNS = [
   { title: 'Department', dataIndex: 'department', key: 'department', width: 180, sorter: (a: any, b: any) => a.department.localeCompare(b.department) }
 ];
 
-/**
- * VTS (Vehicle Tracking System) Component
- * Clean and organized implementation with proper MobX integration
- * Features: Map visualization, user management, search, pagination
- */
+
 const VTS: React.FC = observer(() => {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const mapInitialized = React.useRef(false);
@@ -67,7 +63,6 @@ const VTS: React.FC = observer(() => {
       window.MapAPI.switchTileLayer(MAP_ID, layerType);
     }
   };
-
   const handleUserClick = (userId: number) => {
     vtsStore.focusOnUser(userId);
     if (window.MapAPI) {
