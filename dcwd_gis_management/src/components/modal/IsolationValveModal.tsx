@@ -1,4 +1,4 @@
-import React from 'react';
+git import React from 'react';
 import { Modal, Form, Input, Select, Row, Col, Tabs, Button, Table, Typography, Space } from 'antd';
 
 const { Option } = Select;
