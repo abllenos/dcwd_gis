@@ -218,6 +218,9 @@ const LogPage: React.FC = observer(() => {
           title="Log Details"
           open={logUiStore.isModalOpen}
           onCancel={() => logUiStore.close()}
+          width={'50vw'}
+          style={{ maxHeight: '90vh', top: 20, overflow: 'hidden' }}
+          bodyStyle={{ maxHeight: '76vh', overflow: 'hidden' }}
           footer={[
             <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
           ]}
@@ -237,7 +240,7 @@ const LogPage: React.FC = observer(() => {
                 <div style={{ fontWeight: 600, marginBottom: 8 }}>Map</div>
                 {logUiStore.geometryLoading && <div style={{ padding: 8 }}>Loading geometry…</div>}
                 {!logUiStore.geometryLoading && logUiStore.geometry && (
-                  <MapView height={280} geometry={logUiStore.geometry} />
+                  <MapView height={460} geometry={logUiStore.geometry} />
                 )}
                 {!logUiStore.geometryLoading && !logUiStore.geometry && (
                   <div style={{ padding: 8, color: 'var(--text-muted)' }}>
