@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -10,6 +10,12 @@ const { Title, Text } = Typography;
 
 const UserAccounts: React.FC = observer(() => {
 	const store = userAccountsStore;
+
+	useEffect(() => {
+		// fetch latest accounts on mount (live API)
+		store.refresh();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const columns = [
 		{ title: 'ID', dataIndex: 'id', key: 'id', width: 60 },

@@ -19,6 +19,13 @@ export default defineConfig({
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/classifications/, '/getAllClassification.php')
       },
+      // TEMPORARY CORS WORKAROUND – REMOVE AFTER SERVER HEADERS FIXED
+      // Proxy for User Accounts (views/getAccounts.php)
+      '/web/dcwdgis/ajax/views/getAccounts.php': {
+        target: 'https://gis.davao-water.gov.ph',
+        changeOrigin: true,
+        secure: true,
+      },
       // TEMPORARY WORKAROUND (CORS) for Class endpoint; mirror of classifications rationale above.
       '/api/classes': {
         target: 'https://dev-gis.davao-water.gov.ph/web/dcwdgis/ajax/query',
