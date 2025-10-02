@@ -156,15 +156,28 @@ class MapAPI {
 
     const mapOptions = { ...defaultOptions, ...options };
 
+    // Define Davao City bounds
+    const davaoBounds: L.LatLngBounds = L.latLngBounds(
+      [6.9000, 125.4500], // Southwest corner
+      [7.2500, 125.7500]  // Northeast corner
+    );
+
     const map = L.map(containerId, {
       center: mapOptions.center!,
       zoom: mapOptions.zoom!,
       scrollWheelZoom: mapOptions.scrollWheelZoom!,
       zoomControl: mapOptions.zoomControl!,
+      maxBounds: davaoBounds,
+      maxBoundsViscosity: 1.0, // Prevents panning outside bounds
+      minZoom: 10, // Minimum zoom to keep focus on Davao City
+      maxZoom: 18  // Maximum zoom for detailed view
     });
 
     // Add default tile layer (Google Maps for cleaner appearance)
     L.tileLayer(DAVAO_TILE_LAYERS.googleMaps.url, DAVAO_TILE_LAYERS.googleMaps.options).addTo(map);
+
+    // Restrict map bounds to Davao City
+    this.restrictToDavaoCity(containerId, map);
 
     // Store the map instance
     this.maps.set(containerId, map);
@@ -399,6 +412,46 @@ class MapAPI {
 
     map.fitBounds(davaoBounds, { padding: [20, 20] });
     return true;
+  }
+
+  /**
+   * Apply Davao City bounds restriction to an existing map
+   */
+  applyDavaoCityBounds(mapId: string): boolean {
+    const map = this.maps.get(mapId);
+    if (!map) return false;
+
+    this.restrictToDavaoCity(mapId, map);
+    return true;
+  }
+
+  /**
+   * Restrict map navigation to Davao City bounds only
+   */
+  private restrictToDavaoCity(_mapId: string, map: L.Map): void {
+    const davaoBounds = L.latLngBounds(
+      [6.9000, 125.4500], // Southwest corner
+      [7.2500, 125.7500]  // Northeast corner
+    );
+
+    // Set max bounds to prevent panning outside Davao City
+    map.setMaxBounds(davaoBounds);
+
+    // Add event listeners to enforce bounds
+    map.on('drag', () => {
+      map.panInsideBounds(davaoBounds, { animate: false });
+    });
+
+    map.on('zoomend', () => {
+      if (!davaoBounds.contains(map.getCenter())) {
+        map.panTo(davaoBounds.getCenter());
+      }
+    });
+
+    // Initial check to ensure map is within bounds
+    if (!davaoBounds.contains(map.getCenter())) {
+      map.setView(davaoBounds.getCenter(), map.getZoom());
+    }
   }
 
   /**

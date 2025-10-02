@@ -3,7 +3,11 @@ import { makeAutoObservable } from "mobx";
 class IsolationValveStore {
   pageSize = 10;
   currentPage = 1;
-  setCurrentPage(page: number) { this.currentPage = page; }
+  setCurrentPage(page: number) { 
+    if (page >= 1) {
+      this.currentPage = page; 
+    }
+  }
   setPageSize(size: number) { this.pageSize = size; this.currentPage = 1; }
   search = '';
   modalVisible = false;

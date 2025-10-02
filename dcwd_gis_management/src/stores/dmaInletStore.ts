@@ -19,7 +19,9 @@ class DMAInletStore {
     this.currentPage = 1;
   }
   setCurrentPage(page: number) {
-    this.currentPage = page;
+    if (page >= 1) {
+      this.currentPage = page;
+    }
   }
   setModalOpen(val: boolean) {
     this.modalOpen = val;

@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input } from 'antd';
+import { Card, Typography, Table, Select, Input, Button, Space } from 'antd';
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { distributionTransmissionStore } from '../stores/distributionTransmissionStore';
 import Footer from './layout/Footer';
 
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const initialData = [
   { id: 1, woNumber: 'Unupdated', projectTitle: 'Unupdated', size: 150, type: 'CCIP', length: 74.008 },
@@ -23,7 +23,47 @@ const initialData = [
 
 
 const DistributionTransmission = observer(() => {
-  const { currentPage, pageSize, setCurrentPage, search } = distributionTransmissionStore;
+  const { currentPage, pageSize, search } = distributionTransmissionStore;
+  
+  // Pagination helpers (License.tsx style)
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value);
+    const filteredData = initialData.filter(
+      row =>
+        row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
+        row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+        String(row.size).includes(search) ||
+        row.type.toLowerCase().includes(search.toLowerCase())
+    );
+    const newTotalPages = Math.ceil(filteredData.length / newPageSize);
+    distributionTransmissionStore.setPageSize(newPageSize);
+    // Adjust current page if it would be out of bounds with the new page size
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      distributionTransmissionStore.setCurrentPage(newTotalPages);
+    } else if (newTotalPages === 0) {
+      distributionTransmissionStore.setCurrentPage(1);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    const filteredData = initialData.filter(
+      row =>
+        row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
+        row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
+        String(row.size).includes(search) ||
+        row.type.toLowerCase().includes(search.toLowerCase())
+    );
+    const totalPages = Math.ceil(filteredData.length / distributionTransmissionStore.pageSize);
+    // Ensure page is within valid bounds
+    if (page >= 1 && page <= totalPages) {
+      distributionTransmissionStore.setCurrentPage(page);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    distributionTransmissionStore.setSearch(value);
+    distributionTransmissionStore.setCurrentPage(1); // Reset to first page when searching
+  };
   const columns = [
   { title: 'Asset ID', dataIndex: 'id', width: 80, sorter: (a: any, b: any) => a.id - b.id, render: (_: any, _record: any, index: number) => (currentPage - 1) * pageSize + index + 1 },
     { title: 'WO Number', dataIndex: 'woNumber' },
@@ -60,25 +100,31 @@ const DistributionTransmission = observer(() => {
       row.type.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Manual pagination logic
+  // Simple pagination logic (License.tsx style)
   const totalItems = filteredData.length;
-  const pageCount = Math.ceil(totalItems / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const totalPages = Math.ceil(totalItems / distributionTransmissionStore.pageSize);
+  const startIndex = (distributionTransmissionStore.currentPage - 1) * distributionTransmissionStore.pageSize;
+  const endIndex = Math.min(startIndex + distributionTransmissionStore.pageSize, totalItems);
   const paginatedData = filteredData.slice(startIndex, endIndex);
 
+  // Generate page numbers for pagination (License.tsx style)
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    if (pageCount <= maxVisiblePages) {
-      for (let i = 1; i <= pageCount; i++) pages.push(i);
+    const currentPage = distributionTransmissionStore.currentPage;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
     } else {
       let startPage = Math.max(1, currentPage - 2);
-      let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
       if (endPage - startPage < maxVisiblePages - 1) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-      for (let i = startPage; i <= endPage; i++) pages.push(i);
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
     }
     return pages;
   };
@@ -92,60 +138,64 @@ const DistributionTransmission = observer(() => {
           </div>
           <div className="license-controls-container">
             <div className="license-display-controls">
-              <span>Display</span>
+              <Text className="license-control-text">Display</Text>
               <Select
-                value={pageSize}
-                onChange={distributionTransmissionStore.setPageSize.bind(distributionTransmissionStore)}
+                value={distributionTransmissionStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
                 size="small"
-                style={{ width: 90 }}
-                options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
               />
-              <span>records per page</span>
+              <Text className="license-control-text">records per page</Text>
             </div>
             <div className="license-search-controls">
-              <span>Search:</span>
+              <Text className="license-control-text">Search:</Text>
               <Input.Search
-                placeholder="Search..."
                 size="small"
-                allowClear
-                enterButton
-                value={search}
-                onChange={e => { distributionTransmissionStore.setSearch(e.target.value); setCurrentPage(1); }}
+                placeholder=""
                 style={{ width: 200 }}
+                enterButton
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
           </div>
           <Table
+            key={`distribution-table-page-${distributionTransmissionStore.currentPage}-size-${distributionTransmissionStore.pageSize}`}
             bordered
-            rowKey="id"
+            rowKey={(record) => `distribution-${record.id}-${record.woNumber}`}
             columns={columns}
             dataSource={paginatedData}
             pagination={false}
             style={{ background: '#fff', borderRadius: 8 }}
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
-            <span style={{ fontSize: 12 }}>
+          {/* Pagination (License.tsx style) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+            <Text style={{ fontSize: 12 }}>
               Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-            </span>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <button
-                disabled={currentPage === 1}
-                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >Previous</button>
-              {getPageNumbers().map(pageNum => (
-                <button
-                  key={pageNum}
-                  style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
-                  onClick={() => setCurrentPage(pageNum)}
-                >{pageNum}</button>
-              ))}
-              <button
-                disabled={currentPage === pageCount || pageCount === 0}
-                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >Next</button>
-            </div>
+              {distributionTransmissionStore.search && ` (filtered from ${initialData.length} total entries)`}
+            </Text>
+            <Space>
+              <Button size="small" disabled={distributionTransmissionStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(distributionTransmissionStore.currentPage - 1)}>Previous</Button>
+              {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                <Button 
+                  key={pageNum} 
+                  size="small" 
+                  type={pageNum === distributionTransmissionStore.currentPage ? 'primary' : 'default'} 
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              )) : (
+                <Button size="small" disabled>1</Button>
+              )}
+              <Button size="small" disabled={distributionTransmissionStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(distributionTransmissionStore.currentPage + 1)}>Next</Button>
+            </Space>
           </div>
         </Card>
         <PipeConditionAssessmentModal

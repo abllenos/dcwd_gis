@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, Space } from 'antd';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import BlowOffValveModal from './modal/BlowOffValveModal';
@@ -70,7 +70,7 @@ const BlowOffValve = observer(() => {
     blowOffValveStore.fetchBlowOffValves();
   }, []);
 
-  const { currentPage, pageSize, setCurrentPage, search } = blowOffValveStore;
+  const { currentPage, pageSize, search } = blowOffValveStore;
   const filteredData = blowOffValveStore.data.filter(
     row =>
       (row.workOrder?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
@@ -82,25 +82,29 @@ const BlowOffValve = observer(() => {
     key: `${row.bovnumber || ''}_${row.wonumber || ''}_${idx}`
   }));
 
-  // Manual pagination logic
+  //Pagination Logic
   const totalItems = filteredData.length;
-  const pageCount = Math.ceil(totalItems / pageSize);
+  const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalItems);
-  const paginatedData = filteredData.slice(startIndex, endIndex);
+  const paginatedUsers = filteredData.slice(startIndex, endIndex);
 
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    if (pageCount <= maxVisiblePages) {
-      for (let i = 1; i <= pageCount; i++) pages.push(i);
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
     } else {
       let startPage = Math.max(1, currentPage - 2);
-      let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
       if (endPage - startPage < maxVisiblePages - 1) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-      for (let i = startPage; i <= endPage; i++) pages.push(i);
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
     }
     return pages;
   };
@@ -138,16 +142,17 @@ const BlowOffValve = observer(() => {
                 allowClear
                 enterButton
                 value={search}
-                onChange={e => { blowOffValveStore.setSearch(e.target.value); setCurrentPage(1); }}
+                onChange={e => { blowOffValveStore.setSearch(e.target.value); blowOffValveStore.setCurrentPage(1); }}
                 style={{ width: 200 }}
               />
             </div>
           </div>
           <Table
+            key={`blowoff-table-page-${currentPage}-size-${pageSize}`}
             bordered
-            rowKey="key"
+            rowKey={record => `blowoff-${record.bovnumber}-${record.wonumber}-${record.location}`}
             columns={columns}
-            dataSource={paginatedData}
+            dataSource={paginatedUsers}
             pagination={false}
             style={{ background: '#fff', borderRadius: 8 }}
             onRow={record => ({
@@ -160,29 +165,27 @@ const BlowOffValve = observer(() => {
               },
             })}
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', rowGap: 8 }}>
+          {/* Pagination Controls */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
             <span style={{ fontSize: 12 }}>
               Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
             </span>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <button
-                disabled={currentPage === 1}
-                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === 1 ? '#f5f5f5' : '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >Previous</button>
-              {getPageNumbers().map(pageNum => (
-                <button
+            <Space>
+              <Button size="small" disabled={currentPage === 1 || totalItems === 0} onClick={() => blowOffValveStore.setCurrentPage(currentPage - 1)}>Previous</Button>
+              {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                <Button
                   key={pageNum}
-                  style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: pageNum === currentPage ? '#2563eb' : '#fff', color: pageNum === currentPage ? '#fff' : '#222', fontWeight: pageNum === currentPage ? 600 : 400, cursor: 'pointer' }}
-                  onClick={() => setCurrentPage(pageNum)}
-                >{pageNum}</button>
-              ))}
-              <button
-                disabled={currentPage === pageCount || pageCount === 0}
-                style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid #d9d9d9', background: currentPage === pageCount || pageCount === 0 ? '#f5f5f5' : '#fff', cursor: currentPage === pageCount || pageCount === 0 ? 'not-allowed' : 'pointer' }}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >Next</button>
-            </div>
+                  size="small"
+                  type={pageNum === currentPage ? 'primary' : 'default'}
+                  onClick={() => blowOffValveStore.setCurrentPage(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              )) : (
+                <Button size="small" disabled>1</Button>
+              )}
+              <Button size="small" disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => blowOffValveStore.setCurrentPage(currentPage + 1)}>Next</Button>
+            </Space>
           </div>
         </Card>
         <BlowOffValveModal
