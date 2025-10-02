@@ -22,7 +22,7 @@ export const testLicenseApiIntegration = async () => {
     
     // Test 3: Fetch All Users
     console.log('\n3. Fetching All Users...');
-    const allUsers = await licenseApiService.getAllUsers();
+    const allUsers = await licenseApiService.getUsersByStatus('all');
     console.log('All Users Result:', {
       success: allUsers.success,
       count: allUsers.count,
