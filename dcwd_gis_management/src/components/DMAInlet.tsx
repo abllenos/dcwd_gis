@@ -1,6 +1,9 @@
-import Footer from './layout/Footer';
+
+// React import not needed with the new JSX transform
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Button, Space } from 'antd';
+import { Card, Typography, Table, Select, Input, Space, Button } from 'antd';
+import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 
@@ -102,6 +105,8 @@ const DMAInlet = observer(() => {
         row.type.toLowerCase().includes(search.toLowerCase())
     );
 
+  const { Title } = Typography;
+
     // Simple pagination logic (License.tsx style)
     const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / dmaInletStore.pageSize);
@@ -130,6 +135,7 @@ const DMAInlet = observer(() => {
       }
       return pages;
     };
+
 
 
   return (
@@ -167,45 +173,29 @@ const DMAInlet = observer(() => {
             />
           </div>
         </div>
+
+
         <Table
-          key={`dma-table-page-${dmaInletStore.currentPage}-size-${dmaInletStore.pageSize}`}
           bordered
-          rowKey={(record) => `dma-${record.id}-${record.woNumber}`}
+          rowKey="id"
           columns={columns}
-          dataSource={paginatedData}
-          pagination={false}
+          dataSource={filteredData}
+          pagination={{
+            current: 1,
+            pageSize: dmaInletStore.pageSize,
+            total: filteredData.length,
+            showSizeChanger: false,
+          }}
           style={{ background: '#fff', borderRadius: 8 }}
         />
-        {/* Pagination (License.tsx style) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
-          <Text style={{ fontSize: 12 }}>
-            Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-            {dmaInletStore.search && ` (filtered from ${initialData.length} total entries)`}
-          </Text>
-          <Space>
-            <Button size="small" disabled={dmaInletStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(dmaInletStore.currentPage - 1)}>Previous</Button>
-            {totalItems > 0 ? getPageNumbers().map(pageNum => (
-              <Button 
-                key={pageNum} 
-                size="small" 
-                type={pageNum === dmaInletStore.currentPage ? 'primary' : 'default'} 
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            )) : (
-              <Button size="small" disabled>1</Button>
-            )}
-            <Button size="small" disabled={dmaInletStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(dmaInletStore.currentPage + 1)}>Next</Button>
-          </Space>
-        </div>
+
       </Card>
       <PipeConditionAssessmentModal
         open={dmaInletStore.modalOpen}
         onClose={() => dmaInletStore.setModalOpen(false)}
         assetId={dmaInletStore.selectedAssetId}
       />
-      <Footer />
+
     </>
   );
 });

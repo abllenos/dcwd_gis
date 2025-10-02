@@ -4,7 +4,7 @@ import { dmaBoundariesStore } from '../stores/dmaBoundariesStore';
 import { Table, Input, Select, Card, Typography, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
-import Footer from './layout/Footer';
+// Footer removed - unused import
 import '../styles/DistrictMeteringArea.css';
 
 

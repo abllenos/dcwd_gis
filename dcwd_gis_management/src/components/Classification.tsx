@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form, Alert, Empty } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { classificationStore } from '../stores/classificationStore';
 import type { ClassificationRecord } from '../stores/classificationStore';
 import Footer from './layout/Footer';
@@ -24,16 +24,23 @@ const Classification: React.FC = observer(() => {
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Layer Name', dataIndex: 'layerName', key: 'layerName', sorter: (a: any, b: any) => String(a.layerName || '').localeCompare(String(b.layerName || '')) },
     { title: 'Class Name', dataIndex: 'className', key: 'className', sorter: (a: any, b: any) => String(a.className || '').localeCompare(String(b.className || '')) },
-    { title: ' ', key: 'actions', width: 80, align: 'center' as const, render: (_: unknown, record: ClassificationRecord) => (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <button
+    { title: ' ', key: 'actions', width: 140, render: (_: unknown, record: ClassificationRecord) => (
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button
           className="license-table-action-button"
+          icon={<EditOutlined />}
+          size="small"
           onClick={() => store.openEdit(record)}
-          title="View Details"
+        />
+        <button
+          style={{ background: '#22c55e', border: 'none', borderRadius: 4, color: '#fff', padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => store.openEdit(record)}
         >
+          View
         </button>
       </div>
-    ) }
+    )}
+
   ];
 
   return (

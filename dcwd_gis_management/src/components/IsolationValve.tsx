@@ -1,5 +1,6 @@
-import React, { useMemo } from "react";
-import { Table, Input, Spin, Alert, Card, Typography, Button, Space, Select } from "antd";
+import React, { useState, useMemo } from "react";
+import { Table, Input, Spin, Alert, Card, Typography, Space } from "antd";
+
 import { useQuery } from "@tanstack/react-query";
 import { apiGis } from "./endpoints/Interceptor";
 import type { ColumnsType } from "antd/es/table";

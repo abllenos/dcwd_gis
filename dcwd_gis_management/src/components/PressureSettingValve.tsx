@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+
+
 import { Card, Typography, Select, Input, Table, Button, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
@@ -43,6 +45,7 @@ const PressureSettingValve: React.FC = observer(() => {
 
   // State for details modal
   const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
+
   const [detailsRecord] = React.useState<PSVRecord | null>(null);
 
   const { currentPage, pageSize, filteredData } = psvStore;
@@ -225,15 +228,22 @@ const PressureSettingValve: React.FC = observer(() => {
             onCancel={() => psvStore.setModalVisible(false)}
             onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
           />
-          <PressureSettingValveDetailsModal
-            visible={detailsModalVisible}
-            record={detailsRecord}
-            onCancel={() => setDetailsModalVisible(false)}
-          />
-        </Card>
-      </div>
-      <Footer />
-    </>
+        )}
+
+        <PressureSettingValveModal
+          visible={psvStore.modalVisible}
+          record={psvStore.selected}
+          onCancel={() => psvStore.setModalVisible(false)}
+          onUpdate={() => { console.log('update', psvStore.selected); psvStore.setModalVisible(false); }}
+        />
+        <PressureSettingValveDetailsModal
+          visible={detailsModalVisible}
+          record={psvStore.selected}
+          onCancel={() => setDetailsModalVisible(false)}
+        />
+      </Card>
+    </div>
+
   );
 });
 

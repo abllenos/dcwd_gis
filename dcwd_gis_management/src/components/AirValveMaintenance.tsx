@@ -1,7 +1,9 @@
 import React, { useMemo, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { airValveStore } from '../stores/airValveStore';
-import { Card, Typography, Table, Spin, Alert, Input } from 'antd';
+import { Card, Typography, Space, Table, Spin, Alert, Input, Button } from 'antd';
+import { UnorderedListOutlined } from '@ant-design/icons';
+
 import AirValveModal from './modal/AirValveModal';
 import AirValveDetailsModal from './modal/AirValveDetailsModal';
 import type { ColumnsType } from 'antd/es/table';
@@ -78,20 +80,25 @@ const AirValveMaintenance: React.FC = observer(() => {
     {
       title: '',
       key: 'actions',
-      width: 80,
-      align: 'center' as const,
+      width: 150,
       render: (_: any, _record: AirValveRecord) => (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <button
-            className="license-table-action-button"
+        <Space>
+          <Button aria-label="open-list" className="btn-action-circle" onClick={() => { setSelectedRecord(_record); setModalVisible(true); }}>
+            <UnorderedListOutlined />
+          </Button>
+          <Button
+            type="primary"
+            style={{ background: '#22c55e', borderRadius: 4, fontWeight: 500 }}
+
             onClick={() => {
               airValveStore.setDetailsRecord(_record);
               airValveStore.setDetailsModalVisible(true);
             }}
-            title="View Details"
           >
-          </button>
-        </div>
+            View
+          </Button>
+        </Space>
+
       ),
     },
   ];
