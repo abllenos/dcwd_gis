@@ -107,12 +107,6 @@ const Layer: React.FC = observer(() => {
             <Button size="small" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => store.setCurrentPage(currentPage + 1)}>Next</Button>
           </Space>
         </div>
-
-        {import.meta.env.DEV && (
-          <div style={{ marginTop: 18, fontSize: 11, opacity: 0.7 }}>
-            <Text type="secondary">Diagnostics: url={store.diagnostics.lastUrl} status={store.diagnostics.lastStatus} fetched={store.diagnostics.lastFetchedAt}</Text>
-          </div>
-        )}
       </Card>
 
       <Modal
