@@ -132,7 +132,7 @@ const FireHydrantList: React.FC = observer(() => {
                             key={`page-${currentPage}`}
                             dataSource={paginatedUsers}
                             columns={columns}
-                            rowKey="assetid"
+                            rowKey={(record, index) => record.assetid || `fire-hydrant-${index}`}
                             pagination={false}
                             onRow={(record) => ({
                                 onDoubleClick: () => {

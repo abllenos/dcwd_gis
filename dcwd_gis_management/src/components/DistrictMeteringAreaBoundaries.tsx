@@ -3,8 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { dmaBoundariesStore } from '../stores/dmaBoundariesStore';
 import { Table, Input, Select, Card, Typography, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-
-// Footer removed - unused import
+import Footer from './layout/Footer';
 import '../styles/DistrictMeteringArea.css';
 
 
