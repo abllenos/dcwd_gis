@@ -97,3 +97,15 @@
   display: block !important;
   opacity: 0.4 !important;
 }
+
+/* Custom colored marker styles */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+  z-index: 600 !important;
+}
+
+.custom-marker > div {
+  position: relative !important;
+  display: block !important;
+}

@@ -25,9 +25,38 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
 
-  // Create custom icon
-  const createCustomIcon = (color: string) => {
-    // Use standard Leaflet marker for now - working version
+  // Create custom colored icon
+  const createCustomIcon = (color?: string) => {
+    if (color && color !== '#1890ff') {
+      // Create a colored marker using DivIcon for custom colors
+      return L.divIcon({
+        html: `<div style="
+          background-color: ${color};
+          width: 32px;
+          height: 32px;
+          border-radius: 50% 50% 50% 0;
+          border: 3px solid white;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+          transform: rotate(-45deg);
+          position: relative;
+        "><div style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(45deg);
+          width: 10px;
+          height: 10px;
+          background-color: white;
+          border-radius: 50%;
+        "></div></div>`,
+        className: 'custom-marker',
+        iconSize: [36, 36],
+        iconAnchor: [9, 32],
+        popupAnchor: [0, -32]
+      });
+    }
+    
+    // Use standard Leaflet marker for default color
     return L.icon({
       iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
       iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -45,13 +74,23 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
     // Initialize map only once
     if (!mapInstanceRef.current) {
       // Default center: Davao City, Philippines
-      const defaultCenter: L.LatLngExpression = [7.1907, 125.4553];
+      const defaultCenter: L.LatLngExpression = [7.0731, 125.6128];
+      
+      // Define Davao City bounds to restrict navigation
+      const davaoBounds = L.latLngBounds(
+        [6.9000, 125.4500], // Southwest corner
+        [7.2500, 125.7500]  // Northeast corner
+      );
       
       const map = L.map(mapRef.current, {
         center: defaultCenter,
         zoom: 13,
         zoomControl: true,
-        attributionControl: true
+        attributionControl: true,
+        maxBounds: davaoBounds,
+        maxBoundsViscosity: 1.0, // Prevents panning outside bounds
+        minZoom: 10, // Minimum zoom to keep focus on Davao City
+        maxZoom: 18  // Maximum zoom for detailed view
       });
 
       // Add OpenStreetMap tiles
@@ -60,12 +99,34 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
         maxZoom: 19
       }).addTo(map);
 
+      // Additional bounds enforcement
+      map.on('drag', () => {
+        map.panInsideBounds(davaoBounds, { animate: false });
+      });
+
+      map.on('zoomend', () => {
+        if (!davaoBounds.contains(map.getCenter())) {
+          map.panTo(davaoBounds.getCenter());
+        }
+      });
+
       mapInstanceRef.current = map;
 
-      // Add click handler for editable mode
+      // Add click handler for editable mode only
       if (editable) {
         map.on('click', (e: L.LeafletMouseEvent) => {
           const { lat, lng } = e.latlng;
+          
+          // Check if the click is within Davao bounds
+          const davaoBounds = L.latLngBounds(
+            [6.9000, 125.4500],
+            [7.2500, 125.7500]
+          );
+          
+          if (!davaoBounds.contains([lat, lng])) {
+            // Don't allow placing markers outside Davao City
+            return;
+          }
           
           // Remove existing marker
           if (markerRef.current) {
@@ -83,6 +144,14 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
           // Handle marker drag
           marker.on('dragend', () => {
             const pos = marker.getLatLng();
+            
+            // Check if drag destination is within bounds
+            if (!davaoBounds.contains(pos)) {
+              // Revert to previous position if outside bounds
+              marker.setLatLng([lat, lng]);
+              return;
+            }
+            
             if (onLocationChange) {
               onLocationChange(pos.lng, pos.lat);
             }
@@ -125,21 +194,13 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
           // Create marker
           const marker = L.marker([latitude, longitude], {
             icon: createCustomIcon(markerColor),
-            draggable: editable
+            draggable: false // Always non-draggable for existing locations
           }).addTo(map);
 
           // Bind popup inside setTimeout after marker is added
           marker.bindPopup(`${markerLabel}<br>Lat: ${latitude.toFixed(6)}<br>Lng: ${longitude.toFixed(6)}`);
 
-          if (editable) {
-            marker.on('dragend', () => {
-              const pos = marker.getLatLng();
-              if (onLocationChange) {
-                onLocationChange(pos.lng, pos.lat);
-              }
-              marker.bindPopup(`${markerLabel}<br>Lat: ${pos.lat.toFixed(6)}<br>Lng: ${pos.lng.toFixed(6)}`).openPopup();
-            });
-          }
+          // Don't add drag handlers for existing markers to prevent accidental changes
 
           markerRef.current = marker;
         }, 150);
@@ -175,14 +236,23 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
           zIndex: 0
         }} 
       />
-      {editable && (
+      {editable ? (
         <div style={{ 
           marginTop: '8px', 
           fontSize: '12px', 
           color: '#666',
           fontStyle: 'italic'
         }}>
-          Click on the map or drag the marker to update location
+          Click on the map to set location (restricted to Davao City area)
+        </div>
+      ) : (
+        <div style={{ 
+          marginTop: '8px', 
+          fontSize: '12px', 
+          color: '#999',
+          fontStyle: 'italic'
+        }}>
+          Location view only - marker position cannot be changed
         </div>
       )}
     </div>

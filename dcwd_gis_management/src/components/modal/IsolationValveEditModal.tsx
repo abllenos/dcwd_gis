@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Row, Col, Button, Typography, Space, Tabs, Select, Table } from "antd";
 import type { IsolationValve } from '../types/isolationValve';
+import GeometryMap from "../../components/GeometryMap";
+import { coordinatesToWKB } from "../../utils/wkbParser";
 
 const { Title } = Typography;
 
@@ -62,17 +64,17 @@ const IsolationValveEditModal: React.FC<IsolationValveEditModalProps> = ({ visib
       open={visible}
       onCancel={onCancel}
       footer={null}
-      width={900}
+      width={1200}
       style={{ top: 24 }}
-  styles={{ body: { padding: 0 } }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
-      maskClosable
+      maskClosable={false}
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
+      <div style={{ padding: '24px 32px', background: '#fff', borderRadius: '8px 8px 0 0', borderBottom: '1px solid #e8e8e8' }}>
         <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Isolation Valve - Maintenance</Title>
       </div>
-      <div style={{ padding: '0 0 0 0', background: '#fff' }}>
-        <Form form={form} layout="vertical" style={{ padding: '32px 32px 0 32px' }}>
+      <div style={{ padding: '32px', background: '#fff' }}>
+        <Form form={form} layout="vertical">
           <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
             <Tabs.TabPane tab="Details" key="1">
               <Row gutter={32}>
@@ -83,11 +85,28 @@ const IsolationValveEditModal: React.FC<IsolationValveEditModalProps> = ({ visib
                   <Form.Item label="Location" name="location"><Input /></Form.Item>
                   <Form.Item label="Water Source" name="water_source"><Input /></Form.Item>
                   <Form.Item label="Barangay" name="barangay"><Select options={barangayOptions} allowClear /></Form.Item>
+                  <Form.Item label="Remarks" name="remarks">
+                    <Input.TextArea rows={3} style={{ resize: 'none' }} />
+                  </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Remarks" name="remarks">
-                    <Input.TextArea rows={8} style={{ resize: 'none' }} />
-                  </Form.Item>
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Location Map</label>
+                    {visible && (
+                      <GeometryMap 
+                        key={record?.id || 'new'}
+                        geom={record?.geom} 
+                        height={500}
+                        editable={false}
+                        markerColor="#3a5fc8"
+                        markerLabel="Isolation Valve"
+                        onLocationChange={(lng: number, lat: number) => {
+                          const wkb = coordinatesToWKB(lng, lat);
+                          form.setFieldsValue({ geom: wkb });
+                        }}
+                      />
+                    )}
+                  </div>
                 </Col>
               </Row>
             </Tabs.TabPane>
@@ -133,9 +152,9 @@ const IsolationValveEditModal: React.FC<IsolationValveEditModalProps> = ({ visib
           </Tabs>
         </Form>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#fff', borderTop: '1px solid #e8e8e8', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update Details</Button>
+          <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>
