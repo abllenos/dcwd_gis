@@ -1,9 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Card, Input, Modal, Select, Table, Tag, Typography, Space, Form, Alert, Empty } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Input, Select, Table, Tag, Typography, Space, Alert, Empty } from 'antd';
 import { layerStore } from '../stores/layerStore';
-import type { LayerRecord } from '../stores/layerStore';
 import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
@@ -22,17 +20,7 @@ const Layer: React.FC = observer(() => {
     { title: 'ID', dataIndex: 'id', key: 'id', width: 70, sorter: (a: any, b: any) => (Number(a.id) || 0) - (Number(b.id) || 0) },
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Status Flag', dataIndex: 'statusFlag', key: 'statusFlag', width: 110, render: (v: number) => v === 1 ? <Tag color="green">1</Tag> : <Tag color="red">0</Tag> },
-    { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() },
-    { title: ' ', key: 'actions', width: 80, align: 'center' as const, render: (_: unknown, record: LayerRecord) => (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <button
-          className="license-table-action-button"
-          onClick={() => store.openEdit(record)}
-          title="View Details"
-        >
-        </button>
-      </div>)
-    }
+    { title: 'Date_inserted', dataIndex: 'dateInserted', key: 'dateInserted', sorter: (a: any, b: any) => new Date(a.dateInserted).getTime() - new Date(b.dateInserted).getTime(), render: (v: string) => new Date(v).toISOString() }
   ];
 
   return (
@@ -41,14 +29,11 @@ const Layer: React.FC = observer(() => {
         <Card style={{ boxShadow: '0 4px 18px rgba(0,0,0,0.06)', borderRadius: 12 }} styles={{ body: { padding: 20 } }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Title level={5} style={{ margin: 0 }}>Layer - Maintenance</Title>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => store.openAdd()}>
-            Add Layer
-          </Button>
         </div>
 
         <div style={{ background: 'var(--bg-tertiary, #f5f7fb)', padding: '8px 12px', borderRadius: 8, marginBottom: 18 }}>
           <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>Instructions:</Text>
-          <Text style={{ fontSize: 12 }}>Instruction: Double Click row to edit Class Details.</Text>
+          <Text style={{ fontSize: 12 }}>View-only mode. Use the search and pagination controls to navigate.</Text>
         </div>
 
         <div className="license-controls-container">
@@ -90,7 +75,6 @@ const Layer: React.FC = observer(() => {
           columns={columns as any}
           pagination={false}
           loading={loading}
-          onRow={(record) => ({ onDoubleClick: () => store.openEdit(record) })}
           style={{ marginBottom: 16 }}
         />
 
@@ -108,27 +92,6 @@ const Layer: React.FC = observer(() => {
           </Space>
         </div>
       </Card>
-
-      <Modal
-        title={store.editing ? 'Edit Layer' : 'Add Layer'}
-        open={store.addModalVisible}
-        onCancel={() => store.closeModal()}
-        onOk={() => store.saveDraft()}
-        okText="Save"
-        destroyOnHidden
-      >
-        <Form
-          layout="vertical"
-          initialValues={store.draft}
-          onValuesChange={(_, all) => {
-            if ('description' in all) store.updateDraft('description', all.description);
-            if ('statusFlag' in all) store.updateDraft('statusFlag', all.statusFlag);
-          }}
-        >
-          <Form.Item label="Description" name="description" required rules={[{ required: true }]}> <Input /> </Form.Item>
-          <Form.Item label="Status" name="statusFlag"> <Select options={[{ label: 'Active (1)', value: 1 }, { label: 'Inactive (0)', value: 0 }]} /> </Form.Item>
-        </Form>
-      </Modal>
       </div>
       <Footer />
     </>

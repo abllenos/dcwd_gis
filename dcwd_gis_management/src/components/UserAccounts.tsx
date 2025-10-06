@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Card, Input, Modal, Select, Table, Typography, Space, Form } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -135,6 +135,8 @@ const UserAccounts: React.FC = observer(() => {
 				</Form>
 			</Modal>
 
+			{/* Spacer to prevent content from going under fixed footer */}
+			<div style={{ height: '80px' }} />
 			<Footer />
 		</div>
 	);
