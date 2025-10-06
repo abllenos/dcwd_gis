@@ -24,17 +24,13 @@ class UserAccountsStore {
 	pageSize = 10;
 	currentPage = 1;
 	search = '';
-
-	addModalVisible = false;
-	editing: UserAccountRecord | null = null;
-	draft: Partial<UserAccountRecord> = {};
-
+	pageJumpInput = 1;
 	loading = false;
 	diagnostics: NetworkDiagnostics = { lastUrl: null, lastStatus: null, lastFetchedAt: null, lastError: null };
 
-	 constructor() {
-		 makeAutoObservable(this, {}, { autoBind: true });
-	 }
+	constructor() {
+		makeAutoObservable(this, {}, { autoBind: true });
+	}
 
 	// Computed
 	get filtered() {
@@ -49,112 +45,116 @@ class UserAccountsStore {
 	}
 	get totalCount() { return this.filtered.length; }
 	get paged() { const start = (this.currentPage - 1) * this.pageSize; return this.filtered.slice(start, start + this.pageSize); }
+		get totalPages() { return Math.max(1, Math.ceil(this.totalCount / this.pageSize)); }
 
 	// Actions
-	setSearch(v: string) { this.search = v; this.currentPage = 1; }
-	setPageSize(v: number) { this.pageSize = v; this.currentPage = 1; }
-	setCurrentPage(p: number) { this.currentPage = p; }
-
-	openAdd() { this.editing = null; this.draft = { employeeId: '', name: '', department: '', accessLevel: '', role: 'Viewer' }; this.addModalVisible = true; }
-	openEdit(r: UserAccountRecord) { this.editing = r; this.draft = { ...r }; this.addModalVisible = true; }
-	closeModal() { this.addModalVisible = false; }
-		updateDraft<K extends keyof UserAccountRecord>(field: K, value: UserAccountRecord[K]) {
-			// Narrow safely
-			(this.draft as Partial<UserAccountRecord>)[field] = value;
+		setSearch(v: string) {
+			this.search = v;
+			this.currentPage = 1;
+			this.pageJumpInput = 1;
+		}
+		setPageSize(v: number) {
+			this.pageSize = v;
+			this.currentPage = 1;
+			this.pageJumpInput = 1;
+		}
+		setCurrentPage(p: number) {
+			const target = this.clampPage(p);
+			this.currentPage = target;
+			this.pageJumpInput = target;
+		}
+		setPageJumpInput(value: number | null) {
+			if (typeof value !== 'number' || Number.isNaN(value)) {
+				this.pageJumpInput = 1;
+				return;
+			}
+			this.pageJumpInput = this.clampPage(value);
+		}
+		jumpToPage() {
+			this.setCurrentPage(this.pageJumpInput);
+		}
+		private clampPage(value: number) {
+			if (!Number.isFinite(value)) return 1;
+			const total = this.totalPages;
+			const v = Math.floor(value);
+			if (total <= 0) return 1;
+			if (v < 1) return 1;
+			if (v > total) return total;
+			return v;
 		}
 
-	saveDraft() {
-		if (!this.draft.employeeId || !this.draft.name) return false;
-		if (this.editing) {
-			const idx = this.records.findIndex(r => r.id === this.editing!.id);
-			if (idx >= 0) this.records[idx] = { ...this.records[idx], ...this.draft } as UserAccountRecord;
-		} else {
-			const nextId = this.records.length ? Math.max(...this.records.map(r => r.id)) + 1 : 1;
-			this.records.push({
-				id: nextId,
-				employeeId: this.draft.employeeId!,
-				name: this.draft.name!,
-				department: this.draft.department || '',
-				accessLevel: this.draft.accessLevel || '',
-				role: this.draft.role || 'Viewer',
-				dateInserted: new Date().toISOString()
-			});
-		}
-		this.closeModal();
-		return true;
-	}
+	async refresh() {
+		this.loading = true;
+		const url = import.meta.env.DEV
+			? '/web/dcwdgis/ajax/views/getAccounts.php'
+			: 'https://gis.davao-water.gov.ph/web/dcwdgis/ajax/views/getAccounts.php';
+		try {
+			this.diagnostics.lastUrl = url;
+			this.diagnostics.lastError = null;
+			// Public endpoint (no auth) – use shared client; dev can proxy if needed
+			const cfg = ({
+				skipAuth: true,
+				headers: { Accept: 'text/plain, application/json;q=0.9, */*;q=0.8' },
+				...(import.meta.env.DEV ? { useLocalProxy: true } : {})
+			} as unknown) as AxiosRequestConfig;
+			const res = await apiGis.get(url, cfg);
+			let payload: unknown = res.data as unknown;
+			if (typeof payload === 'string') {
+				const s = payload.trim();
+				if (s.startsWith('{') || s.startsWith('[')) {
+					try { payload = JSON.parse(s); } catch { /* swallow parse error; handle below */ }
+				}
+			}
+			const data = (payload && (payload as any).data) as unknown;
 
-	 async refresh() {
-			this.loading = true;
-				const url = import.meta.env.DEV
-					? '/web/dcwdgis/ajax/views/getAccounts.php'
-					: 'https://gis.davao-water.gov.ph/web/dcwdgis/ajax/views/getAccounts.php';
-			try {
-				this.diagnostics.lastUrl = url;
-				this.diagnostics.lastError = null;
-				// Public endpoint (no auth) – use shared client; dev can proxy if needed
-								const cfg = ({
-							skipAuth: true,
-									headers: { Accept: 'text/plain, application/json;q=0.9, */*;q=0.8' },
-									...(import.meta.env.DEV ? { useLocalProxy: true } : {})
-						} as unknown) as AxiosRequestConfig;
-								const res = await apiGis.get(url, cfg);
-								let payload: unknown = res.data as unknown;
-								if (typeof payload === 'string') {
-									const s = payload.trim();
-									if (s.startsWith('{') || s.startsWith('[')) {
-										try { payload = JSON.parse(s); } catch { /* swallow parse error; handle below */ }
-									}
-								}
-								const data = (payload && (payload as any).data) as unknown;
-
-				// Normalization BEGIN: handle tuple arrays [id, employeeId, name, department, accessLevel, role]
-				const normalized: UserAccountRecord[] = Array.isArray(data)
-					? (data as unknown[]).map((row, idx) => {
-							if (Array.isArray(row)) {
-								const [id, emp, name, dept, access, role] = row as unknown[];
-								return {
-									id: Number(id) || idx + 1,
-									employeeId: String(emp ?? ''),
-									name: String(name ?? ''),
-									department: String(dept ?? ''),
-									accessLevel: String(access ?? ''),
-									role: String(role ?? ''),
-									dateInserted: new Date().toISOString(),
-								};
-							}
-							// Object fallback
-							const obj = row as Record<string, unknown>;
+			// Normalization BEGIN: handle tuple arrays [id, employeeId, name, department, accessLevel, role]
+			const normalized: UserAccountRecord[] = Array.isArray(data)
+				? (data as unknown[]).map((row, idx) => {
+						if (Array.isArray(row)) {
+							const [id, emp, name, dept, access, role] = row as unknown[];
 							return {
-								id: Number(obj.id) || idx + 1,
-								employeeId: String(obj.employeeId ?? obj.empId ?? ''),
-								name: String(obj.name ?? ''),
-								department: String(obj.department ?? ''),
-								accessLevel: String(obj.accessLevel ?? ''),
-								role: String(obj.role ?? ''),
+								id: Number(id) || idx + 1,
+								employeeId: String(emp ?? ''),
+								name: String(name ?? ''),
+								department: String(dept ?? ''),
+								accessLevel: String(access ?? ''),
+								role: String(role ?? ''),
 								dateInserted: new Date().toISOString(),
 							};
-						})
-					: [];
-				// Normalization END
+						}
+						// Object fallback
+						const obj = row as Record<string, unknown>;
+						return {
+							id: Number(obj.id) || idx + 1,
+							employeeId: String(obj.employeeId ?? obj.empId ?? ''),
+							name: String(obj.name ?? ''),
+							department: String(obj.department ?? ''),
+							accessLevel: String(obj.accessLevel ?? ''),
+							role: String(obj.role ?? ''),
+							dateInserted: new Date().toISOString(),
+						};
+					})
+				: [];
+			// Normalization END
 
-				runInAction(() => {
-					this.records = normalized;
-					this.currentPage = 1;
-					this.diagnostics.lastStatus = res.status ?? 200;
-					this.diagnostics.lastFetchedAt = new Date().toISOString();
-					this.loading = false;
-				});
-			} catch (err: unknown) {
-				runInAction(() => {
-					this.loading = false;
-					this.diagnostics.lastStatus = null;
-					this.diagnostics.lastFetchedAt = new Date().toISOString();
-					this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
-					this.records = [];
-				});
-			}
-	 }
+			runInAction(() => {
+				this.records = normalized;
+				this.currentPage = 1;
+						this.pageJumpInput = 1;
+				this.diagnostics.lastStatus = res.status ?? 200;
+				this.diagnostics.lastFetchedAt = new Date().toISOString();
+				this.loading = false;
+			});
+		} catch (err: unknown) {
+			runInAction(() => {
+				this.loading = false;
+				this.diagnostics.lastStatus = null;
+				this.diagnostics.lastFetchedAt = new Date().toISOString();
+				this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
+				this.records = [];
+			});
+		}
+	}
 }
 
 export const userAccountsStore = new UserAccountsStore();

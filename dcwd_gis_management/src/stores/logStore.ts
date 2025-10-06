@@ -9,6 +9,7 @@ export class LogStore {
   pageSize = 10;
   currentPage = 1;
   search = '';
+  pageJumpInput = 1;
   data: LogRecord[] = [];
   loading = false;
   error: string | null = null;
@@ -52,18 +53,22 @@ export class LogStore {
   setLayer(layer?: number) {
     this.selectedLayer = layer;
     this.currentPage = 1;
+    this.pageJumpInput = 1;
     void this.fetchLogs();
   }
 
   setPageSize(size: number) {
     this.pageSize = size;
     this.currentPage = 1;
+    this.pageJumpInput = 1;
     // Server-side pagination: fetch first page with new size
     void this.fetchLogs();
   }
 
   setPage(page: number) {
-    this.currentPage = page;
+    const target = this.clampPage(page);
+    this.currentPage = target;
+    this.pageJumpInput = target;
     // Server-side pagination: fetch selected page
     void this.fetchLogs();
   }
@@ -71,7 +76,9 @@ export class LogStore {
   // Combined update to avoid double fetch when both page & size change from Table pagination event
   updatePagination(page: number, size: number) {
     this.pageSize = size;
-    this.currentPage = page;
+    const target = this.clampPage(page);
+    this.currentPage = target;
+    this.pageJumpInput = target;
     // Server-side pagination: fetch given page/size
     void this.fetchLogs();
     return { sizeChanged: false };
@@ -80,6 +87,7 @@ export class LogStore {
   setSearch(q: string) {
     this.search = q;
     this.currentPage = 1;
+    this.pageJumpInput = 1;
   }
 
   get filteredData(): LogRecord[] {
@@ -100,6 +108,42 @@ export class LogStore {
   get pagedData(): LogRecord[] {
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredData.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    const total = this.totalCount;
+    if (typeof total === 'number' && Number.isFinite(total) && total > 0) {
+      return Math.max(1, Math.ceil(total / this.pageSize));
+    }
+    // Fallback when API doesn't return totals: ensure at least current page is reachable
+    return Math.max(1, this.currentPage);
+  }
+
+  setPageJumpInput(value: number | null) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+      this.pageJumpInput = this.currentPage;
+      return;
+    }
+    this.pageJumpInput = this.clampPage(value);
+  }
+
+  jumpToPage() {
+    const target = this.clampPage(this.pageJumpInput);
+    if (target !== this.currentPage) {
+      this.updatePagination(target, this.pageSize);
+    } else {
+      this.pageJumpInput = target;
+    }
+  }
+
+  private clampPage(value: number) {
+    if (!Number.isFinite(value)) return 1;
+    const total = this.totalPages;
+    const v = Math.floor(value);
+    if (total <= 0) return 1;
+    if (v < 1) return 1;
+    if (v > total) return total;
+    return v;
   }
 
   async fetchLogs() {
@@ -225,6 +269,7 @@ export class LogStore {
         this.debugStatus = 'ok';
         this.backgroundLoading = false;
         this.totalCount = total;
+        this.pageJumpInput = this.currentPage;
       });
     } catch (err: unknown) {
       const maybeResp = (err as { response?: { status?: number; headers?: Record<string, string> } }).response;

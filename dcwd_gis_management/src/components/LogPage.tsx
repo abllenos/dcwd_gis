@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress, InputNumber } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
@@ -195,21 +195,35 @@ const LogPage: React.FC = observer(() => {
 
           {/* Custom Pagination (sliding window with ellipses) */}
           {!isSearching && (() => {
-            const total = totalCount || 0;
-            const totalPages = Math.max(1, Math.ceil(total / pageSize));
+            const total = typeof totalCount === 'number' && Number.isFinite(totalCount)
+              ? totalCount
+              : (logStore.totalPages * pageSize);
+            const totalPages = logStore.totalPages;
             const windowSize = 2; // two pages on each side
-            const start = Math.max(1, (currentPage || 1) - windowSize);
-            const end = Math.min(totalPages, (currentPage || 1) + windowSize);
+            const maxVisiblePages = 5;
             const pages: Array<number | '…'> = [];
-            if (start > 1) pages.push(1);
-            if (start > 2) pages.push('…');
-            for (let p = start; p <= end; p++) pages.push(p);
-            if (end < totalPages - 1) pages.push('…');
-            if (end < totalPages) pages.push(totalPages);
+
+            if (totalPages <= maxVisiblePages) {
+              for (let p = 1; p <= totalPages; p++) {
+                pages.push(p);
+              }
+            } else {
+              const start = Math.max(1, (currentPage || 1) - windowSize);
+              const end = Math.min(totalPages, (currentPage || 1) + windowSize);
+              if (start > 1) pages.push(1);
+              if (start > 2) pages.push('…');
+              for (let p = start; p <= end; p++) pages.push(p);
+              if (end < totalPages - 1) pages.push('…');
+              if (end < totalPages) pages.push(totalPages);
+            }
+
+            const showingStart = total > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
+            const showingEnd = total > 0 ? Math.min(currentPage * pageSize, total) : 0;
+            const disableJump = totalPages <= 1 || total === 0;
             return (
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
                 <Typography.Text style={{ fontSize: 12 }}>
-                  Showing {((currentPage - 1) * pageSize + 1)} to {Math.min(currentPage * pageSize, total)} of {total} entries
+                  Showing {showingStart} to {showingEnd} of {total} entries
                 </Typography.Text>
                 <Space>
                   <Button size="small" disabled={currentPage <= 1} onClick={() => logStore.updatePagination(currentPage - 1, pageSize)}>Previous</Button>
@@ -228,6 +242,19 @@ const LogPage: React.FC = observer(() => {
                     )
                   ))}
                   <Button size="small" disabled={currentPage >= totalPages} onClick={() => logStore.updatePagination(currentPage + 1, pageSize)}>Next</Button>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Typography.Text style={{ fontSize: 12 }}>Jump to</Typography.Text>
+                    <InputNumber
+                      size="small"
+                      min={1}
+                      max={totalPages}
+                      value={logStore.pageJumpInput}
+                      onChange={(value) => logStore.setPageJumpInput(value)}
+                      onPressEnter={() => logStore.jumpToPage()}
+                      disabled={disableJump}
+                    />
+                    <Button size="small" onClick={() => logStore.jumpToPage()} disabled={disableJump}>Go</Button>
+                  </span>
                 </Space>
               </div>
             );
