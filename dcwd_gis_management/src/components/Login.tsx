@@ -12,6 +12,7 @@ import {
 import logo from "../../public/logo-dcwd.webp?url";
 import bgImage from "../../public/login-bg.jpg?url";
 import { loginStore } from "../stores/loginStore"; 
+import "./Login.css";
 interface LoginProps {
   onLogin?: (token: string) => void;
 }
@@ -27,8 +28,38 @@ const Login: React.FC<LoginProps> = observer(({ onLogin }) => {
 
   return (
     <div style={styles.pageWrapper}>
-      <div style={styles.leftPanel} />
+      {/* Layered wave animation - positioned at page level */}
+      <div className="login-wave-container" aria-hidden>
+        <svg
+          className="login-wave-svg"
+          viewBox="0 0 1200 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Back wave layer - lightest */}
+          <path 
+            className="wave-layer wave-layer-3"
+            d="M0,120L48,125.3C96,131,192,141,288,133.3C384,125,480,99,576,96C672,93,768,115,864,120C960,125,1056,115,1104,109.3L1152,104L1152,200L1104,200C1056,200,960,200,864,200C768,200,672,200,576,200C480,200,384,200,288,200C192,200,96,200,48,200L0,200Z"
+          />
+          {/* Middle wave layer */}
+          <path 
+            className="wave-layer wave-layer-2"
+            d="M0,140L48,138.7C96,137,192,135,288,128C384,121,480,111,576,117.3C672,123,768,147,864,154.7C960,163,1056,155,1104,149.3L1152,144L1152,200L1104,200C1056,200,960,200,864,200C768,200,672,200,576,200C480,200,384,200,288,200C192,200,96,200,48,200L0,200Z"
+          />
+          {/* Front wave layer - darkest */}
+          <path 
+            className="wave-layer wave-layer-1"
+            d="M0,160L48,165.3C96,171,192,181,288,176C384,171,480,149,576,144C672,139,768,149,864,157.3C960,165,1056,171,1104,173.3L1152,176L1152,200L1104,200C1056,200,960,200,864,200C768,200,672,200,576,200C480,200,384,200,288,200C192,200,96,200,48,200L0,200Z"
+          />
+        </svg>
+        <div className="login-wave-gradient"></div>
+      </div>
+
+      <div style={styles.leftPanel} className="login-left-panel-animated">
+        <div className="login-left-panel-overlay"></div>
+      </div>
       <div style={styles.rightPanel}>
+        <div className="login-right-panel-with-wave">
         {loginStore.loading ? (
           <div
             style={{
@@ -56,12 +87,12 @@ const Login: React.FC<LoginProps> = observer(({ onLogin }) => {
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <img src={logo} alt="Logo" style={styles.logo} />
-            <h2 style={styles.title}>Login</h2>
-            <p style={styles.subtitle}>GIS Management System</p>
+          <form onSubmit={handleSubmit} style={styles.form} className="login-form-animated">
+            <img src={logo} alt="Logo" style={styles.logo} className="login-logo-animated" />
+            <h2 style={styles.title} className="login-title-animated">Login</h2>
+            <p style={styles.subtitle} className="login-subtitle-animated">GIS Management System</p>
 
-            <div style={styles.inputGroup}>
+            <div style={styles.inputGroup} className="login-input-group-animated login-input-group-hover">
               <MailOutlined style={styles.icon} />
               <input
                 type="text"
@@ -73,7 +104,7 @@ const Login: React.FC<LoginProps> = observer(({ onLogin }) => {
               />
             </div>
 
-            <div style={styles.inputGroup}>
+            <div style={styles.inputGroup} className="login-input-group-animated login-input-group-hover">
               <LockOutlined style={styles.icon} />
               <input
                 type={loginStore.showPassword ? "text" : "password"}
@@ -95,11 +126,12 @@ const Login: React.FC<LoginProps> = observer(({ onLogin }) => {
               </span>
             </div>
 
-            <button type="submit" style={styles.button}>
+            <button type="submit" style={styles.button} className="login-button-animated">
               Log In
             </button>
           </form>
         )}
+        </div>
       </div>
     </div>
   );
@@ -112,6 +144,7 @@ function getStyles(): { [key: string]: React.CSSProperties } {
       minHeight: "100vh",
       width: "100%",
       background: "#f5f5f5",
+      position: "relative",
     },
     leftPanel: {
       flex: 1,
@@ -120,6 +153,8 @@ function getStyles(): { [key: string]: React.CSSProperties } {
       backgroundPosition: "center",
       clipPath: "polygon(0 0, 100% 0, 85% 100%, 0% 100%)",
       filter: "blur(1px)",
+      position: "relative",
+      zIndex: 1,
     },
     rightPanel: {
       flex: 1,
@@ -127,6 +162,8 @@ function getStyles(): { [key: string]: React.CSSProperties } {
       alignItems: "center",
       justifyContent: "center",
       clipPath: "polygon(15% 0, 100% 0, 100% 100%, 0 100%)",
+      position: "relative",
+      zIndex: 2,
     },
     form: {
       width: "100%",
