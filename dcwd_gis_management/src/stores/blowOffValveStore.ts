@@ -1,13 +1,29 @@
 import { makeAutoObservable } from "mobx";
 import axios from "axios";
 
+export interface BlowOffValveRecord {
+  id: string;
+  bovnumber: string;
+  wonumber: string;
+  dategeocoded: string;
+  size: string;
+  status_remarks: string;
+  date_commissioned: string;
+  location: string;
+  brgycode: string;
+  geom: string;
+  lat: number | null;
+  lng: number | null;
+  assetTag: string;
+}
+
 class BlowOffValveStore {
   search = '';
   pageSize = 10;
   currentPage = 1;
   modalOpen = false;
   selectedRow: any | null = null;
-  data: any[] = [];
+  data: BlowOffValveRecord[] = [];
   loading = false;
   error: string | null = null;
 
@@ -47,6 +63,7 @@ class BlowOffValveStore {
       let valves: any[] = Array.isArray(apiData.data) ? apiData.data : [];
       runInAction(() => {
         this.data = valves.map((item: any) => ({
+          id: item.id || '',
           bovnumber: item.bovnumber || '',
           wonumber: item.wonumber || '',
           dategeocoded: item.dategeocoded || '',
@@ -55,6 +72,12 @@ class BlowOffValveStore {
           date_commissioned: item.date_commissioned || '',
           location: item.location || '',
           brgycode: item.brgycode || '',
+          // Add geometry fields like Air Valve
+          geom: item.geom || '',
+          lat: item.lat || item.latitude || null,
+          lng: item.lng || item.lon || item.longitude || null,
+          // Add other potential fields
+          assetTag: item.asset_tag || item.assetTag || '',
         }));
       });
     } catch (err: any) {
