@@ -1,8 +1,7 @@
 
 // React import not needed with the new JSX transform
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Space, Button } from 'antd';
-import { SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Table, Select, Input } from 'antd';
 
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
@@ -50,20 +49,7 @@ const DMAInlet = observer(() => {
     }
   };
 
-  const handlePageChange = (page: number) => {
-    const filteredData = initialData.filter(
-      row =>
-        row.woNumber.toLowerCase().includes(search.toLowerCase()) ||
-        row.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
-        String(row.size).includes(search) ||
-        row.type.toLowerCase().includes(search.toLowerCase())
-    );
-    const totalPages = Math.ceil(filteredData.length / dmaInletStore.pageSize);
-    // Ensure page is within valid bounds
-    if (page >= 1 && page <= totalPages) {
-      dmaInletStore.setCurrentPage(page);
-    }
-  };
+
 
   const handleSearch = (value: string) => {
     dmaInletStore.setSearch(value);
@@ -105,36 +91,7 @@ const DMAInlet = observer(() => {
         row.type.toLowerCase().includes(search.toLowerCase())
     );
 
-  const { Title } = Typography;
 
-    // Simple pagination logic (License.tsx style)
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / dmaInletStore.pageSize);
-    const startIndex = (dmaInletStore.currentPage - 1) * dmaInletStore.pageSize;
-    const endIndex = Math.min(startIndex + dmaInletStore.pageSize, totalItems);
-    const paginatedData = filteredData.slice(startIndex, endIndex);
-
-    // Generate page numbers for pagination (License.tsx style)
-    const getPageNumbers = () => {
-      const pages = [];
-      const maxVisiblePages = 5;
-      const currentPage = dmaInletStore.currentPage;
-      if (totalPages <= maxVisiblePages) {
-        for (let i = 1; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        if (endPage - startPage < maxVisiblePages - 1) {
-          startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-        for (let i = startPage; i <= endPage; i++) {
-          pages.push(i);
-        }
-      }
-      return pages;
-    };
 
 
 

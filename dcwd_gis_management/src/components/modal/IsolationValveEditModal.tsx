@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Row, Col, Button, Typography, Space, Tabs, Select, Table } from "antd";
+import { Modal, Form, Input, Row, Col, Button, Typography, Space, Tabs, Select, Table, DatePicker } from "antd";
 import type { IsolationValve } from '../types/isolationValve';
 import GeometryMap from "../../components/GeometryMap";
 import { coordinatesToWKB } from "../../utils/wkbParser";
@@ -79,14 +79,58 @@ const IsolationValveEditModal: React.FC<IsolationValveEditModalProps> = ({ visib
             <Tabs.TabPane tab="Details" key="1">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="GV Number" name="gvnumber"><Input /></Form.Item>
-                  <Form.Item label="Status" name="status"><Select options={statusOptions} allowClear /></Form.Item>
-                  <Form.Item label="Date Installed" name="date_installed"><Input /></Form.Item>
-                  <Form.Item label="Location" name="location"><Input /></Form.Item>
-                  <Form.Item label="Water Source" name="water_source"><Input /></Form.Item>
-                  <Form.Item label="Barangay" name="barangay"><Select options={barangayOptions} allowClear /></Form.Item>
-                  <Form.Item label="Remarks" name="remarks">
-                    <Input.TextArea rows={3} style={{ resize: 'none' }} />
+                  <Row gutter={[16, 0]} style={{ marginBottom: 12 }}>
+                    <Col xs={24} sm={12}>
+                      <Form.Item label="GV Number" name="gvnumber" style={{ marginBottom: 16 }}>
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={12}>
+                      <Form.Item label="Status" name="status" style={{ marginBottom: 16 }}>
+                        <Select options={statusOptions} allowClear />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  
+                  <Row gutter={[16, 0]} style={{ marginBottom: 12 }}>
+                    <Col xs={24} sm={12}>
+                      <Form.Item label="Location" name="location" style={{ marginBottom: 16 }}>
+                        <Input placeholder={record?.location || "Enter location"} />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={12}>
+                      <Form.Item label="Date Installed" name="date_installed" style={{ marginBottom: 16 }}>
+                        <DatePicker 
+                          style={{ width: '100%' }}
+                          format="YYYY-MM-DD"
+                          placeholder="Select date"
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <Form.Item label="Water Source" name="water_source" style={{ marginBottom: 16 }}>
+                    <Select options={[
+                      { label: 'Main Line', value: 'main_line' },
+                      { label: 'Distribution', value: 'distribution' },
+                      { label: 'Service Line', value: 'service_line' }
+                    ]} allowClear />
+                  </Form.Item>
+
+                  <Form.Item label="Barangay" name="barangay" style={{ marginBottom: 16 }}>
+                    <Select options={barangayOptions} allowClear />
+                  </Form.Item>
+
+                  <Form.Item label="Valve Classification" name="valve_classification" style={{ marginBottom: 16 }}>
+                    <Select options={[
+                      { label: 'Gate Valve', value: 'gate' },
+                      { label: 'Ball Valve', value: 'ball' },
+                      { label: 'Butterfly Valve', value: 'butterfly' }
+                    ]} allowClear />
+                  </Form.Item>
+
+                  <Form.Item label="Remarks" name="remarks" style={{ marginBottom: 0 }}>
+                    <Input.TextArea rows={4} style={{ resize: 'none' }} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
@@ -98,7 +142,7 @@ const IsolationValveEditModal: React.FC<IsolationValveEditModalProps> = ({ visib
                         geom={record?.geom} 
                         height={500}
                         editable={false}
-                        markerColor="#3a5fc8"
+                        markerColor="#ff4d4f"
                         markerLabel="Isolation Valve"
                         onLocationChange={(lng: number, lat: number) => {
                           const wkb = coordinatesToWKB(lng, lat);

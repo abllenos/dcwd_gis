@@ -167,50 +167,84 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
         });
       }
     }
+  }, [editable, onLocationChange, markerColor]);
 
-    // Update marker based on geom prop
+  // Separate useEffect for handling geom changes to ensure map responds to data changes
+  useEffect(() => {
     const map = mapInstanceRef.current;
-    if (map) {
-      const coords = parseWKB(geom);
-      
-      if (coords) {
-        const { latitude, longitude } = coords;
-        
-        // Center map on coordinates
-        map.setView([latitude, longitude], 15);
-        
-        // Force map to recalculate size
-        setTimeout(() => {
-          map.invalidateSize();
-        }, 100);
+    if (!map) return;
 
-        // Add marker with delay to ensure map is ready
-        setTimeout(() => {
-          // Remove existing marker
-          if (markerRef.current) {
-            markerRef.current.remove();
-          }
-
-          // Create marker
-          const marker = L.marker([latitude, longitude], {
-            icon: createCustomIcon(markerColor),
-            draggable: false // Always non-draggable for existing locations
-          }).addTo(map);
-
-          // Bind popup inside setTimeout after marker is added
-          marker.bindPopup(`${markerLabel}<br>Lat: ${latitude.toFixed(6)}<br>Lng: ${longitude.toFixed(6)}`);
-
-          // Don't add drag handlers for existing markers to prevent accidental changes
-
-          markerRef.current = marker;
-        }, 150);
-      }
+    // Remove existing marker first
+    if (markerRef.current) {
+      markerRef.current.remove();
+      markerRef.current = null;
     }
 
-    return () => {
-      // Don't destroy map on every render, only on unmount
-    };
-  }, [geom, editable, onLocationChange, markerColor, markerLabel]);
+    // Try to parse WKB geometry first
+    let coordinates = parseWKB(geom);
+    
+    // If WKB parsing fails or no geom, try to use lat/lon if available
+    // This handles cases where data might have lat/lon but invalid WKB
+    if (!coordinates && geom) {
+      // Check if geom contains lat/lon data in some other format
+      console.warn('WKB parsing failed for geom:', geom);
+    }
+    
+    if (coordinates) {
+      const { latitude, longitude } = coordinates;
+      
+      // Validate coordinates are within reasonable bounds
+      if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        console.warn('Invalid coordinates:', { latitude, longitude });
+        return;
+      }
+      
+      // Smoothly animate to the new location
+      map.setView([latitude, longitude], 16, {
+        animate: true,
+        duration: 1.0
+      });
+      
+      // Force map to recalculate size after animation
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 200);
+
+      // Add marker after the animation completes
+      setTimeout(() => {
+        const marker = L.marker([latitude, longitude], {
+          icon: createCustomIcon(markerColor),
+          draggable: false // Always non-draggable for existing locations
+        }).addTo(map);
+
+        // Create informative popup
+        const popupContent = `
+          <div style="text-align: center;">
+            <strong>${markerLabel}</strong><br>
+            <small>Latitude: ${latitude.toFixed(6)}</small><br>
+            <small>Longitude: ${longitude.toFixed(6)}</small>
+          </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        
+        // Auto-open popup to show location info
+        marker.openPopup();
+
+        markerRef.current = marker;
+        
+        console.log('Map centered on:', { latitude, longitude, label: markerLabel });
+      }, 300);
+    } else {
+      // If no valid coordinates, center on Davao City default location
+      console.warn('No valid coordinates found, using default center');
+      map.setView([7.0731, 125.6128], 13);
+      
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    }
+  }, [geom, markerColor, markerLabel]);
 
   // Cleanup on unmount
   useEffect(() => {

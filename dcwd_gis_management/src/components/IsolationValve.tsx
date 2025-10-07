@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Table, Input, Spin, Alert, Card, Typography, Space, Select, Button } from "antd";
 
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { isolationValveStore } from '../stores/isolationValveStore';
 import Footer from './layout/Footer';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const fetchIsolationValve = async (): Promise<IsolationValve[]> => {
     const res = await apiGis.get("helpers/gis/mgtsys/getLayers/getIsolation.php");
@@ -28,6 +28,8 @@ const fetchIsolationValve = async (): Promise<IsolationValve[]> => {
         valve: item.valve || '',
         project_title: item.project_title || '',
         barangay: item.barangay || '',
+        geom: item.geom || '',
+        ...item,
     }));
 };
 
@@ -149,15 +151,15 @@ const IsolationValveList: React.FC = observer(() => {
         return (
                 <>
                     <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-                        <Card style={{ background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
-                            <div style={{ background: '#e9edfa', borderRadius: 8, padding: '18px 32px 12px 32px', marginBottom: 24 }}>
-                                <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
-                            </div>
-                            <div style={{ marginBottom: 16 }}>
-                                <Text strong>Instructions:</Text>
-                                <div style={{ marginLeft: 12, marginTop: 2 }}>
-                                    <Text>Instruction: Double Click row to edit Details.</Text>
-                                </div>
+                        <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+                            <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Isolation Valve - Maintenance</span>
+                        </div>
+                        <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+                            <div style={{ marginBottom: 24 }}>
+                                <Typography.Title level={5} style={{ color: '#666', marginBottom: 8 }}>
+                                    Instructions:
+                                </Typography.Title>
+                                <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
                             </div>
                             <div className="license-controls-container">
                                 <div className="license-display-controls">
