@@ -55,7 +55,11 @@ const Login: React.FC<LoginProps> = observer(({ onLogin }) => {
         <div className="login-wave-gradient"></div>
       </div>
 
-      <div style={styles.leftPanel} className="login-left-panel-animated">
+      <div style={styles.leftPanel}>
+        <div 
+          className="login-left-panel-bg login-left-panel-animated"
+          style={styles.leftPanelBg}
+        ></div>
         <div className="login-left-panel-overlay"></div>
       </div>
       <div style={styles.rightPanel}>
@@ -148,13 +152,13 @@ function getStyles(): { [key: string]: React.CSSProperties } {
     },
     leftPanel: {
       flex: 1,
-      backgroundImage: `url(${bgImage})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
       clipPath: "polygon(0 0, 100% 0, 85% 100%, 0% 100%)",
-      filter: "blur(1px)",
       position: "relative",
       zIndex: 1,
+      overflow: "hidden",
+    },
+    leftPanelBg: {
+      backgroundImage: `url(${bgImage})`,
     },
     rightPanel: {
       flex: 1,
