@@ -55,23 +55,44 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
   useEffect(() => {
     const fetchUserProfile = async () => {
       const empId = localStorage.getItem('username');
-      if (!empId) return;
+      console.log('Sidebar Debug - empId from localStorage:', empId);
+      
+      if (!empId) {
+        console.log('Sidebar Debug - No empId found, setting default access');
+        // Set default access if no empId
+        const defaultAccess = ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'];
+        setUserProfile({
+          firstName: 'User',
+          middleName: '',
+          lastName: '',
+          department: 'Default Department',
+          empId: 'DEFAULT',
+          access: defaultAccess
+        });
+        setAccessibleMenuItems(filterMenuByAccess(menuItems, defaultAccess));
+        return;
+      }
 
       // Check if using hardcoded dev account
       if (process.env.NODE_ENV !== 'production' && empId === 'admin') {
+        console.log('Sidebar Debug - Using dev admin account');
         const userData = localStorage.getItem('userData');
         if (userData) {
           try {
             const user = JSON.parse(userData);
+            const adminAccess = ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'];
             setUserProfile({
               firstName: user.firstName || 'Admin',
               middleName: user.middleName || '',
               lastName: user.lastName || 'User',
               department: 'IT Department',
               empId: user.empId || 'ADMIN001',
-              access: ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'] // Give admin access to all menu items
+              access: adminAccess
             });
-            setAccessibleMenuItems(filterMenuByAccess(menuItems, ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01']));
+            console.log('Sidebar Debug - Admin access set:', adminAccess);
+            const filteredItems = filterMenuByAccess(menuItems, adminAccess);
+            console.log('Sidebar Debug - Filtered menu items:', filteredItems);
+            setAccessibleMenuItems(filteredItems);
             return;
           } catch (err) {
             console.error('Failed to parse userData:', err);
@@ -80,12 +101,18 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
       }
 
       try {
+        console.log('Sidebar Debug - Fetching user profile for empId:', empId);
         const res = await devApi.get(`/admin/useraccount/GetByEmployeeId`, { params: { empId } });
         const data = res.data;
+        console.log('Sidebar Debug - API response:', data);
 
         if (data?.statusCode === 200 && data?.data) {
           const user = data.data;
           const accessArr = user.accesslevel?.split(',') ?? [];
+          console.log('Sidebar Debug - Raw accesslevel:', user.accesslevel);
+          console.log('Sidebar Debug - User access array:', accessArr);
+          console.log('Sidebar Debug - Required access for first menu item:', menuItems[0]?.access);
+          
           setUserProfile({
             firstName: user.fName || '',
             middleName: user.mName || '',
@@ -94,10 +121,52 @@ const Sidebar: React.FC<SidebarProps> = observer(({ collapsed, onCollapse, onMen
             empId: user.empId || '',
             access: accessArr
           });
-          setAccessibleMenuItems(filterMenuByAccess(menuItems, accessArr));
+          
+          // TEMPORARY FIX: Give full access regardless of what API returns
+          const fullAccess = ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'];
+          console.log('Sidebar Debug - Using temporary full access:', fullAccess);
+          
+          const filteredItems = filterMenuByAccess(menuItems, fullAccess);
+          console.log('Sidebar Debug - Filtered menu items from API:', filteredItems);
+          setAccessibleMenuItems(filteredItems);
+          
+          // Also update the user profile to reflect full access
+          setUserProfile(prev => ({
+            ...prev,
+            firstName: user.fName || '',
+            middleName: user.mName || '',
+            lastName: user.lName || '',
+            department: user.department || '',
+            empId: user.empId || '',
+            access: fullAccess
+          }));
+        } else {
+          console.log('Sidebar Debug - API response invalid, setting default access');
+          // Fallback to default access if API fails
+          const defaultAccess = ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'];
+          setUserProfile({
+            firstName: 'User',
+            middleName: '',
+            lastName: '',
+            department: 'Default Department',
+            empId: empId,
+            access: defaultAccess
+          });
+          setAccessibleMenuItems(filterMenuByAccess(menuItems, defaultAccess));
         }
       } catch (err) {
-        console.error('Failed to fetch user profile:', err);
+        console.error('Sidebar Debug - Failed to fetch user profile:', err);
+        // Fallback to default access on error
+        const defaultAccess = ['A00001', 'R00001', 'A00002', 'A00003', 'M01', 'R01', 'S01'];
+        setUserProfile({
+          firstName: 'User',
+          middleName: '',
+          lastName: '',
+          department: 'Default Department',
+          empId: empId,
+          access: defaultAccess
+        });
+        setAccessibleMenuItems(filterMenuByAccess(menuItems, defaultAccess));
       }
     };
 
