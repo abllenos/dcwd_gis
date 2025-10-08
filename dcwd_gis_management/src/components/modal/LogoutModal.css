@@ -1,0 +1,179 @@
+/* Logout Modal Styling */
+.logout-modal .ant-modal-content {
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.logout-modal .ant-modal-header {
+  border-bottom: none;
+  padding: 24px 24px 8px;
+  background: transparent;
+}
+
+.logout-modal .ant-modal-body {
+  padding: 16px 32px 24px;
+}
+
+.logout-modal .ant-modal-footer {
+  border-top: none;
+  padding: 8px 24px 24px;
+}
+
+/* Modal Title with Icon */
+.logout-modal-title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.4s ease-out;
+}
+
+.logout-modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+  animation: iconPulse 0.6s ease-out;
+}
+
+.logout-modal-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #17212e;
+  margin: 0;
+}
+
+/* Modal Message */
+.logout-modal-message {
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+  animation: fadeInUp 0.5s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: backwards;
+}
+
+/* Button Container */
+.logout-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  animation: fadeInUp 0.5s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: backwards;
+}
+
+/* Cancel Button */
+.btn-cancel {
+  min-width: 110px;
+  height: 42px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 2px solid #d9d9d9;
+  background: white;
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  border-color: #113983;
+  color: #113983;
+  background: #f0f5ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17, 57, 131, 0.15);
+}
+
+.btn-cancel:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(17, 57, 131, 0.1);
+}
+
+/* Logout Button */
+.btn-danger {
+  min-width: 110px;
+  height: 42px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #e04848 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  color: white;
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+/* Animations */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes iconPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Backdrop */
+.logout-modal.ant-modal-wrap {
+  backdrop-filter: blur(4px);
+}

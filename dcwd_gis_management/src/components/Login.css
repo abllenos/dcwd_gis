@@ -1,0 +1,254 @@
+/* Wave animation for login page - positioned at page wrapper level */
+.login-right-panel-with-wave {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10; /* form content above the wave */
+}
+
+.login-wave-container {
+  position: fixed;
+  left: -10%;
+  right: -10%;
+  bottom: 0;
+  width: 120%;
+  height: 35vh;
+  min-height: 280px;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0; /* behind everything - will be behind the picture */
+  margin: 0;
+  padding: 0;
+}
+
+.login-wave-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layered waves with different opacities */
+.wave-layer-1 {
+  fill: rgba(17, 57, 131, 0.25);
+  animation: waveMove1 7s ease-in-out infinite;
+}
+
+.wave-layer-2 {
+  fill: rgba(17, 57, 131, 0.18);
+  animation: waveMove2 9s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+.wave-layer-3 {
+  fill: rgba(17, 57, 131, 0.12);
+  animation: waveMove3 11s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+/* Different wave animations for each layer */
+@keyframes waveMove1 {
+  0%, 100% { 
+    transform: translateX(0) translateY(0); 
+  }
+  50% { 
+    transform: translateX(-3%) translateY(-5px); 
+  }
+}
+
+@keyframes waveMove2 {
+  0%, 100% { 
+    transform: translateX(0) translateY(0); 
+  }
+  50% { 
+    transform: translateX(3%) translateY(-8px); 
+  }
+}
+
+@keyframes waveMove3 {
+  0%, 100% { 
+    transform: translateX(0) translateY(0); 
+  }
+  50% { 
+    transform: translateX(-2%) translateY(-3px); 
+  }
+}
+
+/* subtle gradient overlay to blend with page */
+.login-wave-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 35vh;
+  min-height: 280px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(245,245,245,0.0), rgba(245,245,245,0.1));
+  z-index: 2; /* sits above waves */
+  margin: 0;
+  padding: 0;
+}
+
+/* Login form animations */
+.login-form-animated {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.login-logo-animated {
+  animation: fadeInScale 1s ease-out;
+}
+
+.login-input-group-animated {
+  animation: slideInRight 0.6s ease-out backwards;
+}
+
+.login-input-group-animated:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.login-input-group-animated:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.login-button-animated {
+  animation: fadeInUp 0.8s ease-out backwards;
+  animation-delay: 0.4s;
+  transition: all 0.3s ease;
+}
+
+.login-button-animated:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(17, 57, 131, 0.4);
+}
+
+.login-button-animated:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(17, 57, 131, 0.3);
+}
+
+/* Input group hover effect */
+.login-input-group-hover {
+  transition: all 0.3s ease;
+}
+
+.login-input-group-hover:hover {
+  border-color: #113983;
+  box-shadow: 0 4px 12px rgba(17, 57, 131, 0.15);
+  transform: translateY(-2px);
+}
+
+.login-input-group-hover:focus-within {
+  border-color: #113983;
+  box-shadow: 0 4px 16px rgba(17, 57, 131, 0.25);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Keyframe animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Title animations */
+.login-title-animated {
+  animation: fadeInUp 0.8s ease-out backwards;
+  animation-delay: 0.1s;
+}
+
+.login-subtitle-animated {
+  animation: fadeInUp 0.8s ease-out backwards;
+  animation-delay: 0.15s;
+}
+
+/* Left Panel Background Image */
+.login-left-panel-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../../public/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(1px);
+  transition: transform 0.8s ease-out;
+  will-change: transform;
+}
+
+/* Left Panel (Picture) Animations */
+.login-left-panel-animated:hover {
+  transform: scale(1.08);
+  transform-origin: center center;
+}
+
+/* Add overlay gradient animation on the picture */
+.login-left-panel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg, 
+    rgba(17, 57, 131, 0.08) 0%, 
+    transparent 50%, 
+    rgba(17, 57, 131, 0.04) 100%
+  );
+  animation: overlayShift 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes overlayShift {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .login-left-panel-animated {
+    animation: none;
+  }
+  
+  .login-left-panel-overlay {
+    animation: none;
+  }
+}

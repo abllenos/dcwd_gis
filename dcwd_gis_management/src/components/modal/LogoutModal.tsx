@@ -1,6 +1,8 @@
 
 import React from "react";
 import { Modal, Button } from "antd";
+import { LogoutOutlined } from "@ant-design/icons";
+import "./LogoutModal.css";
 
 interface LogoutModalProps {
   visible: boolean;
@@ -11,18 +13,20 @@ interface LogoutModalProps {
 const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onConfirm, onCancel }) => {
   return (
     <Modal
+      className="logout-modal"
       title={
-        <div style={{ textAlign: "center", width: "100%" }}>
-          <span style={{ fontSize: "22px", fontWeight: 600, color: "#17212e" }}>
-            Confirm Logout
-          </span>
+        <div className="logout-modal-title-container">
+          <div className="logout-modal-icon">
+            <LogoutOutlined />
+          </div>
+          <h3 className="logout-modal-title">Confirm Logout</h3>
         </div>
       }
       open={visible}
       closable={false} 
       onCancel={onCancel}
       footer={
-        <div style={{ textAlign: "center" }}>
+        <div className="logout-modal-buttons">
           <Button 
             className="btn-cancel"
             onClick={onCancel} 
@@ -31,16 +35,16 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onConfirm, onCancel 
           </Button>
           <Button 
             className="btn-danger" 
-            onClick={onConfirm} 
-            style={{ marginLeft: 14 }}
+            onClick={onConfirm}
           >
             Logout
           </Button>
         </div>
       }
       centered
+      width={440}
     >
-      <p style={{ textAlign: "center", fontSize: "17px" }}>
+      <p className="logout-modal-message">
         Do you want to log out of the system?
       </p>
     </Modal>
