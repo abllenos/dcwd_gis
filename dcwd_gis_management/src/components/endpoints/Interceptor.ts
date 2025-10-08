@@ -38,6 +38,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 const PUBLIC_ENDPOINT_PATHS = [
   '/web/dcwdgis/ajax/query/getallclassification.php',
   '/helpers/gis/api/userlogs/getlogsgeometry.php',
+  '/web/dcwdgis/ajax/views/getaccounts.php',
   '/api/classifications', // local dev proxy path
 ];
 

@@ -20,6 +20,7 @@ class LayerStore {
   pageSize = 10;
   currentPage = 1;
   search = '';
+  pageJumpInput = 1;
 
   addModalVisible = false;
   editing: LayerRecord | null = null;
@@ -75,6 +76,9 @@ class LayerStore {
       }).filter(Boolean) as LayerRecord[] : [];
       runInAction(() => {
         this.records = list;
+        const validPage = this.clampPage(this.currentPage);
+        this.currentPage = validPage;
+        this.pageJumpInput = validPage;
         this.diagnostics.lastStatus = 200;
         this.diagnostics.lastFetchedAt = new Date().toISOString();
       });
@@ -99,11 +103,43 @@ class LayerStore {
   }
   get totalCount() { return this.filtered.length; }
   get paged() { const start = (this.currentPage - 1) * this.pageSize; return this.filtered.slice(start, start + this.pageSize); }
+  get totalPages() { return Math.max(1, Math.ceil(this.totalCount / this.pageSize)); }
 
   // Actions
-  setSearch(v: string) { this.search = v; this.currentPage = 1; }
-  setPageSize(v: number) { this.pageSize = v; this.currentPage = 1; }
-  setCurrentPage(p: number) { this.currentPage = p; }
+  setSearch(v: string) {
+    this.search = v;
+    this.currentPage = 1;
+    this.pageJumpInput = 1;
+  }
+  setPageSize(v: number) {
+    this.pageSize = v;
+    this.currentPage = 1;
+    this.pageJumpInput = 1;
+  }
+  setCurrentPage(p: number) {
+    const target = this.clampPage(p);
+    this.currentPage = target;
+    this.pageJumpInput = target;
+  }
+  setPageJumpInput(value: number | null) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+      this.pageJumpInput = 1;
+      return;
+    }
+    this.pageJumpInput = this.clampPage(value);
+  }
+  jumpToPage() {
+    this.setCurrentPage(this.pageJumpInput);
+  }
+  private clampPage(value: number) {
+    if (!Number.isFinite(value)) return 1;
+    const total = this.totalPages;
+    const v = Math.floor(value);
+    if (total <= 0) return 1;
+    if (v < 1) return 1;
+    if (v > total) return total;
+    return v;
+  }
 
   openAdd() { this.editing = null; this.draft = { description: '', statusFlag: 1 }; this.addModalVisible = true; }
   openEdit(r: LayerRecord) { this.editing = r; this.draft = { ...r }; this.addModalVisible = true; }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress, InputNumber } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
@@ -30,11 +30,12 @@ const LogPage: React.FC = observer(() => {
   const tableLoading = loading || (isSearching && layerSearchStore.loading);
 
   return (
+    <>
     <Card className="card shadow mb-4" style={{ borderRadius: 8 }}>
       <div className="card-header py-3" style={{ background: 'var(--bg-muted)' }}>
         <Title level={4} style={{ margin: 0 }}>Log trails</Title>
       </div>
-    <div className="card-body" style={{ paddingTop: 20, paddingLeft: 28, paddingRight: 28 }}>
+  <div className="card-body" style={{ paddingTop: 20, paddingLeft: 28, paddingRight: 28, paddingBottom: 28 }}>
         {/* Row 1: Map Layers */}
         <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 12 }}>
           <Col xs={24} md={12} lg={8}>
@@ -192,32 +193,81 @@ const LogPage: React.FC = observer(() => {
             style={{ marginBottom: 16 }}
           />
 
-          {/* Custom Pagination */}
-          {!isSearching && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
-              <Typography.Text style={{ fontSize: 12 }}>
-                Showing {((currentPage - 1) * pageSize + 1)} to {Math.min(currentPage * pageSize, totalCount || 0)} of {totalCount || 0} entries
-              </Typography.Text>
-              <Space>
-                <Button size="small" disabled={currentPage === 1} onClick={() => logStore.updatePagination(currentPage - 1, pageSize)}>Previous</Button>
-                {Array.from({ length: Math.ceil((totalCount || 0) / pageSize) }).slice(0, 5).map((_, i) => {
-                  const page = i + 1;
-                  return <Button key={page} size="small" type={page === currentPage ? 'primary' : 'default'} onClick={() => logStore.updatePagination(page, pageSize)}>{page}</Button>;
-                })}
-                {Math.ceil((totalCount || 0) / pageSize) > 5 && <Button size="small" disabled>...</Button>}
-                {Math.ceil((totalCount || 0) / pageSize) > 5 && (
-                  <Button size="small" type={currentPage === Math.ceil((totalCount || 0) / pageSize) ? 'primary' : 'default'} onClick={() => logStore.updatePagination(Math.ceil((totalCount || 0) / pageSize), pageSize)}>{Math.ceil((totalCount || 0) / pageSize)}</Button>
-                )}
-                <Button size="small" disabled={currentPage >= Math.ceil((totalCount || 0) / pageSize)} onClick={() => logStore.updatePagination(currentPage + 1, pageSize)}>Next</Button>
-              </Space>
-            </div>
-          )}
+          {/* Custom Pagination (sliding window with ellipses) */}
+          {!isSearching && (() => {
+            const total = typeof totalCount === 'number' && Number.isFinite(totalCount)
+              ? totalCount
+              : (logStore.totalPages * pageSize);
+            const totalPages = logStore.totalPages;
+            const windowSize = 2; // two pages on each side
+            const maxVisiblePages = 5;
+            const pages: Array<number | '…'> = [];
+
+            if (totalPages <= maxVisiblePages) {
+              for (let p = 1; p <= totalPages; p++) {
+                pages.push(p);
+              }
+            } else {
+              const start = Math.max(1, (currentPage || 1) - windowSize);
+              const end = Math.min(totalPages, (currentPage || 1) + windowSize);
+              if (start > 1) pages.push(1);
+              if (start > 2) pages.push('…');
+              for (let p = start; p <= end; p++) pages.push(p);
+              if (end < totalPages - 1) pages.push('…');
+              if (end < totalPages) pages.push(totalPages);
+            }
+
+            const showingStart = total > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
+            const showingEnd = total > 0 ? Math.min(currentPage * pageSize, total) : 0;
+            const disableJump = totalPages <= 1 || total === 0;
+            return (
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
+                <Typography.Text style={{ fontSize: 12 }}>
+                  Showing {showingStart} to {showingEnd} of {total} entries
+                </Typography.Text>
+                <Space>
+                  <Button size="small" disabled={currentPage <= 1} onClick={() => logStore.updatePagination(currentPage - 1, pageSize)}>Previous</Button>
+                  {pages.map((p, idx) => (
+                    p === '…' ? (
+                      <Button key={`ellipsis-${idx}`} size="small" disabled>...</Button>
+                    ) : (
+                      <Button
+                        key={p}
+                        size="small"
+                        type={p === currentPage ? 'primary' : 'default'}
+                        onClick={() => logStore.updatePagination(p, pageSize)}
+                      >
+                        {p}
+                      </Button>
+                    )
+                  ))}
+                  <Button size="small" disabled={currentPage >= totalPages} onClick={() => logStore.updatePagination(currentPage + 1, pageSize)}>Next</Button>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Typography.Text style={{ fontSize: 12 }}>Jump to</Typography.Text>
+                    <InputNumber
+                      size="small"
+                      min={1}
+                      max={totalPages}
+                      value={logStore.pageJumpInput}
+                      onChange={(value) => logStore.setPageJumpInput(value)}
+                      onPressEnter={() => logStore.jumpToPage()}
+                      disabled={disableJump}
+                    />
+                    <Button size="small" onClick={() => logStore.jumpToPage()} disabled={disableJump}>Go</Button>
+                  </span>
+                </Space>
+              </div>
+            );
+          })()}
         </div>
         {/* Bottom search results table removed; search results now render in the main table above. */}
         <Modal
           title="Log Details"
           open={logUiStore.isModalOpen}
           onCancel={() => logUiStore.close()}
+          width={'50vw'}
+          style={{ maxHeight: '90vh', top: 20, overflow: 'hidden' }}
+          styles={{ body: { maxHeight: '76vh', overflow: 'hidden' } }}
           footer={[
             <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
           ]}
@@ -237,7 +287,7 @@ const LogPage: React.FC = observer(() => {
                 <div style={{ fontWeight: 600, marginBottom: 8 }}>Map</div>
                 {logUiStore.geometryLoading && <div style={{ padding: 8 }}>Loading geometry…</div>}
                 {!logUiStore.geometryLoading && logUiStore.geometry && (
-                  <MapView height={280} geometry={logUiStore.geometry} />
+                  <MapView height={460} geometry={logUiStore.geometry} />
                 )}
                 {!logUiStore.geometryLoading && !logUiStore.geometry && (
                   <div style={{ padding: 8, color: 'var(--text-muted)' }}>
@@ -249,11 +299,14 @@ const LogPage: React.FC = observer(() => {
           )}
         </Modal>
 
-        {/* status/progress UI removed as requested */}
-
       </div>
-      <Footer />
     </Card>
+    
+    {/* Spacer to prevent content from going under fixed footer */}
+    <div style={{ height: '80px' }} />
+    
+    <Footer />
+    </>
   );
 });
 
