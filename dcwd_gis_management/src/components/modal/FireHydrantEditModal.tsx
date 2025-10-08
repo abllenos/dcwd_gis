@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, Row, Col, Button, Typography, Space, Tabs, Table, Card } from "antd";
+import { Modal, Form, Input, Select, Row, Col, Button, Typography, Space, Tabs, Table, Card, DatePicker } from "antd";
 import type { FireHydrant } from '../../stores/fireHydrantListStore';
 import GeometryMap from "../GeometryMap";
-import { coordinatesToWKB, parseWKB } from "../../utils/wkbParser";
+import { coordinatesToWKB } from "../../utils/wkbParser";
 
 const { Title } = Typography;
 
@@ -66,26 +66,41 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
       footer={null}
       width={1200}
       style={{ top: 24 }}
-      styles={{ body: { padding: 0 } }}
+      bodyStyle={{ padding: 0 }}
       destroyOnClose
-      maskClosable
+      maskClosable={false}
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
+      <div style={{ padding: '24px 32px', background: '#fff', borderRadius: '8px 8px 0 0', borderBottom: '1px solid #e8e8e8' }}>
         <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Fire Hydrant - Maintenance</Title>
       </div>
-      <div style={{ padding: '0 0 0 0', background: '#fff' }}>
-        <Form form={form} layout="vertical" style={{ padding: '32px 32px 0 32px' }}>
+      <div style={{ padding: '32px', background: '#fff' }}>
+        <Form form={form} layout="vertical">
           <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
             <Tabs.TabPane tab="Details" key="1">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Fire Hydrant ID" name="assetid"><Input /></Form.Item>
-                  <Form.Item label="Status" name="status"><Select options={statusOptions} allowClear /></Form.Item>
-                  <Form.Item label="Location" name="location"><Input /></Form.Item>
-                  <Form.Item label="Date Installed" name="date_installed"><Input /></Form.Item>
-                  <Form.Item label="Water Source" name="water_source"><Input /></Form.Item>
+                  <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Fire Hydrant ID" name="assetid"><Input /></Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Status" name="status"><Select options={statusOptions} allowClear /></Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Location" name="location"><Input /></Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Date Installed" name="date_installed"><DatePicker style={{ width: '100%' }} /></Form.Item>
+                    </Col>
+                  </Row>
+                  <Form.Item label="Water Source" name="water_source"><Select options={statusOptions} allowClear /></Form.Item>
                   <Form.Item label="Barangay" name="barangay"><Select options={barangayOptions} allowClear /></Form.Item>
                   <Form.Item label="Hydrant Classification" name="hydrant_classification"><Select options={hydrantClassOptions} allowClear /></Form.Item>
+                  <Form.Item label="Remarks" name="remarks">
+                    <Input.TextArea rows={3} style={{ resize: 'none' }} />
+                  </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
                   <div style={{ marginBottom: '16px' }}>
@@ -95,8 +110,8 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
                         key={record?.id || 'new'}
                         geom={record?.geom} 
                         height={500}
-                        editable
-                        markerColor="#ff6b6b"
+                        editable={false}
+                        markerColor="#ff0000"
                         markerLabel="Fire Hydrant"
                         onLocationChange={(lng: number, lat: number) => {
                           const wkb = coordinatesToWKB(lng, lat);
@@ -104,18 +119,7 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
                         }}
                       />
                     )}
-                    <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>
-                      {(() => {
-                        const coords = parseWKB(record?.geom);
-                        return coords 
-                          ? `Current: ${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`
-                          : 'No location data';
-                      })()}
-                    </div>
                   </div>
-                  <Form.Item label="Remarks" name="remarks">
-                    <Input.TextArea rows={3} style={{ resize: 'none' }} />
-                  </Form.Item>
                 </Col>
               </Row>
             </Tabs.TabPane>
@@ -163,7 +167,7 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
           </Tabs>
         </Form>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#fff', borderTop: '1px solid #e8e8e8', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
           <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>

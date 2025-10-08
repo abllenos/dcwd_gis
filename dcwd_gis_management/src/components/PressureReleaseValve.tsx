@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Card, Typography, Table, Spin, Alert, Input, Select, Button, Space } from 'antd';
-import { UnorderedListOutlined } from '@ant-design/icons';
 
 import PressureReleaseValveModal from './modal/PressureReleaseValveModal';
 import type { ColumnsType } from 'antd/es/table';

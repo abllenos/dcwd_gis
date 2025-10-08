@@ -57,8 +57,7 @@ const fetchAirValves = async (): Promise<AirValveRecord[]> => {
 
 
 const AirValveMaintenance: React.FC = observer(() => {
-
-  const { pageSize, setPageSize, search, setSearch, modalVisible, setModalVisible, selectedRecord, setSelectedRecord } = airValveStore;
+  const { setSearch, search, modalVisible, setModalVisible, selectedRecord, setSelectedRecord } = airValveStore;
 
   const { data, isLoading, error } = useQuery<AirValveRecord[]>({
     queryKey: ['airValveData'],
@@ -77,7 +76,7 @@ const AirValveMaintenance: React.FC = observer(() => {
   { title: 'Location', dataIndex: 'location', key: 'location', ellipsis: true },
   { title: 'Type', dataIndex: 'status', key: 'status', width: 140 },
     {
-      title: '',
+      title: 'Actions',
       key: 'actions',
       width: 80,
       align: 'center' as const,
@@ -109,6 +108,8 @@ const AirValveMaintenance: React.FC = observer(() => {
     );
   }, [search, airValveStore.data]);
 
+  const pageSize = 10; // Default to 10 records per page
+
   return (
     <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
       <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
@@ -122,18 +123,9 @@ const AirValveMaintenance: React.FC = observer(() => {
           <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
         </div>
 
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <span>Display</span>
-            <select value={String(pageSize)} onChange={(e) => setPageSize(Number(e.target.value))} style={{ width: 80, padding: 6, borderRadius: 4 }}>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-            <span>records per page</span>
-          </div>
-          <div className="license-search-controls">
+        <div className="license-controls-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <div style={{ flexGrow: 1 }}></div> {/* Empty space to push the search bar to the right */}
+          <div className="license-search-controls" style={{ display: 'flex', alignItems: 'center', marginTop: -8 }}>
             <span>Search:</span>
             <Input.Search
               placeholder="Search..."
@@ -142,7 +134,7 @@ const AirValveMaintenance: React.FC = observer(() => {
               enterButton
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ width: 200 }}
+              style={{ width: 200, marginLeft: 8 }}
             />
           </div>
         </div>
@@ -229,6 +221,7 @@ const AirValveMaintenance: React.FC = observer(() => {
           onCancel={() => airValveStore.setDetailsModalVisible(false)}
         />
       </Card>
+      
       <Footer />
     </div>
   );

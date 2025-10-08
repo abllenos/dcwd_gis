@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Form, Input, Select, Row, Col, Tabs, Button, Table, Typography, Space } from 'antd';
+import { Modal, Form, Input, Select, Row, Col, Tabs, Button, Table, Typography, Space, DatePicker } from 'antd';
+import GeometryMap from '../GeometryMap';
 
 const { Option } = Select;
 const { TabPane } = Tabs as any;
@@ -30,9 +31,9 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
       open={visible}
       onCancel={onCancel}
       footer={null}
-      width={900}
+      width={1200}
       style={{ top: 24 }}
-  styles={{ body: { padding: 0 } }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable
     >
@@ -40,35 +41,68 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
         <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Pressure Setting Valve - Maintenance</Title>
       </div>
 
-      <div style={{ padding: 0 }}>
-        <Tabs defaultActiveKey="1" style={{ padding: '0 24px' }}>
-          <TabPane tab="Details" key="1">
-            <Form layout="vertical" initialValues={record}>
-              <Row gutter={24}>
+      <div style={{ padding: '32px', background: '#fff' }}>
+        <Form layout="vertical" initialValues={record}>
+          <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
+            <TabPane tab="Details" key="1">
+              <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Asset Tag" name="assetTag"><Input /></Form.Item>
-                  <Form.Item label="PS Number" name="psNumber"><Input /></Form.Item>
-                  <Form.Item label="Status" name="status">
-                    <Select>
-                      {statusOptions.map(opt => <Option key={opt}>{opt}</Option>)}
-                    </Select>
+                  <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Asset Tag" name="assetTag">
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Status" name="status">
+                        <Select allowClear>
+                          {statusOptions.map(opt => <Option key={opt}>{opt}</Option>)}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="PS Number" name="psNumber">
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Date Installed" name="dateInstalled">
+                        <DatePicker style={{ width: '100%' }} placeholder="Select date" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Form.Item label="Location" name="location">
+                    <Input />
                   </Form.Item>
-                  <Form.Item label="Date Installed" name="dateInstalled"><Input /></Form.Item>
-                  <Form.Item label="Location" name="location"><Input /></Form.Item>
-                  <Form.Item label="Barangay" name="barangay"><Input /></Form.Item>
+                  <Form.Item label="Barangay" name="barangay">
+                    <Input />
+                  </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <div style={{ minHeight: 200, background: '#fff', border: '1px solid #eee', borderRadius: 6 }} />
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Location Map</label>
+                    <GeometryMap
+                      geom={record?.geom}
+                      height={400}
+                      editable={true}
+                      markerColor="#3a5fc8"
+                      markerLabel={`PSV ${record?.psNumber || record?.ps_number || 'Location'}`}
+                      onLocationChange={(lng, lat) => {
+                        console.log('Location updated:', { lng, lat });
+                        // You can handle location changes here if needed
+                      }}
+                    />
+                  </div>
                 </Col>
               </Row>
-            </Form>
-          </TabPane>
+            </TabPane>
 
-          <TabPane tab="Technical Details" key="2">
-            <Row gutter={24}>
-              <Col xs={24} md={12}>
-                <div style={{ background: '#e9edfa', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Valve Details</div>
-                <Form layout="vertical" initialValues={record}>
+            <TabPane tab="Technical Details" key="2">
+              <Row gutter={24}>
+                <Col xs={24} md={12}>
+                  <div style={{ background: '#e9edfa', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Valve Details</div>
                   <Form.Item label="Valve Type" name="type">
                     <Select>
                       {valveTypes.map(v => <Option key={v}>{v}</Option>)}
@@ -76,20 +110,16 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
                   </Form.Item>
                   <Form.Item label="Set Pressure [psi]" name="setPressure"><Input /></Form.Item>
                   <Form.Item label="Operating Range" name="operatingRange"><Input /></Form.Item>
-                </Form>
-              </Col>
-              <Col xs={24} md={12}>
-                <div style={{ background: '#e9edfa', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Installation</div>
-                <Form layout="vertical" initialValues={record}>
+                </Col>
+                <Col xs={24} md={12}>
+                  <div style={{ background: '#e9edfa', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Installation</div>
                   <Form.Item label="Elevation [m]" name="elevation"><Input /></Form.Item>
                   <Form.Item label="Remarks" name="remarks"><Input /></Form.Item>
-                </Form>
-              </Col>
-            </Row>
-          </TabPane>
+                </Col>
+              </Row>
+            </TabPane>
 
-          <TabPane tab="Project Details" key="3">
-            <Form layout="vertical" initialValues={record}>
+            <TabPane tab="Project Details" key="3">
               <Row gutter={24}>
                 <Col xs={24} md={12}>
                   <Form.Item label="Work Order Number" name="workOrderNo"><Input /></Form.Item>
@@ -100,20 +130,20 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
                   <Form.Item label="Purpose" name="purpose"><Input /></Form.Item>
                 </Col>
               </Row>
-            </Form>
-          </TabPane>
+            </TabPane>
 
-          <TabPane tab="Status Log" key="4">
-            <Table
-              columns={statusLogColumns}
-              dataSource={statusLogData}
-              pagination={false}
-              size="small"
-              bordered
-              style={{ background: '#fff', padding: 16 }}
-            />
-          </TabPane>
-        </Tabs>
+            <TabPane tab="Status Log" key="4">
+              <Table
+                columns={statusLogColumns}
+                dataSource={statusLogData}
+                pagination={false}
+                size="small"
+                bordered
+                style={{ background: '#fff', padding: 16 }}
+              />
+            </TabPane>
+          </Tabs>
+        </Form>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>

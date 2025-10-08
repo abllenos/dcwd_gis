@@ -5,14 +5,12 @@ import { Card, Typography, Select, Input, Table, Button, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import PressureSettingValveModal from './modal/PressureSettingValveModal';
 import PressureSettingValveDetailsModal from './modal/PressureSettingValveDetailsModal';
-import Footer from './layout/Footer';
 
 import { observer } from 'mobx-react-lite';
 import { psvStore } from '../stores/psvStore';
 import { apiGis } from './endpoints/Interceptor';
 
 const { Title, Text } = Typography;
-const { Search } = Input;
 
 interface PSVRecord {
   psv_number: string;
@@ -45,8 +43,6 @@ const PressureSettingValve: React.FC = observer(() => {
 
   // State for details modal
   const [detailsModalVisible, setDetailsModalVisible] = React.useState(false);
-
-  const [detailsRecord] = React.useState<PSVRecord | null>(null);
 
   const { currentPage, pageSize, filteredData } = psvStore;
   

@@ -20,7 +20,22 @@ export function parseWKB(wkbHex: string | undefined): Coordinates | null {
 
   try {
     // Remove any whitespace
-    const hex = wkbHex.trim();
+    const input = wkbHex.trim();
+    
+    // Check if it's a simple WKT POINT format (fallback)
+    if (input.startsWith('POINT(') && input.endsWith(')')) {
+      const coords = input.slice(6, -1).split(' ');
+      if (coords.length === 2) {
+        const longitude = parseFloat(coords[0]);
+        const latitude = parseFloat(coords[1]);
+        if (!isNaN(longitude) && !isNaN(latitude)) {
+          return { latitude, longitude };
+        }
+      }
+    }
+    
+    // Otherwise, treat as WKB hex string
+    const hex = input;
     
     // Minimum length check (byte order + type + SRID + 2 doubles = 42 hex chars)
     if (hex.length < 42) {
