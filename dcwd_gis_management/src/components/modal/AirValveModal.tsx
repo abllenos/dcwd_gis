@@ -151,22 +151,113 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Location Map</label>
-                    {visible && (
-                      <GeometryMap 
-                        key={record?.id || 'new'}
-                        geom={record?.geom} 
-                        height={500}
-                        editable={false}
-                        markerColor="#0088cc"
-                        markerLabel="Air Valve"
-                        onLocationChange={(lng: number, lat: number) => {
-                          const wkb = coordinatesToWKB(lng, lat);
-                          form.setFieldsValue({ geom: wkb });
-                        }}
-                      />
-                    )}
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Location Map</label>
+                  <div style={{ 
+                    height: '480px', 
+                    width: '100%',
+                    maxWidth: '500px',
+                    borderRadius: '6px', 
+                    overflow: 'hidden',
+                    border: '1px solid #e8e8e8',
+                    position: 'relative'
+                  }}>
+                    {(() => {
+                      // Helper function to create WKB-like geom string from lat/lon
+                      const createGeomFromCoords = (lat: number, lon: number) => {
+                        return `POINT(${lon} ${lat})`;
+                      };
+
+                      let lat: number | null = null;
+                      let lon: number | null = null;
+                      let geomString: string | undefined = undefined;
+
+                      // Try to extract coordinates from various formats
+                      if (record?.lat && record?.lon) {
+                        lat = parseFloat(record.lat);
+                        lon = parseFloat(record.lon);
+                      } else if (record?.latitude && record?.longitude) {
+                        lat = parseFloat(record.latitude);
+                        lon = parseFloat(record.longitude);
+                      } else if (record?.coordinates && record.coordinates.length === 2) {
+                        lat = record.coordinates[0];
+                        lon = record.coordinates[1];
+                      } else if (record?.geom) {
+                        geomString = record.geom;
+                      }
+
+                      // Create geom string if we have valid coordinates
+                      if (lat !== null && lon !== null && !isNaN(lat) && !isNaN(lon)) {
+                        geomString = createGeomFromCoords(lat, lon);
+                      }
+
+                      return visible && geomString ? (
+                        <GeometryMap 
+                          key={record?.id || 'new'}
+                          geom={geomString}
+                          height={480}
+                          editable={false}
+                          markerColor="#0088cc"
+                          markerLabel={`Air Valve: ${record?.arv_number || 'Unknown'}`}
+                          onLocationChange={(lng: number, lat: number) => {
+                            const wkb = coordinatesToWKB(lng, lat);
+                            form.setFieldsValue({ geom: wkb });
+                          }}
+                        />
+                      ) : (
+                        // Show blurred map with overlay when no coordinates
+                        <div style={{ position: 'relative', height: '100%' }}>
+                          <div style={{ 
+                            filter: 'blur(3px)', 
+                            opacity: 0.5,
+                            height: '100%'
+                          }}>
+                            <GeometryMap 
+                              height={480}
+                              editable={false}
+                              markerColor="#cccccc"
+                              markerLabel="No Location"
+                            />
+                          </div>
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                            padding: '16px'
+                          }}>
+                            <div style={{
+                              fontSize: '48px',
+                              color: '#d9d9d9',
+                              marginBottom: '16px'
+                            }}>
+                              📍
+                            </div>
+                            <div style={{
+                              fontSize: '18px',
+                              fontWeight: 600,
+                              color: '#999',
+                              marginBottom: '8px'
+                            }}>
+                              No Location Data
+                            </div>
+                            <div style={{
+                              fontSize: '14px',
+                              color: '#666',
+                              lineHeight: '1.4'
+                            }}>
+                              Geographic coordinates are not available for this air valve
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </Col>
               </Row>
