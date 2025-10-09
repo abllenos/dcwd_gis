@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Table, Input, Select, Button, Typography, Card, Space, Spin, Alert } from 'antd';
-import { ToolOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { ToolOutlined } from '@ant-design/icons';
 import PmsMaintenanceModal from './modal/PmsMaintenanceModal';
 import { pressureMonitoringSystemStore } from '../stores/pressureMonitoringSystemStore';
 import { useQuery } from '@tanstack/react-query';
@@ -94,7 +94,7 @@ const PressureMonitoringSystem = observer(() => {
       dataIndex: 'location',
     },
     {
-      title: '',
+      title: 'Actions',
       key: 'actions',
       width: 100,
       render: (_: any, _record: PMSRecord) => (
@@ -106,7 +106,6 @@ const PressureMonitoringSystem = observer(() => {
             style={{ background: '#16c784', border: 'none' }}
             onClick={() => pressureMonitoringSystemStore.setModalOpen(true)}
           />
-          <Button type="primary" shape="circle" icon={<InfoCircleOutlined />} style={{ background: '#3b82f6', border: 'none' }} />
         </Space>
       ),
     },
@@ -149,79 +148,78 @@ const PressureMonitoringSystem = observer(() => {
 
   return (
     <>
-      <Card style={{ background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '16px 24px', marginBottom: 24 }}>
+      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '16px 24px' }}>
           <Title level={4} style={{ color: '#2563eb', margin: 0 }}>Pressure Monitoring System - Maintenance</Title>
         </div>
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <Text className="license-control-text">Display</Text>
-            <Select
-              value={pressureMonitoringSystemStore.pageSize.toString()}
-              onChange={handlePageSizeChange}
-              size="small"
-              style={{ width: 80 }}
-              options={[
-                { value: '10', label: '10' },
-                { value: '25', label: '25' },
-                { value: '50', label: '50' },
-                { value: '100', label: '100' }
-              ]}
-            />
-            <Text className="license-control-text">records per page</Text>
-          </div>
-          <div className="license-search-controls">
-            <Text className="license-control-text">Search:</Text>
-            <Input.Search
-              size="small"
-              placeholder=""
-              style={{ width: 200 }}
-              enterButton
-              onSearch={handleSearch}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-          </div>
-        </div>
-        {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load data" /> : (
-          <>
-            <Table
-              key={`pms-table-page-${pressureMonitoringSystemStore.currentPage}-size-${pressureMonitoringSystemStore.pageSize}`}
-              bordered
-              rowKey={(record) => `pms-${record.pmsNumber}-${record.id}`}
-              columns={columns}
-              dataSource={paginatedData}
-              pagination={false}
-              style={{ background: '#fff', borderRadius: 8 }}
-            />
-            {/* Pagination (License.tsx style) */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
-              <Text style={{ fontSize: 12 }}>
-                Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-                {pressureMonitoringSystemStore.search && ` (filtered from ${data?.length || 0} total entries)`}
-              </Text>
-              <Space>
-                <Button size="small" disabled={pressureMonitoringSystemStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(pressureMonitoringSystemStore.currentPage - 1)}>Previous</Button>
-                {totalItems > 0 ? getPageNumbers().map(pageNum => (
-                  <Button 
-                    key={pageNum} 
-                    size="small" 
-                    type={pageNum === pressureMonitoringSystemStore.currentPage ? 'primary' : 'default'} 
-                    onClick={() => handlePageChange(pageNum)}
-                  >
-                    {pageNum}
-                  </Button>
-                )) : (
-                  <Button size="small" disabled>1</Button>
-                )}
-                <Button size="small" disabled={pressureMonitoringSystemStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(pressureMonitoringSystemStore.currentPage + 1)}>Next</Button>
-              </Space>
+        <div style={{ padding: '16px' }}>
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <Text className="license-control-text">Display</Text>
+              <Select
+                value={pressureMonitoringSystemStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
+              />
+              <Text className="license-control-text">records per page</Text>
             </div>
-          </>
-        )}
-      </Card>
-      <PmsMaintenanceModal open={pressureMonitoringSystemStore.modalOpen} onClose={() => pressureMonitoringSystemStore.setModalOpen(false)} />
-      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-        {/* ...existing content... */}
+            <div className="license-search-controls">
+              <Text className="license-control-text">Search:</Text>
+              <Input.Search
+                size="small"
+                placeholder=""
+                style={{ width: 200 }}
+                enterButton
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
+          </div>
+          {isLoading ? <Spin /> : error ? <Alert type="error" message="Failed to load data" /> : (
+            <>
+              <Table
+                key={`pms-table-page-${pressureMonitoringSystemStore.currentPage}-size-${pressureMonitoringSystemStore.pageSize}`}
+                bordered
+                rowKey={(record) => `pms-${record.pmsNumber}-${record.id}`}
+                columns={columns}
+                dataSource={paginatedData}
+                pagination={false}
+                style={{ background: '#fff', borderRadius: 8 }}
+              />
+              {/* Pagination (License.tsx style) */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+                <Text style={{ fontSize: 12 }}>
+                  Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                  {pressureMonitoringSystemStore.search && ` (filtered from ${data?.length || 0} total entries)`}
+                </Text>
+                <Space>
+                  <Button size="small" disabled={pressureMonitoringSystemStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(pressureMonitoringSystemStore.currentPage - 1)}>Previous</Button>
+                  {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                    <Button 
+                      key={pageNum} 
+                      size="small" 
+                      type={pageNum === pressureMonitoringSystemStore.currentPage ? 'primary' : 'default'} 
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  )) : (
+                    <Button size="small" disabled>1</Button>
+                  )}
+                  <Button size="small" disabled={pressureMonitoringSystemStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(pressureMonitoringSystemStore.currentPage + 1)}>Next</Button>
+                </Space>
+              </div>
+            </>
+          )}
+          <PmsMaintenanceModal open={pressureMonitoringSystemStore.modalOpen} onClose={() => pressureMonitoringSystemStore.setModalOpen(false)} />
+        </div>
       </div>
       <Footer />
     </>

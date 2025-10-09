@@ -132,11 +132,11 @@ const DistributionTransmission = observer(() => {
 
   return (
     <>
-      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-        <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-          <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-            <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
-          </div>
+      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px' }}>
+          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
+        </div>
+        <div style={{ padding: '16px' }}>
           <div className="license-controls-container">
             <div className="license-display-controls">
               <Text className="license-control-text">Display</Text>
@@ -198,7 +198,7 @@ const DistributionTransmission = observer(() => {
               <Button size="small" disabled={distributionTransmissionStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(distributionTransmissionStore.currentPage + 1)}>Next</Button>
             </Space>
           </div>
-        </Card>
+        </div>
         <PipeConditionAssessmentModal
           open={distributionTransmissionStore.modalOpen}
           onClose={() => distributionTransmissionStore.setModalOpen(false)}

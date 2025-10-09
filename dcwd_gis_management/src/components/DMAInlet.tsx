@@ -1,7 +1,6 @@
-
 // React import not needed with the new JSX transform
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input } from 'antd';
+import { Card, Typography, Table, Select, Input, Button, Space } from 'antd';
 
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
@@ -93,66 +92,108 @@ const DMAInlet = observer(() => {
 
 
 
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / dmaInletStore.pageSize);
+  const startIndex = (dmaInletStore.currentPage - 1) * dmaInletStore.pageSize;
+  const endIndex = Math.min(startIndex + dmaInletStore.pageSize, totalItems);
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    const currentPage = dmaInletStore.currentPage;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    return pages;
+  };
+
 
 
   return (
     <>
-      <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-          <Typography.Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Typography.Title>
+      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px' }}>
+          <Typography.Title level={5} style={{ color: '#2563eb', margin: 0 }}>DMA Inlet</Typography.Title>
         </div>
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <Text className="license-control-text">Display</Text>
-            <Select
-              value={dmaInletStore.pageSize.toString()}
-              onChange={handlePageSizeChange}
-              size="small"
-              style={{ width: 80 }}
-              options={[
-                { value: '10', label: '10' },
-                { value: '25', label: '25' },
-                { value: '50', label: '50' },
-                { value: '100', label: '100' }
-              ]}
-            />
-            <Text className="license-control-text">records per page</Text>
+        <div style={{ padding: '16px' }}>
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <Text className="license-control-text">Display</Text>
+              <Select
+                value={dmaInletStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
+              />
+              <Text className="license-control-text">records per page</Text>
+            </div>
+            <div className="license-search-controls">
+              <Text className="license-control-text">Search:</Text>
+              <Input.Search
+                size="small"
+                placeholder=""
+                style={{ width: 200 }}
+                enterButton
+                onSearch={handleSearch}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="license-search-controls">
-            <Text className="license-control-text">Search:</Text>
-            <Input.Search
-              size="small"
-              placeholder=""
-              style={{ width: 200 }}
-              enterButton
-              onSearch={handleSearch}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+          <Table
+            bordered
+            rowKey="id"
+            columns={columns}
+            dataSource={paginatedData}
+            pagination={false}
+            style={{ background: '#fff', borderRadius: 8 }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+            <Text style={{ fontSize: 12 }}>
+              Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+              {dmaInletStore.search && ` (filtered from ${initialData.length} total entries)`}
+            </Text>
+            <Space>
+              <Button size="small" disabled={dmaInletStore.currentPage === 1 || totalItems === 0} onClick={() => dmaInletStore.setCurrentPage(dmaInletStore.currentPage - 1)}>Previous</Button>
+              {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                <Button
+                  key={pageNum}
+                  size="small"
+                  type={pageNum === dmaInletStore.currentPage ? 'primary' : 'default'}
+                  onClick={() => dmaInletStore.setCurrentPage(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              )) : (
+                <Button size="small" disabled>1</Button>
+              )}
+              <Button size="small" disabled={dmaInletStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => dmaInletStore.setCurrentPage(dmaInletStore.currentPage + 1)}>Next</Button>
+            </Space>
           </div>
+          <PipeConditionAssessmentModal
+            open={dmaInletStore.modalOpen}
+            onClose={() => dmaInletStore.setModalOpen(false)}
+            assetId={dmaInletStore.selectedAssetId}
+          />
         </div>
-
-
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredData}
-          pagination={{
-            current: 1,
-            pageSize: dmaInletStore.pageSize,
-            total: filteredData.length,
-            showSizeChanger: false,
-          }}
-          style={{ background: '#fff', borderRadius: 8 }}
-        />
-
-      </Card>
-      <PipeConditionAssessmentModal
-        open={dmaInletStore.modalOpen}
-        onClose={() => dmaInletStore.setModalOpen(false)}
-        assetId={dmaInletStore.selectedAssetId}
-      />
-
+      </div>
     </>
   );
 });

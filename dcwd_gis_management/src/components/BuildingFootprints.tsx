@@ -36,11 +36,11 @@ const BuildingFootprints = observer(() => {
 
   return (
     <>
-      <Card style={{ background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
+      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px', marginBottom: 18 }}>
           <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Building Footprints</Title>
         </div>
-        <div style={{ padding: 16, background: '#fff', borderRadius: 8 }}>
+        <div style={{ padding: 16 }}>
           <div style={{ fontWeight: 500, marginBottom: 8 }}>
             Filter<span style={{ color: 'red' }}>*</span>
           </div>
@@ -74,7 +74,7 @@ const BuildingFootprints = observer(() => {
             </Col>
           </Row>
         </div>
-      </Card>
+      </div>
       <Footer />
     </>
   );

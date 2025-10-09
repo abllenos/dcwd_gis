@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch, Space } from 'antd';
+import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch, Space, Form } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
 import { mapApiUserToTableRow } from '../utils/mapApiUserToTableRow';
@@ -192,8 +192,8 @@ const MapInfoUsers = observer(() => {
 
   return (
     <>
-      <Card style={{ marginBottom: 24, background: '#f6f8fc', border: 'none', boxShadow: 'none' }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Create / Update Registered Users</Title>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Text style={{ color: '#000', fontSize: '14px' }}>Search:</Text>
@@ -207,85 +207,150 @@ const MapInfoUsers = observer(() => {
             />
           </div>
         </div>
-        <Row gutter={16} align="middle" style={{ marginBottom: 8 }}>
-          <Col span={4}>
-            <div style={{ fontWeight: 500 }}>Software<span style={{ color: 'red' }}>*</span></div>
-            <Select value={mapInfoUsersStore.software} onChange={mapInfoUsersStore.setSoftware.bind(mapInfoUsersStore)} style={{ width: '100%' }} placeholder="- SELECT -" />
-          </Col>
-          <Col span={4}>
-            <div style={{ fontWeight: 500 }}>Device Name<span style={{ color: 'red' }}>*</span></div>
-            <Input value={mapInfoUsersStore.deviceName} onChange={e => mapInfoUsersStore.setDeviceName(e.target.value)} placeholder="Device Name" />
-          </Col>
-          <Col span={4}>
-            <div style={{ fontWeight: 500 }}>Department<span style={{ color: 'red' }}>*</span></div>
-            <Select value={mapInfoUsersStore.department} onChange={mapInfoUsersStore.setDepartment.bind(mapInfoUsersStore)} style={{ width: '100%' }} placeholder="- SELECT -" />
-          </Col>
-          <Col span={4}>
-            <div style={{ fontWeight: 500 }}>User ID<span style={{ color: 'red' }}>*</span></div>
-            <Input value={mapInfoUsersStore.userId} onChange={e => mapInfoUsersStore.setUserId(e.target.value)} placeholder="User ID" prefix={<UserOutlined />} />
-          </Col>
-          <Col span={4}>
-            <div style={{ fontWeight: 500 }}>Installation Date<span style={{ color: 'red' }}>*</span></div>
-            <DatePicker value={mapInfoUsersStore.installDate} onChange={mapInfoUsersStore.setInstallDate.bind(mapInfoUsersStore)} style={{ width: '100%' }} format="DD/MM/YYYY" />
-          </Col>
-          <Col span={4} style={{ display: 'flex', alignItems: 'end', height: '100%' }}>
-            <Button type="primary" className="license-register-button">
-              Register
-            </Button>
-          </Col>
-        </Row>
-        <div className="license-controls-container">
-          <div className="license-display-controls">
-            <Text className="license-control-text">Display</Text>
-            <Select
-              value={mapInfoUsersStore.pageSize.toString()}
-              onChange={handlePageSizeChange}
-              size="small"
-              style={{ width: 80 }}
-              options={[
-                { value: '10', label: '10' },
-                { value: '25', label: '25' },
-                { value: '50', label: '50' },
-                { value: '100', label: '100' }
-              ]}
-            />
-            <Text className="license-control-text">records per page</Text>
+        <div style={{ padding: '16px' }}>
+          <Form
+  layout="vertical"
+  style={{ marginBottom: 24 }}
+  onFinish={() => {}}
+>
+  <Row gutter={[16, 0]} align="bottom">
+    <Col xs={24} sm={12} md={6} lg={4}>
+      <Form.Item
+        label={<span style={{ fontWeight: 500, color: '#222' }}>* Software</span>}
+        name="software"
+        rules={[{ required: true, message: 'Please select software!' }]}
+      >
+        <Select
+          placeholder="- SELECT -"
+          suffixIcon={<span style={{ opacity: 0.5 }}>⚙️</span>}
+          value={mapInfoUsersStore.software}
+          onChange={mapInfoUsersStore.setSoftware.bind(mapInfoUsersStore)}
+          style={{ height: 40 }}
+        />
+      </Form.Item>
+    </Col>
+    <Col xs={24} sm={12} md={6} lg={4}>
+      <Form.Item
+        label={<span style={{ fontWeight: 500, color: '#222' }}>* Device Name</span>}
+        name="deviceName"
+        rules={[{ required: true, message: 'Please enter device name!' }]}
+      >
+        <Input
+          placeholder="Device Name"
+          prefix={<span style={{ opacity: 0.7 }}><i className="anticon anticon-laptop" /></span>}
+          value={mapInfoUsersStore.deviceName}
+          onChange={e => mapInfoUsersStore.setDeviceName(e.target.value)}
+          style={{ height: 40 }}
+        />
+      </Form.Item>
+    </Col>
+    <Col xs={24} sm={12} md={6} lg={4}>
+      <Form.Item
+        label={<span style={{ fontWeight: 500, color: '#222' }}>* Department</span>}
+        name="department"
+        rules={[{ required: true, message: 'Please select department!' }]}
+      >
+        <Select
+          placeholder="- SELECT -"
+          suffixIcon={<span style={{ opacity: 0.5 }}>⚙️</span>}
+          value={mapInfoUsersStore.department}
+          onChange={mapInfoUsersStore.setDepartment.bind(mapInfoUsersStore)}
+          style={{ height: 40 }}
+        />
+      </Form.Item>
+    </Col>
+    <Col xs={24} sm={12} md={6} lg={4}>
+      <Form.Item
+        label={<span style={{ fontWeight: 500, color: '#222' }}>* User ID</span>}
+        name="userId"
+        rules={[{ required: true, message: 'Please enter user ID!' }]}
+      >
+        <Input
+          placeholder="User ID"
+          prefix={<UserOutlined style={{ opacity: 0.7 }} />}
+          value={mapInfoUsersStore.userId}
+          onChange={e => mapInfoUsersStore.setUserId(e.target.value)}
+          style={{ height: 40 }}
+        />
+      </Form.Item>
+    </Col>
+    <Col xs={24} sm={12} md={6} lg={4}>
+      <Form.Item
+        label={<span style={{ fontWeight: 500, color: '#222' }}>* Installation Date</span>}
+        name="installDate"
+        rules={[{ required: true, message: 'Please select installation date!' }]}
+      >
+        <DatePicker
+          placeholder="dd/mm/yyyy"
+          value={mapInfoUsersStore.installDate}
+          onChange={mapInfoUsersStore.setInstallDate.bind(mapInfoUsersStore)}
+          style={{ width: '100%', height: 40 }}
+          format="DD/MM/YYYY"
+        />
+      </Form.Item>
+    </Col>
+    <Col xs={24} sm={12} md={6} lg={3}>
+      <Form.Item>
+        <Button type="primary" className="license-register-button" icon={<i className="anticon anticon-save" />} style={{ height: 40, fontWeight: 600, background: '#6C86F5', borderColor: '#6C86F5', width: '100%' }}>
+          Register
+        </Button>
+      </Form.Item>
+    </Col>
+  </Row>
+</Form>
+          <div className="license-controls-container">
+            <div className="license-display-controls">
+              <Text className="license-control-text">Display</Text>
+              <Select
+                value={mapInfoUsersStore.pageSize.toString()}
+                onChange={handlePageSizeChange}
+                size="small"
+                style={{ width: 80 }}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '25', label: '25' },
+                  { value: '50', label: '50' },
+                  { value: '100', label: '100' }
+                ]}
+              />
+              <Text className="license-control-text">records per page</Text>
+            </div>
+          </div>
+          <Table
+            key={`mapinfo-table-page-${mapInfoUsersStore.currentPage}-size-${mapInfoUsersStore.pageSize}`}
+            bordered
+            rowKey={(record) => `mapinfo-${record.id}-${record.deviceName}`}
+            columns={columns}
+            dataSource={tableData}
+            pagination={false}
+            style={{ background: '#fff', borderRadius: 8 }}
+          />
+          {/* Pagination (License.tsx style) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+            <Text style={{ fontSize: 12 }}>
+              Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+              {mapInfoUsersStore.search && ` (filtered from ${mapInfoUsersStore.users.length} total entries)`}
+            </Text>
+            <Space>
+              <Button size="small" disabled={mapInfoUsersStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(mapInfoUsersStore.currentPage - 1)}>Previous</Button>
+              {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                <Button 
+                  key={pageNum} 
+                  size="small" 
+                  type={pageNum === mapInfoUsersStore.currentPage ? 'primary' : 'default'} 
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              )) : (
+                <Button size="small" disabled>1</Button>
+              )}
+              <Button size="small" disabled={mapInfoUsersStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(mapInfoUsersStore.currentPage + 1)}>Next</Button>
+            </Space>
           </div>
         </div>
-        <Table
-          key={`mapinfo-table-page-${mapInfoUsersStore.currentPage}-size-${mapInfoUsersStore.pageSize}`}
-          bordered
-          rowKey={(record) => `mapinfo-${record.id}-${record.deviceName}`}
-          columns={columns}
-          dataSource={tableData}
-          pagination={false}
-          style={{ background: '#fff', borderRadius: 8 }}
-        />
-        {/* Pagination (License.tsx style) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
-          <Text style={{ fontSize: 12 }}>
-            Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-            {mapInfoUsersStore.search && ` (filtered from ${mapInfoUsersStore.users.length} total entries)`}
-          </Text>
-          <Space>
-            <Button size="small" disabled={mapInfoUsersStore.currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(mapInfoUsersStore.currentPage - 1)}>Previous</Button>
-            {totalItems > 0 ? getPageNumbers().map(pageNum => (
-              <Button 
-                key={pageNum} 
-                size="small" 
-                type={pageNum === mapInfoUsersStore.currentPage ? 'primary' : 'default'} 
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            )) : (
-              <Button size="small" disabled>1</Button>
-            )}
-            <Button size="small" disabled={mapInfoUsersStore.currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(mapInfoUsersStore.currentPage + 1)}>Next</Button>
-          </Space>
-        </div>
-      </Card>
-      <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
+        <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
+      </div>
       <Footer />
     </>
   );
