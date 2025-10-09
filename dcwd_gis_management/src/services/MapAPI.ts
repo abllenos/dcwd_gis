@@ -7,6 +7,7 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+
 });
 
 export interface MapOptions {
@@ -156,10 +157,10 @@ class MapAPI {
 
     const mapOptions = { ...defaultOptions, ...options };
 
-    // Define Davao City bounds
+    // Define Davao City bounds (more restrictive to city proper only)
     const davaoBounds: L.LatLngBounds = L.latLngBounds(
-      [6.9000, 125.4500], // Southwest corner
-      [7.2500, 125.7500]  // Northeast corner
+      [6.9600, 125.4800], // Southwest corner - Davao City proper
+      [7.2000, 125.7000]  // Northeast corner - Davao City proper
     );
 
     const map = L.map(containerId, {
@@ -169,7 +170,7 @@ class MapAPI {
       zoomControl: mapOptions.zoomControl!,
       maxBounds: davaoBounds,
       maxBoundsViscosity: 1.0, // Prevents panning outside bounds
-      minZoom: 10, // Minimum zoom to keep focus on Davao City
+      minZoom: 12, // Higher minimum zoom to keep focus strictly on Davao City
       maxZoom: 18  // Maximum zoom for detailed view
     });
 
@@ -290,11 +291,20 @@ class MapAPI {
   /**
    * Set the map view (center and zoom)
    */
-  setView(mapId: string, center: [number, number], zoom: number): boolean {
+  setView(mapId: string, center: [number, number], zoom: number, animate: boolean = true): boolean {
     const map = this.maps.get(mapId);
     if (!map) return false;
 
-    map.setView(center, zoom);
+    if (animate) {
+      // Smooth animated zoom to location
+      map.setView(center, zoom, {
+        animate: true,
+        duration: 1.5, // 1.5 seconds animation
+        easeLinearity: 0.25
+      });
+    } else {
+      map.setView(center, zoom);
+    }
     return true;
   }
 
@@ -359,6 +369,126 @@ class MapAPI {
   }
 
   /**
+   * Create a status marker (colored circle) for employee tracking with glowing effect
+   */
+  createStatusMarker(status: 'online' | 'offline' | 'unknown'): L.DivIcon {
+    const colors = {
+      online: '#00ff00',    // Green
+      offline: '#ff0000',   // Red
+      unknown: '#ffff00'    // Yellow
+    };
+    
+    const color = colors[status] || '#0000ff'; // Blue as default
+    const glowColor = color;
+
+    return L.divIcon({
+      html: `
+        <div class="live-location-marker" style="
+          position: relative;
+          width: 24px;
+          height: 24px;
+        ">
+          <!-- Outer glow rings for live effect -->
+          <div class="glow-ring-outer" style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle, ${glowColor} 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blink-outer 4s infinite linear;
+          "></div>
+          <div class="glow-ring-inner" style="
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, ${glowColor} 0%, transparent 60%);
+            border-radius: 50%;
+            animation: blink-inner 4s infinite linear;
+          "></div>
+          <!-- Core location pin -->
+          <div class="location-core" style="
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 12px;
+            height: 12px;
+            background-color: ${color};
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: core-blink 4s infinite linear;
+            z-index: 10;
+          "></div>
+        </div>
+        <style>
+          @keyframes blink-outer {
+            0%, 45% {
+              opacity: 0;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 0.8;
+              transform: scale(1.4);
+            }
+            55%, 100% {
+              opacity: 0;
+              transform: scale(1.4);
+            }
+          }
+          @keyframes blink-inner {
+            0%, 20% {
+              opacity: 0;
+              transform: scale(1);
+            }
+            25% {
+              opacity: 0.9;
+              transform: scale(1.2);
+            }
+            30%, 65% {
+              opacity: 0;
+              transform: scale(1.2);
+            }
+            70% {
+              opacity: 0.9;
+              transform: scale(1.2);
+            }
+            75%, 100% {
+              opacity: 0;
+              transform: scale(1.2);
+            }
+          }
+          @keyframes core-blink {
+            0%, 40% {
+              box-shadow: 0 0 8px rgba(0,0,0,0.3), 0 0 16px ${color}40;
+            }
+            45% {
+              box-shadow: 0 0 12px rgba(0,0,0,0.5), 0 0 24px ${color}80, 0 0 32px ${color}60;
+            }
+            50%, 65% {
+              box-shadow: 0 0 8px rgba(0,0,0,0.3), 0 0 16px ${color}40;
+            }
+            70% {
+              box-shadow: 0 0 12px rgba(0,0,0,0.5), 0 0 24px ${color}80, 0 0 32px ${color}60;
+            }
+            75%, 100% {
+              box-shadow: 0 0 8px rgba(0,0,0,0.3), 0 0 16px ${color}40;
+            }
+          }
+          .live-location-marker {
+            overflow: visible !important;
+          }
+        </style>
+      `,
+      className: 'employee-status-marker-glowing',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+  }
+
+  /**
    * Add Davao water facilities to the map
    */
   addDavaoWaterFacilities(mapId: string, facilities: DavaoLocation[] = DAVAO_WATER_FACILITIES): void {
@@ -404,10 +534,10 @@ class MapAPI {
     const map = this.maps.get(mapId);
     if (!map) return false;
 
-    // Davao City approximate bounds
+    // Davao City proper bounds (restricted to city only)
     const davaoBounds: [[number, number], [number, number]] = [
-      [6.9000, 125.4500], // Southwest
-      [7.2500, 125.7500]  // Northeast
+      [6.9600, 125.4800], // Southwest - Davao City proper
+      [7.2000, 125.7000]  // Northeast - Davao City proper
     ];
 
     map.fitBounds(davaoBounds, { padding: [20, 20] });
@@ -430,8 +560,8 @@ class MapAPI {
    */
   private restrictToDavaoCity(_mapId: string, map: L.Map): void {
     const davaoBounds = L.latLngBounds(
-      [6.9000, 125.4500], // Southwest corner
-      [7.2500, 125.7500]  // Northeast corner
+      [6.9600, 125.4800], // Southwest corner - Davao City proper
+      [7.2000, 125.7000]  // Northeast corner - Davao City proper
     );
 
     // Set max bounds to prevent panning outside Davao City
