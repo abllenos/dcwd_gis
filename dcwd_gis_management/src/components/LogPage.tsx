@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress, InputNumber } from 'antd';
+import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
@@ -75,60 +75,40 @@ const LogPage: React.FC = observer(() => {
           </Col>
           <Col xs={24} md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
 
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 520 }}>
-              <label style={{ fontWeight: 600, marginBottom: 6 }}>Search:</label>
-              {/* Improved search input: larger, accessible, Escape clears, Enter triggers search */}
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Input.Search
-                  placeholder="Search across layers (press Enter to search, Esc to clear)"
-                  value={search}
-                  allowClear
-                  enterButton
-                  size="middle"
-                  aria-label="Search logs"
-                  style={{ width: '100%', minWidth: 240 }}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    logStore.setSearch(v);
-                    if (!v.trim()) {
-                      layerSearchStore.clear();
-                    } else {
-                      layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
-                    }
-                  }}
-                  onSearch={(val) => {
-                    if ((val ?? '').toString().trim()) {
-                      layerSearchStore.start((val ?? '').toString(), selectedLayer ?? 1, logStore.apiFetchPageSize);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') {
-                      logStore.setSearch('');
-                      layerSearchStore.clear();
-                    }
-                  }}
-                />
-
-                <Space>
-                  <Button
-                    type="default"
-                    disabled={!search.trim()}
-                    loading={layerSearchStore.loading}
-                    onClick={() => layerSearchStore.start(search, selectedLayer ?? 1, logStore.apiFetchPageSize)}
-                  >
-                    Search
-
-                  </Button>
-                  {layerSearchStore.active && (
-                    <Button onClick={() => layerSearchStore.cancel()} danger>
-                      Stop search
-                    </Button>
-                  )}
-                </Space>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Typography.Text className="license-control-text">Search:</Typography.Text>
+              <Input.Search
+                placeholder=""
+                value={search}
+                allowClear
+                enterButton
+                size="small"
+                aria-label="Search logs"
+                style={{ width: 200 }}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  logStore.setSearch(v);
+                  if (!v.trim()) {
+                    layerSearchStore.clear();
+                  } else {
+                    layerSearchStore.scheduleAutoStart(v, selectedLayer ?? 1, logStore.apiFetchPageSize);
+                  }
+                }}
+                onSearch={(val) => {
+                  if ((val ?? '').toString().trim()) {
+                    layerSearchStore.start((val ?? '').toString(), selectedLayer ?? 1, logStore.apiFetchPageSize);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    logStore.setSearch('');
+                    layerSearchStore.clear();
+                  }
+                }}
+              />
               {/* Progress / scanned indicator */}
-              <div style={{ marginTop: 8 }}>
-                {layerSearchStore.active && (
+              {layerSearchStore.active && (
+                <div style={{ marginTop: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ flex: 1 }}>
                       <Progress
@@ -154,8 +134,8 @@ const LogPage: React.FC = observer(() => {
                       )}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </Col>
         </Row>
@@ -183,7 +163,7 @@ const LogPage: React.FC = observer(() => {
             dataSource={tableData}
             loading={tableLoading}
             onRow={(record) => ({
-              onClick: () => logUiStore.open(record),
+              onDoubleClick: () => logUiStore.open(record),
               style: { cursor: 'pointer' },
             })}
             pagination={false}
@@ -219,7 +199,6 @@ const LogPage: React.FC = observer(() => {
 
             const showingStart = total > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
             const showingEnd = total > 0 ? Math.min(currentPage * pageSize, total) : 0;
-            const disableJump = totalPages <= 1 || total === 0;
             return (
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8 }}>
                 <Typography.Text style={{ fontSize: 12 }}>
@@ -242,19 +221,6 @@ const LogPage: React.FC = observer(() => {
                     )
                   ))}
                   <Button size="small" disabled={currentPage >= totalPages} onClick={() => logStore.updatePagination(currentPage + 1, pageSize)}>Next</Button>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Typography.Text style={{ fontSize: 12 }}>Jump to</Typography.Text>
-                    <InputNumber
-                      size="small"
-                      min={1}
-                      max={totalPages}
-                      value={logStore.pageJumpInput}
-                      onChange={(value) => logStore.setPageJumpInput(value)}
-                      onPressEnter={() => logStore.jumpToPage()}
-                      disabled={disableJump}
-                    />
-                    <Button size="small" onClick={() => logStore.jumpToPage()} disabled={disableJump}>Go</Button>
-                  </span>
                 </Space>
               </div>
             );
@@ -268,6 +234,7 @@ const LogPage: React.FC = observer(() => {
           width={'50vw'}
           style={{ maxHeight: '90vh', top: 20, overflow: 'hidden' }}
           styles={{ body: { maxHeight: '76vh', overflow: 'hidden' } }}
+          maskClosable={false}
           footer={[
             <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
           ]}
