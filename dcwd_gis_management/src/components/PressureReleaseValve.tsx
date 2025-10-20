@@ -36,6 +36,12 @@ const PressureReleaseValve: React.FC = observer(() => {
           prvNumber: item.prv_number || '',
           location: item.location || '',
           status: item.status_remarks || '',
+          // Include coordinate fields for the map
+          lat: item.lat,
+          lon: item.lon,
+          longitude: item.longitude,
+          latitude: item.latitude,
+          geom: item.geom,
           ...item,
         }));
         prvStore.setData(data);

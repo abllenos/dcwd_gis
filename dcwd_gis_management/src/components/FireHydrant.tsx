@@ -96,84 +96,84 @@ const FireHydrantList: React.FC = observer(() => {
 
         return (
             <>
-                <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-                    <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-                        <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Fire Hydrant - Maintenance</span>
-                    </div>
-                    <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
-                        <div style={{ marginBottom: 24 }}>
-                            <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
-                                Instructions:
-                            </Title>
-                            <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16, gap: 8 }}>
-                            <span>Search:</span>
-                            <Input.Search
-                                placeholder="Search..."
-                                size="small"
-                                allowClear
-                                enterButton
-                                value={searchText}
-                                onChange={(e) => {
-                                    setSearchText(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                                style={{ width: 200 }}
-                            />
-                        </div>
-
-                        <Table
-                            key={`page-${currentPage}`}
-                            dataSource={paginatedUsers}
-                            columns={columns}
-                            rowKey={(record, index) => record.assetid || `fire-hydrant-${index}`}
-                            pagination={false}
-                            onRow={(record) => ({
-                                onDoubleClick: () => {
-                                    fireHydrantListStore.setSelectedRecord(record);
-                                    fireHydrantListStore.setEditModalVisible(true);
-                                },
-                            })}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
-                            <span style={{ fontSize: 12 }}>
-                                Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-                            </span>
-                            <Space>
-                                <Button size="small" disabled={currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(currentPage - 1)}>Previous</Button>
-                                {totalItems > 0 ? getPageNumbers().map(pageNum => (
-                                    <Button 
-                                        key={pageNum} 
-                                        size="small" 
-                                        type={pageNum === currentPage ? 'primary' : 'default'} 
-                                        onClick={() => handlePageChange(pageNum)}
-                                    >
-                                        {pageNum}
-                                    </Button>
-                                )) : (
-                                    <Button size="small" disabled>1</Button>
-                                )}
-                                <Button size="small" disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(currentPage + 1)}>Next</Button>
-                            </Space>
-                        </div>
-                        <FireHydrantDetailsModal
-                            visible={fireHydrantListStore.detailsModalVisible}
-                            record={fireHydrantListStore.selectedRecord}
-                            onCancel={() => fireHydrantListStore.setDetailsModalVisible(false)}
-                        />
-                        <FireHydrantEditModal
-                            visible={fireHydrantListStore.editModalVisible}
-                            record={fireHydrantListStore.selectedRecord}
-                            onCancel={() => fireHydrantListStore.setEditModalVisible(false)}
-                            onUpdate={(updated) => {
-                                fireHydrantListStore.updateRecord(updated);
-                                fireHydrantListStore.setEditModalVisible(false);
-                            }}
-                        />
-                    </Card>
+                <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
+                    <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Fire Hydrant - Maintenance</span>
                 </div>
+                <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+                    <div style={{ marginBottom: 24 }}>
+                        <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
+                            Instructions:
+                        </Title>
+                        <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16, gap: 8 }}>
+                        <span>Search:</span>
+                        <Input.Search
+                            placeholder="Search..."
+                            size="small"
+                            allowClear
+                            enterButton
+                            value={searchText}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            style={{ width: 200 }}
+                        />
+                    </div>
+
+                    <Table
+                        key={`page-${currentPage}`}
+                        dataSource={paginatedUsers}
+                        columns={columns}
+                        rowKey={(record, index) => record.assetid || `fire-hydrant-${index}`}
+                        pagination={false}
+                        onRow={(record) => ({
+                            onDoubleClick: () => {
+                                fireHydrantListStore.setSelectedRecord(record);
+                                fireHydrantListStore.setEditModalVisible(true);
+                            },
+                        })}
+                        style={{ border: '1px solid #ddd', borderRadius: '12px' }}
+                    />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
+                        <span style={{ fontSize: 12 }}>
+                            Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                        </span>
+                        <Space>
+                            <Button size="small" disabled={currentPage === 1 || totalItems === 0} onClick={() => handlePageChange(currentPage - 1)}>Previous</Button>
+                            {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                                <Button 
+                                    key={pageNum} 
+                                    size="small" 
+                                    type={pageNum === currentPage ? 'primary' : 'default'} 
+                                    onClick={() => handlePageChange(pageNum)}
+                                >
+                                    {pageNum}
+                                </Button>
+                            )) : (
+                                <Button size="small" disabled>1</Button>
+                            )}
+                            <Button size="small" disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => handlePageChange(currentPage + 1)}>Next</Button>
+                        </Space>
+                    </div>
+                    <FireHydrantDetailsModal
+                        visible={fireHydrantListStore.detailsModalVisible}
+                        record={fireHydrantListStore.selectedRecord}
+                        onCancel={() => fireHydrantListStore.setDetailsModalVisible(false)}
+                    />
+                    <FireHydrantEditModal
+                        visible={fireHydrantListStore.editModalVisible}
+                        record={fireHydrantListStore.selectedRecord}
+                        onCancel={() => fireHydrantListStore.setEditModalVisible(false)}
+                        onUpdate={(updated) => {
+                            fireHydrantListStore.updateRecord(updated);
+                            fireHydrantListStore.setEditModalVisible(false);
+                        }}
+                    />
+                </Card>
                 <Footer />
             </>
         );

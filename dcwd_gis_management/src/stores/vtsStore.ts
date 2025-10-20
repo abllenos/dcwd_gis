@@ -14,15 +14,15 @@ const DEFAULTS = {
   MAX_VISIBLE_PAGES: 3,
 };
 
+
 const DAVAO_CENTER: [number, number] = [7.0731, 125.6128];
+// Davao City bounding box (approximate)
+export const DAVAO_CITY_BOUNDS: { sw: [number, number]; ne: [number, number] } = {
+  sw: [6.9600, 125.4800], // Southwest corner
+  ne: [7.2000, 125.7000]  // Northeast corner
+};
 
 const STATUS_OPTIONS: Array<'online' | 'offline' | 'unknown'> = ['online', 'online', 'online', 'offline', 'unknown'];
-
-const SAMPLE_USERS = [
-  { software: 'MapInfo Professional 19', department: 'Engineering and Construction Department', prefix: 'eng' },
-  { software: 'QGIS', department: 'Production Department', prefix: 'prod' },
-  { software: 'MapInfo Professional 17', department: 'Information and Communication Technology Department', prefix: 'ict' },
-];
 
 export interface VTSUser {
   key: number;
@@ -75,9 +75,8 @@ class VTSStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.loadUsersFromLicenseStore();
-    // Attempt to fetch fresh data from API
-    this.fetchUsers();
+    // Only load our 10 sample users
+    this.initializeSampleUsers();
   }
 
   // Convert license store users to VTS users with additional properties
@@ -106,30 +105,34 @@ class VTSStore {
 
   private getRandomStatus = () => STATUS_OPTIONS[Math.floor(Math.random() * STATUS_OPTIONS.length)];
 
-  // Load users from license store
-  private loadUsersFromLicenseStore = () => {
-    if (licenseStore.registeredUsers.length > 0) {
-      this.users = this.convertLicenseUsersToVTSUsers(licenseStore.registeredUsers);
-      this.filteredUsers = [...this.users];
-    } else {
-      // Fallback to sample data if no license users available
-      this.initializeSampleUsers();
-    }
-  };
 
-  // Fallback sample data (kept for when license store is empty)
+
+  // Fallback sample data with 10 fake employees with live locations
   private initializeSampleUsers = () => {
-    this.users = SAMPLE_USERS.map((sample, index) => ({
+    const fakeEmployees = [
+      { userId: 'EMP001', coordinates: [7.0731, 125.6128] as [number, number], status: 'online' as const }, // Downtown Poblacion (City Hall area)
+      { userId: 'EMP002', coordinates: [7.1056, 125.6289] as [number, number], status: 'online' as const }, // Buhangin (residential area)
+      { userId: 'EMP003', coordinates: [7.1689, 125.4889] as [number, number], status: 'offline' as const }, // Calinan (town center)
+      { userId: 'EMP004', coordinates: [7.0856, 125.5234] as [number, number], status: 'online' as const }, // Mintal (commercial area)
+      { userId: 'EMP005', coordinates: [7.0912, 125.5845] as [number, number], status: 'unknown' as const }, // Tugbok (moved further inland)
+      { userId: 'EMP006', coordinates: [7.0445, 125.5912] as [number, number], status: 'online' as const }, // Talomo (moved inland from coast)
+      { userId: 'EMP007', coordinates: [7.1267, 125.5823] as [number, number], status: 'offline' as const }, // Marilog (district center)
+      { userId: 'EMP008', coordinates: [7.0823, 125.6034] as [number, number], status: 'online' as const }, // Agdao (moved inland)
+      { userId: 'EMP009', coordinates: [7.0934, 125.5989] as [number, number], status: 'unknown' as const }, // Ma-a (inland area)
+      { userId: 'EMP010', coordinates: [7.1123, 125.6167] as [number, number], status: 'online' as const }  // Panacan (moved inland from coast)
+    ];
+
+    this.users = fakeEmployees.map((emp, index) => ({
       key: index + 1,
       id: index + 1,
-      software: sample.software,
-      deviceName: `DCWD-WS-${String(index + 1).padStart(3, '0')}`,
-      department: sample.department,
-      userId: `${sample.prefix}${String(index + 1).padStart(3, '0')}`,
+      software: 'VTS Tracker',
+      deviceName: `DCWD-MOBILE-${String(index + 1).padStart(3, '0')}`,
+      department: 'Field Operations',
+      userId: emp.userId,
       installationDate: new Date().toISOString().split('T')[0],
-      status: this.getRandomStatus(),
+      status: emp.status,
       isActive: true,
-      coordinates: this.generateRandomCoordinates(),
+      coordinates: emp.coordinates,
       lastSeen: new Date().toISOString().replace('T', ' ').substring(0, 19)
     }));
     this.filteredUsers = [...this.users];

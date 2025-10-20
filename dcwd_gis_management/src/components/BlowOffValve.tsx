@@ -73,10 +73,12 @@ const BlowOffValve = observer(() => {
   const { currentPage, pageSize, search } = blowOffValveStore;
   const filteredData = blowOffValveStore.data.filter(
     row =>
-      (row.workOrder?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (row.bovnumber?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (row.wonumber?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
       (row.location?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
-      (row.status?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
-      (row.project?.toLowerCase() ?? '').includes(search.toLowerCase())
+      (row.status_remarks?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (row.dategeocoded?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (row.brgycode?.toLowerCase() ?? '').includes(search.toLowerCase())
   ).map((row, idx) => ({
     ...row,
     key: `${row.bovnumber || ''}_${row.wonumber || ''}_${idx}`
@@ -113,86 +115,90 @@ const BlowOffValve = observer(() => {
     <>
       <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
         <Card style={{ background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
-          <div style={{ background: '#e6edfc', borderRadius: 8, padding: '16px 24px', marginBottom: 24 }}>
-            <Title level={4} style={{ color: '#2563eb', margin: 0 }}>Blow Off Valve - Maintenance</Title>
-          </div>
-          <div style={{ marginBottom: 16 }}>
-            <Text strong>Instructions:</Text>
-            <div style={{ marginLeft: 12, marginTop: 2 }}>
-              <Text>Instruction: Double Click row to edit Details.</Text>
+          <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', marginBottom: '16px', marginTop: '0' }}>
+            <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '16px 24px' }}>
+              <Title level={4} style={{ color: '#2563eb', margin: 0 }}>Blow Off Valve - Maintenance</Title>
             </div>
-          </div>
-          <div className="license-controls-container">
-            <div className="license-display-controls">
-              <span>Display</span>
-              <Select
-                value={pageSize}
-                onChange={blowOffValveStore.setPageSize.bind(blowOffValveStore)}
-                size="small"
-                style={{ width: 90 }}
-                options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
+            <div style={{ padding: '16px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <Text strong>Instructions:</Text>
+                <div style={{ marginLeft: '12px', marginTop: '2px' }}>
+                  <Text>Instruction: Double Click row to edit Details.</Text>
+                </div>
+              </div>
+              <div className="license-controls-container">
+                <div className="license-display-controls">
+                  <span>Display</span>
+                  <Select
+                    value={pageSize}
+                    onChange={blowOffValveStore.setPageSize.bind(blowOffValveStore)}
+                    size="small"
+                    style={{ width: '90px' }}
+                    options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
+                  />
+                  <span>records per page</span>
+                </div>
+                <div className="license-search-controls">
+                  <span>Search:</span>
+                  <Input.Search
+                    placeholder="Search..."
+                    size="small"
+                    allowClear
+                    enterButton
+                    value={search}
+                    onChange={e => { blowOffValveStore.setSearch(e.target.value); blowOffValveStore.setCurrentPage(1); }}
+                    style={{ width: '200px' }}
+                  />
+                </div>
+              </div>
+              <Table
+                key={`blowoff-table-page-${currentPage}-size-${pageSize}`}
+                bordered
+                rowKey={record => `blowoff-${record.bovnumber}-${record.wonumber}-${record.location}`}
+                columns={columns}
+                dataSource={paginatedUsers}
+                pagination={false}
+                style={{ background: '#fff', borderRadius: '8px' }}
+                onRow={record => ({
+                  onDoubleClick: (event: React.MouseEvent) => {
+                    // Only trigger row double click if not clicking the action button
+                    if (!(event.target as HTMLElement).closest('button')) {
+                      blowOffValveStore.setSelectedRow(record);
+                      blowOffValveStore.setModalOpen(true);
+                    }
+                  },
+                })}
               />
-              <span>records per page</span>
-            </div>
-            <div className="license-search-controls">
-              <span>Search:</span>
-              <Input.Search
-                placeholder="Search..."
-                size="small"
-                allowClear
-                enterButton
-                value={search}
-                onChange={e => { blowOffValveStore.setSearch(e.target.value); blowOffValveStore.setCurrentPage(1); }}
-                style={{ width: 200 }}
+              {/* Pagination Controls */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: '8px', marginTop: '16px' }}>
+                <span style={{ fontSize: '12px' }}>
+                  Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
+                </span>
+                <Space>
+                  <Button size="small" disabled={currentPage === 1 || totalItems === 0} onClick={() => blowOffValveStore.setCurrentPage(currentPage - 1)}>Previous</Button>
+                  {totalItems > 0 ? getPageNumbers().map(pageNum => (
+                    <Button
+                      key={pageNum}
+                      size="small"
+                      type={pageNum === currentPage ? 'primary' : 'default'}
+                      onClick={() => blowOffValveStore.setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  )) : (
+                    <Button size="small" disabled>1</Button>
+                  )}
+                  <Button size="small" disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => blowOffValveStore.setCurrentPage(currentPage + 1)}>Next</Button>
+                </Space>
+              </div>
+              <BlowOffValveModal
+                open={blowOffValveStore.modalOpen}
+                onClose={() => blowOffValveStore.setModalOpen(false)}
+                initialValues={blowOffValveStore.selectedRow || {}}
               />
             </div>
-          </div>
-          <Table
-            key={`blowoff-table-page-${currentPage}-size-${pageSize}`}
-            bordered
-            rowKey={record => `blowoff-${record.bovnumber}-${record.wonumber}-${record.location}`}
-            columns={columns}
-            dataSource={paginatedUsers}
-            pagination={false}
-            style={{ background: '#fff', borderRadius: 8 }}
-            onRow={record => ({
-              onDoubleClick: (event: React.MouseEvent) => {
-                // Only trigger row double click if not clicking the action button
-                if (!(event.target as HTMLElement).closest('button')) {
-                  blowOffValveStore.setSelectedRow(record);
-                  blowOffValveStore.setModalOpen(true);
-                }
-              },
-            })}
-          />
-          {/* Pagination Controls */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
-            <span style={{ fontSize: 12 }}>
-              Showing {totalItems > 0 ? startIndex + 1 : 0} to {totalItems > 0 ? endIndex : 0} of {totalItems} entries
-            </span>
-            <Space>
-              <Button size="small" disabled={currentPage === 1 || totalItems === 0} onClick={() => blowOffValveStore.setCurrentPage(currentPage - 1)}>Previous</Button>
-              {totalItems > 0 ? getPageNumbers().map(pageNum => (
-                <Button
-                  key={pageNum}
-                  size="small"
-                  type={pageNum === currentPage ? 'primary' : 'default'}
-                  onClick={() => blowOffValveStore.setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </Button>
-              )) : (
-                <Button size="small" disabled>1</Button>
-              )}
-              <Button size="small" disabled={currentPage === totalPages || totalPages === 0 || totalItems === 0} onClick={() => blowOffValveStore.setCurrentPage(currentPage + 1)}>Next</Button>
-            </Space>
           </div>
         </Card>
-        <BlowOffValveModal
-          open={blowOffValveStore.modalOpen}
-          onClose={() => blowOffValveStore.setModalOpen(false)}
-          initialValues={blowOffValveStore.selectedRow || {}}
-        />
       </div>
       <Footer />
     </>
