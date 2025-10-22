@@ -73,10 +73,10 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
       destroyOnClose
       maskClosable={false}
     >
-      <div style={{ padding: '24px 32px', background: '#fff', borderRadius: '8px 8px 0 0', borderBottom: '1px solid #e8e8e8' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Pressure Release Valve - Maintenance</Title>
+      <div style={{ padding: '24px 32px', background: 'var(--bg-secondary, #fff)', borderRadius: '8px 8px 0 0', borderBottom: '1px solid var(--border-color, #e8e8e8)' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Pressure Release Valve - Maintenance</Title>
       </div>
-      <div style={{ padding: '32px', background: '#fff' }}>
+      <div style={{ padding: '32px', background: 'var(--bg-primary, #fff)' }}>
         <Form form={form} layout="vertical">
           <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
             <TabPane tab="Details" key="1">
@@ -129,7 +129,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
                     maxWidth: '500px',
                     borderRadius: '6px', 
                     overflow: 'hidden',
-                    border: '1px solid #e8e8e8',
+                    border: '1px solid var(--border-color, #e8e8e8)',
                     position: 'relative'
                   }}>
                     {(() => {
@@ -195,7 +195,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backgroundColor: 'var(--bg-secondary, rgba(255, 255, 255, 0.95))',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -205,7 +205,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
                           }}>
                             <div style={{
                               fontSize: '48px',
-                              color: '#d9d9d9',
+                              color: 'var(--text-tertiary, #d9d9d9)',
                               marginBottom: '16px'
                             }}>
                               📍
@@ -213,14 +213,14 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
                             <div style={{
                               fontSize: '18px',
                               fontWeight: 600,
-                              color: '#999',
+                              color: 'var(--text-secondary, #999)',
                               marginBottom: '8px'
                             }}>
                               No Location Data
                             </div>
                             <div style={{
                               fontSize: '14px',
-                              color: '#666',
+                              color: 'var(--text-tertiary, #666)',
                               lineHeight: '1.4'
                             }}>
                               Geographic coordinates are not available for this pressure release valve
@@ -236,7 +236,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
             <TabPane tab="Technical Details" key="2">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>PRV Details</span>} headStyle={{ background: '#3a5fc8', color: '#fff' }} bodyStyle={{ background: '#f7f9fc' }}>
+                  <Card size="small" title={<span style={{ color: '#fff' }}>PRV Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} bodyStyle={{ background: 'var(--primary-hover-bg, #f2f7fd)' }}>
                     <Form.Item label="Valve Size" name="size">
                       <Select allowClear>{prvSizes.map(opt => <Option key={opt}>{opt}</Option>)}</Select>
                     </Form.Item>
@@ -252,7 +252,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>Additional Details</span>} headStyle={{ background: '#3a5fc8', color: '#fff' }} bodyStyle={{ background: '#f7f9fc' }}>
+                  <Card size="small" title={<span style={{ color: '#fff' }}>Additional Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} bodyStyle={{ background: 'var(--primary-hover-bg, #f2f7fd)' }}>
                     <Form.Item label="Manufacturer" name="manufacturer">
                       <Input />
                     </Form.Item>
@@ -303,9 +303,9 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
           </Tabs>
         </Form>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#fff', borderTop: '1px solid #e8e8e8', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #f7f9fc)', borderTop: '1px solid var(--border-color, #e8e8e8)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
+          <Button type="primary" onClick={handleUpdate}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>

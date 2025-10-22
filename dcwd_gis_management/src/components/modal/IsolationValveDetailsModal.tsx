@@ -23,14 +23,14 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
       destroyOnClose
       maskClosable
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Isolation Valve - Details</Title>
+      <div style={{ padding: '24px 32px 0 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '8px 8px 0 0' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Isolation Valve - Details</Title>
       </div>
-      <div style={{ background: '#fff', display: 'flex' }}>
+      <div style={{ background: 'var(--bg-primary, #fff)', display: 'flex' }}>
         {/* Left side - Form */}
-        <div style={{ flex: 1, padding: '24px 32px', borderRight: '1px solid #f0f0f0' }}>
+        <div style={{ flex: 1, padding: '24px 32px', borderRight: '1px solid var(--border-color, #f0f0f0)' }}>
           <div style={{ marginBottom: 20 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>GV Number</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>GV Number</Text>
             <Input
               style={{ width: '100%' }}
               value={record?.gvnumber}
@@ -38,7 +38,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>Status</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>Status</Text>
             <Select
               style={{ width: '100%' }}
               value={record?.brand}
@@ -51,7 +51,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
           </div>
           
           <div style={{ marginBottom: 20 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>Location</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>Location</Text>
             <Input
               value={record?.location}
               style={{ width: '100%' }}
@@ -59,7 +59,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>Date Installed</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>Date Installed</Text>
             <DatePicker
               style={{ width: '100%' }}
               placeholder="Select date"
@@ -68,7 +68,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>Water Source</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>Water Source</Text>
             <Select
               style={{ width: '100%' }}
               options={[
@@ -80,7 +80,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>Barangay</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>Barangay</Text>
             <Select
               style={{ width: '100%' }}
               value={record?.barangay}
@@ -93,7 +93,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
           </div>
 
           <div style={{ marginBottom: 0 }}>
-            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: '#666' }}>Remarks</Text>
+            <Text style={{ display: 'block', marginBottom: 8, fontSize: '14px', color: 'var(--text-secondary, #666)' }}>Remarks</Text>
             <Input.TextArea
               rows={4}
               value={record?.remarks}
@@ -105,7 +105,7 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
         {/* Right side - Map */}
         <div style={{ flex: 1, padding: '24px 32px' }}>
           <div style={{ marginBottom: 16 }}>
-            <Text strong style={{ fontSize: '16px', color: '#333' }}>Location Map</Text>
+            <Text strong style={{ fontSize: '16px', color: 'var(--text-primary, #333)' }}>Location Map</Text>
           </div>
           {record && record.geom ? (
             <GeometryMap
@@ -121,20 +121,20 @@ const IsolationValveDetailsModal: React.FC<IsolationValveDetailsModalProps> = ({
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center', 
-              background: '#f5f5f5', 
-              border: '1px solid #d9d9d9', 
+              background: 'var(--bg-tertiary, #f5f5f5)', 
+              border: '1px solid var(--border-color, #d9d9d9)', 
               borderRadius: 6,
-              color: '#999'
+              color: 'var(--text-tertiary, #999)'
             }}>
               <Text>No location data available</Text>
             </div>
           )}
-          <div style={{ marginTop: 8, fontSize: '12px', color: '#999', fontStyle: 'italic' }}>
+          <div style={{ marginTop: 8, fontSize: '12px', color: 'var(--text-tertiary, #999)', fontStyle: 'italic' }}>
             Location view only - marker position cannot be changed
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>

@@ -31,16 +31,16 @@ const LogPage: React.FC = observer(() => {
 
   return (
     <>
-    <Card className="card shadow mb-4" style={{ borderRadius: 8 }}>
-      <div className="card-header py-3" style={{ background: 'var(--bg-muted)' }}>
-        <Title level={4} style={{ margin: 0 }}>Log trails</Title>
+    <Card className="card shadow mb-4" style={{ borderRadius: 8, background: 'var(--bg-primary, #fff)', border: '1px solid var(--border-color, #e8e8e8)' }}>
+      <div className="card-header py-3" style={{ marginBottom: 16 }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Log trails</Title>
       </div>
-  <div className="card-body" style={{ paddingTop: 20, paddingLeft: 28, paddingRight: 28, paddingBottom: 28 }}>
+  <div className="card-body" style={{ paddingTop: 0, paddingLeft: 28, paddingRight: 28, paddingBottom: 28 }}>
         {/* Row 1: Map Layers */}
         <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 12 }}>
           <Col xs={24} md={12} lg={8}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label style={{ fontWeight: 600, marginBottom: 6 }}>Map Layers<span style={{ color: 'var(--primary)' }}>*</span></label>
+              <label style={{ fontWeight: 600, marginBottom: 6, color: 'var(--text-primary, #000)' }}>Map Layers<span style={{ color: 'var(--primary-color, #1890ff)' }}>*</span></label>
               <Select
                 value={selectedLayer}
                 style={{ width: '100%', cursor: 'pointer' }}
@@ -170,7 +170,7 @@ const LogPage: React.FC = observer(() => {
             scroll={{ x: 900 }}
             bordered
             locale={{ emptyText: isSearching ? (layerSearchStore.loading ? 'Searching…' : 'No matches') : 'Empty' }}
-            style={{ marginBottom: 16 }}
+            style={{ marginBottom: 16, background: 'var(--bg-primary, #fff)' }}
           />
 
           {/* Custom Pagination (sliding window with ellipses) */}
@@ -233,7 +233,7 @@ const LogPage: React.FC = observer(() => {
           onCancel={() => logUiStore.close()}
           width={'50vw'}
           style={{ maxHeight: '90vh', top: 20, overflow: 'hidden' }}
-          styles={{ body: { maxHeight: '76vh', overflow: 'hidden' } }}
+          styles={{ body: { maxHeight: '76vh', overflow: 'hidden', background: 'var(--bg-primary, #fff)' }, header: { background: 'var(--bg-secondary, #f7f9fc)', borderBottom: '1px solid var(--border-color, #e8e8e8)' } }}
           maskClosable={false}
           footer={[
             <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,
@@ -241,7 +241,7 @@ const LogPage: React.FC = observer(() => {
         >
           {logUiStore.selected && (
             <>
-              <Descriptions column={1} size="small" styles={{ label: { width: 200 } }}>
+              <Descriptions column={1} size="small" styles={{ label: { width: 200, color: 'var(--text-secondary, #666)' }, content: { color: 'var(--text-primary, #000)' } }}>
                 <Descriptions.Item label="ID">{logUiStore.selected.id}</Descriptions.Item>
                 <Descriptions.Item label="Layer ID">{logUiStore.selected.layerId}</Descriptions.Item>
                 <Descriptions.Item label="Asset ID">{formatAssetId(logUiStore.selected.assetId)}</Descriptions.Item>
@@ -251,13 +251,13 @@ const LogPage: React.FC = observer(() => {
                 <Descriptions.Item label="Description">{logUiStore.selected.description || '-'}</Descriptions.Item>
               </Descriptions>
               <div style={{ marginTop: 16 }}>
-                <div style={{ fontWeight: 600, marginBottom: 8 }}>Map</div>
-                {logUiStore.geometryLoading && <div style={{ padding: 8 }}>Loading geometry…</div>}
+                <div style={{ fontWeight: 600, marginBottom: 8, color: 'var(--text-primary, #000)' }}>Map</div>
+                {logUiStore.geometryLoading && <div style={{ padding: 8, color: 'var(--text-secondary, #666)' }}>Loading geometry…</div>}
                 {!logUiStore.geometryLoading && logUiStore.geometry && (
                   <MapView height={460} geometry={logUiStore.geometry} />
                 )}
                 {!logUiStore.geometryLoading && !logUiStore.geometry && (
-                  <div style={{ padding: 8, color: 'var(--text-muted)' }}>
+                  <div style={{ padding: 8, color: 'var(--text-tertiary, #999)' }}>
                     {logUiStore.geometryError || 'No geometry available.'}
                   </div>
                 )}

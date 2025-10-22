@@ -7,12 +7,8 @@ import FireHydrantEditModal from './modal/FireHydrantEditModal';
 import { observer } from 'mobx-react-lite';
 import { fireHydrantListStore } from '../stores/fireHydrantListStore';
 import type { FireHydrant } from '../stores/fireHydrantListStore';
-
 import type { ColumnsType } from "antd/es/table";
 import Footer from './layout/Footer';
-
-
-
 
 const FireHydrantList: React.FC = observer(() => {
     const { searchText, filteredData, loading, error, currentPage, pageSize, setSearchText, setCurrentPage } = fireHydrantListStore;
@@ -93,13 +89,13 @@ const FireHydrantList: React.FC = observer(() => {
         return <Alert message="Error" description={error.message || String(error)} type="error" showIcon />;
 
 
-
         return (
             <>
-                <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-                    <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Fire Hydrant - Maintenance</span>
-                </div>
-                <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+                <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+                <Card style={{ borderRadius: '12px 12px 12px 12px', marginTop: 0 }}>
+                    <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginLeft: '-24px', marginRight: '-24px', marginTop: '-24px', marginBottom: 24 }}>
+                        <span style={{ color: 'var(--primary-color, #1890ff)', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Fire Hydrant - Maintenance</span>
+                    </div>
                     <div style={{ marginBottom: 24 }}>
                         <Title level={5} style={{ color: '#666', marginBottom: 8 }}>
                             Instructions:
@@ -174,6 +170,7 @@ const FireHydrantList: React.FC = observer(() => {
                         }}
                     />
                 </Card>
+                </div>
                 <Footer />
             </>
         );

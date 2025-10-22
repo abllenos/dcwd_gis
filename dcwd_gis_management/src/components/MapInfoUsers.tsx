@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch, Space, Form } from 'antd';
+import { Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch, Space, Form } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
 import { mapApiUserToTableRow } from '../utils/mapApiUserToTableRow';
@@ -26,30 +26,30 @@ const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
     l.admin.toLowerCase().includes(logSearch.toLowerCase())
   );
   return (
-    <Modal open={visible} onCancel={onCancel} footer={null} width={800} title={null}>
+    <Modal open={visible} onCancel={onCancel} footer={null} width={800} title={null} bodyStyle={{ padding: '24px', background: 'var(--bg-primary, #fff)' }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
-          <Typography.Title level={4} style={{ color: '#222', margin: 0 }}>Installation Details</Typography.Title>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
+          <Typography.Title level={4} style={{ color: 'var(--primary-color, #1890ff)', margin: 0 }}>Installation Details</Typography.Title>
         </div>
-        <div style={{ background: '#f6f8fc', borderRadius: 6, padding: 18, marginBottom: 18 }}>
+        <div style={{ background: 'var(--bg-secondary, #f6f8fc)', borderRadius: 6, padding: 18, marginBottom: 18 }}>
           <Row gutter={24}>
             <Col span={12}>
-              <div><b>Registered To:</b> <span style={{ color: '#2563eb' }}>mpbaron</span></div>
-              <div><b>Software Version:</b> <span style={{ color: '#2563eb' }}>MapInfo Professional 19</span></div>
-              <div style={{ marginTop: 8 }}><Switch checkedChildren="Status" unCheckedChildren="Status" defaultChecked style={{ background: '#16c784' }} /></div>
+              <div><b>Registered To:</b> <span style={{ color: 'var(--primary-color, #2563eb)' }}>mpbaron</span></div>
+              <div><b>Software Version:</b> <span style={{ color: 'var(--primary-color, #2563eb)' }}>MapInfo Professional 19</span></div>
+              <div style={{ marginTop: 8 }}><Switch checkedChildren="Status" unCheckedChildren="Status" defaultChecked /></div>
             </Col>
             <Col span={12}>
-              <div><b>Department:</b> <span style={{ color: '#2563eb' }}>{user?.department}</span></div>
-              <div><b>License Type:</b> <span style={{ color: '#2563eb' }}>{user?.licenseType}</span></div>
-              <div><b>PC Name:</b> <span style={{ color: '#2563eb' }}>{user?.computerName}</span></div>
+              <div><b>Department:</b> <span style={{ color: 'var(--primary-color, #2563eb)' }}>{user?.department}</span></div>
+              <div><b>License Type:</b> <span style={{ color: 'var(--primary-color, #2563eb)' }}>{user?.licenseType}</span></div>
+              <div><b>PC Name:</b> <span style={{ color: 'var(--primary-color, #2563eb)' }}>{user?.computerName}</span></div>
             </Col>
           </Row>
         </div>
-        <div style={{ background: '#e6edfc', borderRadius: 8, padding: '12px 24px', marginBottom: 12 }}>
-          <Typography.Title level={5} style={{ color: '#222', margin: 0, fontWeight: 500 }}>Installation logs</Typography.Title>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: 8, padding: '12px 24px', marginBottom: 12 }}>
+          <Typography.Title level={5} style={{ color: 'var(--primary-color, #1890ff)', margin: 0, fontWeight: 500 }}>Installation logs</Typography.Title>
         </div>
-        <div style={{ background: '#f6f8fc', borderRadius: 6, padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 16 }}>
+        <div style={{ background: 'var(--bg-secondary, #f6f8fc)', borderRadius: 6, padding: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 16, color: 'var(--text-primary, #000)' }}>
             <span>Display</span>
             <Select value={10} style={{ width: 80 }} options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))} disabled />
             <span>records per page</span>
@@ -68,11 +68,11 @@ const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
             ]}
             dataSource={filteredLogs}
             pagination={{ pageSize: 10, showSizeChanger: false }}
-            style={{ background: '#fff', borderRadius: 8 }}
+            style={{ background: 'var(--bg-primary, #fff)', borderRadius: 8 }}
           />
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 18 }}>
-          <Button type="primary" style={{ background: '#2563eb', fontWeight: 600 }}>Renew</Button>
+          <Button type="primary">Renew</Button>
         </div>
       </div>
     </Modal>
@@ -192,11 +192,11 @@ const MapInfoUsers = observer(() => {
 
   return (
     <>
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
-        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Create / Update Registered Users</Title>
+      <div style={{ border: '1px solid var(--border-color, #ddd)', borderRadius: '12px', padding: '0', backgroundColor: 'var(--bg-primary, #fff)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={5} style={{ color: 'var(--primary-color, #1890ff)', margin: 0 }}>Create / Update Registered Users</Title>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Text style={{ color: '#000', fontSize: '14px' }}>Search:</Text>
+            <Text style={{ color: 'var(--text-primary, #000)', fontSize: '14px' }}>Search:</Text>
             <Input.Search
               size="small"
               placeholder=""
@@ -216,7 +216,7 @@ const MapInfoUsers = observer(() => {
   <Row gutter={[16, 0]} align="bottom">
     <Col xs={24} sm={12} md={6} lg={4}>
       <Form.Item
-        label={<span style={{ fontWeight: 500, color: '#222' }}>* Software</span>}
+        label={<span style={{ fontWeight: 500, color: 'var(--text-primary, #222)' }}>* Software</span>}
         name="software"
         rules={[{ required: true, message: 'Please select software!' }]}
       >
@@ -231,7 +231,7 @@ const MapInfoUsers = observer(() => {
     </Col>
     <Col xs={24} sm={12} md={6} lg={4}>
       <Form.Item
-        label={<span style={{ fontWeight: 500, color: '#222' }}>* Device Name</span>}
+        label={<span style={{ fontWeight: 500, color: 'var(--text-primary, #222)' }}>* Device Name</span>}
         name="deviceName"
         rules={[{ required: true, message: 'Please enter device name!' }]}
       >
@@ -246,7 +246,7 @@ const MapInfoUsers = observer(() => {
     </Col>
     <Col xs={24} sm={12} md={6} lg={4}>
       <Form.Item
-        label={<span style={{ fontWeight: 500, color: '#222' }}>* Department</span>}
+        label={<span style={{ fontWeight: 500, color: 'var(--text-primary, #222)' }}>* Department</span>}
         name="department"
         rules={[{ required: true, message: 'Please select department!' }]}
       >
@@ -261,7 +261,7 @@ const MapInfoUsers = observer(() => {
     </Col>
     <Col xs={24} sm={12} md={6} lg={4}>
       <Form.Item
-        label={<span style={{ fontWeight: 500, color: '#222' }}>* User ID</span>}
+        label={<span style={{ fontWeight: 500, color: 'var(--text-primary, #222)' }}>* User ID</span>}
         name="userId"
         rules={[{ required: true, message: 'Please enter user ID!' }]}
       >
@@ -276,7 +276,7 @@ const MapInfoUsers = observer(() => {
     </Col>
     <Col xs={24} sm={12} md={6} lg={4}>
       <Form.Item
-        label={<span style={{ fontWeight: 500, color: '#222' }}>* Installation Date</span>}
+        label={<span style={{ fontWeight: 500, color: 'var(--text-primary, #222)' }}>* Installation Date</span>}
         name="installDate"
         rules={[{ required: true, message: 'Please select installation date!' }]}
       >
@@ -291,7 +291,7 @@ const MapInfoUsers = observer(() => {
     </Col>
     <Col xs={24} sm={12} md={6} lg={3}>
       <Form.Item>
-        <Button type="primary" className="license-register-button" icon={<i className="anticon anticon-save" />} style={{ height: 40, fontWeight: 600, background: '#6C86F5', borderColor: '#6C86F5', width: '100%' }}>
+        <Button type="primary" className="license-register-button" icon={<i className="anticon anticon-save" />} style={{ height: 40, fontWeight: 600, width: '100%' }}>
           Register
         </Button>
       </Form.Item>
@@ -323,7 +323,7 @@ const MapInfoUsers = observer(() => {
             columns={columns}
             dataSource={tableData}
             pagination={false}
-            style={{ background: '#fff', borderRadius: 8 }}
+            style={{ background: 'var(--bg-primary, #fff)', borderRadius: 8 }}
           />
           {/* Pagination (License.tsx style) */}
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>

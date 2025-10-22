@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiGis } from './endpoints/Interceptor';
 import Footer from './layout/Footer';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface PMSRecord {
   id: number;
@@ -110,7 +110,6 @@ const PressureMonitoringSystem = observer(() => {
       ),
     },
   ];
-
   const filteredData = (data || []).filter(
     row =>
       row.pmsNumber.toLowerCase().includes(search.toLowerCase()) ||
@@ -148,11 +147,11 @@ const PressureMonitoringSystem = observer(() => {
 
   return (
     <>
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
-        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '16px 24px' }}>
-          <Title level={4} style={{ color: '#2563eb', margin: 0 }}>Pressure Monitoring System - Maintenance</Title>
-        </div>
-        <div style={{ padding: '16px' }}>
+      <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
+        <Card style={{ borderRadius: '12px 12px 12px 12px', marginTop: 0 }}>
+          <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginLeft: '-24px', marginRight: '-24px', marginTop: '-24px', marginBottom: 24 }}>
+            <span style={{ color: 'var(--primary-color, #1890ff)', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Monitoring System - Maintenance</span>
+          </div>
           <div className="license-controls-container">
             <div className="license-display-controls">
               <Text className="license-control-text">Display</Text>
@@ -219,7 +218,7 @@ const PressureMonitoringSystem = observer(() => {
             </>
           )}
           <PmsMaintenanceModal open={pressureMonitoringSystemStore.modalOpen} onClose={() => pressureMonitoringSystemStore.setModalOpen(false)} />
-        </div>
+        </Card>
       </div>
       <Footer />
     </>

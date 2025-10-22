@@ -23,10 +23,10 @@ const AirValveDetailsModal: React.FC<AirValveDetailsModalProps> = ({ visible, on
       destroyOnClose
       maskClosable
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Air Valve - Details</Title>
+      <div style={{ padding: '24px 32px 0 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '8px 8px 0 0' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Air Valve - Details</Title>
       </div>
-      <div style={{ padding: '32px 32px 0 32px', background: '#fff' }}>
+      <div style={{ padding: '32px 32px 0 32px', background: 'var(--bg-primary, #fff)' }}>
         <Row gutter={[24, 16]} style={{ marginBottom: 8 }}>
           <Col xs={24} md={12}>
             <Text>Location: {getValue(record?.location)}</Text>
@@ -35,7 +35,7 @@ const AirValveDetailsModal: React.FC<AirValveDetailsModalProps> = ({ visible, on
             <Text>Valve Status : {getValue(record?.status)}</Text>
           </Col>
         </Row>
-        <div style={{ background: '#e9edfa', borderRadius: 8, padding: '12px 24px', margin: '18px 0 0 0' }}>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: 8, padding: '12px 24px', margin: '18px 0 0 0' }}>
           <Row gutter={[24, 16]}>
             <Col xs={24} md={12}>
               <Text>Work Order Number : {getValue(record?.wonumber)}</Text>
@@ -58,7 +58,7 @@ const AirValveDetailsModal: React.FC<AirValveDetailsModalProps> = ({ visible, on
             </Col>
           </Row>
         </div>
-        <div style={{ background: '#e9edfa', borderRadius: 8, padding: '12px 24px', margin: '18px 0 0 0' }}>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: 8, padding: '12px 24px', margin: '18px 0 0 0' }}>
           <Row gutter={[24, 16]}>
             <Col xs={24} md={12}>
               <Text>Barangay : {getValue(record?.barangay)}</Text>
@@ -77,7 +77,7 @@ const AirValveDetailsModal: React.FC<AirValveDetailsModalProps> = ({ visible, on
           </Row>
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>

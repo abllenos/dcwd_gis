@@ -27,11 +27,13 @@ const PipeConditionAssessmentModal: React.FC<PipeConditionAssessmentModalProps> 
       style={{ top: 24 }}
       destroyOnClose
       title={null}
+      bodyStyle={{ padding: '24px 32px', background: 'var(--bg-primary, #fff)' }}
     >
-      <div style={{ padding: '24px 32px 0 32px' }}>
-        <Title level={4} style={{ margin: 0 }}>Pipe Condition Assessment</Title>
-        <div style={{ fontWeight: 600, margin: '18px 0 8px 0' }}>Asset ID: {assetId}</div>
-        <Form form={form} layout="vertical">
+      <div style={{ marginBottom: '24px' }}>
+        <Title level={4} style={{ margin: '0 0 12px 0', color: 'var(--primary-color, #1890ff)' }}>Pipe Condition Assessment</Title>
+        <div style={{ fontWeight: 600, margin: '0', color: 'var(--text-secondary, #666)' }}>Asset ID: {assetId}</div>
+      </div>
+      <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item label="Operational Status" name="operationalStatus">
@@ -62,7 +64,7 @@ const PipeConditionAssessmentModal: React.FC<PipeConditionAssessmentModalProps> 
             </Col>
           </Row>
 
-          <div style={{ fontWeight: 600, margin: '24px 0 8px 0' }}>Impact Scoring</div>
+          <div style={{ fontWeight: 600, margin: '24px 0 8px 0', color: 'var(--text-primary, #000)' }}>Impact Scoring</div>
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item label="Service Demand" name="serviceDemand">
@@ -90,7 +92,7 @@ const PipeConditionAssessmentModal: React.FC<PipeConditionAssessmentModalProps> 
             </Col>
           </Row>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 18 }}>
-            <Button type="primary" htmlType="submit" style={{ background: '#16c784', border: 'none' }}>
+            <Button type="primary" htmlType="submit">
               Save
             </Button>
             <Button danger onClick={onClose} style={{ minWidth: 80 }}>
@@ -98,7 +100,6 @@ const PipeConditionAssessmentModal: React.FC<PipeConditionAssessmentModalProps> 
             </Button>
           </div>
         </Form>
-      </div>
     </Modal>
   );
 };

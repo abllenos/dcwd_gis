@@ -1,11 +1,5 @@
 import {
-  HomeOutlined,
-  AppstoreOutlined,
-  BookOutlined,
-  BoxPlotOutlined,
-  FileTextOutlined,
-  ClusterOutlined,
-  ToolOutlined,
+  HomeOutlined, AppstoreOutlined, BookOutlined, BoxPlotOutlined, FileTextOutlined, ClusterOutlined, ToolOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 

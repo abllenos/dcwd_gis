@@ -107,13 +107,13 @@ const PressureReleaseValve: React.FC = observer(() => {
   return (
     <>
       <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-        <div style={{ background: '#e9edfa', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginBottom: 0 }}>
-          <span style={{ color: '#3a5fc8', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
-        </div>
-        <Card style={{ borderRadius: '0 0 12px 12px', marginTop: 0 }}>
+        <Card style={{ borderRadius: '12px 12px 12px 12px', marginTop: 0 }}>
+          <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginLeft: '-24px', marginRight: '-24px', marginTop: '-24px', marginBottom: 24 }}>
+            <span style={{ color: 'var(--primary-color, #1890ff)', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Pressure Release Valve - Maintenance</span>
+          </div>
           <div style={{ marginBottom: 24 }}>
-            <Title level={5} style={{ color: '#666', marginBottom: 8 }}>Instructions:</Title>
-            <Text style={{ color: '#999' }}>Instruction: Double Click row to edit Details.</Text>
+            <Title level={5} style={{ color: 'var(--text-secondary, #666)', marginBottom: 8 }}>Instructions:</Title>
+            <Text style={{ color: 'var(--text-tertiary, #999)' }}>Instruction: Double Click row to edit Details.</Text>
           </div>
 
           <div className="license-controls-container">
@@ -190,7 +190,7 @@ const PressureReleaseValve: React.FC = observer(() => {
                   },
                 })}
                 bordered
-                style={{ background: '#fff', borderRadius: 8 }}
+                style={{ background: 'var(--bg-primary, #fff)', borderRadius: 8 }}
               />
               {/* Pagination (License.tsx style) */}
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>

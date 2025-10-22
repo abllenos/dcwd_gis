@@ -1,16 +1,11 @@
 // React import not needed with the new JSX transform
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Button, Space } from 'antd';
+import { Typography, Table, Select, Input, Button, Space } from 'antd';
 
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { dmaInletStore } from '../stores/dmaInletStore';
 
 const { Text } = Typography;
-
-
-
-
-
 
 const DMAInlet = observer(() => {
   const initialData = [
@@ -47,8 +42,6 @@ const DMAInlet = observer(() => {
       dmaInletStore.setCurrentPage(1);
     }
   };
-
-
 
   const handleSearch = (value: string) => {
     dmaInletStore.setSearch(value);
@@ -90,8 +83,6 @@ const DMAInlet = observer(() => {
         row.type.toLowerCase().includes(search.toLowerCase())
     );
 
-
-
   const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / dmaInletStore.pageSize);
   const startIndex = (dmaInletStore.currentPage - 1) * dmaInletStore.pageSize;
@@ -119,13 +110,11 @@ const DMAInlet = observer(() => {
     return pages;
   };
 
-
-
   return (
     <>
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
-        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px' }}>
-          <Typography.Title level={5} style={{ color: '#2563eb', margin: 0 }}>DMA Inlet</Typography.Title>
+      <div style={{ border: '1px solid var(--border-color, #ddd)', borderRadius: '12px', padding: '0', backgroundColor: 'var(--bg-primary, #fff)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '12px 24px' }}>
+          <Typography.Title level={5} style={{ color: 'var(--primary-color, #1890ff)', margin: 0 }}>DMA Inlet</Typography.Title>
         </div>
         <div style={{ padding: '16px' }}>
           <div className="license-controls-container">
@@ -163,7 +152,7 @@ const DMAInlet = observer(() => {
             columns={columns}
             dataSource={paginatedData}
             pagination={false}
-            style={{ background: '#fff', borderRadius: 8 }}
+            style={{ background: 'var(--bg-primary, #fff)', borderRadius: 8 }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>
             <Text style={{ fontSize: 12 }}>

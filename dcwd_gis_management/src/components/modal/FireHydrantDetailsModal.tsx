@@ -23,10 +23,10 @@ const FireHydrantDetailsModal: React.FC<FireHydrantDetailsModalProps> = ({ visib
       destroyOnClose
       maskClosable
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Fire Hydrant - Details</Title>
+      <div style={{ padding: '24px 32px 0 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '8px 8px 0 0' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Fire Hydrant - Details</Title>
       </div>
-      <div style={{ padding: '32px 32px 0 32px', background: '#fff' }}>
+      <div style={{ padding: '32px 32px 0 32px', background: 'var(--bg-primary, #fff)' }}>
         <Row gutter={[24, 16]} style={{ marginBottom: 8 }}>
           <Col xs={24} md={12}>
             <Text>Asset ID: {getValue(record?.assetid)}</Text>
@@ -52,7 +52,7 @@ const FireHydrantDetailsModal: React.FC<FireHydrantDetailsModalProps> = ({ visib
           </Col>
         </Row>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>

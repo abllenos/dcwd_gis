@@ -262,19 +262,6 @@ const License: React.FC = observer(() => {
         <Typography.Title level={4} className="license-list-title">
           List of Registered Users
         </Typography.Title>
-        <Space>
-          <Tooltip title="Refresh Users">
-            <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
-              type="text"
-              icon={<ReloadOutlined />}
-              onClick={handleRefreshUsers}
-              loading={licenseStore.loading}
-              className="license-action-button"
-            >
-              Refresh
-            </Button>
-          </Tooltip>
-        </Space>
       </div>
 
       <div className="license-list-container">
