@@ -59,7 +59,6 @@ class BlowOffValveStore {
     try {
       const res = await axios.get('helpers/gis/mgtsys/getLayers/getBov.php');
       const apiData = res.data;
-      console.log('BlowOffValve API response:', apiData);
       let valves: any[] = Array.isArray(apiData.data) ? apiData.data : [];
       runInAction(() => {
         this.data = valves.map((item: any) => ({

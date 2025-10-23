@@ -25,9 +25,9 @@ const PipeConditionAssessmentModal: React.FC<PipeConditionAssessmentModalProps> 
       footer={null}
       width={900}
       style={{ top: 24 }}
-      destroyOnClose
+      destroyOnHidden
       title={null}
-      bodyStyle={{ padding: '24px 32px', background: 'var(--bg-primary, #fff)' }}
+      styles={{ body: { padding: '24px 32px', background: 'var(--bg-primary, #fff)' } }}
     >
       <div style={{ marginBottom: '24px' }}>
         <Title level={4} style={{ margin: '0 0 12px 0', color: 'var(--primary-color, #1890ff)' }}>Pipe Condition Assessment</Title>

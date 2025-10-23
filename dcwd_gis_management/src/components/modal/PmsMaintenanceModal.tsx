@@ -1,5 +1,6 @@
 import { Modal, Button, Table, Typography, Select, Input } from 'antd';
-import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { pmsMaintenanceUiStore } from '../../stores/pmsMaintenanceUiStore';
 
 const { Title } = Typography;
 
@@ -67,9 +68,7 @@ const columns = [
   },
 ];
 
-const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose }) => {
-  const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState('');
+const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = observer(({ open, onClose }) => {
   // Placeholder for data
   const data: any[] = [];
 
@@ -80,7 +79,7 @@ const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose
       footer={null}
       width={1200}
       style={{ top: 16 }}
-      bodyStyle={{ padding: 0, background: 'transparent' }}
+      styles={{ body: { padding: 0, background: 'transparent' } }}
       destroyOnClose
       title={null}
     >
@@ -96,8 +95,8 @@ const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose
           <div style={{ display: 'flex', alignItems: 'center', margin: '18px 0 12px 0', gap: 16 }}>
             <span>Show</span>
             <Select
-              value={pageSize}
-              onChange={setPageSize}
+              value={pmsMaintenanceUiStore.pageSize}
+              onChange={(value) => pmsMaintenanceUiStore.setPageSize(value)}
               style={{ width: 80 }}
               options={[10, 20, 50, 100].map(v => ({ value: v, label: v }))}
             />
@@ -105,8 +104,8 @@ const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose
             <div style={{ flex: 1 }} />
             <span>Search:</span>
             <Input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+              value={pmsMaintenanceUiStore.search}
+              onChange={(e) => pmsMaintenanceUiStore.setSearch(e.target.value)}
               style={{ width: 260 }}
               allowClear
             />
@@ -116,7 +115,7 @@ const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose
             rowKey="transId"
             columns={columns}
             dataSource={data}
-            pagination={{ pageSize, showSizeChanger: false }}
+            pagination={{ pageSize: pmsMaintenanceUiStore.pageSize, showSizeChanger: false }}
             style={{ background: '#fff', borderRadius: 8 }}
             locale={{ emptyText: 'No data available in table' }}
             scroll={{ x: 1100 }}
@@ -125,6 +124,6 @@ const PmsMaintenanceModal: React.FC<PmsMaintenanceModalProps> = ({ open, onClose
       </div>
     </Modal>
   );
-};
+});
 
 export default PmsMaintenanceModal;

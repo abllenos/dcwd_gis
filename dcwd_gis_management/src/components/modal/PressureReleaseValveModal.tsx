@@ -69,7 +69,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
       footer={null}
       width={1200}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable={false}
     >
@@ -236,7 +236,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
             <TabPane tab="Technical Details" key="2">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>PRV Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} bodyStyle={{ background: 'var(--primary-hover-bg, #f2f7fd)' }}>
+                  <Card size="small" title={<span style={{ color: '#fff' }}>PRV Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f2f7fd)' } }}>
                     <Form.Item label="Valve Size" name="size">
                       <Select allowClear>{prvSizes.map(opt => <Option key={opt}>{opt}</Option>)}</Select>
                     </Form.Item>
@@ -252,7 +252,7 @@ const PressureReleaseValveModal: React.FC<Props> = ({ visible, record, onCancel,
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>Additional Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} bodyStyle={{ background: 'var(--primary-hover-bg, #f2f7fd)' }}>
+                  <Card size="small" title={<span style={{ color: '#fff' }}>Additional Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f2f7fd)' } }}>
                     <Form.Item label="Manufacturer" name="manufacturer">
                       <Input />
                     </Form.Item>

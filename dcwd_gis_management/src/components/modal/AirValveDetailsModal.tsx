@@ -19,7 +19,7 @@ const AirValveDetailsModal: React.FC<AirValveDetailsModalProps> = ({ visible, on
       footer={null}
       width={800}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable
     >

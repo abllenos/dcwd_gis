@@ -100,7 +100,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
       footer={null}
       width={1200}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable={false}
     >
@@ -264,7 +264,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
             <TabPane tab="Technical Details" key="2">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span>Air Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} bodyStyle={{ background: 'var(--primary-hover-bg, #f7f9fc)' }}>
+                  <Card size="small" title={<span>Air Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f7f9fc)' } }}>
                     <Form.Item label="Air Valve Serial No." name="avSerialNo"><Input /></Form.Item>
                     <Form.Item label="Air Valve Type" name="avType"><Select allowClear>{valveTypes.map(opt => <Option key={opt}>{opt}</Option>)}</Select></Form.Item>
                     <Form.Item label="Air Valve Size" name="avSize"><Select allowClear>{valveSizes.map(opt => <Option key={opt}>{opt}</Option>)}</Select></Form.Item>
@@ -272,7 +272,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span>Gate Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} bodyStyle={{ background: 'var(--primary-hover-bg, #f7f9fc)' }}>
+                  <Card size="small" title={<span>Gate Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f7f9fc)' } }}>
                     <Form.Item label="Serial No." name="gateSerialNo"><Input /></Form.Item>
                     <Form.Item label="Valve Size" name="gateValveSize"><Input /></Form.Item>
                     <Form.Item label="Gate Valve Brand" name="gateValveBrand"><Input /></Form.Item>

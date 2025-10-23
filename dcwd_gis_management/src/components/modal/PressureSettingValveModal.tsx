@@ -89,8 +89,7 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
                       editable={true}
                       markerColor="#3a5fc8"
                       markerLabel={`PSV ${record?.psNumber || record?.ps_number || 'Location'}`}
-                      onLocationChange={(lng, lat) => {
-                        console.log('Location updated:', { lng, lat });
+                      onLocationChange={() => {
                         // You can handle location changes here if needed
                       }}
                     />

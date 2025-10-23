@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { 
   Card, 
   Row, 
@@ -29,20 +29,10 @@ import {
   CameraOutlined
 } from "@ant-design/icons";
 import "../styles/Settings.css";
+import { settingsStore } from "../stores/settingsStore";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-
-interface SettingsFormData {
-  theme: string;
-  language: string;
-  fontSize: number;
-  notifications: boolean;
-  emailNotifications: boolean;
-  autoSave: boolean;
-  displayName: string;
-  email: string;
-}
 
 interface SettingsProps {
   isDarkMode?: boolean;
@@ -51,52 +41,20 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
-  // Load saved settings from localStorage
-  const loadSavedSettings = (): SettingsFormData => {
-    const savedSettings = localStorage.getItem('userSettings');
-    if (savedSettings) {
-      return JSON.parse(savedSettings);
-    }
-    return {
-      theme: 'light',
-      language: 'en',
-      fontSize: 14,
-      notifications: true,
-      emailNotifications: false,
-      autoSave: true,
-      displayName: 'John Doe',
-      email: 'john.doe@dcwd.gov.ph'
-    };
-  };
-
-  const [settings, setSettings] = useState<SettingsFormData>(loadSavedSettings());
-  const [tempSettings, setTempSettings] = useState<SettingsFormData>(settings);
 
   // Apply theme and font size only for saved settings
   useEffect(() => {
-    applyTheme(settings.theme);
-    applyFontSize(settings.fontSize);
-  }, [settings.theme, settings.fontSize]);
+    applyTheme(settingsStore.settings.theme);
+    applyFontSize(settingsStore.settings.fontSize);
+  }, [settingsStore.settings.theme, settingsStore.settings.fontSize]);
 
   // Sync theme settings when header dark mode changes
   useEffect(() => {
     if (isDarkMode !== undefined) {
-      const currentTheme = isDarkMode ? 'dark' : 'light';
-      // Only update if the current theme setting doesn't match
-      if (settings.theme !== 'auto' && 
-          ((settings.theme === 'dark' && !isDarkMode) || 
-           (settings.theme === 'light' && isDarkMode))) {
-        const newSettings = { ...settings, theme: currentTheme };
-        setSettings(newSettings);
-        setTempSettings(newSettings);
-        saveToLocalStorage(newSettings);
-        form.setFieldValue('theme', currentTheme);
-      }
+      settingsStore.applySettingsFromDarkMode(isDarkMode);
+      form.setFieldValue('theme', settingsStore.tempSettings.theme);
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, form]);
 
   const applyTheme = (theme: string) => {
     const root = document.documentElement;
@@ -125,20 +83,15 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
     root.style.setProperty('--base-font-size', `${fontSize}px`);
   };
 
-  const saveToLocalStorage = (settingsToSave: SettingsFormData) => {
-    localStorage.setItem('userSettings', JSON.stringify(settingsToSave));
-  };
-
-  // handleAutoSave removed - autosave flow handled inline in other handlers
-
   const handleThemeChange = (theme: string) => {
-    const newSettings = { ...tempSettings, theme };
-    setTempSettings(newSettings);
+    settingsStore.setTheme(theme);
     form.setFieldValue('theme', theme);
     
-    if (tempSettings.autoSave) {
-      setSettings(newSettings);
-      saveToLocalStorage(newSettings);
+    if (settingsStore.tempSettings.autoSave) {
+      settingsStore.saveSettings({
+        ...settingsStore.tempSettings,
+        theme
+      });
       applyTheme(theme);
       
       notification.success({
@@ -147,9 +100,8 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
         placement: 'topRight',
         duration: 2
       });
-      setHasUnsavedChanges(false);
     } else {
-      setHasUnsavedChanges(true);
+      settingsStore.setHasUnsavedChanges(true);
       notification.info({
         message: 'Theme Changed',
         description: 'Click "Save Settings" to apply changes',
@@ -160,32 +112,29 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
   };
 
   const handleFontSizeChange = (fontSize: number) => {
-    const newSettings = { ...tempSettings, fontSize };
-    setTempSettings(newSettings);
+    settingsStore.setFontSize(fontSize);
     form.setFieldValue('fontSize', fontSize);
     
-    if (tempSettings.autoSave) {
-      setSettings(newSettings);
-      saveToLocalStorage(newSettings);
+    if (settingsStore.tempSettings.autoSave) {
+      settingsStore.saveSettings({
+        ...settingsStore.tempSettings,
+        fontSize
+      });
       applyFontSize(fontSize);
-      setHasUnsavedChanges(false);
     } else {
-      setHasUnsavedChanges(true);
+      settingsStore.setHasUnsavedChanges(true);
     }
   };
 
   const handleAutoSaveToggle = (checked: boolean) => {
-    const newSettings = { ...tempSettings, autoSave: checked };
-    setTempSettings(newSettings);
+    settingsStore.setAutoSave(checked);
     form.setFieldValue('autoSave', checked);
     
     if (checked) {
       // If enabling autosave, save all current temp settings
-      setSettings(newSettings);
-      saveToLocalStorage(newSettings);
-      applyTheme(newSettings.theme);
-      applyFontSize(newSettings.fontSize);
-      setHasUnsavedChanges(false);
+      settingsStore.saveSettings(settingsStore.tempSettings);
+      applyTheme(settingsStore.tempSettings.theme);
+      applyFontSize(settingsStore.tempSettings.fontSize);
       
       notification.success({
         message: 'Auto-save Enabled',
@@ -203,18 +152,15 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
     }
   };
 
-  const handleSaveSettings = async (values: SettingsFormData) => {
-    setLoading(true);
+  const handleSaveSettings = async (values: any) => {
+    settingsStore.setLoading(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setSettings(values);
-      setTempSettings(values);
-      saveToLocalStorage(values);
+      settingsStore.saveSettings(values);
       applyTheme(values.theme);
       applyFontSize(values.fontSize);
-      setHasUnsavedChanges(false);
       
       notification.success({
         message: 'Settings Saved',
@@ -228,12 +174,13 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
         placement: 'topRight'
       });
     } finally {
-      setLoading(false);
+      settingsStore.setLoading(false);
     }
   };
 
   const handleResetSettings = () => {
-    const defaultSettings: SettingsFormData = {
+    settingsStore.resetSettings();
+    form.setFieldsValue({
       theme: 'light',
       language: 'en',
       fontSize: 14,
@@ -242,15 +189,9 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
       autoSave: true,
       displayName: 'John Doe',
       email: 'john.doe@dcwd.gov.ph'
-    };
-    
-    form.setFieldsValue(defaultSettings);
-    setSettings(defaultSettings);
-    setTempSettings(defaultSettings);
-    saveToLocalStorage(defaultSettings);
-    applyTheme(defaultSettings.theme);
-    applyFontSize(defaultSettings.fontSize);
-    setHasUnsavedChanges(false);
+    });
+    applyTheme('light');
+    applyFontSize(14);
     
     notification.info({
       message: 'Settings Reset',
@@ -274,7 +215,7 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
       <Form
         form={form}
         layout="vertical"
-        initialValues={tempSettings}
+        initialValues={settingsStore.tempSettings}
         onFinish={handleSaveSettings}
         className="settings-form"
       >
@@ -332,7 +273,7 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
             }>
               <Form.Item label="Theme" name="theme">
                 <Select 
-                  value={tempSettings.theme}
+                  value={settingsStore.tempSettings.theme}
                   onChange={handleThemeChange}
                   size="large"
                 >
@@ -388,18 +329,18 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
                   <div className="font-size-preview">
                     <Text 
                       className="preview-text"
-                      style={{ fontSize: `${tempSettings.fontSize}px` }}
+                      style={{ fontSize: `${settingsStore.tempSettings.fontSize}px` }}
                     >
                       Sample Text Preview
                     </Text>
                     <Text type="secondary" className="preview-size">
-                      {tempSettings.fontSize}px
+                      {settingsStore.tempSettings.fontSize}px
                     </Text>
                   </div>
                   <Slider
                     min={12}
                     max={20}
-                    value={tempSettings.fontSize}
+                    value={settingsStore.tempSettings.fontSize}
                     onChange={handleFontSizeChange}
                     marks={{
                       12: 'XS',
@@ -467,7 +408,7 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
                       <Text type="secondary"> Automatically save changes</Text>
                     </div>
                     <Switch 
-                      checked={tempSettings.autoSave}
+                      checked={settingsStore.tempSettings.autoSave}
                       onChange={handleAutoSaveToggle}
                     />
                   </div>
@@ -519,12 +460,12 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
             <Button 
               type="primary" 
               htmlType="submit" 
-              loading={loading}
+              loading={settingsStore.loading}
               icon={<SaveOutlined />}
               size="large"
-              disabled={!hasUnsavedChanges && !tempSettings.autoSave}
+              disabled={!settingsStore.hasUnsavedChanges && !settingsStore.tempSettings.autoSave}
             >
-              {hasUnsavedChanges ? 'Save Changes' : 'Save Settings'}
+              {settingsStore.hasUnsavedChanges ? 'Save Changes' : 'Save Settings'}
             </Button>
             <Button 
               type="default" 
@@ -535,10 +476,10 @@ const Settings: React.FC<SettingsProps> = observer(({ isDarkMode, setIsDarkMode 
               Reset to Default
             </Button>
           </Space>
-          {hasUnsavedChanges && (
+          {settingsStore.hasUnsavedChanges && (
             <div style={{ marginTop: '12px', textAlign: 'center' }}>
               <Text type="warning" style={{ fontSize: '14px' }}>
-                ⚠️ You have unsaved changes. {tempSettings.autoSave ? '' : 'Click "Save Changes" to apply them.'}
+                ⚠️ You have unsaved changes. {settingsStore.tempSettings.autoSave ? '' : 'Click "Save Changes" to apply them.'}
               </Text>
             </div>
           )}

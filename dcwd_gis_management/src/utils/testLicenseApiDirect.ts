@@ -2,7 +2,6 @@
 // Use this in browser console to test the API connection
 
 export const testDirectLicenseAPI = async () => {
-  console.log('🧪 Testing License API endpoints...');
   
   // Test different endpoint variations
   const endpoints = [
@@ -14,7 +13,6 @@ export const testDirectLicenseAPI = async () => {
 
   for (let i = 0; i < endpoints.length; i++) {
     const endpoint = endpoints[i];
-    console.log(`\n🔗 Testing endpoint ${i + 1}:`, endpoint);
     
     try {
       const response = await fetch(endpoint, {
@@ -24,52 +22,26 @@ export const testDirectLicenseAPI = async () => {
         },
       });
       
-      console.log(`✅ Status: ${response.status} ${response.statusText}`);
-      console.log(`📄 Content-Type: ${response.headers.get('content-type')}`);
-      
       const text = await response.text();
-      console.log(`📝 Raw Response (first 200 chars):`, text.substring(0, 200));
       
       // Try to parse as JSON
       try {
-        const json = JSON.parse(text);
-        console.log(`🔍 Parsed JSON:`, json);
-        console.log(`📊 Data type: ${typeof json}, Array: ${Array.isArray(json)}`);
-        if (Array.isArray(json)) {
-          console.log(`📈 Array length: ${json.length}`);
-          if (json.length > 0) {
-            console.log(`🎯 First item:`, json[0]);
-          }
-        }
+        JSON.parse(text);
       } catch (parseError) {
-        console.log(`❌ JSON Parse Error:`, parseError);
-        console.log(`📄 Response appears to be text/HTML, not JSON`);
+        // Silent failure
       }
       
     } catch (error) {
-      console.log(`❌ Network Error:`, error);
+      // Silent failure
     }
   }
 
   // Test the proxied endpoint through Vite
-  console.log(`\n🔗 Testing proxied endpoint: /api/license/getRegUsers.php?mode=active`);
   try {
-    const proxyResponse = await fetch('/api/license/getRegUsers.php?mode=active');
-    console.log(`✅ Proxy Status: ${proxyResponse.status} ${proxyResponse.statusText}`);
-    const proxyText = await proxyResponse.text();
-    console.log(`📝 Proxy Response:`, proxyText.substring(0, 200));
-    
-    try {
-      const proxyJson = JSON.parse(proxyText);
-      console.log(`🎯 Proxy JSON:`, proxyJson);
-    } catch (e) {
-      console.log(`❌ Proxy response not JSON`);
-    }
+    await fetch('/api/license/getRegUsers.php?mode=active');
   } catch (error) {
-    console.log(`❌ Proxy Error:`, error);
+    // Silent failure
   }
-  
-  console.log('\n✨ API testing complete!');
 };
 
 // Make it available globally for browser console

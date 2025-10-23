@@ -90,7 +90,7 @@ const Dashboard: React.FC<DashboardProps> = observer(({
 
   return (
     <>
-      <Layout>
+      <Layout style={{ minHeight: '100vh' }}>
         <Sidebar
           collapsed={collapsed}
           onCollapse={handleCollapseBreakpoint}

@@ -89,30 +89,38 @@ const App = observer(() => {
         <Routes>
           <Route
             path="/login"
-            element={<Login onLogin={handleLogin} />}
+            element={
+              (() => {
+                return <Login onLogin={handleLogin} />;
+              })()
+            }
           />
           <Route
             path="/"
             element={
-              isLoggedIn ? (
-                <Navigate to="/home" replace />
-              ) : (
-                <Navigate to="/login" />
-              )
+              (() => {
+                return isLoggedIn ? (
+                  <Navigate to="/home" replace />
+                ) : (
+                  <Navigate to="/login" />
+                );
+              })()
             }
           />
           <Route
             path="/*"
             element={
-              isLoggedIn ? (
-                <Dashboard
-                  onLogout={handleLogout}
-                  isDarkMode={isDarkMode}
-                  setIsDarkMode={updateDarkMode}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
+              (() => {
+                return isLoggedIn ? (
+                  <Dashboard
+                    onLogout={handleLogout}
+                    isDarkMode={isDarkMode}
+                    setIsDarkMode={updateDarkMode}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                );
+              })()
             }
           />
         </Routes>

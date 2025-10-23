@@ -220,7 +220,6 @@ const PressureSettingValve: React.FC = observer(() => {
         record={psvStore.selected}
         onCancel={() => psvStore.setModalVisible(false)}
         onUpdate={() => { 
-          console.log('update', psvStore.selected); 
           psvStore.setModalVisible(false); 
         }}
       />

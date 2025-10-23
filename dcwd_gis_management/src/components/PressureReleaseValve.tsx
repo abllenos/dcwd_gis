@@ -223,7 +223,6 @@ const PressureReleaseValve: React.FC = observer(() => {
             record={prvStore.selectedRecord}
             onCancel={() => prvStore.setModalVisible(false)}
             onUpdate={() => {
-              console.log('Updated', prvStore.selectedRecord);
               prvStore.setModalVisible(false);
             }}
           />

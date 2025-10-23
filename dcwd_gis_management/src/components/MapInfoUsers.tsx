@@ -2,8 +2,9 @@ import { observer } from 'mobx-react-lite';
 import { Typography, Row, Col, Select, Input, DatePicker, Button, Table, Modal, Switch, Space, Form } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { mapInfoUsersStore } from '../stores/mapInfoUsersStore';
+import { mapInfoUsersUiStore } from '../stores/mapInfoUsersUiStore';
 import { mapApiUserToTableRow } from '../utils/mapApiUserToTableRow';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Footer from './layout/Footer';
 
 const { Title, Text } = Typography;
@@ -12,21 +13,20 @@ const { Title, Text } = Typography;
 
 
 // Modal for Installation Details
-const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
+const InstallationDetailsModal = observer(({ visible, onCancel, user }: any) => {
   // Example logs data (replace with real data as needed)
   const logs = [
     { key: 1, installDate: '2021-09-20', expDate: '2021-10-20', days: 'Expired', admin: 'Basio, Alexis L.' },
     { key: 2, installDate: '2025-09-19', expDate: '2025-10-19', days: '24', admin: 'Llenos, Alvin B.' },
   ];
-  const [logSearch, setLogSearch] = useState('');
   const filteredLogs = logs.filter(l =>
-    l.installDate.includes(logSearch) ||
-    l.expDate.includes(logSearch) ||
-    l.days.toString().toLowerCase().includes(logSearch.toLowerCase()) ||
-    l.admin.toLowerCase().includes(logSearch.toLowerCase())
+    l.installDate.includes(mapInfoUsersUiStore.searchQuery) ||
+    l.expDate.includes(mapInfoUsersUiStore.searchQuery) ||
+    l.days.toString().toLowerCase().includes(mapInfoUsersUiStore.searchQuery.toLowerCase()) ||
+    l.admin.toLowerCase().includes(mapInfoUsersUiStore.searchQuery.toLowerCase())
   );
   return (
-    <Modal open={visible} onCancel={onCancel} footer={null} width={800} title={null} bodyStyle={{ padding: '24px', background: 'var(--bg-primary, #fff)' }}>
+    <Modal open={visible} onCancel={onCancel} footer={null} width={800} title={null} styles={{ body: { padding: '24px', background: 'var(--bg-primary, #fff)' } }}>
       <div style={{ marginBottom: 16 }}>
         <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: 8, padding: '12px 24px', marginBottom: 18 }}>
           <Typography.Title level={4} style={{ color: 'var(--primary-color, #1890ff)', margin: 0 }}>Installation Details</Typography.Title>
@@ -55,7 +55,7 @@ const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
             <span>records per page</span>
             <div style={{ flex: 1 }} />
             <span>Search:</span>
-            <Input value={logSearch} onChange={e => setLogSearch(e.target.value)} style={{ width: 200 }} allowClear />
+            <Input value={mapInfoUsersUiStore.searchQuery} onChange={e => mapInfoUsersUiStore.setLogSearch(e.target.value)} style={{ width: 200 }} allowClear />
           </div>
           <Table
             bordered
@@ -77,7 +77,7 @@ const InstallationDetailsModal = ({ visible, onCancel, user }: any) => {
       </div>
     </Modal>
   );
-};
+});
 
 const columns = [
   { title: 'ID', dataIndex: 'id', width: 60, sorter: (a: any, b: any) => a.id - b.id },
@@ -105,9 +105,6 @@ const columns = [
 
 
 const MapInfoUsers = observer(() => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-
   useEffect(() => {
     mapInfoUsersStore.fetchUsers();
   }, []);
@@ -151,6 +148,15 @@ const MapInfoUsers = observer(() => {
     mapInfoUsersStore.setSearch(value);
     mapInfoUsersStore.setCurrentPage(1); // Reset to first page when searching
   };
+
+  const handleModalClose = () => {
+    mapInfoUsersUiStore.closeModal();
+  };
+
+  const handleShowModal = (user: any) => {
+    mapInfoUsersUiStore.openModal(user);
+  };
+
   const filteredUsers = mapInfoUsersStore.users.filter(
     u =>
       (u.software?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
@@ -186,8 +192,8 @@ const MapInfoUsers = observer(() => {
     return pages;
   };
   const tableData = paginatedData.map((u, idx) => ({
-  ...mapApiUserToTableRow(u, idx),
-  onShowModal: (user: ReturnType<typeof mapApiUserToTableRow>) => { setSelectedUser(user); setModalVisible(true); }
+    ...mapApiUserToTableRow(u, idx),
+    onShowModal: handleShowModal
   }));
 
   return (
@@ -349,7 +355,7 @@ const MapInfoUsers = observer(() => {
             </Space>
           </div>
         </div>
-        <InstallationDetailsModal visible={modalVisible} onCancel={() => setModalVisible(false)} user={selectedUser} />
+        <InstallationDetailsModal visible={mapInfoUsersUiStore.isModalVisible} onCancel={handleModalClose} user={mapInfoUsersUiStore.selectedUserData} />
       </div>
       <Footer />
     </>

@@ -49,7 +49,7 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
       footer={null}
       width={1200}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable={false}
       title={null}
@@ -107,13 +107,6 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                         // Check for geometry data in various formats
                         const hasGeometry = initialValues?.geom;
                         const hasLatLng = initialValues?.lat && initialValues?.lng;
-                        
-                        console.log('Blow Off Valve Data:', {
-                          geom: initialValues?.geom,
-                          lat: initialValues?.lat,
-                          lng: initialValues?.lng,
-                          location: initialValues?.location
-                        });
                         
                         if (hasGeometry || hasLatLng) {
                           // Show map with actual coordinates

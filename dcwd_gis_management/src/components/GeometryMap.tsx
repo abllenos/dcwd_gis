@@ -233,7 +233,6 @@ const GeometryMap: React.FC<GeometryMapProps> = ({
 
         markerRef.current = marker;
         
-        console.log('Map centered on:', { latitude, longitude, label: markerLabel });
       }, 300);
     } else {
       // If no valid coordinates, center on Davao City default location

@@ -60,6 +60,13 @@ class VTSStore {
   pageSize = DEFAULTS.PAGE_SIZE;
   currentPage = DEFAULTS.CURRENT_PAGE;
   
+  // UI State - Employee Selection
+  selectedEmployeeId: number | null = null;
+  selectedEmployee: any | null = null;
+  
+  // Map layer selection
+  mapLayer: MapLayerType = 'googleMaps';
+  
   // Map state
   mapState: MapState = {
     center: DAVAO_CENTER,
@@ -208,6 +215,24 @@ class VTSStore {
     this.currentPage = page;
   };
 
+  // UI State Methods - Employee Selection
+  setSelectedEmployeeId = (id: number | null) => {
+    this.selectedEmployeeId = id;
+  };
+
+  setSelectedEmployee = (employee: any) => {
+    this.selectedEmployee = employee;
+  };
+
+  // Map Layer Methods
+  setMapLayerType = (layer: MapLayerType) => {
+    this.mapLayer = layer;
+  };
+
+  get isEmployeeSelected() {
+    return this.selectedEmployeeId !== null;
+  }
+
   // Actions for map management
   setMapCenter = (center: [number, number]) => {
     this.mapState.center = center;
@@ -341,7 +366,6 @@ class VTSStore {
       if (result.success) {
         this.users = this.convertLicenseUsersToVTSUsers(licenseStore.registeredUsers);
         this.updateFilteredUsers();
-        console.log(`VTS loaded ${this.users.length} users from license API`);
       } else {
         this.setError(result.error || 'Failed to fetch from API');
         this.initializeSampleUsers();
@@ -349,7 +373,6 @@ class VTSStore {
       
     } catch (error: any) {
       this.setError('API call failed');
-      console.error('VTS API Error:', error);
       this.initializeSampleUsers();
     } finally {
       this.setLoading(false);
@@ -367,7 +390,6 @@ class VTSStore {
     if (licenseStore.registeredUsers.length > 0) {
       this.users = this.convertLicenseUsersToVTSUsers(licenseStore.registeredUsers);
       this.updateFilteredUsers();
-      console.log(`VTS synced with ${this.users.length} license users`);
     }
   };
 }
