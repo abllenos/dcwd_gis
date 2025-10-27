@@ -44,7 +44,6 @@ class LayerStore {
       this.diagnostics.lastError = null;
     });
     try {
-      const start = performance.now();
       const resp = await apiGis.get(urlPath, { params: { mode: 'active' }, useLocalProxy: isDev, skipAuth: true, headers: { Accept: 'application/json, text/plain;q=0.9' } } as any);
       const raw = resp.data;
       let parsed: unknown = raw;
@@ -82,14 +81,12 @@ class LayerStore {
         this.diagnostics.lastStatus = 200;
         this.diagnostics.lastFetchedAt = new Date().toISOString();
       });
-      console.log('[LayerFetch] ok', { tookMs: +(performance.now() - start).toFixed(1), count: list.length });
     } catch (err: unknown) {
       runInAction(() => {
         this.diagnostics.lastStatus = (err as any)?.response?.status ?? 0;
         this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
         this.records = [];
       });
-      console.error('[LayerFetch] failed', err);
     } finally {
       runInAction(() => { this.loading = false; });
     }

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Card, Typography, Table, Select, Input, Space, Button } from 'antd';
+import { Typography, Table, Select, Input, Space, Button } from 'antd';
 
 import PipeConditionAssessmentModal from './modal/PipeConditionAssessmentModal';
 import { distributionTransmissionStore } from '../stores/distributionTransmissionStore';
@@ -132,9 +132,9 @@ const DistributionTransmission = observer(() => {
 
   return (
     <>
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
-        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px' }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Distribution & Transmission</Title>
+      <div style={{ border: '1px solid var(--border-color, #ddd)', borderRadius: '12px', padding: '0', backgroundColor: 'var(--bg-primary, #fff)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '12px 24px' }}>
+          <Title level={5} style={{ color: 'var(--primary-color, #1890ff)', margin: 0 }}>Distribution & Transmission</Title>
         </div>
         <div style={{ padding: '16px' }}>
           <div className="license-controls-container">
@@ -173,7 +173,7 @@ const DistributionTransmission = observer(() => {
             columns={columns}
             dataSource={paginatedData}
             pagination={false}
-            style={{ background: '#fff', borderRadius: 8 }}
+            style={{ background: 'var(--bg-primary, #fff)', borderRadius: 8 }}
           />
           {/* Pagination (License.tsx style) */}
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginTop: 16 }}>

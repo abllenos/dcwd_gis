@@ -1,4 +1,4 @@
-import { Card, Typography, Row, Col, Select, Button } from 'antd';
+import { Typography, Row, Col, Select, Button } from 'antd';
 import { FilterOutlined, CalendarOutlined } from '@ant-design/icons';
 import Footer from './layout/Footer';
 import { observer } from 'mobx-react-lite';
@@ -36,12 +36,12 @@ const BuildingFootprints = observer(() => {
 
   return (
     <>
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
-        <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '12px 24px', marginBottom: 18 }}>
-          <Title level={5} style={{ color: '#2563eb', margin: 0 }}>Building Footprints</Title>
+      <div style={{ border: '1px solid var(--border-color, #ddd)', borderRadius: '12px', padding: '0', backgroundColor: 'var(--bg-primary, #fff)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '16px', marginTop: '0' }}>
+        <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '12px 24px', marginBottom: 18 }}>
+          <Title level={5} style={{ color: 'var(--primary-color, #1890ff)', margin: 0 }}>Building Footprints</Title>
         </div>
         <div style={{ padding: 16 }}>
-          <div style={{ fontWeight: 500, marginBottom: 8 }}>
+          <div style={{ fontWeight: 500, marginBottom: 8, color: 'var(--text-primary, #000)' }}>
             Filter<span style={{ color: 'red' }}>*</span>
           </div>
           <Row gutter={16} align="middle">
@@ -53,7 +53,7 @@ const BuildingFootprints = observer(() => {
                 options={months}
                 prefix={<CalendarOutlined />}
                 placeholder="-- Month --"
-                suffixIcon={<CalendarOutlined style={{ color: '#6b7280' }} />}
+                suffixIcon={<CalendarOutlined style={{ color: 'var(--text-tertiary, #6b7280)' }} />}
               />
             </Col>
             <Col span={6}>
@@ -64,7 +64,7 @@ const BuildingFootprints = observer(() => {
                 options={years}
                 prefix={<CalendarOutlined />}
                 placeholder="-- Year --"
-                suffixIcon={<CalendarOutlined style={{ color: '#6b7280' }} />}
+                suffixIcon={<CalendarOutlined style={{ color: 'var(--text-tertiary, #6b7280)' }} />}
               />
             </Col>
             <Col span={4}>

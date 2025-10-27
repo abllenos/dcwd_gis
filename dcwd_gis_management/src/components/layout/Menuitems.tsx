@@ -1,11 +1,5 @@
 import {
-  HomeOutlined,
-  AppstoreOutlined,
-  BookOutlined,
-  BoxPlotOutlined,
-  FileTextOutlined,
-  ClusterOutlined,
-  ToolOutlined,
+  HomeOutlined, AppstoreOutlined, BookOutlined, BoxPlotOutlined, FileTextOutlined, ClusterOutlined, ToolOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
@@ -20,7 +14,7 @@ export interface CustomMenuItem {
 
 const iconSize = { fontSize: "18px" };
 
-export const menuItems: CustomMenuItem[] = [
+const getMenuItems = (): CustomMenuItem[] => [
   {
     key: "home",
     label: "Dashboard",
@@ -104,6 +98,8 @@ export const menuItems: CustomMenuItem[] = [
     ]
   },
 ];
+
+export const menuItems: CustomMenuItem[] = getMenuItems();
 
 export const getSidebarWidth = () => {
   const screenWidth = window.innerWidth;

@@ -391,9 +391,9 @@
 }
 
 [data-theme='dark'] .license-form-input {
-  background-color: #262626;
-  border-color: #434343;
-  color: #f1f5f9;
+  background-color: #262626 !important;
+  border-color: #434343 !important;
+  color: #f1f5f9 !important;
 }
 
 [data-theme='dark'] .license-form-input:hover {
@@ -403,6 +403,93 @@
 [data-theme='dark'] .license-form-input:focus {
   border-color: #60a5fa;
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+[data-theme='dark'] .license-form-input::placeholder {
+  color: #999999 !important;
+  opacity: 1 !important;
+}
+
+/* Ant Design Input Placeholder */
+[data-theme='dark'] .ant-input::placeholder {
+  color: #999999 !important;
+  opacity: 1 !important;
+}
+
+[data-theme='dark'] .ant-input {
+  background-color: #262626 !important;
+  border-color: #434343 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme='dark'] .ant-input:hover {
+  border-color: #60a5fa !important;
+}
+
+[data-theme='dark'] .ant-input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Search Input - Dark Mode Placeholder */
+[data-theme='dark'] .ant-input-search input::placeholder {
+  color: #999999 !important;
+  opacity: 1 !important;
+}
+
+[data-theme='dark'] .ant-input-search .ant-input {
+  background-color: #262626 !important;
+  border-color: #434343 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Select Placeholder */
+[data-theme='dark'] .ant-select-selector {
+  background-color: #262626 !important;
+  border-color: #434343 !important;
+}
+
+[data-theme='dark'] .ant-select-selector:hover {
+  border-color: #60a5fa !important;
+}
+
+[data-theme='dark'] .ant-select-focused .ant-select-selector {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+[data-theme='dark'] .ant-select-selection-placeholder {
+  color: #999999 !important;
+}
+
+[data-theme='dark'] .ant-select-selection-item {
+  color: #f1f5f9 !important;
+}
+
+/* DatePicker Placeholder */
+[data-theme='dark'] .ant-picker {
+  background-color: #262626 !important;
+  border-color: #434343 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme='dark'] .ant-picker:hover {
+  border-color: #60a5fa !important;
+}
+
+[data-theme='dark'] .ant-picker-focused {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+[data-theme='dark'] .ant-picker-input::placeholder {
+  color: #999999 !important;
+  opacity: 1 !important;
+}
+
+[data-theme='dark'] .ant-picker input::placeholder {
+  color: #999999 !important;
+  opacity: 1 !important;
 }
 
 [data-theme='dark'] .license-register-button {

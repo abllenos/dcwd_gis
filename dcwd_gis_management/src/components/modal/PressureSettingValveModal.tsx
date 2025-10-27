@@ -37,11 +37,11 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
       destroyOnClose
       maskClosable
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Pressure Setting Valve - Maintenance</Title>
+      <div style={{ padding: '24px 32px 0 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '8px 8px 0 0' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Pressure Setting Valve - Maintenance</Title>
       </div>
 
-      <div style={{ padding: '32px', background: '#fff' }}>
+      <div style={{ padding: '32px', background: 'var(--bg-primary, #fff)' }}>
         <Form layout="vertical" initialValues={record}>
           <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
             <TabPane tab="Details" key="1">
@@ -89,8 +89,7 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
                       editable={true}
                       markerColor="#3a5fc8"
                       markerLabel={`PSV ${record?.psNumber || record?.ps_number || 'Location'}`}
-                      onLocationChange={(lng, lat) => {
-                        console.log('Location updated:', { lng, lat });
+                      onLocationChange={() => {
                         // You can handle location changes here if needed
                       }}
                     />
@@ -102,7 +101,7 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
             <TabPane tab="Technical Details" key="2">
               <Row gutter={24}>
                 <Col xs={24} md={12}>
-                  <div style={{ background: '#e9edfa', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Valve Details</div>
+                  <div style={{ background: 'var(--primary-hover-bg, #e9edfa)', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Valve Details</div>
                   <Form.Item label="Valve Type" name="type">
                     <Select>
                       {valveTypes.map(v => <Option key={v}>{v}</Option>)}
@@ -112,7 +111,7 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
                   <Form.Item label="Operating Range" name="operatingRange"><Input /></Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <div style={{ background: '#e9edfa', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Installation</div>
+                  <div style={{ background: 'var(--primary-hover-bg, #e9edfa)', padding: 8, borderRadius: 4, marginBottom: 12, fontWeight: 600 }}>Installation</div>
                   <Form.Item label="Elevation [m]" name="elevation"><Input /></Form.Item>
                   <Form.Item label="Remarks" name="remarks"><Input /></Form.Item>
                 </Col>
@@ -139,16 +138,16 @@ const PressureSettingValveModal: React.FC<Props> = ({ visible, record, onCancel,
                 pagination={false}
                 size="small"
                 bordered
-                style={{ background: '#fff', padding: 16 }}
+                style={{ background: 'var(--bg-primary, #fff)', padding: 16 }}
               />
             </TabPane>
           </Tabs>
         </Form>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={onUpdate} style={{ background: '#2563eb', borderColor: '#2563eb' }}>Update</Button>
+          <Button type="primary" onClick={onUpdate}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>

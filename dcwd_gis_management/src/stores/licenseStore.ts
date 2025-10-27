@@ -252,7 +252,6 @@ class LicenseStore {
       
       return response;
     } catch (error: any) {
-      console.error(`${errorPrefix}:`, error);
       return {
         success: false,
         error: `${errorPrefix}`,

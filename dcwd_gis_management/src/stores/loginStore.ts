@@ -30,7 +30,8 @@ class LoginStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.loadUserData(); 
+    this.loadUserData();
+    this.loadDarkModePreference();
   }
 
   setUsername(value: string) {
@@ -47,10 +48,19 @@ class LoginStore {
 
   toggleDarkMode() {
     this.darkMode = !this.darkMode;
+    localStorage.setItem("darkMode", JSON.stringify(this.darkMode));
   }
 
   setDarkMode(value: boolean) {
     this.darkMode = value;
+    localStorage.setItem("darkMode", JSON.stringify(value));
+  }
+
+  loadDarkModePreference() {
+    const stored = localStorage.getItem("darkMode");
+    if (stored !== null) {
+      this.darkMode = JSON.parse(stored);
+    }
   }
 
   setUserDataFromToken(token: string, expiration: number, username: string = '') {
@@ -118,6 +128,7 @@ class LoginStore {
     localStorage.removeItem("userData");
     localStorage.removeItem("token");
     localStorage.removeItem("username");
+    localStorage.removeItem("darkMode");
   }
 
   get fullDetails() {

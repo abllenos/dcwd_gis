@@ -1,6 +1,5 @@
-
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, Row, Col, Tabs, Button, Table, Typography, Space, Card } from 'antd';
+import { Modal, Form, Input, Select, Row, Col, Tabs, Button, Table, Typography, Space, Card, DatePicker } from 'antd';
 import GeometryMap from "../GeometryMap";
 import { coordinatesToWKB } from "../../utils/wkbParser";
 
@@ -101,14 +100,14 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
       footer={null}
       width={1200}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable={false}
     >
-      <div style={{ padding: '24px 32px', background: '#fff', borderRadius: '8px 8px 0 0', borderBottom: '1px solid #e8e8e8' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Air Valve - Maintenance</Title>
+      <div style={{ padding: '24px 32px', background: 'var(--bg-secondary, #fff)', borderRadius: '8px 8px 0 0', borderBottom: '1px solid var(--border-color, #e8e8e8)' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Air Valve - Maintenance</Title>
       </div>
-      <div style={{ padding: '32px', background: '#fff' }}>
+      <div style={{ padding: '32px', background: 'var(--bg-primary, #fff)' }}>
         <Form form={form} layout="vertical">
           <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
             <TabPane tab="Details" key="1">
@@ -136,7 +135,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                     </Col>
                     <Col xs={24} md={12}>
                       <Form.Item label="Date Installed" name="dateInstalled">
-                        <Input />
+                        <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
                       </Form.Item>
                     </Col>
                   </Row>
@@ -158,7 +157,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                     maxWidth: '500px',
                     borderRadius: '6px', 
                     overflow: 'hidden',
-                    border: '1px solid #e8e8e8',
+                    border: '1px solid var(--border-color, #e8e8e8)',
                     position: 'relative'
                   }}>
                     {(() => {
@@ -224,7 +223,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backgroundColor: 'var(--bg-secondary, rgba(255, 255, 255, 0.9))',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -242,14 +241,14 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                             <div style={{
                               fontSize: '18px',
                               fontWeight: 600,
-                              color: '#999',
+                              color: 'var(--text-secondary, #999)',
                               marginBottom: '8px'
                             }}>
                               No Location Data
                             </div>
                             <div style={{
                               fontSize: '14px',
-                              color: '#666',
+                              color: 'var(--text-tertiary, #666)',
                               lineHeight: '1.4'
                             }}>
                               Geographic coordinates are not available for this air valve
@@ -265,7 +264,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
             <TabPane tab="Technical Details" key="2">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>Air Valve Details</span>} headStyle={{ background: '#3a5fc8', color: '#fff' }} bodyStyle={{ background: '#f7f9fc' }}>
+                  <Card size="small" title={<span>Air Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f7f9fc)' } }}>
                     <Form.Item label="Air Valve Serial No." name="avSerialNo"><Input /></Form.Item>
                     <Form.Item label="Air Valve Type" name="avType"><Select allowClear>{valveTypes.map(opt => <Option key={opt}>{opt}</Option>)}</Select></Form.Item>
                     <Form.Item label="Air Valve Size" name="avSize"><Select allowClear>{valveSizes.map(opt => <Option key={opt}>{opt}</Option>)}</Select></Form.Item>
@@ -273,7 +272,7 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>Gate Valve Details</span>} headStyle={{ background: '#3a5fc8', color: '#fff' }} bodyStyle={{ background: '#f7f9fc' }}>
+                  <Card size="small" title={<span>Gate Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f7f9fc)' } }}>
                     <Form.Item label="Serial No." name="gateSerialNo"><Input /></Form.Item>
                     <Form.Item label="Valve Size" name="gateValveSize"><Input /></Form.Item>
                     <Form.Item label="Gate Valve Brand" name="gateValveBrand"><Input /></Form.Item>
@@ -306,15 +305,15 @@ const AirValveModal: React.FC<AirValveModalProps> = ({ visible, onCancel, onUpda
                 locale={{ emptyText: 'No status log entries.' }}
               />
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
-                <Button type="primary" style={{ backgroundColor: '#1677ff' }}>Renew</Button>
+                <Button type="primary">Renew</Button>
               </div>
             </TabPane>
           </Tabs>
         </Form>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#fff', borderTop: '1px solid #e8e8e8', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #fff)', borderTop: '1px solid var(--border-color, #e8e8e8)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
+          <Button type="primary" onClick={handleUpdate}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>

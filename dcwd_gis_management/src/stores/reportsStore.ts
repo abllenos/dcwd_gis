@@ -32,13 +32,14 @@ class ReportsStore {
   // Available reports data - populated from actual files in public/reports folder
   localReports: ReportFile[] = [];
 
-  // Filter state
-  selectedCategory: ReportFilter = 'all';
+  // Filter state - UI State
+  selectedReportType: string = "all";
 
   // UI state
   loading = false;
   error: string | null = null;
   downloadingReportId: number | null = null;
+  isLoading = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -99,14 +100,17 @@ class ReportsStore {
       }));
 
     } catch (error) {
-      console.error('Error loading local reports:', error);
       this.setError('Failed to load local reports');
     }
   }
 
-  // Actions for filtering
-  setSelectedCategory = (category: ReportFilter) => {
-    this.selectedCategory = category;
+  // Actions for filtering - UI Methods
+  setSelectedReportType = (reportType: string) => {
+    this.selectedReportType = reportType;
+  };
+
+  setIsLoading = (value: boolean) => {
+    this.isLoading = value;
   };
 
   // Actions for local report management
@@ -146,14 +150,11 @@ class ReportsStore {
       link.click();
       document.body.removeChild(link);
       
-      console.log(`Downloading: ${report.displayName} (${report.fileName})`);
-      
       // Simulate download delay for UI feedback
       await new Promise(resolve => setTimeout(resolve, 500));
       
     } catch (error) {
       this.error = `Failed to download ${report.displayName}`;
-      console.error('Download error:', error);
     } finally {
       this.downloadingReportId = null;
     }
@@ -162,10 +163,8 @@ class ReportsStore {
   viewReport = (report: ReportFile) => {
     try {
       window.open(report.filePath, '_blank');
-      console.log(`Viewing: ${report.displayName} (${report.fileName})`);
     } catch (error) {
       this.error = `Failed to open ${report.displayName}`;
-      console.error('View error:', error);
     }
   };
 
@@ -205,12 +204,12 @@ class ReportsStore {
 
   // Computed values
   get filteredReports() {
-    if (this.selectedCategory === 'all') {
+    if (this.selectedReportType === 'all') {
       return this.reports;
     }
     
     return this.reports.filter(report => 
-      report.category.toLowerCase() === this.selectedCategory.toLowerCase()
+      report.category.toLowerCase() === this.selectedReportType.toLowerCase()
     );
   }
 
@@ -288,10 +287,8 @@ class ReportsStore {
     
     try {
       await this.loadLocalReports();
-      console.log(`Loaded ${this.localReports.length} local reports`);
     } catch (error: any) {
       this.setError('Failed to load local reports');
-      console.error('Error fetching reports:', error);
     } finally {
       this.setLoading(false);
     }
@@ -324,7 +321,6 @@ class ReportsStore {
       
     } catch (error) {
       this.setError('Failed to upload report');
-      console.error('Error uploading report:', error);
     } finally {
       this.setLoading(false);
     }

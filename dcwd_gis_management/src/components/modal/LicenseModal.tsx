@@ -23,7 +23,6 @@ const LicenseModal: React.FC<LicenseModalProps> = observer(() => {
   };
 
   const handleRenewSubmit = (values: any) => {
-    console.log('Renew values:', values);
     message.success('License renewed successfully!');
     licenseStore.setRenewModalVisible(false);
     renewForm.resetFields();
@@ -131,11 +130,9 @@ const LicenseModal: React.FC<LicenseModalProps> = observer(() => {
                     enterButton
                     onSearch={(value) => {
                       // Add search functionality here if needed
-                      console.log('Search value:', value);
                     }}
                     onChange={(e) => {
                       // Add onChange functionality here if needed
-                      console.log('Search change:', e.target.value);
                     }}
                   />
                 </Col>

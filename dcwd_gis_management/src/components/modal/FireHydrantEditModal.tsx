@@ -66,14 +66,14 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
       footer={null}
       width={1200}
       style={{ top: 24 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       destroyOnClose
       maskClosable={false}
     >
-      <div style={{ padding: '24px 32px', background: '#fff', borderRadius: '8px 8px 0 0', borderBottom: '1px solid #e8e8e8' }}>
-        <Title level={4} style={{ margin: 0, color: '#3a5fc8' }}>Fire Hydrant - Maintenance</Title>
+      <div style={{ padding: '24px 32px', background: 'var(--bg-secondary, #fff)', borderRadius: '8px 8px 0 0', borderBottom: '1px solid var(--border-color, #e8e8e8)' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Fire Hydrant - Maintenance</Title>
       </div>
-      <div style={{ padding: '32px', background: '#fff' }}>
+      <div style={{ padding: '32px', background: 'var(--bg-primary, #fff)' }}>
         <Form form={form} layout="vertical">
           <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
             <Tabs.TabPane tab="Details" key="1">
@@ -126,13 +126,13 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
             <Tabs.TabPane tab="Technical Details" key="2">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>Hydrant Details</span>} headStyle={{ background: '#3a5fc8', color: '#fff' }} bodyStyle={{ background: '#f7f9fc' }}>
+                  <Card size="small" title={<span>Hydrant Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f7f9fc)' } }}>
                     <Form.Item label="Hydrant Size [mm]" name="size"><Input /></Form.Item>
                     <Form.Item label="Pressure [psi]" name="pressure"><Input /></Form.Item>
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Card size="small" title={<span style={{ color: '#fff' }}>Gate Valve Details</span>} headStyle={{ background: '#3a5fc8', color: '#fff' }} bodyStyle={{ background: '#f7f9fc' }}>
+                  <Card size="small" title={<span>Gate Valve Details</span>} headStyle={{ background: 'var(--primary-color, #1890ff)', color: '#fff' }} styles={{ body: { background: 'var(--primary-hover-bg, #f7f9fc)' } }}>
                     <Form.Item label="Valve Type" name="valve_type"><Select options={valveTypeOptions} allowClear /></Form.Item>
                     <Form.Item label="No. of Turns" name="valve_turns"><Input /></Form.Item>
                     <Form.Item label="Valve Size [mm]" name="valve_size"><Input /></Form.Item>
@@ -167,9 +167,9 @@ const FireHydrantEditModal: React.FC<FireHydrantEditModalProps> = ({ visible, on
           </Tabs>
         </Form>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#fff', borderTop: '1px solid #e8e8e8', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #fff)', borderTop: '1px solid var(--border-color, #e8e8e8)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
-          <Button type="primary" onClick={handleUpdate} style={{ background: '#00c29b', borderColor: '#00c29b' }}>Update</Button>
+          <Button type="primary" onClick={handleUpdate}>Update</Button>
           <Button danger onClick={onCancel}>Close</Button>
         </Space>
       </div>

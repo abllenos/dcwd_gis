@@ -39,7 +39,6 @@ export function parseWKB(wkbHex: string | undefined): Coordinates | null {
     
     // Minimum length check (byte order + type + SRID + 2 doubles = 42 hex chars)
     if (hex.length < 42) {
-      console.warn('WKB hex string too short:', hex.length);
       return null;
     }
 
@@ -48,7 +47,6 @@ export function parseWKB(wkbHex: string | undefined): Coordinates | null {
     const isLittleEndian = byteOrder === '01';
     
     if (!isLittleEndian) {
-      console.warn('Big-endian WKB not supported');
       return null;
     }
 
@@ -64,7 +62,6 @@ export function parseWKB(wkbHex: string | undefined): Coordinates | null {
     const baseType = geomType & 0x1FFFFFFF;
     
     if (baseType !== 1) {
-      console.warn('Not a POINT geometry:', baseType);
       return null;
     }
 
@@ -88,13 +85,11 @@ export function parseWKB(wkbHex: string | undefined): Coordinates | null {
 
     // Validate coordinates
     if (isNaN(latitude) || isNaN(longitude)) {
-      console.warn('Invalid coordinates parsed');
       return null;
     }
 
     return { latitude, longitude };
   } catch (error) {
-    console.error('Error parsing WKB:', error);
     return null;
   }
 }

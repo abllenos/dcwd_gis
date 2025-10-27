@@ -68,14 +68,9 @@ class ClassificationStore {
       this.diagnostics.lastError = null;
     });
     try {
-      // TEMP DEBUG START (remove later)
-      const startTs = performance.now();
       // Public endpoint: do not send Authorization header; mark skipAuth to be explicit
-      console.log('[ClassificationFetch] starting request', { urlPath, params: { mode: 'active' } });
   const response = await apiGis.get(urlPath, { params: { mode: 'active' }, useLocalProxy: isDev, skipAuth: true, headers: { Accept: 'application/json, text/plain;q=0.9' } } as any);
-      console.log('[ClassificationFetch] response received', { status: response.status, tookMs: +(performance.now() - startTs).toFixed(1) });
       const raw = response.data;
-      try { console.debug('[ClassificationFetch] raw type/preview', { type: typeof raw, preview: typeof raw === 'string' ? raw.slice(0, 300) : JSON.stringify(raw).slice(0, 300) }); } catch {}
       // Some endpoints might respond as text; defensively parse if string
       let data: unknown;
       if (typeof raw === 'string') {
@@ -142,7 +137,6 @@ class ClassificationStore {
         this.diagnostics.lastRawCount = Array.isArray(working) ? (working as any[]).length : null;
         this.diagnostics.lastParseNote = parseNote;
       });
-      console.log('[ClassificationFetch] normalization complete', { rawCount: this.diagnostics.lastRawCount, stored: arr.length, parseNote });
     } catch (err: unknown) {
       runInAction(() => {
         this.diagnostics.lastStatus = (err as any)?.response?.status ?? 0;
@@ -150,7 +144,6 @@ class ClassificationStore {
         this.diagnostics.lastRawCount = null;
         this.diagnostics.lastParseNote = null;
       });
-      console.error('[ClassificationFetch] request failed', err);
     } finally {
       runInAction(() => { this.loading = false; });
     }

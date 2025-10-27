@@ -10,6 +10,7 @@ import "../styles/Home.css";
 const { Text, Title } = Typography;
 
 const Home: React.FC = observer(() => {
+  
   useEffect(() => {
     // Fetch customer stat on mount
     (async () => {

@@ -7,7 +7,7 @@ import { Table, Input, Select, Typography, Card } from 'antd';
 
 
 import { blowOffValveStore } from '../stores/blowOffValveStore';
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const columns = [
   {
@@ -114,18 +114,16 @@ const BlowOffValve = observer(() => {
   return (
     <>
       <div style={{ padding: 24, background: 'var(--bg-secondary, #f7f9fc)', minHeight: '100vh' }}>
-        <Card style={{ background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
-          <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', marginBottom: '16px', marginTop: '0' }}>
-            <div style={{ background: '#e6edfc', borderRadius: '12px 12px 0 0', padding: '16px 24px' }}>
-              <Title level={4} style={{ color: '#2563eb', margin: 0 }}>Blow Off Valve - Maintenance</Title>
+        <Card style={{ borderRadius: '12px 12px 12px 12px', marginTop: 0 }}>
+          <div style={{ background: 'var(--primary-hover-bg, #f2f7fd)', borderRadius: '12px 12px 0 0', padding: '18px 32px 12px 32px', marginLeft: '-24px', marginRight: '-24px', marginTop: '-24px', marginBottom: 24 }}>
+            <span style={{ color: 'var(--primary-color, #1890ff)', fontWeight: 600, fontSize: 22, letterSpacing: 0.2 }}>Blow Off Valve - Maintenance</span>
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            <Text strong>Instructions:</Text>
+            <div style={{ marginLeft: '12px', marginTop: '2px' }}>
+              <Text>Instruction: Double Click row to edit Details.</Text>
             </div>
-            <div style={{ padding: '16px' }}>
-              <div style={{ marginBottom: '16px' }}>
-                <Text strong>Instructions:</Text>
-                <div style={{ marginLeft: '12px', marginTop: '2px' }}>
-                  <Text>Instruction: Double Click row to edit Details.</Text>
-                </div>
-              </div>
+          </div>
               <div className="license-controls-container">
                 <div className="license-display-controls">
                   <span>Display</span>
@@ -196,13 +194,11 @@ const BlowOffValve = observer(() => {
                 onClose={() => blowOffValveStore.setModalOpen(false)}
                 initialValues={blowOffValveStore.selectedRow || {}}
               />
-            </div>
+            </Card>
           </div>
-        </Card>
-      </div>
-      <Footer />
-    </>
-  );
+        <Footer />
+      </>
+    );
 });
 
 export default BlowOffValve;

@@ -44,7 +44,6 @@ class MapInfoUsersStore {
     try {
       const res = await fetch('/api/license/getRegUsers.php?mode=active');
       const data = await res.json();
-      console.log('MapInfoUsers API response:', data); // Debug log
       runInAction(() => {
         if (Array.isArray(data)) {
           this.users = data;

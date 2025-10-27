@@ -1,6 +1,7 @@
 import { Modal, Form, Input, Select, Button, Row, Col, Table, Typography, Upload, Tabs, Space, DatePicker } from 'antd';
 import GeometryMap from '../GeometryMap';
 import { UploadOutlined } from '@ant-design/icons';
+import React from 'react';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -49,17 +50,17 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
       width={1200}
       style={{ top: 24 }}
       styles={{ body: { padding: 0 } }}
-      destroyOnHidden
-      maskClosable
+      destroyOnClose
+      maskClosable={false}
       title={null}
     >
-      <div style={{ padding: '24px 32px 0 32px', background: '#f7f9fc', borderRadius: '8px 8px 0 0' }}>
-        <Title level={4} style={{ margin: 0, color: '#2563eb' }}>Blow Off Valve - Maintenance</Title>
+      <div style={{ padding: '24px 32px', background: 'var(--bg-secondary, #fff)', borderRadius: '8px 8px 0 0', borderBottom: '1px solid var(--border-color, #e8e8e8)' }}>
+        <Title level={4} style={{ margin: 0, color: 'var(--primary-color, #1890ff)' }}>Blow Off Valve - Maintenance</Title>
       </div>
-      <div style={{ padding: 0 }}>
-        <Tabs defaultActiveKey="1" style={{ padding: '0 24px' }}>
-          <TabPane tab="Details" key="1">
-            <Form form={form} layout="vertical" initialValues={initialValues}>
+      <div style={{ padding: '32px', background: 'var(--bg-primary, #fff)' }}>
+        <Form form={form} layout="vertical" initialValues={initialValues}>
+          <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 0 }}>
+            <TabPane tab="Details" key="1">
               <Row gutter={32}>
                 <Col xs={24} md={12}>
                   <Row gutter={16}>
@@ -101,18 +102,11 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                 <Col xs={24} md={12}>
                   <div style={{ marginBottom: '16px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Location Map</label>
-                    <div style={{ width: '100%', height: '500px', position: 'relative', border: '1px solid #d9d9d9', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: '500px', position: 'relative', border: '1px solid var(--border-color, #d9d9d9)', borderRadius: '6px', overflow: 'hidden' }}>
                       {open && (() => {
                         // Check for geometry data in various formats
                         const hasGeometry = initialValues?.geom;
                         const hasLatLng = initialValues?.lat && initialValues?.lng;
-                        
-                        console.log('Blow Off Valve Data:', {
-                          geom: initialValues?.geom,
-                          lat: initialValues?.lat,
-                          lng: initialValues?.lng,
-                          location: initialValues?.location
-                        });
                         
                         if (hasGeometry || hasLatLng) {
                           // Show map with actual coordinates
@@ -152,10 +146,10 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                               top: '50%',
                               left: '50%',
                               transform: 'translate(-50%, -50%)',
-                              background: 'rgba(255, 255, 255, 0.95)',
+                              background: 'var(--bg-secondary, rgba(255, 255, 255, 0.95))',
                               padding: '20px 30px',
                               borderRadius: '8px',
-                              border: '2px solid #e0e0e0',
+                              border: '2px solid var(--border-color, #e0e0e0)',
                               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                               textAlign: 'center',
                               zIndex: 1000
@@ -163,21 +157,21 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                               <div style={{ 
                                 fontSize: '16px', 
                                 fontWeight: 600, 
-                                color: '#666',
+                                color: 'var(--text-secondary, #666)',
                                 marginBottom: '8px'
                               }}>
                                 📍 No Coordinate Data Available
                               </div>
                               <div style={{ 
                                 fontSize: '14px', 
-                                color: '#999',
+                                color: 'var(--text-tertiary, #999)',
                                 marginBottom: '8px'
                               }}>
                                 Location: {initialValues?.location || 'Not specified'}
                               </div>
                               <div style={{ 
                                 fontSize: '12px', 
-                                color: '#bbb'
+                                color: 'var(--text-tertiary, #bbb)'
                               }}>
                                 Coordinates needed to display map pin
                               </div>
@@ -189,10 +183,8 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                   </div>
                 </Col>
               </Row>
-            </Form>
-          </TabPane>
-          <TabPane tab="Technical Details" key="2">
-            <Form form={form} layout="vertical" initialValues={initialValues}>
+            </TabPane>
+            <TabPane tab="Technical Details" key="2">
               <Row gutter={24}>
                 <Col xs={24} md={12}>
                   <Form.Item label="Valve Size [mm]" name="valveSize"><Input {...fieldProps} /></Form.Item>
@@ -201,10 +193,8 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                   <Form.Item label="No of Turns" name="noOfTurns"><Input {...fieldProps} /></Form.Item>
                 </Col>
               </Row>
-            </Form>
-          </TabPane>
-          <TabPane tab="Project Details" key="3">
-            <Form form={form} layout="vertical" initialValues={initialValues}>
+            </TabPane>
+            <TabPane tab="Project Details" key="3">
               <Row gutter={24}>
                 <Col xs={24} md={12}>
                   <Form.Item label="Work Order No." name="workOrderNo"><Input {...fieldProps} /></Form.Item>
@@ -215,21 +205,21 @@ const BlowOffValveModal: React.FC<BlowOffValveModalProps> = ({ open, onClose, in
                   <Form.Item label="Hotlink" name="hotlink"><Input {...fieldProps} /></Form.Item>
                 </Col>
               </Row>
-            </Form>
-          </TabPane>
-          <TabPane tab="Status Log" key="4">
-            <Table
-              columns={statusLogColumns}
-              dataSource={[]}
-              pagination={false}
-              size="small"
-              bordered
-              style={{ background: '#fff' }}
-            />
-          </TabPane>
-        </Tabs>
+            </TabPane>
+            <TabPane tab="Status Log" key="4">
+              <Table
+                columns={statusLogColumns}
+                dataSource={[]}
+                pagination={false}
+                size="small"
+                bordered
+                style={{ background: 'var(--bg-primary)' }}
+              />
+            </TabPane>
+          </Tabs>
+        </Form>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: '#f7f9fc', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 32px', background: 'var(--bg-secondary, #f7f9fc)', borderRadius: '0 0 8px 8px', position: 'sticky', bottom: 0, zIndex: 10 }}>
         <Space>
 
           <Button className="btn-update" htmlType="submit" loading={loading} onClick={form.submit}>

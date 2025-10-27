@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Card, Table, Typography, Row, Col, Select, Button, Space, message, Spin, Alert } from 'antd';
 import { FileTextOutlined, PrinterOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
@@ -36,8 +36,6 @@ const PREVIEW_WINDOW_FEATURES = 'width=1200,height=800,scrollbars=yes,resizable=
  * Features: Report filtering, download, preview, file management
  */
 const Reports: React.FC = observer(() => {
-  const [selectedReportType, setSelectedReportType] = useState<string>('all');
-
   // Initialize data on component mount
   useEffect(() => {
     reportsStore.fetchReports();
@@ -91,6 +89,10 @@ const Reports: React.FC = observer(() => {
     }
   };
 
+  const handleReportTypeChange = (value: string) => {
+    reportsStore.setSelectedReportType(value);
+  };
+
   // Helper functions
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase() || 'default';
@@ -98,10 +100,10 @@ const Reports: React.FC = observer(() => {
   };
 
   // Computed values
-  const filteredReports = selectedReportType === 'all' 
+  const filteredReports = reportsStore.selectedReportType === 'all' 
     ? reportsStore.reports 
     : reportsStore.reports.filter(report => 
-        report.category.toLowerCase().includes(selectedReportType.toLowerCase())
+        report.category.toLowerCase().includes(reportsStore.selectedReportType.toLowerCase())
       );
 
   const columns = [
@@ -238,8 +240,8 @@ const Reports: React.FC = observer(() => {
                 Report Category:
               </Text>
               <Select
-                value={selectedReportType}
-                onChange={setSelectedReportType}
+                value={reportsStore.selectedReportType}
+                onChange={handleReportTypeChange}
                 style={{ width: '100%' }}
                 placeholder="Select report category"
                 size="large"

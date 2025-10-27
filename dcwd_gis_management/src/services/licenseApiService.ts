@@ -64,7 +64,6 @@ class LicenseApiService {
         count: users.length
       };
     } catch (error: any) {
-      console.error('Error fetching active users:', error);
       return {
         success: false,
         error: error.message || 'API Error',
@@ -84,8 +83,6 @@ class LicenseApiService {
         }
       });
 
-      console.log(`License API Response (${status} users):`, response.data);
-
       if (response.data && Array.isArray(response.data)) {
         return {
           success: true,
@@ -103,7 +100,6 @@ class LicenseApiService {
       };
 
     } catch (error: any) {
-      console.error(`Error fetching ${status} users:`, error);
       return {
         success: false,
         error: `Failed to fetch ${status} users: ${error.message}`,

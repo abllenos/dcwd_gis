@@ -9,8 +9,8 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
 } from "@ant-design/icons";
-import logo from "../../public/logo-dcwd.webp?url";
-import bgImage from "../../public/login-bg.jpg?url";
+import logo from "/logo-dcwd.webp";
+import bgImage from "/login-bg.jpg";
 import { loginStore } from "../stores/loginStore"; 
 import "./Login.css";
 interface LoginProps {

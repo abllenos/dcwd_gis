@@ -88,14 +88,12 @@ class ClassStore {
         this.currentPage = validPage;
         this.pageJumpInput = validPage;
       });
-      console.log('[ClassFetch] ok', { tookMs: +(performance.now() - start).toFixed(1), count: list.length });
     } catch (err: unknown) {
       runInAction(() => {
         this.diagnostics.lastStatus = (err as any)?.response?.status ?? 0;
         this.diagnostics.lastError = err instanceof Error ? err.message : 'Unknown error';
         this.records = [];
       });
-      console.error('[ClassFetch] failed', err);
     } finally {
       runInAction(() => { this.loading = false; });
     }

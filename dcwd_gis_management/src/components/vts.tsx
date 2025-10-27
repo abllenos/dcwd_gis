@@ -63,20 +63,17 @@ const TABLE_COLUMNS = [
 const VTS: React.FC = observer(() => {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const mapInitialized = React.useRef(false);
-  const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<number | null>(null);
-  const [selectedEmployee, setSelectedEmployee] = React.useState<any | null>(null);
 
   // Initialize data on component mount
   React.useEffect(() => {
     // Data is already loaded in constructor, no need to reload
-    console.log(`VTS initialized with ${vtsStore.users.length} employees`);
     
     // Set up global function for map marker clicks
     (window as any).selectEmployeeFromMap = (employeeId: number) => {
       const employee = vtsStore.users.find(u => u.id === employeeId);
       if (employee) {
-        setSelectedEmployeeId(employeeId);
-        setSelectedEmployee(employee);
+        vtsStore.setSelectedEmployeeId(employeeId);
+        vtsStore.setSelectedEmployee(employee);
         
         // If the employee is not on the current page, navigate to the correct page
         const employeeIndex = vtsStore.filteredUsers.findIndex(u => u.id === employeeId);
@@ -224,7 +221,6 @@ const VTS: React.FC = observer(() => {
         }
       });
       
-      console.log(`Added ${vtsStore.users.length} employee markers to map`);
     }
   }, [vtsStore.users.length, mapInitialized.current]);
 
@@ -404,17 +400,17 @@ const VTS: React.FC = observer(() => {
                     className="vts-user-table"
                     rowKey="id"
                     expandable={{
-                      expandedRowKeys: selectedEmployeeId ? [selectedEmployeeId] : [],
+                      expandedRowKeys: vtsStore.selectedEmployeeId ? [vtsStore.selectedEmployeeId] : [],
                       onExpand: (expanded, record) => {
                         if (expanded) {
                           // Close any previously open row and open this one
-                          setSelectedEmployeeId(record.id);
-                          setSelectedEmployee(record);
+                          vtsStore.setSelectedEmployeeId(record.id);
+                          vtsStore.setSelectedEmployee(record);
                           handleUserClick(record.id);
                         } else {
                           // Close the expanded row
-                          setSelectedEmployeeId(null);
-                          setSelectedEmployee(null);
+                          vtsStore.setSelectedEmployeeId(null);
+                          vtsStore.setSelectedEmployee(null);
                         }
                       },
                       expandedRowRender: (record) => (
@@ -461,17 +457,17 @@ const VTS: React.FC = observer(() => {
                       onClick: () => {
                         // Always close any previously opened row and open the clicked one
                         // If clicking the same row that's already open, close it
-                        if (selectedEmployeeId === record.id) {
-                          setSelectedEmployeeId(null);
-                          setSelectedEmployee(null);
+                        if (vtsStore.selectedEmployeeId === record.id) {
+                          vtsStore.setSelectedEmployeeId(null);
+                          vtsStore.setSelectedEmployee(null);
                         } else {
                           // Close any other open row and open this one
-                          setSelectedEmployeeId(record.id);
-                          setSelectedEmployee(record);
+                          vtsStore.setSelectedEmployeeId(record.id);
+                          vtsStore.setSelectedEmployee(record);
                           handleUserClick(record.id);
                         }
                       },
-                      className: selectedEmployeeId === record.id ? 'selected-row' : '',
+                      className: vtsStore.selectedEmployeeId === record.id ? 'selected-row' : '',
                     })}
                   />
                 </>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Typography, Form, Select, Input, DatePicker, Button, Row, Col, message, Table, Spin, Tooltip, Space } from 'antd';
-import { LaptopOutlined, UserOutlined, CalendarOutlined, UnorderedListOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Typography, Form, Select, Input, DatePicker, Button, Row, Col, message, Table, Spin, Space } from 'antd';
+import { LaptopOutlined, UserOutlined, CalendarOutlined, UnorderedListOutlined, SaveOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { licenseStore } from '../stores/licenseStore';
 import Footer from './layout/Footer';
@@ -101,22 +101,6 @@ const License: React.FC = observer(() => {
 
   const handlePageChange = (page: number) => {
     licenseStore.setCurrentPage(page);
-  };
-
-  const handleRefreshUsers = async () => {
-    try {
-      message.loading('Refreshing users...', 1);
-      licenseStore.clearUsers();
-      const result = await licenseStore.fetchRegisteredUsers();
-      if (result.success) {
-        message.success(`Refreshed! Loaded ${result.count || 0} registered users`);
-      } else {
-        message.error(result.error || 'Failed to refresh users');
-      }
-    } catch (error) {
-      message.error('An error occurred while refreshing users');
-      console.error('Refresh error:', error);
-    }
   };
 
   // Computed values from MobX store - no local state needed
@@ -262,19 +246,6 @@ const License: React.FC = observer(() => {
         <Typography.Title level={4} className="license-list-title">
           List of Registered Users
         </Typography.Title>
-        <Space>
-          <Tooltip title="Refresh Users">
-            <Button style={{ background: '#2563eb', borderColor: '#2563eb' }}
-              type="text"
-              icon={<ReloadOutlined />}
-              onClick={handleRefreshUsers}
-              loading={licenseStore.loading}
-              className="license-action-button"
-            >
-              Refresh
-            </Button>
-          </Tooltip>
-        </Space>
       </div>
 
       <div className="license-list-container">
