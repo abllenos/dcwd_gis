@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Card, Row, Col, Select, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress } from 'antd';
+import { Card, Row, Col, Input, Table, Typography, Alert, Button, Modal, Descriptions, Space, Progress } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { logStore } from '../stores/logStore';
 import { layerSearchStore } from '../stores/layerSearchStore';
@@ -19,7 +19,23 @@ const columns: ColumnsType<LogRecord> = [
   { title: 'Modified By', dataIndex: 'modifiedBy', width: 140, sorter: (a, b) => safeString(a.modifiedBy).localeCompare(safeString(b.modifiedBy)) },
   { title: 'Access Flag', dataIndex: 'accessFlag', width: 130, sorter: (a, b) => safeString(a.accessFlag).localeCompare(safeString(b.accessFlag)) },
   { title: 'Date & Time', dataIndex: 'dateTime', width: 200, sorter: (a, b) => safeString(a.dateTime).localeCompare(safeString(b.dateTime)) },
-  { title: 'Description', dataIndex: 'description', sorter: (a, b) => safeString(a.description).localeCompare(safeString(b.description)) },
+  { 
+    title: 'Description', 
+    dataIndex: 'description', 
+    width: 200,
+    ellipsis: true,
+    sorter: (a, b) => safeString(a.description).localeCompare(safeString(b.description)),
+    render: (text: string) => (
+      <div style={{ 
+        overflow: 'hidden', 
+        textOverflow: 'ellipsis', 
+        whiteSpace: 'nowrap',
+        maxWidth: '200px'
+      }} title={text}>
+        {text}
+      </div>
+    )
+  },
 ];
 
 const LogPage: React.FC = observer(() => {
@@ -38,38 +54,37 @@ const LogPage: React.FC = observer(() => {
   <div className="card-body" style={{ paddingTop: 0, paddingLeft: 28, paddingRight: 28, paddingBottom: 28 }}>
         {/* Row 1: Map Layers */}
         <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 12 }}>
-          <Col xs={24} md={12} lg={8}>
+          <Col xs={24} md={12} lg={6}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={{ fontWeight: 600, marginBottom: 6, color: 'var(--text-primary, #000)' }}>Map Layers<span style={{ color: 'var(--primary-color, #1890ff)' }}>*</span></label>
-              <Select
+              <select
                 value={selectedLayer}
-                style={{ width: '100%', cursor: 'pointer' }}
-                onChange={(val) => {
-                  // when changing layer, clear any active search and input
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
                   logStore.setLayer(val);
                   logStore.setSearch('');
                   layerSearchStore.clear();
                 }}
-                showSearch={false}
-                allowClear={false}
-                options={layerOptions.map(o => ({ label: o.label, value: o.value }))}
-              />
+                style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--bg-primary)', width: '100%', cursor: 'pointer' }}
+              >
+                {layerOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
             </div>
           </Col>
         </Row>
 
         {/* Row 2: Display (left) and Search (right) above the table */}
-        <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 8 }}>
+        <Row gutter={[16, 8]} align="middle" style={{ marginBottom: 16 }}>
           <Col xs={24} md={12}>
             <div className="license-display-controls">
               <span className="license-control-text">Display</span>
-              <Select
+              <select
                 value={pageSize}
-                onChange={(v) => logStore.setPageSize(v)}
-                options={[10,20,50,100].map(n => ({ label: String(n), value: n }))}
-                style={{ width: 80 }}
-                size="small"
-              />
+                onChange={(e) => logStore.setPageSize(parseInt(e.target.value, 10))}
+                style={{ padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--bg-primary)', width: 80, fontSize: 14 }}
+              >
+                {[10,20,50,100].map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
               <span className="license-control-text">records per page</span>
             </div>
           </Col>
@@ -121,18 +136,11 @@ const LogPage: React.FC = observer(() => {
                         showInfo={false}
                       />
                     </div>
-                    <div style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
-                      Scanned {layerSearchStore.scannedPages} page{layerSearchStore.scannedPages === 1 ? '' : 's'}
-                      {typeof layerSearchStore.totalPages === 'number' && (
-                        <span> • Total approx: {layerSearchStore.totalPages} pages</span>
-                      )}
-                      {typeof layerSearchStore.totalPages !== 'number' && typeof layerSearchStore.totalRecords === 'number' && (
-                        <span> • Total approx: {layerSearchStore.totalRecords} records</span>
-                      )}
-                      {layerSearchStore.results.length > 0 && (
-                        <span> • Matches: {layerSearchStore.results.length}</span>
-                      )}
-                    </div>
+                    {layerSearchStore.results.length > 0 && (
+                      <div style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+                        Matches: {layerSearchStore.results.length}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -228,12 +236,18 @@ const LogPage: React.FC = observer(() => {
         </div>
         {/* Bottom search results table removed; search results now render in the main table above. */}
         <Modal
-          title="Log Details"
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary, #000)' }}>Log Details</span>
+              </div>
+            </div>
+          }
           open={logUiStore.isModalOpen}
           onCancel={() => logUiStore.close()}
           width={'50vw'}
           style={{ maxHeight: '90vh', top: 20, overflow: 'hidden' }}
-          styles={{ body: { maxHeight: '76vh', overflow: 'hidden', background: 'var(--bg-primary, #fff)' }, header: { background: 'var(--bg-secondary, #f7f9fc)', borderBottom: '1px solid var(--border-color, #e8e8e8)' } }}
+          styles={{ body: { maxHeight: '76vh', overflow: 'hidden', background: 'transparent' }, header: { background: 'transparent', border: 'none' } }}
           maskClosable={false}
           footer={[
             <Button key="close" className="license-action-button" onClick={() => logUiStore.close()}>Close</Button>,

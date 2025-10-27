@@ -249,13 +249,8 @@ class LayerSearchStore {
   private matches(r: LogRecord, q: string): boolean {
     if (!q) return false;
     return (
-      String(r.id).includes(q) ||
-      r.layerId.toLowerCase().includes(q) ||
       r.assetId.toLowerCase().includes(q) ||
-      r.modifiedBy.toLowerCase().includes(q) ||
-      r.accessFlag.toLowerCase().includes(q) ||
-      r.dateTime.toLowerCase().includes(q) ||
-      r.description.toLowerCase().includes(q)
+      r.modifiedBy.toLowerCase().includes(q)
     );
   }
 }
